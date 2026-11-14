@@ -1793,6 +1793,256 @@ body.t3-desktop .top-actions .pill{max-width:150px;overflow:hidden;text-overflow
 body.t3-dark #t3Roll.fx-crit,body.t3-dark #rollPopup.fx-crit{border-color:#f4c95d!important}
 body.t3-dark .fx-crit .die.best{background:linear-gradient(145deg,#e9b949,#b8860b)!important;border-color:#f4c95d!important;color:#2b1d05!important}
 
+/* ===== TULPA · ETAPA 6 — nova Visão de Mesa (M no topo, P nos lados, mapa no centro) ===== */
+.portal-wrap:has(#tablePanel:not(.hide)){max-width:1640px}
+#tablePanel>.sub{display:none}
+#tablePanel{--seat:232px;--felt:#241b14;--brass:#a98447;--ok:#35c26b}
+body.t3-dark #tablePanel{--felt:#0d1117;--brass:#c8a66a}
+
+/* barra da mesa */
+.mesa-bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;margin:6px 0 14px;padding:10px 12px;border:1px solid #9d846188;border-radius:12px;background:#fbf4e488}
+body.t3-dark .mesa-bar{background:#1a212b;border-color:#3b4658}
+.mb-group{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-width:0}
+.mb-right{margin-left:auto}
+#mbGm{display:inline-flex;gap:8px;flex-wrap:wrap}
+.mb-vol{display:inline-flex;align-items:center;gap:8px;min-width:0}
+.mb-vol input[type=range]{width:96px;accent-color:#8e3e34}
+body.t3-dark .mb-vol input[type=range]{accent-color:#e59a8c}
+.mb-ico{border:1px solid #a58c67;background:#f7efdf;border-radius:9px;width:34px;height:32px;cursor:pointer;font-size:15px;line-height:1}
+body.t3-dark .mb-ico{background:#242d3a;border-color:#4d5a70}
+.mb-now{font-size:12.5px;color:var(--muted);max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mb-now.on{color:inherit;font-weight:600}
+.vc-live{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:13px}
+.vc-live i{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 #35c26b99;animation:vc-pulse 1.8s infinite}
+@keyframes vc-pulse{0%{box-shadow:0 0 0 0 #35c26b99}70%{box-shadow:0 0 0 8px #35c26b00}100%{box-shadow:0 0 0 0 #35c26b00}}
+.vc-whisper{font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:999px;background:#3f2a5c;color:#f1e6ff}
+.vc-off{opacity:.8}
+
+/* grade da mesa */
+#mesaWrap{display:grid;grid-template-columns:var(--seat) minmax(0,1fr) var(--seat);grid-template-rows:var(--tpl,auto 1fr);gap:14px;align-items:start;position:relative}
+#mesaWrap>#tableCharacters{display:contents}
+#mesaCenter{grid-column:2;grid-row:1 / span var(--rows,2);min-width:0;display:flex;flex-direction:column;gap:14px}
+#mesaWrap .table-char.off-seat{display:none!important}
+#mesaWrap .table-char.seat{grid-column:var(--col);grid-row:var(--row);margin:0;padding:12px 12px 10px;display:flex;flex-direction:column;min-width:0;overflow:visible}
+#mesaWrap .table-char.seat::before{left:0;right:0;top:0;bottom:auto;width:auto;height:4px;border-radius:16px 16px 0 0}
+#mesaWrap .table-char.seat.mine::before{background:linear-gradient(90deg,#b8860b,#e9b949)}
+#mesaWrap .table-char.seat.absent{opacity:.58}
+#mesaWrap .table-char.seat.whisper{box-shadow:0 0 0 2px #7c4dbb,var(--lift)}
+#mesaWrap .empty{grid-column:1 / -1}
+.seat .tc-head{flex-direction:column;align-items:center;text-align:center;gap:8px;margin:4px 0 6px;position:relative}
+.seat .tc-head .av{--s:76px}
+.seat .tc-id{width:100%}
+.seat.table-char h3{font-size:1.22rem;overflow-wrap:anywhere}
+.seat .tc-id .owner{font-size:10.5px;letter-spacing:.06em;margin-top:2px}
+.seat .tc-head .scene-eye{position:absolute;left:0;top:0;padding:4px 7px}
+.seat-more{position:absolute;right:0;top:0;width:32px;height:30px;border-radius:9px;border:1px solid #a58c67;background:#f7efdf;color:inherit;font-weight:700;font-size:16px;line-height:1;cursor:pointer}
+body.t3-dark .seat-more{background:#242d3a;border-color:#4d5a70}
+.seat.open .seat-more{background:#8e3e34;color:#fff;border-color:#8e3e34}
+.seat-tag{display:inline-block;margin-top:4px;font-size:10.5px;font-weight:600;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:#0000001c}
+.seat .t3-chips{justify-content:center;gap:5px;margin:2px 0 4px;order:2}
+.seat .t3-chips .tag,.seat .t3-chips .pill{font-size:10.5px;padding:2px 7px}
+.seat>.notice{order:3;font-size:11.5px;margin:6px 0}
+/* Vital, Essência e Lucidez em uma linha cada */
+#mesaWrap .seat .resource-row{order:3;display:grid;grid-template-columns:24px minmax(0,1fr);grid-template-areas:"l b" "a a";column-gap:8px;row-gap:0;align-items:center;margin:5px 0 0}
+#mesaWrap .seat .resource-row[data-k="VT"]{order:3}#mesaWrap .seat .resource-row[data-k="ES"]{order:4}#mesaWrap .seat .resource-row[data-k="LU"]{order:5}
+#mesaWrap .seat .resource-row>label{grid-area:l;font-size:0;letter-spacing:0;margin:0}
+#mesaWrap .seat .resource-row>label::before{content:attr(data-k);font-size:10.5px;font-weight:700;letter-spacing:.06em}
+#mesaWrap .seat .resource-row>div:not(.resource-actions){grid-area:b;position:relative;min-width:0}
+#mesaWrap .seat .resource-row .inline{position:absolute;inset:0;z-index:1;justify-content:center!important;pointer-events:none}
+#mesaWrap .seat .resource-row .inline b{font-size:10.5px;line-height:15px;color:#fff;text-shadow:0 1px 2px #000c,0 0 3px #000a;font-weight:700}
+#mesaWrap .seat .resource-row .inline .sub{display:none}
+#mesaWrap .seat .resource-bar{height:15px}
+#mesaWrap .seat .resource-actions{grid-area:a;display:none;justify-content:center;gap:5px;margin:5px 0 3px}
+#mesaWrap .seat.open .resource-actions{display:flex}
+#mesaWrap .seat .resource-actions button{min-width:36px;min-height:30px;height:30px}
+.seat .table-actions,.seat>.btn,.seat>.inline,.seat .team-bonus,.seat>.sub{order:8;display:none}
+.seat.open .table-actions,.seat.open>.inline{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
+.seat.open>.btn{display:inline-flex;justify-content:center;margin:6px 0 0}
+.seat.open .team-bonus{display:block;font-size:11px;margin-top:6px}
+.seat .table-actions .btn,.seat>.inline .btn{flex:1 1 auto;justify-content:center;margin:0!important}
+.seat.in-call .tc-head::after{content:"🎙";position:absolute;left:50%;top:60px;margin-left:22px;font-size:13px;width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:#fbf4e4;box-shadow:0 1px 4px #0006}
+.seat.in-call .tc-head:has(.av.muted)::after{content:"🔇"}
+body.t3-dark .seat.in-call .tc-head::after{background:#171d26}
+/* quem está falando: contorno verde */
+.av.speaking{box-shadow:0 0 0 2px #fbf4e4,0 0 0 5px var(--ok),0 0 22px 4px #35c26baa!important}
+body.t3-dark .av.speaking{box-shadow:0 0 0 2px #171d26,0 0 0 5px var(--ok),0 0 22px 4px #35c26baa!important}
+
+/* caixa do Mestre */
+.mesa-m{align-self:center;width:min(100%,640px);padding:14px 16px;border-radius:18px;border:1px solid var(--brass);background:linear-gradient(160deg,#2b2019,#18110d);color:#f4ead6;box-shadow:0 1px 0 #ffffff14 inset,0 18px 34px -18px #000c;display:flex;flex-direction:column;gap:10px}
+.m-main{display:flex;align-items:center;gap:16px;justify-content:center}
+.m-av .av{--s:92px;border-radius:22%}
+.m-av .av.narr{box-shadow:0 0 0 2px #18110d,0 0 0 3.5px #e9e2d0,0 10px 22px -8px #000}
+.m-id{min-width:0}
+.m-id small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#c9b995}
+.m-id b{display:block;font-family:var(--f-display);font-size:1.9rem;line-height:1.05;overflow-wrap:anywhere}
+.m-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.m-bars{display:grid;gap:5px}
+.m-res{display:grid;grid-template-columns:24px minmax(0,1fr) 64px auto;gap:8px;align-items:center;font-size:12px}
+.m-res>span:first-child{font-weight:700;letter-spacing:.06em;font-size:10.5px}
+.m-res b{font-variant-numeric:tabular-nums;font-size:12px;text-align:right}
+.m-res .resource-bar{height:9px;background:#ffffff1f}
+.m-pm{display:inline-flex;gap:4px}
+.m-pm button{min-width:30px;height:26px;border-radius:7px;border:1px solid #6b5a44;background:#3a2c22;color:#f4ead6;font-weight:700;cursor:pointer}
+.m-pm button:hover{background:#4a382b}
+.m-act,.m-cast{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.mesa-m .btn.small{background:#3a2c22;border-color:#6b5a44;color:#f4ead6}
+.mesa-m .btn.small.primary{background:#8e3e34;border-color:#a95845}
+.m-chip{display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 4px;border-radius:999px;border:1px solid #6b5a44;background:#2f241c;color:#f4ead6;font:600 12.5px var(--f-ui);cursor:pointer;max-width:100%}
+.m-chip.ro{cursor:default}
+.m-chip.on{background:#f4ead6;color:#2b2019;border-color:#f4ead6}
+.m-chip.out{opacity:.6}
+.m-chip .av{--s:26px;box-shadow:none;border-radius:50%}
+.m-chip-av{display:inline-flex}
+.mesa-m.in-call .m-id small::after{content:" · 🎙 na call"}
+
+/* palco do mapa */
+.map-stage{position:relative;width:100%;aspect-ratio:16 / 10;min-height:300px;max-height:74vh;border-radius:16px;overflow:hidden;background:var(--felt);border:1px solid var(--brass);box-shadow:0 0 0 4px #00000022 inset,0 20px 40px -22px #000c;touch-action:none}
+.map-stage:fullscreen{max-height:none;border-radius:0;aspect-ratio:auto}
+.map-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+.map-empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:#f4ead655;gap:4px}
+.map-empty b{font-family:var(--f-display);font-size:clamp(40px,8vw,96px);letter-spacing:.08em}
+.map-tools{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;pointer-events:none}
+.mt-row{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:12px;background:#1b1410e0;border:1px solid #6b5a44;pointer-events:auto;backdrop-filter:blur(6px);max-width:100%}
+.mt-btn{width:36px;height:34px;border-radius:9px;border:1px solid transparent;background:transparent;color:#f4ead6;font-size:16px;line-height:1;cursor:pointer}
+.mt-btn:hover{background:#ffffff1a}
+.mt-btn.on{background:#f4ead6;color:#2b2019}
+.mt-sep{width:1px;background:#6b5a44;margin:4px 3px}
+.mt-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid #6b5a44;background:#2f241c;color:#f4ead6;font:600 12px var(--f-ui);cursor:pointer}
+.mt-chip.on{background:#f4ead6;color:#2b2019}
+.mt-chip.danger{border-color:#a94a3f;color:#ffb4a8}
+.mt-chip select{background:#1b1410;color:#f4ead6;border:1px solid #6b5a44;border-radius:6px;font:inherit;padding:1px 4px}
+.map-info{position:absolute;left:10px;bottom:10px;padding:4px 10px;border-radius:999px;background:#1b1410cc;color:#f4ead6;font-size:11.5px;pointer-events:none;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-menu{position:absolute;z-index:3;min-width:190px;max-width:260px;padding:10px;border-radius:12px;background:#1b1410f2;border:1px solid #a98447;color:#f4ead6;display:flex;flex-direction:column;gap:7px;box-shadow:0 14px 30px -10px #000}
+.map-menu[hidden]{display:none}
+.map-menu b{font-family:var(--f-display);font-size:1.1rem}
+.mm-row{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.mm-row .sub{color:#c9b995;font-size:11px;min-width:54px}
+
+/* abas embaixo do mapa */
+.mesa-dock{border:1px solid #9d846188;border-radius:16px;background:#fbf4e466;overflow:hidden}
+body.t3-dark .mesa-dock{background:#171c24;border-color:#3b4658}
+.dock-tabs{display:flex;gap:2px;overflow-x:auto;padding:6px 6px 0;border-bottom:1px solid #9d846166;scrollbar-width:none}
+.dock-tabs button{flex:0 0 auto;padding:9px 14px;border:0;border-radius:10px 10px 0 0;background:transparent;color:var(--muted);font:600 13px var(--f-ui);cursor:pointer;white-space:nowrap}
+.dock-tabs button.active{background:#f4ecd9;color:#2c2118;box-shadow:0 -2px 0 #8e3e34 inset}
+body.t3-dark .dock-tabs button.active{background:#232b37;color:#eef2f7;box-shadow:0 -2px 0 #e59a8c inset}
+.dock-tabs button.alert::after{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#c0392b;margin-left:7px;vertical-align:middle}
+.dock-pane{padding:12px 14px 14px}
+.dock-pane[hidden]{display:none}
+.dock-pane>.combat-panel:first-child,.dock-pane>.scene-tools:first-child{margin-top:0}
+.dock-pane h4{margin:14px 0 6px;font-size:1.05rem}
+.mesa-quick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+.bn-form,.mu-form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin:8px 0 10px}
+.bn-form .search{flex:1 1 220px;margin:0}
+.mu-form .field{flex:1 1 170px;margin:0}
+.bn-list,.doc-list,.mu-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.bn-list{counter-reset:bn}
+.bn-list li,.doc-list li,.mu-list li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f7efdf;border:1px solid #a58c6766;min-width:0}
+body.t3-dark .bn-list li,body.t3-dark .doc-list li,body.t3-dark .mu-list li{background:#1f2733;border-color:#46536a}
+.bn-list li::before{counter-increment:bn;content:counter(bn);font-weight:700;font-size:12px;color:var(--muted);min-width:18px}
+.bn-list li[value]::before{content:attr(value)}
+.bn-t,.mu-t{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.4}
+.bn-list small,.doc-list small,.mu-t small{color:var(--muted);font-size:11px;white-space:nowrap}
+.bn-x{flex:0 0 auto;width:30px;height:30px;border-radius:8px;border:1px solid #a58c67;background:transparent;color:inherit;cursor:pointer}
+.bn-x:hover{background:#b3261e;color:#fff;border-color:#b3261e}
+.doc-open{flex:1;min-width:0;text-align:left;background:none;border:0;color:inherit;font:600 14px var(--f-ui);cursor:pointer;overflow-wrap:anywhere;padding:2px 0}
+.doc-open:hover{text-decoration:underline}
+.mu-list li.cur{border-color:#8e3e34;box-shadow:0 0 0 1px #8e3e34 inset}
+.mu-now{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;background:#2b2019;color:#f4ead6;margin-bottom:10px}
+.mu-now small{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#c9b995}
+.mu-now b{font-family:var(--f-display);font-size:1.3rem;margin-right:8px}
+.mu-now .btn.small{background:#3a2c22;border-color:#6b5a44;color:#f4ead6}
+.mu-now.on small::before{content:"♪ "}
+.tk-list .av{--s:34px;border-radius:50%}
+.sd-aud{border:1px solid #a58c6788;border-radius:10px;padding:8px 12px;margin:10px 0 0}
+.sd-aud legend{font-size:12px;font-weight:600;padding:0 6px}
+.sd-players{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:2px 12px;margin:6px 0 0 4px}
+
+/* porta de entrada: escolher personagem, foto e token */
+#mesaGate{position:absolute;inset:-6px;z-index:6;display:grid;place-items:start center;padding:28px 12px;background:#1b1410d9;border-radius:18px;backdrop-filter:blur(5px)}
+#mesaGate[hidden]{display:none}
+.gate-card{width:min(100%,560px);padding:22px;border-radius:18px;background:#f4ecd9;color:#2c2118;border:1px solid #a98447;box-shadow:0 30px 60px -20px #000;position:sticky;top:20px}
+body.t3-dark .gate-card{background:#1c2430;color:#eef2f7;border-color:#6d5a3a}
+.gate-card h3{font-size:1.5rem;margin:0 0 6px}
+.gate-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:14px}
+.gate-opt{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;border-radius:14px;border:1px solid #a58c67;background:#fbf4e4;color:inherit;cursor:pointer;font:inherit}
+.gate-opt:hover{border-color:#8e3e34;transform:translateY(-2px)}
+body.t3-dark .gate-opt{background:#232b37;border-color:#46536a}
+.gate-opt b{font-family:var(--f-display);font-size:1.15rem;text-align:center}
+.gate-imgs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.gate-slot{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px;border-radius:14px;border:1px dashed #a58c67}
+.gate-slot.ok{border-style:solid;border-color:#2f7d3a}
+.gate-prev{width:96px;height:96px;border-radius:24%;overflow:hidden;display:grid;place-items:center;background:#0000001a;font:700 34px var(--f-display);color:var(--muted)}
+.gate-slot.round .gate-prev,.av-btn.round .av{border-radius:50%}
+.gate-prev img{width:100%;height:100%;object-fit:cover}
+.tok-edit{border-bottom:1px solid #9d846155}
+
+/* imagem pop-up do Mestre */
+#docPop{position:fixed;inset:0;z-index:140;display:none;place-items:center;padding:16px;background:#0b0806d9;backdrop-filter:blur(4px)}
+#docPop.show{display:grid}
+.doc-card{position:relative;max-width:min(96vw,1100px);max-height:94vh;display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:16px;background:#f4ecd9;color:#2c2118;border:1px solid #a98447;box-shadow:0 30px 80px -20px #000;animation:stamp5 .35s var(--ease) both}
+body.t3-dark .doc-card{background:#1c2430;color:#eef2f7;border-color:#6d5a3a}
+.doc-title{font-family:var(--f-display);font-size:1.4rem;font-weight:700;padding-right:48px;overflow-wrap:anywhere}
+.doc-img{min-height:0;overflow:auto;border-radius:10px;background:#0003}
+.doc-img img{display:block;max-width:100%;max-height:78vh;margin:auto;object-fit:contain}
+.doc-x{position:absolute;right:10px;top:10px;width:40px;height:40px;border-radius:50%;border:1px solid #a58c67;background:#8e3e34;color:#fff;font-size:18px;font-weight:700;cursor:pointer}
+.doc-x:hover{background:#6f2c25}
+
+/* intervalo */
+#mesaPause{position:fixed;inset:0;z-index:130;display:none;place-items:center;padding:16px;background:radial-gradient(ellipse at 50% 30%,#2b2019f2,#0e0a08f7)}
+#mesaPause.show{display:grid}
+#mesaPause.mini{inset:auto auto 14px 14px;background:none;padding:0}
+#mesaPause.mini .pause-card{display:none}
+.pause-pill{display:none;padding:10px 16px;border-radius:999px;border:1px solid #a98447;background:#2b2019;color:#f4ead6;font:600 13px var(--f-ui);cursor:pointer;box-shadow:0 10px 24px -8px #000}
+#mesaPause.mini .pause-pill{display:inline-flex}
+.pause-card{width:min(100%,460px);text-align:center;color:#f4ead6;display:flex;flex-direction:column;align-items:center;gap:10px}
+.pause-ico{font-size:44px;width:92px;height:92px;display:grid;place-items:center;border-radius:50%;border:1px solid #a98447;background:#00000033}
+.pause-card h2{font-family:var(--f-display);font-size:clamp(40px,9vw,68px);font-weight:600;margin:0;line-height:1}
+.pause-card p{margin:0;color:#d9cbb0;line-height:1.5}
+.pause-time{font:600 26px var(--f-ui);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.pause-vol{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#c9b995;width:min(100%,280px)}
+.pause-vol input{accent-color:#e9b949}
+.pause-act{justify-content:center;margin-top:6px}
+.pause-act .btn.small{background:#3a2c22;border-color:#6b5a44;color:#f4ead6}
+#mesaYTBox{position:fixed;left:-400px;bottom:0;width:200px;height:113px;opacity:.01;pointer-events:none}
+
+/* rolagem: atributo puro e troca de atributo */
+.rp6-h{margin:10px 0 2px;font-size:1.1rem}
+.rp6-attrs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:8px 0 6px}
+.rp6-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.rp6-row .field{margin:0}
+.skill-attr-sel{height:30px;border-radius:8px;border:1px solid #a58c67;background:#f7efdf;color:inherit;font:600 11px var(--f-ui);letter-spacing:.04em;padding:0 4px;max-width:74px}
+.skill-attr-sel.alt{border-color:#8e3e34;background:#8e3e34;color:#fff}
+body.t3-dark .skill-attr-sel{background:#242d3a;border-color:#4d5a70}
+body.t3-dark .skill-attr-sel.alt{background:#e59a8c;color:#1a1010;border-color:#e59a8c}
+.attr-card .attr-roll{margin-top:8px;width:100%;justify-content:center}
+
+/* Perseus: falas anteriores continuam na tela */
+#t3BubStack{position:fixed;right:100px;z-index:85;display:flex;flex-direction:column;gap:6px;align-items:flex-end;max-width:min(270px,62vw);pointer-events:none}
+body.t3-mobile #t3BubStack{right:80px}
+.t3-bubold{pointer-events:auto;cursor:pointer;padding:7px 11px;border-radius:12px;background:#fffaf0e6;color:#2c2118;border:1px solid #8e3e3488;font-size:12.5px;line-height:1.35;box-shadow:0 6px 16px rgba(0,0,0,.2);opacity:.94}
+body.t3-dark .t3-bubold{background:#1f2733e6;color:#eef2f7;border-color:#e59a8c88}
+.t3-catbubble.show{cursor:pointer}
+.t3-msgs .bn-list li{background:#00000010;border-color:#0000001c}
+
+@media(max-width:1180px){#tablePanel{--seat:200px}.seat .tc-head .av{--s:64px}.seat.in-call .tc-head::after{top:50px}}
+@media(max-width:860px){
+  #mesaWrap{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:none;gap:10px}
+  #mesaCenter{grid-column:1 / -1;grid-row:1}
+  #mesaWrap .table-char.seat{grid-column:calc((var(--col) + 1) / 2);grid-row:calc(var(--row) + 1);padding:10px 9px 9px}
+  .seat .tc-head .av{--s:58px}.seat.in-call .tc-head::after{top:44px}
+  .map-stage{aspect-ratio:4 / 3;min-height:260px}
+  .mesa-m{padding:12px}.m-av .av{--s:68px}.m-id b{font-size:1.45rem}
+  .m-res{grid-template-columns:22px minmax(0,1fr) 54px}.m-res .m-pm{grid-column:1 / -1;justify-content:center}
+  .mesa-bar{padding:8px 10px}.mb-right{margin-left:0}
+  .mb-vol input[type=range]{width:84px}
+  .rp6-attrs{grid-template-columns:repeat(2,minmax(0,1fr))}.rp6-row{grid-template-columns:1fr}
+  .gate-imgs{grid-template-columns:1fr}
+  .mt-btn{width:40px;height:40px}
+  .dock-pane{padding:10px}
+  #mesaWrap .seat .resource-actions button{min-width:38px;min-height:38px;height:38px}
+  .seat-more{width:38px;height:36px}
+}
+
 </style>
 <script id="tulpa-etapa3">
 (()=>{
@@ -2381,8 +2631,9 @@ E.skillTier=(d,skill)=>{
 E.tierUsage=d=>{const ups=d?.skillUpgrades||{},sk=Object.keys(ups).filter(k=>ups[k]>=10);
   return{five:(d?.extraSkills||[]).length,ten:sk.filter(k=>d.free10!==k).length,fifteen:sk.filter(k=>ups[k]>=15).length,free10:d?.free10?1:0}};
 E.baseSkill=()=>0; /* todas as perícias começam em 0 */
-function skillCalc3(ch,skill){
-  const d=ch.data||{},attr=SKILL_ATTR[skill],m=E.computeMods(d),n=E.diceFor(d,skill,SKILL_ATTR,m);
+/* attrOv: atributo escolhido para este teste (o padrão da perícia continua sendo o SKILL_ATTR) */
+function skillCalc3(ch,skill,attrOv){
+  const d=ch.data||{},std=SKILL_ATTR[skill],attr=attrOv&&ATTRS.includes(attrOv)?attrOv:std,SA=attr===std?SKILL_ATTR:{...SKILL_ATTR,[skill]:attr},m=E.computeMods(d),n=E.diceFor(d,skill,SA,m);
   const vlist=(ch.vocations||vocations),v=vlist.find(x=>x.name===d.vocation);
   let voc=0;if(v&&(v.skills||[]).includes(skill)){const y=Number(d.serviceYears)||0;voc=y>=40?15:y>=10?10:5}
   const extra=E.skillTier(d,skill),start=E.baseSkill(skill);
@@ -2398,16 +2649,16 @@ function skillCalc3(ch,skill){
   const isAtk=ATTACK_SKILLS.includes(skill),isDodge=skill==='Esquiva'||skill==='Reflexo';
   const combatFlat=(isAtk?m.atk:0)+(isDodge?m.dodge:0);
   const dis=m.disadv.has('ataque')&&isAtk||m.disadvSkills.has(skill)||(m.disadv.has('ataqueDistancia')&&['Armas de Disparo','Arremesso'].includes(skill));
-  return{attr,n,base,start,tier:extra,voc,persistent,once,onceList,team,combatFlat,dis,mods:m,bonus:base+persistent+once+team+combatFlat};
+  return{attr,std,SA,n,base,start,tier:extra,voc,persistent,once,onceList,team,combatFlat,dis,mods:m,bonus:base+persistent+once+team+combatFlat};
 }
 window.tulpaSkillCalc=skillCalc3;
 /* a ficha usa os mesmos cálculos */
 currentAttr=skill=>E.diceFor(data,skill,SKILL_ATTR);
 skillBonus=skill=>{const c=skillCalc3({data,vocations,tracks},skill);return c.base+c.persistent+c.combatFlat};
 pendingTalentBonus=skill=>skillCalc3({data,vocations,tracks},skill).once;
-function doRoll(ch,skill,{label,extraBonus=0,forceDis=false,adv=false}={}){
-  const c=skillCalc3(ch,skill),d=ch.data;
-  const r=E.rollTest(d,skill,SKILL_ATTR,{mods:c.mods,bonus:c.bonus+extraBonus,disadv:c.dis||forceDis,adv,consumeDelta:true});
+function doRoll(ch,skill,{label,extraBonus=0,forceDis=false,adv=false,attr}={}){
+  const c=skillCalc3(ch,skill,attr),d=ch.data;
+  const r=E.rollTest(d,skill,c.SA,{mods:c.mods,bonus:c.bonus+extraBonus,disadv:c.dis||forceDis,adv,consumeDelta:true});
   r.calc=c;return r;
 }
 /* consome efeitos "uso único" e dado extra ao rolar */
@@ -2423,10 +2674,10 @@ function consumeOnce(d,calc,{attack=false}={}){
 }
 function rollModal(skill,r,title){
   const sg=n=>(n>=0?'+':'')+n,c=r.calc;
-  openModal('ROLAGEM DE APTIDÃO',`${skill} · ${r.n}d20 ${sg(r.bonus)}`,`<div class="roll-result"><div class="sub">${r.mode==='normal'?'Maior resultado mantido':'<b>'+r.mode.toUpperCase()+'</b> — duas rolagens, vale a '+(r.mode==='desvantagem'?'pior':'melhor')}${r.delta?' · dado extra/penalidade '+sg(r.delta):''}</div><div class="dice">${r.dice.map(x=>`<span class="die ${x===r.best?'best':'discard'}">${x}</span>`).join('')}${r.alt?'<span class="sub"> | </span>'+r.alt.map(x=>`<span class="die discard">${x}</span>`).join(''):''}</div><div class="bigresult">${r.total}</div><div class="sub">Dado ${r.best} ${sg(r.bonus)} = ${r.total}</div>${c.mods.sources.length?`<div class="sub" style="margin-top:6px">Modificadores: ${c.mods.sources.map(esc).join(' · ')}</div>`:''}</div>`,'Fechar',()=>closeModal());
+  openModal('ROLAGEM DE APTIDÃO',`${skill}${c.attr!==c.std?' ('+c.attr+')':''} · ${r.n}d20 ${sg(r.bonus)}`,`<div class="roll-result">${c.attr!==c.std?`<div class="sub">Atributo trocado: <b>${esc(c.attr)}</b> no lugar de ${esc(c.std)}</div>`:''}<div class="sub">${r.mode==='normal'?'Maior resultado mantido':'<b>'+r.mode.toUpperCase()+'</b> — duas rolagens, vale a '+(r.mode==='desvantagem'?'pior':'melhor')}${r.delta?' · dado extra/penalidade '+sg(r.delta):''}</div><div class="dice">${r.dice.map(x=>`<span class="die ${x===r.best?'best':'discard'}">${x}</span>`).join('')}${r.alt?'<span class="sub"> | </span>'+r.alt.map(x=>`<span class="die discard">${x}</span>`).join(''):''}</div><div class="bigresult">${r.total}</div><div class="sub">Dado ${r.best} ${sg(r.bonus)} = ${r.total}</div>${c.mods.sources.length?`<div class="sub" style="margin-top:6px">Modificadores: ${c.mods.sources.map(esc).join(' · ')}</div>`:''}</div>`,'Fechar',()=>closeModal());
 }
-rollSkill=function(skill){
-  const ch={data,vocations,tracks},r=doRoll(ch,skill);
+rollSkill=function(skill,attr){
+  const ch={data,vocations,tracks},r=doRoll(ch,skill,{attr});
   consumeOnce(data,r.calc);save();renderTalents();renderSkills();rollModal(skill,r);
   window.tulpaRollFx?window.tulpaRollFx($('modalBody'),{d20:true,crit:r.best===20,fumble:r.best===1,who:[data.name]}):fx3('dice');
   T3.shareSheetRoll?.(skill,r);
@@ -2434,7 +2685,7 @@ rollSkill=function(skill){
 };
 
 /* ---- persistência de qualquer ficha que eu controle ---- */
-const pubSummary=d=>{const h=!!d?.hideStats;return{name:d?.name||'Personagem sem nome',stage:Number(d?.stage)||1,vital:h?0:Number(d?.vital)||0,lucidity:h?0:Number(d?.lucidity)||0,essence:h?0:Number(d?.essence)||0,statuses:(d?.statuses||[]).map(s=>typeof s==='string'?s:s.id),df:Number(E.defenseInfo(d||{attributes:{}}).DF)||10,hideStats:h,temp:h?0:Number(d?.vitalTemp)||0,dying:((d?.statuses||[]).find(s=>(s.id||s)==='agonia')||{}).turns??null,...(avOk(d?.avatar)?{avatar:d.avatar}:{})}};
+const pubSummary=d=>{const h=!!d?.hideStats;return{name:d?.name||'Personagem sem nome',stage:Number(d?.stage)||1,vital:h?0:Number(d?.vital)||0,lucidity:h?0:Number(d?.lucidity)||0,essence:h?0:Number(d?.essence)||0,statuses:(d?.statuses||[]).map(s=>typeof s==='string'?s:s.id),df:Number(E.defenseInfo(d||{attributes:{}}).DF)||10,hideStats:h,temp:h?0:Number(d?.vitalTemp)||0,dying:((d?.statuses||[]).find(s=>(s.id||s)==='agonia')||{}).turns??null,...(avOk(d?.avatar)?{avatar:d.avatar}:{}),...(avOk(d?.tokenAvatar)?{tokenAvatar:d.tokenAvatar}:{})}};
 function combatCache(d,voc,trk){
   try{const c=skillCalc3({data:d,vocations:voc||vocations,tracks:trk||tracks},'Reflexo');d.combatCache={reflexDice:Math.max(1,Math.min(8,c.n)),reflexBonus:Math.max(-30,Math.min(60,c.bonus)),at:Date.now()}}catch(e){}
 }
@@ -3172,8 +3423,9 @@ function processRow(row,live=true){
   const dt=row?.detail;if(!dt?.cmb||CB.seen.has(row.id))return;CB.seen.add(row.id);
   if(dt.cmb==='atk'){
     CB.pending[dt.aid]={row,dt,targets:Object.fromEntries((dt.targets||[]).map(t=>[t.id,{}])),t:Date.parse(row.created_at)||Date.now()};
-    const fresh=live||(Date.now()-Date.parse(row.created_at)<600000);
-    if(fresh)(dt.targets||[]).forEach(t=>{const c=charById(t.id);if(c&&controls(c)&&(c._sheetAvailable||c.id===activeCharacterId)){if(dt.noDefense)doDefense(dt.aid,t.id,'none');else queuePrompt(dt.aid,t.id)}});
+    /* só uma linha que chegou AGORA dispara a defesa. As linhas antigas (recarregar a página)
+       são conferidas em loadCombatRows, depois de lidas todas as defesas e resultados. */
+    if(live)(dt.targets||[]).forEach(t=>{if(defDone(dt.aid,t.id))return;const c=charById(t.id);if(c&&controls(c)&&(c._sheetAvailable||c.id===activeCharacterId)){if(dt.noDefense)doDefense(dt.aid,t.id,'none');else queuePrompt(dt.aid,t.id)}});
   }else if(dt.cmb==='def'){const p=CB.pending[dt.aid];if(p&&p.targets[dt.targetId])p.targets[dt.targetId].def=row}
   else if(dt.cmb==='res'){
     const p=CB.pending[dt.aid];if(p&&p.targets[dt.targetId])p.targets[dt.targetId].res=row;
@@ -3199,17 +3451,19 @@ function applyItemRow(dt){
 /* Itens da campanha: tabela própria campaign_items (só quem criou ou o Mestre apagam).
    Se o banco ainda não tiver a tabela, usa o jeito antigo (linhas no histórico de rolagens). */
 const noTable=e=>e&&(e.code==='42P01'||e.code==='PGRST205'||e.code==='PGRST202'||/campaign_items/i.test(e.message||''));
+const notMesaRow=r=>!String(r?.item_key||'').startsWith('mesa~');
 const rowToItem=r=>({...(r.item||{}),id:r.item_key,byId:r.created_by,by:(r.item&&r.item.by)||r.creator_label||'—'});
 async function loadItemRows(force=false){
   const c=camp3();if(!c||!sb()||(!force&&T3.items.loadedFor===c.id))return;T3.items.loadedFor=c.id;
   try{
-    const {data:rows,error}=await sb().from('campaign_items').select('*').eq('campaign_id',c.id).order('created_at',{ascending:true}).limit(1000);
+    const {data:rows,error}=await sb().from('campaign_items').select('*').eq('campaign_id',c.id).not('item_key','like','mesa~%').order('created_at',{ascending:true}).limit(1000);
     if(error)throw error;
-    T3.items.mode='table';T3.items.campaign=(rows||[]).map(rowToItem);
+    T3.items.mode='table';T3.items.campaign=(rows||[]).filter(notMesaRow).map(rowToItem);
     if(T3.items.chFor!==c.id){
       try{if(T3.items.ch)sb().removeChannel(T3.items.ch)}catch(e){}
       T3.items.chFor=c.id;
       T3.items.ch=sb().channel('tulpa-items-'+c.id).on('postgres_changes',{event:'*',schema:'public',table:'campaign_items',filter:'campaign_id=eq.'+c.id},p=>{
+        if(String(p.new?.item_key||p.old?.item_key||'').startsWith('mesa~'))return; /* estado da Visão de Mesa (reserva), não é item */
         if(p.eventType==='DELETE'){const k=p.old?.item_key;if(k)T3.items.campaign=T3.items.campaign.filter(x=>x.id!==k);else{loadItemRows(true);return}}
         else if(p.new){const it=rowToItem(p.new);T3.items.campaign=T3.items.campaign.filter(x=>x.id!==it.id).concat(it)}
         try{if($('addList'))renderAddList()}catch(e){}
@@ -3244,7 +3498,7 @@ T3.shareItem=async(op,item)=>{
 };
 T3.shareSheetRoll=async(skill,r)=>{
   if(!T3.prefs.shareSheet||!camp3()||!sb())return;const ch=charById(activeCharacterId);if(!ch)return;
-  try{await sb().from('campaign_rolls').insert({campaign_id:camp3().id,character_id:ch.id,character_name:nm(ch),roller_id:uid3(),roller_label:myLabel(),skill,attribute:SKILL_ATTR[skill],dice:r.dice,bonus:r.bonus,total:r.total,detail:{best:r.best,base:r.calc.base,persistent:r.calc.persistent,talent:r.calc.once,team:r.calc.team}})}catch(e){console.warn('[T3] compartilhar rolagem',e)}
+  try{await sb().from('campaign_rolls').insert({campaign_id:camp3().id,character_id:ch.id,character_name:nm(ch),roller_id:uid3(),roller_label:myLabel(),skill:skill+(r.calc.attr!==r.calc.std?' ('+r.calc.attr+')':''),attribute:r.calc.attr||SKILL_ATTR[skill],dice:r.dice,bonus:r.bonus,total:r.total,detail:{best:r.best,base:r.calc.base,persistent:r.calc.persistent,talent:r.calc.once,team:r.calc.team}})}catch(e){console.warn('[T3] compartilhar rolagem',e)}
 };
 async function loadCombatRows(){
   const c=camp3();if(!c||!sb()||CB.loadedFor===c.id)return;CB.loadedFor=c.id;
@@ -3253,9 +3507,29 @@ async function loadCombatRows(){
   try{
     const {data:rows,error}=await sb().from('campaign_rolls').select('*').eq('campaign_id',c.id).gte('created_at',since).not('detail->>cmb','is',null).order('created_at',{ascending:true}).limit(300);
     if(error)throw error;
-    (rows||[]).forEach(r=>processRow(r,false));renderCombatUI();
+    (rows||[]).forEach(r=>processRow(r,false));
+    resumePending();renderCombatUI();
   }catch(e){console.error('[T3] carregar combate',e)}
 }
+/* Defesas já respondidas neste aparelho (sobrevive ao F5, mesmo que a linha ainda não tenha chegado ao banco) */
+const DEFKEY=()=>'tulpa_def_'+(camp3()?.id||'x');
+function defDoneSet(){try{return new Set(JSON.parse(localStorage.getItem(DEFKEY())||'[]'))}catch(e){return new Set()}}
+const defDone=(aid,tid)=>defDoneSet().has(aid+'|'+tid);
+function markDefDone(aid,tid){try{const s=[...defDoneSet(),aid+'|'+tid].slice(-80);localStorage.setItem(DEFKEY(),JSON.stringify(s))}catch(e){}}
+/* Depois de reler o histórico: só reabre a defesa de um ataque do combate ATUAL que ainda não
+   tem nenhuma linha de defesa ou de resultado e que este aparelho ainda não respondeu. */
+function resumePending(){
+  const cm=camp3()?.combat;if(!cm?.active||cm.phase!=='active')return;
+  Object.entries(CB.pending).forEach(([aid,p])=>{
+    if(Date.now()-p.t>600000)return;
+    (p.dt.targets||[]).forEach(t=>{
+      const st=p.targets[t.id]||{};if(st.def||st.res||defDone(aid,t.id))return;
+      const c=charById(t.id);if(!c||!controls(c)||!(c._sheetAvailable||c.id===activeCharacterId))return;
+      if(p.dt.noDefense)doDefense(aid,t.id,'none');else queuePrompt(aid,t.id);
+    });
+  });
+}
+T3._resumePending=resumePending;T3._defDone=defDone;
 
 /* ---------- popup de resultado ---------- */
 const RQ={q:[],timer:null};
@@ -3317,8 +3591,15 @@ async function defendPrompt(aid,tid){
   openModal('VOCÊ ESTÁ SENDO ATACADO',nm(ch),body,label,()=>{const x=rv();closeModal();doDefense(aid,tid,x==='brecha'?'none':dflt,false,x)});
   setTimeout(()=>{const e=$('defEsq'),r=$('defRef');if(e)e.onclick=()=>{const x=rv();closeModal();doDefense(aid,tid,x==='brecha'?'none':'esquiva',false,x)};if(r)r.onclick=()=>{const x=rv();closeModal();doDefense(aid,tid,x==='brecha'?'none':'reflexo',false,x)}},0);
 }
+/* uma defesa por ataque e por alvo: nunca roda duas vezes, nem em paralelo, nem depois do resultado */
 async function doDefense(aid,tid,mode,byMaster=false,react=''){
-  const p=CB.pending[aid],ch=charById(tid);if(!p||!ch||p.targets[tid]?.def)return;
+  const p=CB.pending[aid],t=p&&(p.targets[tid]=p.targets[tid]||{});
+  if(!p||!charById(tid)||t.def||t.res||t.busy)return;
+  t.busy=true;markDefDone(aid,tid);
+  try{return await doDefenseNow(aid,tid,mode,byMaster,react)}finally{t.busy=false}
+}
+async function doDefenseNow(aid,tid,mode,byMaster=false,react=''){
+  const p=CB.pending[aid],ch=charById(tid);if(!p||!ch||p.targets[tid]?.def||p.targets[tid]?.res)return;
   const d=ch.id===activeCharacterId?data:ch.data,m=E.computeMods(d),di=E.defenseInfo(d);
   let rxDef=react?reactionsFor(ch,d).find(x=>x.id===react):null;
   if(rxDef){mutateChar(ch,x=>{x.essence=Math.max(0,(Number(x.essence)||0)-rxDef.cost)});toast(rxDef.name+'! −'+rxDef.cost+' ES');fx3('activate');if(rxDef.el)setTimeout(()=>{try{window.tulpaFx('cast',rxDef.el)}catch(e){}},40)}
@@ -4646,10 +4927,22 @@ const avOk=a=>typeof a==='string'&&a.length<90000&&/^data:image\/(jpeg|png|webp)
 function av5(d,cls=''){
   const n=String(d?.name||'?').trim()||'?',ini=(n.split(/\s+/).filter(w=>/[\p{L}\p{N}]/u.test(w)).slice(0,2).map(w=>[...w][0]).join('')||'?').toUpperCase();
   let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))>>>0;
-  const st=stIds(d||{}),mx=STAGES[d?.stage]||STAGES[1],low=(Number(d?.vital)||0)<=mx.vt/3;
-  const state=st.includes('morto')||st.includes('agonia')?'down':low?'low':'';
-  return `<span class="av ${cls} ${state}" style="--avc:${AV_C[h%AV_C.length]}">${avOk(d?.avatar)?`<img src="${d.avatar}" alt="">`:`<b>${esc(ini)}</b>`}</span>`;
+  const state=avState(d);
+  return `<span class="av ${cls} ${state}" style="--avc:${AV_C[h%AV_C.length]}">${avOk(d?.avatar)?`<img src="${d.avatar}" alt="" decoding="sync">`:`<b>${esc(ini)}</b>`}</span>`;
 }
+function avState(d){const st=stIds(d||{}),mx=STAGES[d?.stage]||STAGES[1],low=(Number(d?.vital)||0)<=mx.vt/3;return st.includes('morto')||st.includes('agonia')?'down':low?'low':''}
+/* Correção do pisca-pisca: cada foto vira UM nó do DOM, guardado por personagem + foto.
+   Quando a mesa ou a ordem de combate são redesenhadas, o mesmo nó é recolocado no lugar
+   (a imagem já está decodificada), em vez de criar um <img> novo a cada atualização. */
+const AVN=new Map();
+const avSig=(d,f)=>{const a=avOk(d?.[f])?d[f]:'';return String(d?.name||'')+'|'+a.length+'|'+a.slice(-32)};
+function avNode(key,d,cls='',field='avatar'){
+  const sig=avSig(d,field)+'|'+cls;let e=AVN.get(key);
+  if(!e||e.sig!==sig){const t=document.createElement('template');t.innerHTML=av5(field==='avatar'?d:{...d,avatar:avOk(d?.[field])?d[field]:d?.avatar},cls).trim();const keep=e?[...e.node.classList].filter(c=>c==='speaking'||c==='muted'):[];e={sig,node:t.content.firstElementChild};keep.forEach(c=>e.node.classList.add(c));AVN.set(key,e)}
+  const s=avState(d);e.node.classList.toggle('down',s==='down');e.node.classList.toggle('low',s==='low');
+  return e.node;
+}
+T3.avNode=avNode;T3._avn=AVN;
 T3.avatar=av5;T3._avLoad=avLoad;
 function charByName(name){
   const n=String(name||'').trim();if(!n)return null;
@@ -4701,7 +4994,7 @@ function decorateTable(){
     if(!card.querySelector('.tc-head')){
       const h3=card.querySelector('h3'),own=card.querySelector('.owner'),eye=card.querySelector('.scene-eye');
       if(h3){const head=document.createElement('div');head.className='tc-head';const id=document.createElement('div');id.className='tc-id';
-        h3.before(head);head.insertAdjacentHTML('beforeend',av5(d,'lg'));id.append(h3);if(own)id.append(own);head.append(id);if(eye)head.append(eye)}
+        h3.before(head);head.append(avNode('card:'+ch.id,d,'lg'));id.append(h3);if(own)id.append(own);head.append(id);if(eye)head.append(eye)}
     }
     if(hidden(ch))return;
     const mx=STAGES[d.stage]||STAGES[1],cur={vital:[Number(d.vital)||0,mx.vt],lucidity:[Number(d.lucidity)||0,mx.luc],essence:[Number(d.essence)||0,mx.es]};
@@ -4719,9 +5012,17 @@ function decorateTable(){
     T5.prev[ch.id]=cur;
   });
   /* fotos na ordem de combate */
-  const cm=c.combat,order=cm?.order||[];
-  $$('#roundRoster .combatant').forEach((el,i)=>{if(el.querySelector('.av'))return;const ch=charById(order[i]?.characterId);if(ch){el.insertAdjacentHTML('afterbegin',av5(ch.data,'sm'));el.classList.add('has-av')}});
+  watchRoster();decorateRoster();
 }
+function decorateRoster(){
+  const cm=camp3()?.combat;if(!cm?.active)return;
+  const list=cm.phase==='rolling'?(cm.participants||[]):(cm.order||[]);
+  $$('#roundRoster .combatant').forEach((el,i)=>{const ch=charById(list[i]?.characterId);if(!ch)return;el.dataset.cid=ch.id;const n=avNode('ros:'+ch.id,ch.data,'sm');if(el.firstElementChild!==n)el.prepend(n);el.classList.add('has-av')});
+}
+/* a ordem de combate também é redesenhada fora da Visão de Mesa (a cada salvamento da ficha):
+   as fotos voltam no mesmo instante, antes de a tela ser pintada */
+let _ro5=null;
+function watchRoster(){const r=$('roundRoster');if(!r||r===_ro5)return;_ro5=r;new MutationObserver(()=>{try{decorateRoster()}catch(e){}}).observe(r,{childList:true})}
 {const _rt5=window.renderTable;window.renderTable=function(){_rt5.apply(this,arguments);try{decorateTable()}catch(e){console.warn('[T5] mesa',e)}}}
 {const _rc5=renderCombatUI;renderCombatUI=function(){_rc5.apply(this,arguments);try{decorateTable();watchTurn()}catch(e){console.warn('[T5] combate',e)}}}
 
@@ -4846,6 +5147,1486 @@ function watchTurn(){
  ['sons','Sons e efeitos',['som','sons','efeitos sonoros','volume','mudo','silenciar','barulho'],'Os sons de dado, acerto, crítico, turno e ritual podem ficar <b>ligados, baixos ou desligados</b> em <b>⚙ Aparência › Sons</b>. As animações respeitam a opção “reduzir movimento” do seu aparelho.'],
  ['narrador','Perseus narrando a sessão',['narrar','narrador','comentar','comentarios','comenta as rolagens','parar de comentar'],'Eu comento as rolagens e o combate com o nome de quem jogou: 20 natural, 1 natural, acertos, esquivas, críticos, quem caiu e de quem é a vez. Para me calar (que grosseria), clique em ⚙ no meu chat e desmarque <b>Comentar rolagens e acontecimentos</b>.'],
 ].forEach(([id,title,kws,a,go])=>{if(K.some(x=>x.id===id))return;const e={id,title,kws,a,...(go&&go.tab?{go:[go]}:{})};e.nk=kws.map(normP);e.nt=normP(title).split(' ').filter(w=>!STOP.has(w)&&w.length>2);K.push(e)});
+
+
+/* ===================================================================
+   TULPA · ETAPA 6 — nova Visão de Mesa
+   Caixa do Mestre (M), lugares dos jogadores (P) simétricos, estado
+   compartilhado da mesa, entrada do jogador (personagem, foto e token),
+   rolagem de atributo puro e troca de atributo, imagens pop-up e
+   Documentos, música do YouTube, playlist, intervalo, bloco de notas e
+   comandos do Mestre para o Perseus.
+   O mapa tático está em t7.js e a chamada de voz em t8.js.
+   =================================================================== */
+const NARR_IMG='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4RERAOEA8SFBoWEhMYEw8QFh8XGBsbHR0dERYgIh8cIhocHRz/2wBDAQUFBQcGBw0HBw0cEhASHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBz/wAARCADAAMADASIAAhEBAxEB/8QAHQABAAEEAwEAAAAAAAAAAAAAAAMBAgUIBAYHCf/EADwQAAEDAgQDBwIEAwcFAAAAAAEAAgMEEQUGEiEHMUEIExRRUmGhIjJCcYGRI0OxCRUWM2LB0SRyktLh/8QAFwEBAQEBAAAAAAAAAAAAAAAAAAECA//EABsRAQEBAQEBAQEAAAAAAAAAAAABEQIhMQNB/9oADAMBAAIRAxEAPwDQbxk3r+AnjJvX8BQIgn8ZN6/gJ4yb1/AUCIJ/GTev4CeMm9fwFAiCfxk3r+AnjJvX8BQIgn8ZN6/gJ4yb1/AUCIJ/GTev4CeMm9fwFAiCfxk3r+AnjJvX8BQIgn8ZN6/gJ4yb1/AUCIJ/GTev4CeMm9fwFAiCfxk3r+AnjJvX8BQIgn8ZN6/gJ4yb1/AUCIJ/GTev4CeMm9fwFAiAiIgIiICIiAirZLFBRERARVsvRuFHA/OHGWrr4MsULZWUERlmnmdpjBtsy/Vx5AIPOEXJrqCow2sqKOqiMVTTyOikjdza5psR+hXGsgIiICIiAiIgIiICIiAiIgIiICIiDl4e2N9dStm/yjIwO36ahf4W93H3sb4VieScPzfwso2tngpI5anDInlwqWFoJfGT+Pnt16LQgcvdbyjjFi3DXh9wa4jYLikkmFzxOwLF8MeLtnbCdRdv+IC4BUu/xWjs8EtPM+KaN0csZ0uY8WLSOhCujpZHN1EaWep2y+hvaL7NNDxcwKh4ncNaRk1bXQNqZqGIBvi2OFw9o9Q8uq10p+yNxfq2B3+CqlxI/m1ETLfoXJOpUeH4PgjsYr6ahow+oramRsMMLGkl73GwAA3X1N4QjJ/ZwoMj8M6qS+bc1OMspiAd/G03u/e4btpB8wvLOy12V8b4fZhrc7Z9wllPPhkLv7uoGPbNIX2JdIQ24vawb1vdeSZ0xHiMeM1FxqzNlPFqbK+FYpE2PxMTou5pw4gfS4XaNybkWus274rqva14fw5S43Y+wQtjpMU010BYLAB/P5uvB5sGI3ieD7O2W/fb4wODFMu5MzrRlpguIHvtu5kouxaM6rOt+A/afda5vhXWZaeWE/Wwj36KJdtcA76XNBHksfV4WyQF0VmO8uhVRgkUksT4X6XggqNAREQEREBERAREQEREBERAX0c7FmQIs78LcBrsz4aZKLLeNT1eDazdkznxaXuc089LuXutIODnDmo4q8QsFyvBIImVcmqaU/gibu8267L7O5SwLCsr5dw/BsFbEzDaCIQRtiIIFud7dTzKx3cWRmYo2QsEcTGxxtFmtYLAD2Cv5qg8/JdLzNxbyLkqs8Fj+bcIw2rDdXcVFS0SW5fbzXJt3QqKso6bEKaWlq4Y6imlbpkimaHNePIg811TKvFbJGd6h9Nl3NWE4lURgOdFT1DS8A7A6Tuu4uba3KyexHh/akyNPnXg7jeEUEEZmgg76njtsDGL2HlsF8l6Cbv4HROB1s236eS+zHE3iRlbIeDPrMxYrTUlIwElr3AvlNvta3mSV8a8VxWnxDNuK11HGY6Osq5pYoyLaWOkLmi3sCAuvDPSdt7NceZ2Kv5hUIS62iKop46hlnj9RzCwFVA6nlLHbgcj5rPyPLCCNwea4WLMEkEcrfwmx/JBhkREBERAREQEREBERAREQemcEczVeUM0Yji9BKYq6DCavuJBzY8sABWz39nvnTHsVzxm3C67EauropqIVbmSvLmtm7wXfvyJvZa78JeHeIYvkrPecm0lRNQYNRGmaIhfXLL/AOrd/wBVvD2GuCkmQci1GbcTjLMZzIxndtJIMVMDdoI8yd1nqzFj3PjZmysyNwmzfmDD3BtfQUEskDjyD9OxXxUxLEqvFa2esrqmWpqpnl8k0zy5z3E3JJPmd19vOJ2T25+4eZmy0ZDG7FaKSnY/0uLTY/uvjFmnhxmrJ+M1GF4zgddTVsLiHNMLiD7ggbhZ/P4vTBYXilZhFZFV0FVNS1MR1MlheWuafMEL6+9nLiDiXETgPhON1r/EYxFBJBI4m5kfGDpJPmbC/wCa+XmRuBWf+INXTQ4LlmvkimeGGpkiLIo/MuJ5AL61cDuGTeEfDTB8r9+J6mmaZJ5hsHSONzb2HJXvEj5BcUM44/nTOWL12YKqaWtFQ+MxvcbRAOI0AdAF05jtLwfIhfUrtPdnTImZcq4/mKLDaTCswUsD6o10A7sSPG51tFg6/md18sytc3YWY7Sxwc1p8wqFR0pLqaInmQpSFUU0hwN+q4FQCY5Yz5XC59r/AKKGpj1N1Dn1/JB1xFc8WcfzVqAiIgIiICIiAiIgIiIPpT2AM24TjvC3GsnFkTMSoKmSWVpAJmil5Pt1sdv0Xg2cM18Yqbjzh3DpmdMQY+ixRkFAYbMYI3uu0vawDWA3mHXC632J82nLHHbB4pKvuKXE4pKSRpNmyEi7Af1X0wl4Q5OfxAbn12DRuzU1ugVpcdhp0/byvbquduVZ67dhzZ20cIqH65QwBzrW1G25spZ6SnqdIqKeGa3LvGB1v3Uge0ENLmhxFwL7lYaPNWHT4ti+FxyXqcKjY+pvyZqbqHxZc22Xbpja0Ma1jR0AsB+y6dn3PWBZRpIK/Fsy0uD01JKJpTM5v8VgBBZpsXWNx9ovsvDc89qjDcK4IYzmDxED8cmxKtwijp6Z4Li5kjgx532Aj0OJ9wvmRjuZ8YzLUmpxfEquulJJ1VEpfa/lfktzjfrNrbLtV9rOkz/QTZQyY98mDzbV+IPbp8Rbkxg6N9zufZabc1W6BtyAOq6SYy7HSbQQtPpKnKjibbSPSwBXXOq1lRUW68lb3gJ0qOWQD6Rv7qAOIIPVMGMxCAwVDhbZ24XFWZxgB9PDL1vpWGQEREBERAREQEREBERBncm49JlfNODYzFbXQVUc+/8Apdf+i3a4/drbO+Ss8YL/AIddQvy3VYfFXUznx3NS2Vlnaj7G9loTcLL4hjmJY3R0kFdWy1MeHRdzTMkN+6jvfSPa6maN7+y72msw8VeK2A5fx+KBvcYZPE2SLbvHtBcHH3tsvJeOvaCx3LPGfipDlusaIMYEeGSSncwiFuh2jyNwRda65Gzti/DvNWHZkwOZsWJUEneRl7dTHezhcXB6i6xGK4lU41idXiFW/vauslfPM+33PcSXH9ymeq47pnuZ3Ze4s1F2kna55m3ny/ZWKum33AhXBxOzG7/uqiOy5NDH3tTG3pe5UYjc5pcdgFk8IgOl0ttzsEGQBOo26lWSyfSWt5+aSzCK4H3HkuOSeZVC1hur449VydmjmVQMuNT3Wb5dSrZpvosLCMdAg4OJz63sjH2NC4Cvlf3jy7zKsUBERAREQEREBERAREQFyqB2mcA8n/SQuKrmktsR0KDIyUkeonSQfJRGMEaW2BXOJ7yAO/Ufku28MshT8Qcx1FFFFK6mo6aSqnMYN9LR9t+hKDoMdNqaHOJ/KymEQ5AaR1813LJ3DrMXETFXUOXMInqJNVnmxEcIvyc87Cw/dbfcMuxNhWENjxHO9ScUqdnCjhu2nBHn1d+RQaO0WXcTxakqaihoZ5qGkaX1FS1n8KID1PP0g+xKlDm0lO1g5jYLbnteZqwvJ2D4Xw7y/TQUUEjW1FXDTt0ARD7GG3O/VacSTmV5e43ceTQgkLtTjf7uqjfO1psPqeOgVA2SXYjbyCudTua25+lvWy0LS90u73WPkoat/dxtYPxdVa55i3sT5FcaWV0pBd05LIjREQEREBERAREQEREBERAVQqKSOJ8uzQT5+QQZCilvSvafwf0K94y1xEq+AWQ20mX4YBnnM0bKurrJGhxoKVwvFG0epzSHm/LWvNOGeSn5wzdhWFN1Gne/v6uRv8uCP6nu/QArh53zGcfzPjGMyAWrqqSSJjftbHqIY0ewaAB7BB9LuyFm6m4jcKG1tXTU399UFfNT1z4oWxd48nvGuNuf0vaL+y9zzFLS0WFz1M1mw07XTPNuTGNLnfAWl/8AZ4jHqeLNhq6SWHAMQEctLI9tmPmZcPLT1GnQL8tl6J2tePWG5UyTX5cwd7qrHMZjfSNniI0UzTbW6/4ja4sPNB89+Jeb6riVn3GswzuJjrKhxhJ5NiBswAflZdfjo42nlq/3UugNYGtsANgPJQva8OBMrtPt0WsE4aA06BZRae+eSPsb08yrW05c7aV9vzXIjjaxga3kFUWPp2TbHlZYmqw90RJYLjyWatYqpF+e7UsNdVO3PmqLN1mGiQa4xY+Sw8kbonFrhYrNirERFAREQEREBERARFW3L3Qc6hoPEjW86WDr5rJNjjijIaLR7n81Ixnd0kTehAC7bwwyPPxJ4hZdytTh1sRqWtlc38ELfqkdvtyC0Pe8iZZi4Odm3MXEWve6nzLmZgpMKYR9TGE2abHoeZ9l492c+G9DxO4qYLg+JMdJhEd56lvra3fSfzXfe2RxCgx7PtLk7CC1mXspQilhijtoM1rONrbWGy9c7A3DNsuHYxnqujJbK/wlI13Ihv3O/wDIkfosjazOLcs5CyBNWVmjDcBwencO6p3d0C2wtGLeogBfKLiPnys4j5trMdqohTxPHdUtKz7aeEH6Wj+p917x2y+OQz5mdmScEqWuy9gUhNU9l/8AqKsXBHkWsGw9y5au8z7rUiapbayskkbGwudt0A81WSVsTC88ug6lRRQukf301tf4W9GhUiSDVp+oBt9wPIKUct0DQOQQi1kFOt+isLnOP0/b5ofrJaL2BsR5qjy8CzBsgrdrSbuJJUE0UMws5l/dO7de7gg25FBiKul8M+wOpp5FcZZWrZ3kbtt273WL6LNiqIiKAiIgIiICuZ97R7q1XxC8rQOpQdjcRZovs1q2W7KLaPJmEcReKtf3ZZlrDjSUYLgHGplHJt+pFhb3Ws4cGxvfvbn+y9/4lTDIPZwyBk2ORgrszzvx/EA1li6IG0IJ9nLVGvtdWVeNYlUVdRI6atrZi9zzuXvef+Svoxn/ADVH2YezTl3LmHOjbmeupG08TQbOErm3ml/QuK0y7OWUoc6cYMv0lVZuHUEnjqt7vsbHF9Rv7bLn8f8AizNxf4kYljDHkYNTONNhsV9hA02D7dC/7v1Ug8vc98jnySPdJK8lznuN3OceZJ6kqx8rYma3HZVdJpBebALjNDqiTvHAhjftb/utIuiidK4SyCx6NvsP/q5INvdWnfk1yaj6XILrqyRxa3b7jsFdfce6sv8Axt+TR8oirWhosOQV9tyqdSq3RVC3Y+fRcW1uq5fPzuoJm2u4fqEEMjA6Nw6kc1g3cys3r1NuOoWEd1/NZpFqIiiiIiAiIgKSD/OZ+ajU1KNU8Y90HZcPpnVVTS0zAXvnmjjDR1u8bL0PtHZujzBxGqYqd7jQYLSQYZTR/hj0MGsD2Lt10XA8QiwnF8Mr5h/BppmSv28r/wC9l13GcTlxbEaurkdqkqJnSuPmSf8AiytHoeQ80HKGRM1OpXkYvmNowxsg/lU/3SuHkSLtB911MeRtcdByXGo43QwNYSQeZueSuqZXFwgYbvP3H0hWRFpcKiWwv3TDv/qP/C5Fxfrb8kjYI2ho5DZXXVVaHj3Qk+Z5q791WyIhe/TLF5EqsRDu8/7juoas6XNtvbdVpJLBzbD6iSD7oY5AN1Wxtt+ys7wuOlwDXf1UgFtvJBG6RzebCB5hUErTvqF/JS/kQoJYGS3NrP6FCIJ4+5dr/A7mPJYQ73WZk72D6XnXH77rFVDBHKQw3HNSqhREWR//2Q==';
+const NARRADOR={name:'Narrador',avatar:NARR_IMG,stage:1,vital:999,statuses:[]};
+const M6={
+  state:null,campId:null,backend:'',ch:null,dbch:null,live:false,
+  present:{},joinedAt:0,myChar:null,
+  assetCache:{},maps:[],docs:[],gmNotes:[],
+  openSeats:new Set(),tab:'',seenDocs:null,saveTimer:null,saving:Promise.resolve(),
+  hooks:{state:[],cast:[],layout:[],leave:[]},
+};
+T3.mesa=M6;
+const defState6=()=>({v:1,rev:0,speaker:{mode:'narrator',charId:null},map:null,mapCfg:{},tokens:[],cam:{x:.5,y:.5,z:1},fog:{on:false,open:[]},music:null,playlist:[],pause:{on:false,since:0},call:{on:false,id:'',whisper:null}});
+M6.state=defState6();
+const isGM6=()=>role3()==='master';
+const cloud6=()=>!!(sb()&&window.tulpaCloudUser&&camp3()&&typeof sb().from==='function');
+const gmChar6=ch=>{const c=camp3();return !!ch&&(!ch.ownerId||ch.ownerId===c?.createdBy||(isGM6()&&ch.ownerId===uid3()))};
+const tableOpen6=()=>{const t=$('tablePanel');return !!t&&!t.classList.contains('hide')&&$('portal')?.style.display!=='none'};
+const dOf6=ch=>ch?(ch.id===activeCharacterId?data:ch.data)||{}:{};
+const lsGet6=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const lsSet6=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+
+/* ---------- armazenamento da mesa ----------
+   1) tabela campaign_store (tulpa-mesa.sql) quando existir;
+   2) sem ela, reserva em campaign_items (chaves com prefixo "mesa~");
+   3) fora da nuvem, localStorage. */
+const KP6='mesa~';
+const noStore6=e=>!!e&&(e.code==='42P01'||e.code==='PGRST205'||e.code==='PGRST202'||/campaign_store/i.test(e.message||''));
+async function stDetect6(){
+  if(M6.backend)return M6.backend;
+  if(!cloud6())return M6.backend='local';
+  try{const {error}=await sb().from('campaign_store').select('key').eq('campaign_id',camp3().id).limit(1);if(error)throw error;M6.backend='store'}
+  catch(e){M6.backend='items';if(!noStore6(e))console.warn('[T6] campaign_store indisponível, usando a reserva',e)}
+  return M6.backend;
+}
+const lk6=key=>'tulpa_mesa_'+(camp3()?.id||'local')+'_'+key;
+async function stGet6(key){
+  const b=await stDetect6(),cid=camp3()?.id;
+  if(b==='local')return lsGet6(lk6(key),null);
+  if(b==='store'){const {data:r,error}=await sb().from('campaign_store').select('value').eq('campaign_id',cid).eq('key',key).limit(1);if(error)throw error;return r&&r[0]?r[0].value:null}
+  const {data:r,error}=await sb().from('campaign_items').select('item').eq('campaign_id',cid).eq('item_key',KP6+key).limit(1);if(error)throw error;return r&&r[0]?r[0].item?.value??null:null;
+}
+/* a imagem (pesada) vai para campaign_blobs, fora do tempo real; o registro leve fica em campaign_store */
+async function blobPut6(key,dataUrl,audience=null){
+  const b=await stDetect6(),cid=camp3()?.id;
+  if(b==='local'){if(!lsSet6(lk6('blob:'+key),dataUrl))M6.assetCache[key]=dataUrl;return}
+  if(b==='store'){const {error}=await sb().from('campaign_blobs').upsert({campaign_id:cid,key,data:dataUrl,audience},{onConflict:'campaign_id,key'});if(error)throw error;return}
+  const k=KP6+'blob:'+key,{data:r,error:e0}=await sb().from('campaign_items').select('id').eq('campaign_id',cid).eq('item_key',k).limit(1);if(e0)throw e0;
+  const item={kind:'blob',value:{data:dataUrl},audience};
+  if(r&&r[0]){const {error}=await sb().from('campaign_items').update({item,updated_at:new Date().toISOString()}).eq('id',r[0].id);if(error)throw error}
+  else{const {error}=await sb().from('campaign_items').insert({campaign_id:cid,item_key:k,item,creator_label:myLabel()});if(error)throw error}
+}
+async function blobGet6(key){
+  const b=await stDetect6(),cid=camp3()?.id;
+  if(b==='local')return lsGet6(lk6('blob:'+key),null);
+  if(b==='store'){const {data:r,error}=await sb().from('campaign_blobs').select('data').eq('campaign_id',cid).eq('key',key).limit(1);if(error)throw error;return r&&r[0]?r[0].data:null}
+  const {data:r,error}=await sb().from('campaign_items').select('item').eq('campaign_id',cid).eq('item_key',KP6+'blob:'+key).limit(1);if(error)throw error;return r&&r[0]?r[0].item?.value?.data??null:null;
+}
+async function blobDel6(key){
+  const b=await stDetect6(),cid=camp3()?.id;
+  try{
+    if(b==='local'){localStorage.removeItem(lk6('blob:'+key));return}
+    if(b==='store'){await sb().from('campaign_blobs').delete().eq('campaign_id',cid).eq('key',key);return}
+    await sb().from('campaign_items').delete().eq('campaign_id',cid).eq('item_key',KP6+'blob:'+key);
+  }catch(e){}
+}
+async function stPut6(key,kind,value,audience=null){
+  if(value&&typeof value.data==='string'&&value.data.length>1500){const {data:blob,...rest}=value;await blobPut6(key,blob,audience);value=rest}
+  const b=await stDetect6(),cid=camp3()?.id;
+  if(b==='local'){lsSet6(lk6(key),value);const ix=lsGet6(lk6('~index'),[]).filter(x=>x.key!==key);ix.push({key,kind,audience,meta:value?.meta||null,created_at:new Date().toISOString(),created_by:uid3()});lsSet6(lk6('~index'),ix);return}
+  if(b==='store'){const {error}=await sb().from('campaign_store').upsert({campaign_id:cid,key,kind,value,audience,updated_at:new Date().toISOString()},{onConflict:'campaign_id,key'});if(error)throw error;return}
+  const {data:r,error:e0}=await sb().from('campaign_items').select('id').eq('campaign_id',cid).eq('item_key',KP6+key).limit(1);if(e0)throw e0;
+  const item={kind,value,audience};
+  if(r&&r[0]){const {error}=await sb().from('campaign_items').update({item,updated_at:new Date().toISOString()}).eq('id',r[0].id);if(error)throw error}
+  else{const {error}=await sb().from('campaign_items').insert({campaign_id:cid,item_key:KP6+key,item,creator_label:myLabel()});if(error)throw error}
+}
+async function stDel6(key){
+  const b=await stDetect6(),cid=camp3()?.id;
+  if(/^(map|doc):/.test(key))await blobDel6(key);
+  if(b==='local'){try{localStorage.removeItem(lk6(key))}catch(e){}lsSet6(lk6('~index'),lsGet6(lk6('~index'),[]).filter(x=>x.key!==key));return}
+  if(b==='store'){const {error}=await sb().from('campaign_store').delete().eq('campaign_id',cid).eq('key',key);if(error)throw error;return}
+  const {error}=await sb().from('campaign_items').delete().eq('campaign_id',cid).eq('item_key',KP6+key);if(error)throw error;
+}
+async function stList6(kind){
+  const b=await stDetect6(),cid=camp3()?.id;
+  if(b==='local')return lsGet6(lk6('~index'),[]).filter(x=>x.kind===kind);
+  if(b==='store'){const {data:r,error}=await sb().from('campaign_store').select('key,kind,audience,created_by,created_at,meta:value->meta').eq('campaign_id',cid).eq('kind',kind).order('created_at',{ascending:true}).limit(300);if(error)throw error;return r||[]}
+  const {data:r,error}=await sb().from('campaign_items').select('item_key,created_by,created_at,kind:item->>kind,audience:item->audience,meta:item->value->meta').eq('campaign_id',cid).like('item_key',KP6+'%').order('created_at',{ascending:true}).limit(300);if(error)throw error;
+  return(r||[]).filter(x=>x.kind===kind).map(x=>({...x,key:String(x.item_key).slice(KP6.length)}));
+}
+/* imagem guardada (mapa ou documento): busca uma vez e mantém em memória */
+async function assetData6(key){
+  if(M6.assetCache[key])return M6.assetCache[key];
+  const v=await blobGet6(key);
+  if(v)M6.assetCache[key]=v;
+  return v||null;
+}
+
+/* ---------- estado compartilhado ---------- */
+function onState6(fn){M6.hooks.state.push(fn)}
+function applyState6(why){M6.hooks.state.forEach(f=>{try{f(M6.state,why)}catch(e){console.warn('[T6] estado',e)}})}
+function acceptState6(st,why='remoto'){
+  if(!st||typeof st!=='object')return;
+  if((Number(st.rev)||0)<(Number(M6.state.rev)||0)&&isGM6())return; /* eco de uma gravação antiga do próprio Mestre */
+  M6.state={...defState6(),...st};applyState6(why);
+}
+/* só o Mestre altera o estado da mesa */
+function setState6(patch,{silent=false}={}){
+  if(!isGM6()){console.warn('[T6] só o Mestre altera a mesa');return false}
+  M6.state={...M6.state,...patch,rev:(Number(M6.state.rev)||0)+1};
+  if(!silent)applyState6('local');
+  clearTimeout(M6.saveTimer);M6.saveTimer=setTimeout(flushState6,220);
+  return true;
+}
+function flushState6(){
+  clearTimeout(M6.saveTimer);M6.saveTimer=null;
+  const snap=JSON.parse(JSON.stringify(M6.state));
+  M6.saving=M6.saving.then(()=>stPut6('state','state',snap)).then(()=>{cast6({t:'state',rev:snap.rev})}).catch(e=>{console.warn('[T6] salvar mesa',e);if(!M6.warned){M6.warned=true;toast('Não consegui salvar o estado da mesa: '+(e?.message||'erro'))}});
+  return M6.saving;
+}
+T3.mesaSet=setState6;T3.mesaState=()=>M6.state;
+
+/* ---------- canal ao vivo (transmissão + presença) ---------- */
+function onCast6(fn){M6.hooks.cast.push(fn)}
+function cast6(o){try{if(M6.ch&&M6.live&&typeof M6.ch.send==='function')M6.ch.send({type:'broadcast',event:'m',payload:{...o,from:uid3()}})}catch(e){}}
+function trackMe6(){
+  try{if(M6.ch&&M6.live&&typeof M6.ch.track==='function')M6.ch.track({uid:uid3(),role:role3(),name:myLabel(),charId:M6.myChar||null,at:M6.joinedAt})}catch(e){}
+}
+function presentUids6(){return Object.keys(M6.present)}
+function readPresence6(){
+  const out={};
+  try{const ps=M6.ch.presenceState();Object.values(ps).forEach(list=>(list||[]).forEach(p=>{if(p&&p.uid&&(!out[p.uid]||p.at<out[p.uid].at))out[p.uid]=p}))}catch(e){}
+  M6.present=out;
+}
+async function joinMesa6(){
+  const c=camp3();if(!c)return;
+  if(M6.campId===c.id)return;
+  leaveMesa6();
+  M6.campId=c.id;M6.backend='';M6.state=defState6();M6.present={};M6.myChar=null;M6.maps=[];M6.docs=[];M6.live=false;
+  const jk='tulpa_join_'+c.id;let at=0;try{at=Number(sessionStorage.getItem(jk))||0}catch(e){}
+  if(!at){at=Date.now();try{sessionStorage.setItem(jk,String(at))}catch(e){}}
+  M6.joinedAt=at;
+  try{M6.myChar=sessionStorage.getItem('tulpa_mychar_'+c.id)||null}catch(e){}
+  M6.seenDocs=new Set(lsGet6('tulpa_docs_seen_'+(uid3()||'x'),[]));
+  M6.gmNotes=lsGet6('tulpa_bn_gm_'+c.id,[]);
+  const id=c.id;
+  await stDetect6();
+  if(M6.campId!==id)return;
+  if(cloud6()&&typeof sb().channel==='function'){
+    try{
+      const ch=sb().channel('tulpa-mesa-'+id,{config:{broadcast:{self:false},presence:{key:uid3()||rid()}}});
+      ch.on('broadcast',{event:'m'},({payload})=>{if(M6.campId!==id||!payload)return;M6.hooks.cast.forEach(f=>{try{f(payload)}catch(e){console.warn('[T6] transmissão',e)}})});
+      ch.on('presence',{event:'sync'},()=>{if(M6.campId!==id)return;readPresence6();layoutMesa6();M6.hooks.layout.forEach(f=>{try{f()}catch(e){}})});
+      ch.subscribe(st=>{if(st==='SUBSCRIBED'&&M6.campId===id){M6.live=true;trackMe6()}});
+      M6.ch=ch;
+      const tbl=M6.backend==='store'?'campaign_store':'campaign_items';
+      M6.dbch=sb().channel('tulpa-store-'+id).on('postgres_changes',{event:'*',schema:'public',table:tbl,filter:'campaign_id=eq.'+id},p=>{if(M6.campId===id)onStoreChange6(p)}).subscribe();
+    }catch(e){console.warn('[T6] canal da mesa',e)}
+  }
+  try{const st=await stGet6('state');if(M6.campId!==id)return;if(st)acceptState6(st,'carga');else applyState6('carga')}catch(e){console.warn('[T6] carregar mesa',e);applyState6('carga')}
+  if(isGM6()&&M6.backend==='store'){try{const v=await stGet6('gmnotes:'+uid3());if(v&&Array.isArray(v.list)&&v.list.length>=M6.gmNotes.length){M6.gmNotes=v.list;lsSet6('tulpa_bn_gm_'+id,M6.gmNotes)}}catch(e){}}
+  refreshDocs6();T3.mapRefreshList?.();
+}
+function leaveMesa6(){
+  M6.hooks.leave.forEach(f=>{try{f()}catch(e){}});
+  try{if(M6.ch)sb()?.removeChannel(M6.ch)}catch(e){}
+  try{if(M6.dbch)sb()?.removeChannel(M6.dbch)}catch(e){}
+  M6.ch=M6.dbch=null;M6.live=false;M6.campId=null;clearTimeout(M6.saveTimer);
+}
+function onStoreChange6(p){
+  const row=p.new&&Object.keys(p.new).length?p.new:null,items=M6.backend!=='store';
+  if(!row){refreshDocs6();T3.mapRefreshList?.();return} /* exclusão */
+  let key=items?row.item_key:row.key;if(!key)return;
+  if(items){if(!String(key).startsWith(KP6))return;key=String(key).slice(KP6.length)}
+  if(String(key).startsWith('blob:'))return;
+  const kind=items?row.item?.kind:row.kind,val=items?row.item?.value:row.value;
+  if(key==='state'){if(val&&typeof val==='object')acceptState6(val);else stGet6('state').then(v=>acceptState6(v)).catch(()=>{});return}
+  if(kind==='doc'){refreshDocs6().then(()=>{if(p.eventType==='INSERT')docArrived6(key)});return}
+  if(kind==='map'){T3.mapRefreshList?.();return}
+  if(!kind){refreshDocs6();T3.mapRefreshList?.()}
+}
+onCast6(p=>{
+  if(p.t==='state'&&!isGM6()&&(p.rev||0)>(M6.state.rev||0))stGet6('state').then(v=>acceptState6(v)).catch(()=>{});
+  if(p.t==='doc')refreshDocs6().then(()=>docArrived6(p.key));
+});
+window.addEventListener('beforeunload',()=>{try{if(M6.saveTimer)flushState6()}catch(e){}});
+
+/* ---------- lugares à mesa ---------- */
+function seats6(){
+  const c=camp3();if(!c)return{players:[],gm:[]};
+  const all=chars3(),gm=all.filter(gmChar6),pcs=all.filter(x=>!gmChar6(x));
+  const byOwner=new Map();pcs.forEach(ch=>{if(!byOwner.has(ch.ownerId))byOwner.set(ch.ownerId,[]);byOwner.get(ch.ownerId).push(ch)});
+  const havePresence=M6.live&&presentUids6().length>0;
+  const list=[];
+  byOwner.forEach((chs,owner)=>{
+    const pr=M6.present[owner],mine=owner===uid3();
+    let pick=chs.find(x=>x.id===(mine?M6.myChar:pr?.charId));
+    if(!pick)pick=chs.find(inScene)||chs[0];
+    list.push({uid:owner,ch:pick,others:chs.filter(x=>x!==pick),present:!havePresence||!!pr||mine,at:(mine?M6.joinedAt:pr?.at)||Number.MAX_SAFE_INTEGER});
+  });
+  const ix=new Map(all.map((c,i)=>[c.id,i]));
+  list.sort((a,b)=>(b.present-a.present)||(a.at-b.at)||(ix.get(a.ch.id)-ix.get(b.ch.id)));
+  return{players:list,gm};
+}
+/* quem está usando qual personagem (para a call, sussurro e pop-ups) */
+function charOfUser6(uid){const s=seats6().players.find(x=>x.uid===uid);return s?s.ch:null}
+T3.mesaSeats=seats6;T3.mesaCharOfUser=charOfUser6;
+
+function paneEl6(id){return $q(`#mesaDock [data-pane="${id}"]`)}
+function ensureMesaDom6(){
+  const tp=$('tablePanel'),box=$('tableCharacters');if(!tp||!box)return null;
+  let w=$('mesaWrap');
+  if(w)return w;
+  /* outros módulos inserem painéis "antes de #tableCharacters": continuam funcionando depois que ele muda de lugar */
+  const _ib=tp.insertBefore.bind(tp);
+  tp.insertBefore=function(n,ref){if(ref&&ref.parentNode!==tp)ref=$('mesaWrap')&&$('mesaWrap').parentNode===tp?$('mesaWrap'):null;return _ib(n,ref)};
+  const bar=document.createElement('div');bar.id='mesaBar';bar.className='mesa-bar';
+  bar.innerHTML=`<div class="mb-group" id="mbCall"></div><div class="mb-group mb-right"><div class="mb-vol" id="mbMusic"></div><span id="mbGm"></span></div>`;
+  w=document.createElement('div');w.id='mesaWrap';
+  const center=document.createElement('div');center.id='mesaCenter';
+  center.innerHTML=`<section id="mesaM" class="mesa-m" aria-label="Mestre"></section>
+   <section id="mapStage" class="map-stage" aria-label="Mesa: mapa tático"><div class="map-empty"><b>MESA</b><span>O mapa aparece aqui.</span></div></section>
+   <section id="mesaDock" class="mesa-dock"><div class="dock-tabs" role="tablist">${[['combate','⚔ Combate'],['rolagens','🎲 Rolagens'],['docs','📂 Documentos'],['musica','🎵 Música'],['notas','📝 Notas']].map(([id,l])=>`<button type="button" role="tab" data-dock="${id}">${l}</button>`).join('')}</div>${['combate','rolagens','docs','musica','notas'].map(id=>`<div class="dock-pane" data-pane="${id}" hidden></div>`).join('')}</section>`;
+  tp.insertBefore(bar,box);tp.insertBefore(w,box);w.append(center,box);
+  const gate=document.createElement('div');gate.id='mesaGate';gate.hidden=true;w.append(gate);
+  $$('[data-dock]',center).forEach(b=>b.onclick=()=>setDock6(b.dataset.dock,true));
+  paneEl6('rolagens').innerHTML='<div id="mesaQuick" class="mesa-quick"></div>';
+  paneEl6('docs').innerHTML='<div id="mesaDocs"></div>';
+  paneEl6('musica').innerHTML='<div id="mesaMusic"></div>';
+  paneEl6('notas').innerHTML='<div id="mesaNotes"></div>';
+  setDock6(M6.tab||'rolagens');
+  return w;
+}
+function setDock6(id,user=false){
+  M6.tab=id;if(user)M6.tabUser=Date.now();
+  $$('#mesaDock [data-dock]').forEach(b=>{const on=b.dataset.dock===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false')});
+  $$('#mesaDock [data-pane]').forEach(p=>{p.hidden=p.dataset.pane!==id});
+  if(id==='docs')renderDocs6();if(id==='musica')renderMusic6();if(id==='notas')renderNotes6();if(id==='rolagens')renderQuick6();
+}
+/* o painel de ação em combate passa a morar na aba Combate */
+ensureCombatPanel=function(){
+  const tp=$('tablePanel');if(!tp)return null;let p=$('t3Combat');
+  if(!p){p=document.createElement('section');p.id='t3Combat';p.className='combat-panel hide';(paneEl6('combate')||tp).append(p)}
+  return p;
+};
+function layoutMesa6(){
+  if(!camp3())return;
+  const w=ensureMesaDom6();if(!w)return;
+  const pc=paneEl6('combate'),pr=paneEl6('rolagens');
+  ['sceneTools','combatPanel','roundPanel','t3Combat'].forEach(id=>{const e=$(id);if(e&&e.parentNode!==pc)pc.append(e)});
+  {const h=$('rollHistoryPanel');if(h&&h.parentNode!==pr)pr.append(h)}
+  const {players,gm}=seats6(),isM=isGM6();
+  const cards=new Map($$('#tableCharacters .table-char').map(c=>[c.dataset.cid,c]));
+  const seated=new Set();let L=0,R=0,n=0;
+  players.forEach(s=>{
+    const card=cards.get(s.ch.id);if(!card)return;
+    if(!isM&&!inScene(s.ch)&&s.uid!==uid3())return;
+    const left=n%2===0;n++;seated.add(s.ch.id);
+    card.classList.add('seat');card.classList.toggle('absent',!s.present);card.classList.toggle('mine',s.uid===uid3());
+    card.style.setProperty('--col',left?1:3);card.style.setProperty('--row',left?++L:++R);
+    card.dataset.uid=s.uid;seatCard6(card,s);
+  });
+  cards.forEach((card,id)=>{if(!seated.has(id)){card.classList.add('off-seat');card.classList.remove('seat')}});
+  const rows=Math.max(L,R,1);
+  w.style.setProperty('--tpl',`repeat(${rows},auto) 1fr`);w.style.setProperty('--rows',rows+1);
+  w.classList.toggle('no-seats',n===0);
+  renderM6(gm);renderBar6();
+  /* combate ativo abre a aba Combate (a não ser que a pessoa acabou de escolher outra) */
+  const act=!!camp3()?.combat?.active;
+  if(act&&!M6.wasCombat&&Date.now()-(M6.tabUser||0)>4000)setDock6('combate');
+  M6.wasCombat=act;
+  const tb=$q('#mesaDock [data-dock="combate"]');if(tb)tb.classList.toggle('alert',act);
+  if(M6.tab==='rolagens')renderQuick6();
+  checkPrivateDocs6();entryFlow6();
+}
+/* cartão compacto de cada lugar "P": foto, nome, Vital, Essência, Lucidez, DF e estados */
+function seatCard6(card,s){
+  const ch=s.ch;
+  $$('.resource-row',card).forEach(r=>{const b=r.querySelector('.resource-bar');if(!b)return;const k=b.classList.contains('vt')?'VT':b.classList.contains('es')?'ES':'LU';r.dataset.k=k;const lab=r.querySelector('label');if(lab){lab.dataset.k=k;lab.title=lab.textContent}});
+  if(!card.querySelector('.seat-more')){
+    const b=document.createElement('button');b.type='button';b.className='seat-more';b.title='Mostrar ou esconder os controles';b.setAttribute('aria-label','Controles de '+nm(ch));b.textContent='⋯';
+    b.onclick=()=>{const o=!M6.openSeats.has(ch.id);o?M6.openSeats.add(ch.id):M6.openSeats.delete(ch.id);card.classList.toggle('open',o)};
+    (card.querySelector('.tc-head')||card).append(b);
+  }
+  card.classList.toggle('open',M6.openSeats.has(ch.id));
+  let tag=card.querySelector('.seat-tag');
+  const txt=!s.present?'ausente':'';
+  if(txt){if(!tag){tag=document.createElement('span');tag.className='seat-tag';card.querySelector('.tc-id')?.append(tag)}tag.textContent=txt}else tag?.remove();
+  /* rolagem pela mesa com escolha de atributo */
+  let rb=card.querySelector('.mesa-roll-btn');
+  if(!rb&&(isGM6()||s.uid===uid3())){rb=document.createElement('button');rb.type='button';rb.className='btn primary small mesa-roll-btn';let row=card.querySelector('.table-actions');if(!row){row=document.createElement('div');row.className='table-actions';card.append(row)}row.prepend(rb)}
+  if(rb){rb.textContent='🎲 Rolar';rb.onclick=()=>openRollPicker6(ch)}
+  if(s.uid===uid3()&&!isGM6()&&(s.others.length)&&!card.querySelector('.seat-swap')){
+    const sw=document.createElement('button');sw.type='button';sw.className='btn small seat-swap';sw.textContent='⇄ Trocar personagem';sw.onclick=()=>{M6.myChar=null;try{sessionStorage.removeItem('tulpa_mychar_'+camp3().id)}catch(e){}entryFlow6(true)};
+    card.append(sw);
+  }
+}
+
+/* ---------- caixa "M": Mestre, narrador e NPCs ---------- */
+function speaker6(){
+  const sp=M6.state.speaker||{},ch=sp.mode==='char'?charById(sp.charId):null;
+  return ch&&gmChar6(ch)?{mode:'char',ch}:{mode:'narrator',ch:null};
+}
+function renderM6(gm){
+  const box=$('mesaM');if(!box)return;
+  gm=gm||seats6().gm;const isM=isGM6(),sp=speaker6();
+  const vis=gm.filter(ch=>isM||inScene(ch));
+  const d=sp.ch?dOf6(sp.ch):NARRADOR;
+  const hiddenStats=ch=>!!ch.data?.hideStats&&!isM;
+  const mini=ch=>{const x=dOf6(ch),mx=STAGES[x.stage]||STAGES[1];if(hiddenStats(ch))return '<span class="sub">🔒 status ocultos</span>';return [['VT','vital',mx.vt,'vt'],['ES','essence',mx.es,'es'],['LU','lucidity',mx.luc,'luc']].map(([l,k,m,c])=>{const v=Math.max(0,Math.min(m,Number(x[k])||0));return `<div class="m-res" data-k="${l}"><span>${l}</span><div class="resource-bar ${c}"><span style="width:${m?v/m*100:0}%"></span></div><b>${v}/${m}</b>${isM?`<span class="m-pm"><button type="button" data-mres="${ch.id}|${k}|-5">−5</button><button type="button" data-mres="${ch.id}|${k}|-1">−</button><button type="button" data-mres="${ch.id}|${k}|1">+</button><button type="button" data-mres="${ch.id}|${k}|5">+5</button></span>`:''}</div>`}).join('')};
+  const sig=JSON.stringify([isM,sp.mode,sp.ch?.id,sp.ch?[nm(sp.ch),d.vital,d.essence,d.lucidity,d.stage,stIds(d),d.hideStats,inScene(sp.ch)]:0,vis.map(c=>[c.id,nm(c),inScene(c)])]);
+  if(box.dataset.sig!==sig){
+    box.dataset.sig=sig;
+    box.innerHTML=`<div class="m-main"><div class="m-av" id="mAv"></div><div class="m-id"><small>${sp.ch?'Mestre · falando como':'Mestre · narrando'}</small><b>${esc(sp.ch?nm(sp.ch):'Narrador')}</b>${sp.ch?`<div class="m-chips">${statusChips(d)||''}${hiddenStats(sp.ch)?'':`<span class="pill">DF ${E.defenseInfo(d).DF}</span>`}</div>`:''}</div></div>
+    ${sp.ch?`<div class="m-bars">${mini(sp.ch)}</div>`:''}
+    ${isM&&sp.ch?`<div class="m-act"><button type="button" class="btn small primary" data-mact="roll">🎲 Rolar</button><button type="button" class="btn small" data-mact="sheet">Abrir ficha</button><button type="button" class="btn small" data-mact="st">☠ Estados</button><button type="button" class="btn small" data-mact="hide">${sp.ch.data?.hideStats?'👁 Mostrar status':'🙈 Ocultar status'}</button><button type="button" class="btn small" data-mact="scene">${inScene(sp.ch)?'◉ Na cena':'◌ Fora da cena'}</button></div>`:''}
+    ${isM?`<div class="m-cast" role="group" aria-label="Quem está falando"><button type="button" class="m-chip ${sp.mode==='narrator'?'on':''}" data-speak=""><span class="m-chip-av" data-av="narr"></span>Narrador</button>${vis.map(ch=>`<button type="button" class="m-chip ${sp.ch?.id===ch.id?'on':''} ${inScene(ch)?'':'out'}" data-speak="${ch.id}" title="Falar como ${esc(nm(ch))}"><span class="m-chip-av" data-av="${ch.id}"></span>${esc(nm(ch))}</button>`).join('')}${vis.length?'':'<span class="sub">Crie NPCs e chefes em Personagens para falar por eles.</span>'}</div>`
+      :vis.length?`<div class="m-cast">${vis.map(ch=>`<span class="m-chip ro ${sp.ch?.id===ch.id?'on':''}"><span class="m-chip-av" data-av="${ch.id}"></span>${esc(nm(ch))}</span>`).join('')}</div>`:''}`;
+    $$('[data-speak]',box).forEach(b=>b.onclick=()=>{const id=b.dataset.speak;setState6({speaker:id?{mode:'char',charId:id}:{mode:'narrator',charId:null}});fx5('click')});
+    $$('[data-mres]',box).forEach(b=>b.onclick=()=>{const [id,k,dl]=b.dataset.mres.split('|');const real=$q(`#tableCharacters .table-char[data-cid="${id}"] [data-res="${id}|${k}|${dl}"]`);if(real)real.click();else mutateChar(charById(id),x=>{const mx=STAGES[x.stage]||STAGES[1],m={vital:mx.vt,essence:mx.es,lucidity:mx.luc}[k];x[k]=Math.max(0,Math.min(m,(Number(x[k])||0)+Number(dl)))})});
+    $$('[data-mact]',box).forEach(b=>b.onclick=()=>{const ch=speaker6().ch;if(!ch)return;const a=b.dataset.mact;
+      if(a==='roll')openRollPicker6(ch);else if(a==='sheet')loadCharacter(ch.id);else if(a==='st')masterStatuses(ch);else if(a==='hide')toggleHideStats(ch);
+      else if(a==='scene'){const eye=$q(`#tableCharacters .table-char[data-cid="${ch.id}"] .scene-eye`);if(eye&&!eye.disabled)eye.click();else toast('A cena fica travada durante o combate.')}});
+  }
+  /* as fotos são nós guardados: não piscam quando a caixa é redesenhada */
+  const av=$('mAv');if(av){const n=sp.ch?avNode('m:'+sp.ch.id,d,'xl'):avNode('m:narr',NARRADOR,'xl narr');if(av.firstElementChild!==n)av.replaceChildren(n)}
+  $$('.m-chip-av',box).forEach(h=>{const id=h.dataset.av,n=id==='narr'?avNode('mc:narr',NARRADOR,'sm narr'):avNode('mc:'+id,dOf6(charById(id)),'sm');if(h.firstElementChild!==n)h.replaceChildren(n)});
+  T3.voicePaint?.();
+}
+onState6(()=>{if(tableOpen6()){renderM6();renderBar6()}});
+
+/* ---------- barra de ferramentas da mesa ---------- */
+function renderBar6(){
+  const g=$('mbGm');if(!g)return;
+  const isM=isGM6(),p=M6.state.pause?.on;
+  const sig=[isM,p].join();
+  if(g.dataset.sig!==sig){
+    g.dataset.sig=sig;
+    g.innerHTML=isM?`<button type="button" class="btn small" id="mbImg">🖼 Enviar imagem</button><button type="button" class="btn small ${p?'primary':''}" id="mbPause">${p?'▶ Retomar sessão':'⏸ Intervalo'}</button>`:'';
+    if(isM){$('mbImg').onclick=openSendDoc6;$('mbPause').onclick=()=>togglePause6()}
+  }
+  renderVol6();T3.voiceBar?.();
+}
+
+/* ---------- entrada do jogador: personagem, foto e token ---------- */
+const tokOk6=d=>avOk(d?.tokenAvatar);
+async function imgSquare6(file,S=192){
+  if(!file||!/^image\//.test(file.type))throw new Error('escolha um arquivo de imagem (JPG, PNG ou WEBP)');
+  if(file.size>20e6)throw new Error('a imagem passa de 20 MB');
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('imagem inválida'));i.src=url});
+    const cv=document.createElement('canvas');cv.width=cv.height=S;const w=img.naturalWidth,h=img.naturalHeight,m=Math.min(w,h),x=cv.getContext('2d');
+    x.fillStyle='#2b211b';x.fillRect(0,0,S,S);x.imageSmoothingQuality='high';x.drawImage(img,(w-m)/2,(h-m)*.3,m,m,0,0,S,S);
+    let q=.86,out=cv.toDataURL('image/jpeg',q);while(out.length>30000&&q>.4){q-=.08;out=cv.toDataURL('image/jpeg',q)}
+    if(!avOk(out))throw new Error('não consegui converter a imagem');
+    return out;
+  }finally{URL.revokeObjectURL(url)}
+}
+/* imagem grande (mapa, documento): reduz o lado maior e a qualidade até caber no limite */
+async function imgFit6(file,max=1600,limit=700000){
+  if(!file||!/^image\//.test(file.type))throw new Error('escolha um arquivo de imagem (JPG, PNG ou WEBP)');
+  if(file.size>40e6)throw new Error('a imagem passa de 40 MB');
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('imagem inválida'));i.src=url});
+    let side=max,out='',w=0,h=0;
+    for(let step=0;step<7;step++){
+      const k=Math.min(1,side/Math.max(img.naturalWidth,img.naturalHeight));w=Math.max(1,Math.round(img.naturalWidth*k));h=Math.max(1,Math.round(img.naturalHeight*k));
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#1b1612';x.fillRect(0,0,w,h);x.imageSmoothingQuality='high';x.drawImage(img,0,0,w,h);
+      let q=.86;out=cv.toDataURL('image/jpeg',q);while(out.length>limit&&q>.5){q-=.08;out=cv.toDataURL('image/jpeg',q)}
+      if(out.length<=limit)break;side=Math.round(side*.8);
+    }
+    return{data:out,w,h};
+  }finally{URL.revokeObjectURL(url)}
+}
+T3._imgFit=imgFit6;T3._imgSquare=imgSquare6;
+function myChars6(){const u=uid3();return u?chars3().filter(c=>c.ownerId===u&&!gmChar6(c)):[]}
+function chooseChar6(id){
+  M6.myChar=id;try{sessionStorage.setItem('tulpa_mychar_'+camp3().id,id)}catch(e){}
+  trackMe6();layoutMesa6();
+}
+function entryFlow6(force=false){
+  const gate=$('mesaGate');if(!gate)return;
+  if(isGM6()||!cloud6()||!tableOpen6()){gate.hidden=true;return}
+  const mine=myChars6();if(!mine.length){gate.hidden=true;return}
+  let ch=mine.find(c=>c.id===M6.myChar);
+  if(!ch&&mine.length===1){chooseChar6(mine[0].id);return}
+  if(!ch){
+    const sig='pick:'+mine.map(c=>c.id).join();
+    if(gate.dataset.sig!==sig||force){
+      gate.dataset.sig=sig;
+      gate.innerHTML=`<div class="gate-card" role="dialog" aria-label="Escolha do personagem"><h3>Com qual personagem você entra na mesa?</h3><p class="sub">Você tem ${mine.length} personagens nesta campanha. Dá para trocar depois, no seu lugar à mesa.</p><div class="gate-pick">${mine.map(c=>`<button type="button" class="gate-opt" data-pick="${c.id}">${av5(c.data,'lg')}<b>${esc(nm(c))}</b><small>Estágio ${Number(c.data?.stage)||1}</small></button>`).join('')}</div></div>`;
+      $$('[data-pick]',gate).forEach(b=>b.onclick=()=>{gate.dataset.sig='';chooseChar6(b.dataset.pick)});
+    }
+    gate.hidden=false;return;
+  }
+  const d=dOf6(ch),hasA=avOk(d.avatar),hasT=tokOk6(d);
+  if(hasA&&hasT){gate.hidden=true;gate.dataset.sig='';return}
+  const sig='img:'+ch.id+hasA+hasT;
+  if(gate.dataset.sig!==sig){
+    gate.dataset.sig=sig;
+    gate.innerHTML=`<div class="gate-card" role="dialog" aria-label="Foto e token do personagem"><h3>${esc(nm(ch))} precisa de foto e de token</h3><p class="sub">A foto aparece no seu lugar à mesa e na chamada. O token é a peça que você move no mapa.</p>
+     <div class="gate-imgs">
+      <div class="gate-slot ${hasA?'ok':''}"><div class="gate-prev">${hasA?`<img src="${d.avatar}" alt="">`:'<span>?</span>'}</div><b>Foto de perfil</b><button type="button" class="btn small ${hasA?'':'primary'}" data-up="avatar">${hasA?'Trocar foto':'Escolher foto'}</button></div>
+      <div class="gate-slot round ${hasT?'ok':''}"><div class="gate-prev">${hasT?`<img src="${d.tokenAvatar}" alt="">`:'<span>?</span>'}</div><b>Token do mapa</b><button type="button" class="btn small ${hasT?'':'primary'}" data-up="tokenAvatar">${hasT?'Trocar token':'Escolher token'}</button>${hasA&&!hasT?'<button type="button" class="btn small" data-same>Usar a mesma foto</button>':''}</div>
+     </div><input type="file" accept="image/*" id="gateFile" hidden>${mine.length>1?'<button type="button" class="btn small" data-back>← Escolher outro personagem</button>':''}</div>`;
+    let field='avatar';
+    $$('[data-up]',gate).forEach(b=>b.onclick=()=>{field=b.dataset.up;$('gateFile').click()});
+    $('gateFile').onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;try{const img=await imgSquare6(f);mutateChar(ch,x=>{x[field]=img});fx5('confirm');layoutMesa6()}catch(err){toast('Não consegui usar essa imagem: '+(err.message||'erro')+'.')}};
+    const same=$q('[data-same]',gate);if(same)same.onclick=()=>{mutateChar(ch,x=>{x.tokenAvatar=x.avatar});fx5('confirm');layoutMesa6()};
+    const back=$q('[data-back]',gate);if(back)back.onclick=()=>{M6.myChar=null;gate.dataset.sig='';entryFlow6(true)};
+  }
+  gate.hidden=false;
+}
+/* a ficha também permite trocar o token */
+{const _av6=avEditor;avEditor=function(){
+  _av6.apply(this,arguments);
+  const w=$('avEdit');if(!w)return;
+  if(!$('tokEdit')){
+    const t=document.createElement('div');t.id='tokEdit';t.className='av-edit tok-edit';
+    t.innerHTML=`<button type="button" class="av-btn round" id="tokBtn" aria-label="Trocar o token do mapa"></button><div class="av-txt"><b>Token do mapa</b><span class="sub">A peça redonda que representa o personagem no mapa da Visão de Mesa.</span><div class="inline"><button type="button" class="btn small" id="tokPick">Escolher token</button><button type="button" class="btn small" id="tokSame">Usar a foto</button><button type="button" class="btn small" id="tokDel">Remover</button></div></div><input type="file" id="tokFile" accept="image/*" hidden>`;
+    w.after(t);
+    const pick=()=>$('tokFile').click();$('tokBtn').onclick=pick;$('tokPick').onclick=pick;
+    $('tokFile').onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;try{data.tokenAvatar=await imgSquare6(f);save();fx5('confirm');toast('Token atualizado.')}catch(err){toast('Não consegui usar essa imagem: '+(err.message||'erro')+'.')}};
+    $('tokSame').onclick=()=>{if(!avOk(data.avatar)){toast('Escolha primeiro a foto do personagem.');return}data.tokenAvatar=data.avatar;save();toast('O token agora usa a foto do personagem.')};
+    $('tokDel').onclick=()=>{if(!data.tokenAvatar)return;delete data.tokenAvatar;save();toast('Token removido.')};
+  }
+  $('tokBtn').innerHTML=av5({...data,avatar:tokOk6(data)?data.tokenAvatar:null},'xl');
+  $('tokDel').style.display=data.tokenAvatar?'':'none';$('tokSame').style.display=avOk(data.avatar)?'':'none';
+}}
+
+/* ---------- rolagens: atributo puro e troca de atributo ---------- */
+const ATTR8=['Força','Destreza','Constituição','Inteligência','Percepção','Carisma','Aparência','Presença'];
+const attrDice6=(d,attr,m=E.computeMods(d))=>Math.max(1,(Number(d.attributes?.[attr])||1)+(m.attrDice[attr]||0)+m.allDice+(E.isPhysAttr(attr)?m.physDice:0));
+async function rollAttr6(ch,attr){
+  const d=ch?dOf6(ch):data,m=E.computeMods(d),r=attrRoll(d,attr,m);
+  const who=ch||{id:null,data:d};
+  await announceRoll(who,'Teste de '+attr,{dice:r.dice,sides:20,bonus:0,total:r.total,eyebrow:'ATRIBUTO PURO',note:`${r.n}d20, vale o maior dado. Sem perícia: só o atributo e os modificadores de carga e estado.`,share:!!(ch&&ch.id&&camp3()&&sb()&&(tableOpen6()||prefs.shareSheet))});
+  T3.narrateRoll?.({name:nm(who),skill:attr,dice:r.dice,total:r.total});
+  return r;
+}
+async function rollSkillAs6(ch,skill,attr){
+  const d=dOf6(ch),src={data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks};
+  const base=SKILL_ATTR[skill],use=attr&&ATTR8.includes(attr)?attr:base,c=skillCalc3(src,skill,use);
+  const r=E.rollTest(d,skill,use===base?SKILL_ATTR:{...SKILL_ATTR,[skill]:use},{mods:c.mods,bonus:c.bonus,disadv:c.dis,consumeDelta:true});
+  mutateChar(ch,x=>consumeOnce(x,c));
+  const notes=[];if(use!==base)notes.push(`Atributo trocado: ${use} no lugar de ${base}`);if(r.mode!=='normal')notes.push(r.mode);
+  await announceRoll(ch,skill+(use!==base?` (${use})`:''),{dice:r.dice,sides:20,bonus:r.bonus,total:r.total,note:notes.join(' · ')});
+  T3.narrateRoll?.({name:nm(ch),skill,dice:r.dice,total:r.total});
+  return r;
+}
+T3.rollAttr=rollAttr6;T3.rollSkillAs=rollSkillAs6;
+function openRollPicker6(ch){
+  if(!ch||!(isGM6()||ch.ownerId===uid3())){toast('Você só pode rolar pelo seu próprio personagem.');return}
+  const d=dOf6(ch),m=E.computeMods(d),src={data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks};
+  openModal('ROLAGEM NA MESA',nm(ch),`<h4 class="rp6-h">Atributo puro</h4><p class="sub">Rola só o atributo, sem perícia: vale o maior dado.</p><div class="rp6-attrs">${ATTR8.map(a=>`<button type="button" class="mesa-skill" data-pure="${a}"><b>${a}</b><small>${attrDice6(d,a,m)}d20</small></button>`).join('')}</div>
+   <h4 class="rp6-h">Perícia</h4><div class="rp6-row"><div class="field"><label for="rp6Attr">Rolar a perícia com qual atributo?</label><select id="rp6Attr"><option value="">O atributo padrão de cada perícia</option>${ATTR8.map(a=>`<option>${a}</option>`).join('')}</select></div><div class="field"><label for="rp6Search">Buscar</label><input class="search" id="rp6Search" placeholder="Nome da perícia"></div></div><div class="mesa-skill-grid" id="rp6Grid"></div>`,'Fechar',()=>closeModal());
+  const draw=()=>{
+    const q=normTxt($('rp6Search').value||''),at=$('rp6Attr').value;
+    const list=BASE_SKILLS.slice().sort((a,b)=>a.localeCompare(b,'pt-BR')).filter(s=>normTxt(s).includes(q));
+    $('rp6Grid').innerHTML=list.map(s=>{const k=skillCalc3(src,s,at||undefined);return `<button type="button" class="mesa-skill" data-skill="${esc(s)}"><b>${esc(s)}</b><small>${esc(at||k.attr)} · ${k.n}d20 · ${sign(k.bonus)}</small></button>`}).join('')||'<div class="empty" style="grid-column:1/-1">Nenhuma perícia encontrada.</div>';
+    $$('#rp6Grid [data-skill]').forEach(b=>b.onclick=()=>{closeModal();rollSkillAs6(ch,b.dataset.skill,at).catch(e=>fail3('rolagem',e))});
+  };
+  $('rp6Search').oninput=draw;$('rp6Attr').onchange=draw;draw();
+  $$('#modalBody [data-pure]').forEach(b=>b.onclick=()=>{closeModal();rollAttr6(ch,b.dataset.pure).catch(e=>fail3('rolagem',e))});
+}
+T3.openRollPicker=openRollPicker6;
+/* atalhos na aba Rolagens: um botão por personagem que eu controlo */
+function renderQuick6(){
+  const box=$('mesaQuick');if(!box)return;
+  const mine=chars3().filter(c=>isGM6()||(!!uid3()&&c.ownerId===uid3()));
+  const mineFirst=isGM6()?mine.filter(gmChar6).concat(mine.filter(c=>!gmChar6(c))):mine;
+  const sig=mineFirst.map(c=>c.id+nm(c)).join('|');
+  if(box.dataset.sig===sig)return;box.dataset.sig=sig;
+  box.innerHTML=mineFirst.length?`<span class="sub">Rolar por:</span>${mineFirst.map(c=>`<button type="button" class="btn small" data-qroll="${c.id}">🎲 ${esc(nm(c))}</button>`).join('')}`:'<span class="sub">Crie um personagem para rolar pela mesa.</span>';
+  $$('[data-qroll]',box).forEach(b=>b.onclick=()=>openRollPicker6(charById(b.dataset.qroll)));
+}
+/* na ficha: escolher o atributo de cada perícia e rolar atributo puro */
+M6.skAttr={};
+{const _rs6=renderSkills;renderSkills=function(){
+  _rs6.apply(this,arguments);
+  try{
+    $$('#skillGrid .skill').forEach(row=>{
+      const btn=row.querySelector('[data-roll]');if(!btn)return;const s=btn.dataset.roll,base=SKILL_ATTR[s],cur=M6.skAttr[s]||base;
+      const sel=document.createElement('select');sel.className='skill-attr-sel';sel.title='Atributo usado nesta rolagem';sel.setAttribute('aria-label','Atributo para rolar '+s);
+      sel.innerHTML=ATTR8.map(a=>`<option value="${a}" ${a===cur?'selected':''}>${a.slice(0,3).toUpperCase()}${a===base?' •':''}</option>`).join('');
+      btn.before(sel);
+      const info=row.querySelector('.skill-attr');
+      const paint=()=>{const a=sel.value;if(a===base)delete M6.skAttr[s];else M6.skAttr[s]=a;sel.classList.toggle('alt',a!==base);if(info){const k=skillCalc3({data,vocations,tracks},s,a);info.textContent=`${a}${a!==base?' (padrão: '+base+')':''} · ${k.n}d20 · vocação +${vocBonus(s)}`}};
+      sel.onchange=paint;if(cur!==base)paint();
+      btn.onclick=()=>rollSkill(s,sel.value);
+    });
+  }catch(e){console.warn('[T6] perícias',e)}
+}}
+{const _ra6=renderAttributes;renderAttributes=function(){
+  _ra6.apply(this,arguments);
+  try{
+    const m=E.computeMods(data);
+    $$('#attributes .attr-card').forEach((card,i)=>{
+      const a=ATTRS[i];if(!a||card.querySelector('.attr-roll'))return;
+      const b=document.createElement('button');b.type='button';b.className='roll attr-roll';b.textContent='🎲 '+attrDice6(data,a,m)+'d20';b.title='Rolar '+a+' puro, sem perícia';
+      b.onclick=()=>rollAttr6(charById(activeCharacterId)||null,a).catch(e=>fail3('rolagem',e));
+      card.append(b);
+    });
+  }catch(e){console.warn('[T6] atributos',e)}
+}}
+
+/* ---------- Perseus: balões que dão tempo de ler ---------- */
+const BUB_MIN=13000;
+function bubStack6(){let s=$('t3BubStack');if(!s){s=document.createElement('div');s.id='t3BubStack';s.setAttribute('aria-hidden','true');($('t3PerseusRoot')||document.body).append(s)}return s}
+function bubOld6(html,left){
+  const s=bubStack6(),o=document.createElement('div');o.className='t3-bubold';o.innerHTML=html;o.title='Clique para fechar';s.append(o);
+  while(s.children.length>2)s.firstElementChild.remove();
+  let t=setTimeout(()=>o.remove(),Math.max(6000,left));
+  o.onmouseenter=()=>clearTimeout(t);o.onmouseleave=()=>{t=setTimeout(()=>o.remove(),4000)};o.onclick=()=>o.remove();
+}
+say=function(html,ms){
+  const b=$('t3CatBubble');if(!b||!prefs.perseus)return;
+  const len=String(html).replace(/<[^>]+>/g,'').length,dur=Math.max(BUB_MIN,Number(ms)||0,6000+len*80);
+  /* a fala anterior não some: sobe e continua na tela até dar o tempo dela */
+  if(b.classList.contains('show')&&b.innerHTML&&b.innerHTML!==html&&(PS.bubbleEnd||0)-Date.now()>1200)bubOld6(b.innerHTML,PS.bubbleEnd-Date.now());
+  clearTimeout(PS.bubbleTimer);b.innerHTML=html;b.classList.add('show');b.title='Clique para fechar';
+  const hide=()=>{b.classList.remove('show');PS.bubbleEnd=0};
+  PS.bubbleEnd=Date.now()+dur;PS.bubbleTimer=setTimeout(hide,dur);
+  b.onmouseenter=()=>{clearTimeout(PS.bubbleTimer);PS.bubbleEnd=Date.now()+600000};
+  b.onmouseleave=()=>{PS.bubbleEnd=Date.now()+4500;PS.bubbleTimer=setTimeout(hide,4500)};
+  b.onclick=e=>{if(e.target.closest('[data-pact],a,button'))return;clearTimeout(PS.bubbleTimer);hide()};
+  const st=bubStack6();st.style.bottom=(window.innerHeight-b.getBoundingClientRect().top+8)+'px';
+};
+T3.say=say;
+/* avisos rápidos também ficam mais tempo quando o texto é longo */
+{let _tt6=null;toast=function(msg){const t=$('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(_tt6);_tt6=setTimeout(()=>t.classList.remove('show'),Math.max(3200,1800+String(msg).length*55))}}
+
+/* ---------- bloco de notas (BN) ---------- */
+function bnWhere6(){
+  if(camp3()&&isGM6())return{kind:'gm'};
+  const ch=camp3()?(charById(M6.myChar)||charById(activeCharacterId)||myChars6()[0]):null;
+  if(ch)return{kind:'ch',ch};
+  return{kind:'sheet'};
+}
+function bnList6(){const w=bnWhere6();if(w.kind==='gm')return M6.gmNotes||[];if(w.kind==='ch')return dOf6(w.ch).notepad||[];return data.notepad||[]}
+function bnSave6(list){
+  const w=bnWhere6();
+  if(w.kind==='gm'){M6.gmNotes=list;lsSet6('tulpa_bn_gm_'+camp3().id,list);if(M6.backend==='store')stPut6('gmnotes:'+uid3(),'note',{list},[uid3()]).catch(e=>console.warn('[T6] notas do Mestre',e))}
+  else if(w.kind==='ch')mutateChar(w.ch,d=>{d.notepad=list});
+  else{data.notepad=list;save()}
+  if(M6.tab==='notas')renderNotes6();renderSheetDocs6();
+}
+function bnAdd6(text){const t=String(text||'').trim().slice(0,1200);if(!t)return null;const n={id:rid(),t,at:Date.now()};bnSave6([...bnList6(),n].slice(-200));return n}
+function bnDel6(id){bnSave6(bnList6().filter(n=>n.id!==id))}
+T3.bn={list:bnList6,add:bnAdd6,del:bnDel6,where:bnWhere6};
+const bnDate6=at=>{try{return new Date(at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}catch(e){return ''}};
+function bnHtml6(list,{del=true}={}){
+  return list.length?`<ol class="bn-list">${list.map(n=>`<li><span class="bn-t">${esc(n.t)}</span><small>${bnDate6(n.at)}</small>${del?`<button type="button" class="bn-x" data-bndel="${n.id}" title="Apagar esta nota" aria-label="Apagar esta nota">✕</button>`:''}</li>`).join('')}</ol>`:'<p class="sub">Nenhuma nota ainda.</p>';
+}
+function bnPanel6(box){
+  if(!box)return;const w=bnWhere6();
+  const who=w.kind==='gm'?'Bloco de notas do Mestre. Só você vê.':w.kind==='ch'?`Bloco de notas de ${esc(nm(w.ch))}. É particular: os outros jogadores não veem.`:'Bloco de notas desta ficha.';
+  box.innerHTML=`<p class="sub">${who} Você também pode pedir ao Perseus: “adiciona no BN: …” e “o que tem no meu BN?”.</p><form class="bn-form"><input class="search" name="t" maxlength="1200" placeholder="Escreva uma nota" aria-label="Nova nota"><button class="btn primary small">Anotar</button></form>${bnHtml6(bnList6())}`;
+  box.querySelector('form').onsubmit=e=>{e.preventDefault();const i=e.target.elements.t;if(bnAdd6(i.value)){fx5('confirm')}};
+  $$('[data-bndel]',box).forEach(b=>b.onclick=()=>bnDel6(b.dataset.bndel));
+}
+function renderNotes6(){bnPanel6($('mesaNotes'))}
+
+/* ---------- documentos e imagens pop-up ---------- */
+const docSeen6=id=>{M6.seenDocs=M6.seenDocs||new Set();if(M6.seenDocs.has(id))return true;M6.seenDocs.add(id);lsSet6('tulpa_docs_seen_'+(uid3()||'x'),[...M6.seenDocs].slice(-300));return false};
+function showDoc6(title,src){
+  let p=$('docPop');
+  if(!p){p=document.createElement('div');p.id='docPop';p.innerHTML='<div class="doc-card" role="dialog" aria-modal="true" aria-label="Imagem enviada pelo Mestre"><button type="button" class="doc-x" aria-label="Fechar">✕</button><div class="doc-title"></div><div class="doc-img"><img alt=""></div></div>';document.body.append(p);
+    const close=()=>p.classList.remove('show');p.querySelector('.doc-x').onclick=close;p.onclick=e=>{if(e.target===p)close()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&p.classList.contains('show'))close()})}
+  p.querySelector('.doc-title').textContent=title||'Imagem do Mestre';p.querySelector('img').src=src;p.querySelector('img').alt=title||'';
+  p.classList.add('show');p.querySelector('.doc-x').focus({preventScroll:true});
+}
+async function openDoc6(key,title,inline){
+  try{const src=inline||await assetData6(key);if(!src){toast('Essa imagem não está mais disponível.');return}showDoc6(title,src)}
+  catch(e){toast('Não consegui abrir a imagem: '+(e?.message||'erro'))}
+}
+async function refreshDocs6(){
+  try{M6.docs=(await stList6('doc')).map(x=>({key:x.key,title:x.meta?.title||'Imagem',at:x.meta?.at||Date.parse(x.created_at)||0,audience:Array.isArray(x.audience)&&x.audience.length?x.audience:null})).sort((a,b)=>b.at-a.at)}catch(e){console.warn('[T6] documentos',e)}
+  if(M6.tab==='docs')renderDocs6();
+}
+/* chegou um documento para todos: abre o pop-up uma única vez */
+function docArrived6(key){
+  const d=M6.docs.find(x=>x.key===key);if(!d||d.audience)return;
+  if(Date.now()-d.at>180000){docSeen6(key);return}
+  if(docSeen6(key))return;
+  fx5('activate');openDoc6(key,d.title);
+}
+/* documentos enviados só para mim ficam na minha ficha */
+function checkPrivateDocs6(){
+  if(isGM6()||!uid3())return;
+  myChars6().forEach(ch=>(dOf6(ch).docs||[]).forEach(x=>{
+    if(!x||!x.id)return;const fresh=Date.now()-(x.at||0)<180000;
+    if(docSeen6(x.id)||!fresh)return;
+    fx5('activate');openDoc6('doc:'+x.id,x.title,x.img);say(`📂 O Mestre mandou uma imagem só para você: <b>${esc(x.title||'sem título')}</b>. Ela fica guardada na sua ficha, em Documentos / Pistas.`);
+  }));
+}
+function privDocs6(){const out=[];myChars6().forEach(ch=>(dOf6(ch).docs||[]).forEach(x=>{if(x&&x.id)out.push({...x,ch})}));return out.sort((a,b)=>(b.at||0)-(a.at||0))}
+function removePrivDoc6(ch,id){
+  mutateChar(ch,d=>{d.docs=(d.docs||[]).filter(x=>x.id!==id)});
+  if(M6.backend==='store')stDel6('doc:'+id).catch(()=>{});
+  renderDocs6();renderSheetDocs6();
+}
+function docRows6(list,{del}={}){
+  return list.map(x=>`<li><button type="button" class="doc-open" data-dopen="${esc(x.key||'doc:'+x.id)}" data-dtitle="${esc(x.title||'Imagem')}">🖼 ${esc(x.title||'Imagem')}</button><small>${bnDate6(x.at)}${x.who?' · '+esc(x.who):''}</small>${del?`<button type="button" class="bn-x" data-ddel="${esc(x.key||x.id)}" title="Apagar" aria-label="Apagar ${esc(x.title||'imagem')}">✕</button>`:''}</li>`).join('');
+}
+function renderDocs6(){
+  const box=$('mesaDocs');if(!box)return;const isM=isGM6();
+  const pub=M6.docs.filter(d=>!d.audience),prv=isM?M6.docs.filter(d=>d.audience).map(d=>({...d,who:'só para '+d.audience.map(u=>nm(charOfUser6(u))||'jogador').join(', ')})):privDocs6();
+  box.innerHTML=`${isM?'<div class="inline"><button type="button" class="btn primary small" id="docSend">🖼 Enviar imagem</button><span class="sub">Abre como pop-up na tela de quem você escolher.</span></div>':''}
+   <h4>Para todos na mesa</h4>${pub.length?`<ul class="doc-list">${docRows6(pub,{del:isM})}</ul>`:'<p class="sub">O Mestre ainda não enviou nenhuma imagem para a mesa.</p>'}
+   <h4>${isM?'Enviadas em particular':'Só para você'}</h4>${prv.length?`<ul class="doc-list">${docRows6(prv,{del:true})}</ul>`:`<p class="sub">${isM?'Nenhuma imagem particular enviada.':'Nenhuma pista particular. Quando o Mestre mandar, ela aparece aqui e na sua ficha.'}</p>`}`;
+  const s=$('docSend');if(s)s.onclick=openSendDoc6;
+  bindDocs6(box);
+}
+function bindDocs6(box){
+  const prv=isGM6()?[]:privDocs6();
+  $$('[data-dopen]',box).forEach(b=>b.onclick=()=>{const k=b.dataset.dopen,p=prv.find(x=>'doc:'+x.id===k);openDoc6(k,b.dataset.dtitle,p?.img)});
+  $$('[data-ddel]',box).forEach(b=>b.onclick=async()=>{
+    const k=b.dataset.ddel,p=prv.find(x=>x.id===k);
+    if(p){if(confirm('Apagar esta pista da sua ficha?'))removePrivDoc6(p.ch,p.id);return}
+    if(!isGM6())return;if(!confirm('Apagar esta imagem dos Documentos? Ela some para todos.'))return;
+    try{const d=M6.docs.find(x=>x.key===k);await stDel6(k);if(d?.audience){const id=k.replace(/^doc:/,'');d.audience.forEach(u=>chars3().filter(c=>c.ownerId===u).forEach(c=>{if((c.data?.docs||[]).some(x=>x.id===id))mutateChar(c,x=>{x.docs=(x.docs||[]).filter(y=>y.id!==id)})}))}delete M6.assetCache[k];await refreshDocs6();cast6({t:'doc',key:k})}catch(e){toast('Não consegui apagar: '+(e?.message||'erro'))}
+  });
+}
+function openSendDoc6(){
+  if(!isGM6())return;
+  const players=seats6().players;
+  openModal('ENVIAR IMAGEM','Pop-up para a mesa',`<div class="field"><label for="sdFile">Imagem (pista, carta, foto)</label><input type="file" id="sdFile" accept="image/*"></div><div class="field"><label for="sdTitle">Título</label><input id="sdTitle" maxlength="80" placeholder="Ex.: Carta encontrada na gaveta"></div>
+   <fieldset class="sd-aud"><legend>Quem recebe</legend><label class="t3-check"><input type="radio" name="sdAud" value="all" checked> Todos na mesa (fica salva em Documentos)</label><label class="t3-check"><input type="radio" name="sdAud" value="some"> Só os jogadores marcados (fica salva na ficha de cada um)</label>
+   <div class="sd-players" id="sdPlayers">${players.length?players.map(s=>`<label class="t3-check"><input type="checkbox" value="${s.uid}" disabled> ${esc(nm(s.ch))}${s.present?'':' <span class="sub">(ausente)</span>'}</label>`).join(''):'<span class="sub">Nenhum jogador na campanha ainda.</span>'}</div></fieldset>`,'Enviar',async()=>{
+    const f=$('sdFile').files&&$('sdFile').files[0],title=($('sdTitle').value||'').trim()||'Imagem do Mestre';
+    if(!f){toast('Escolha a imagem primeiro.');return}
+    const some=$q('[name="sdAud"]:checked').value==='some',targets=some?$$('#sdPlayers input:checked').map(i=>i.value):null;
+    if(some&&!targets.length){toast('Marque pelo menos um jogador.');return}
+    closeModal();
+    try{await sendDoc6(f,title,targets);toast(targets?'Imagem enviada em particular.':'Imagem enviada para a mesa.')}catch(e){toast('Não consegui enviar: '+(e?.message||'erro'))}
+  });
+  $$('[name="sdAud"]').forEach(r=>r.onchange=()=>{const on=$q('[name="sdAud"]:checked').value==='some';$$('#sdPlayers input').forEach(i=>{i.disabled=!on})});
+}
+async function sendDoc6(file,title,targets){
+  const id='d'+rid(),at=Date.now(),store=(await stDetect6())==='store';
+  if(!targets){
+    const im=await imgFit6(file,1600,700000);
+    await stPut6('doc:'+id,'doc',{meta:{title,at},data:im.data},null);M6.assetCache['doc:'+id]=im.data;
+    docSeen6('doc:'+id);await refreshDocs6();cast6({t:'doc',key:'doc:'+id});showDoc6(title,im.data);return id;
+  }
+  /* particular: a referência vai para a ficha de cada jogador marcado.
+     Com a tabela campaign_store, a imagem fica lá, visível só para o destinatário (RLS);
+     na reserva, uma versão menor vai dentro da própria ficha. */
+  const im=await imgFit6(file,store?1600:1000,store?700000:170000);
+  if(store)await stPut6('doc:'+id,'doc',{meta:{title,at,priv:true},data:im.data},targets);
+  let n=0;
+  targets.forEach(u=>{const ch=charOfUser6(u);if(!ch||!ch._sheetAvailable)return;n++;mutateChar(ch,d=>{d.docs=[...(d.docs||[]),{id,title,at,...(store?{}:{img:im.data})}].slice(-(store?60:12))})});
+  if(!n)throw new Error('a ficha do jogador não está disponível');
+  await refreshDocs6();return id;
+}
+T3.sendDoc=sendDoc6;T3.showDoc=showDoc6;T3._asset=assetData6;T3._refreshDocs=refreshDocs6;
+
+/* aba "Documentos / Pistas" dentro da ficha */
+function renderSheetDocs6(){
+  if(!$('tab-inventory'))return;
+  let sec=$('tab-docs');
+  if(!sec){
+    const main=$q('.main'),side=$q('.side'),before=$q('[data-tab="records"]');if(!main||!side)return;
+    sec=document.createElement('section');sec.className='tab';sec.id='tab-docs';main.insertBefore(sec,$('tab-records'));
+    const b=document.createElement('button');b.className='navbtn';b.dataset.tab='docs';b.innerHTML='<span class="ico">📂</span> Documentos / Pistas';side.insertBefore(b,before);
+    b.onclick=()=>{$$('.navbtn').forEach(x=>x.classList.toggle('active',x===b));$$('.tab').forEach(x=>x.classList.toggle('active',x.id==='tab-docs'))};
+    try{NAV.mo&&NAV.mo.observe(sec,{attributes:true,attributeFilter:['class']})}catch(e){}
+  }
+  const list=(data.docs||[]).filter(x=>x&&x.id).slice().sort((a,b)=>(b.at||0)-(a.at||0));
+  const sig=JSON.stringify([list.map(x=>x.id),(data.notepad||[]).map(n=>n.id),activeCharacterId,M6.gmNotes?.length]);
+  if(sec.dataset.sig===sig)return;sec.dataset.sig=sig;
+  sec.innerHTML=`<div class="panel"><div class="panel-head"><h2>Documentos / Pistas</h2><span class="pill">${list.length} ${list.length===1?'imagem':'imagens'}</span></div><p class="sub">Imagens que o Mestre mandou só para este personagem. Você pode ver de novo ou apagar.</p>${list.length?`<ul class="doc-list">${list.map(x=>`<li><button type="button" class="doc-open" data-sdoc="${esc(x.id)}">🖼 ${esc(x.title||'Imagem')}</button><small>${bnDate6(x.at)}</small><button type="button" class="bn-x" data-sdel="${esc(x.id)}" title="Apagar" aria-label="Apagar ${esc(x.title||'imagem')}">✕</button></li>`).join('')}</ul>`:'<p class="sub">Nenhuma pista por enquanto.</p>'}</div><div class="panel"><div class="panel-head"><h2>Bloco de notas</h2></div><div id="sheetNotes"></div></div>`;
+  $$('[data-sdoc]',sec).forEach(b=>b.onclick=()=>{const x=list.find(y=>y.id===b.dataset.sdoc);openDoc6('doc:'+x.id,x.title,x.img)});
+  $$('[data-sdel]',sec).forEach(b=>b.onclick=()=>{if(!confirm('Apagar esta pista da ficha?'))return;const id=b.dataset.sdel;data.docs=(data.docs||[]).filter(x=>x.id!==id);save();if(M6.backend==='store')stDel6('doc:'+id).catch(()=>{})});
+  /* dentro da ficha, o bloco é sempre o deste personagem */
+  const box=$('sheetNotes'),notes=data.notepad||[];
+  box.innerHTML=`<p class="sub">Notas particulares deste personagem. Peça ao Perseus: “adiciona no BN: …”.</p><form class="bn-form"><input class="search" name="t" maxlength="1200" placeholder="Escreva uma nota" aria-label="Nova nota"><button class="btn primary small">Anotar</button></form>${bnHtml6(notes)}`;
+  box.querySelector('form').onsubmit=e=>{e.preventDefault();const t=e.target.elements.t.value.trim();if(!t)return;data.notepad=[...(data.notepad||[]),{id:rid(),t:t.slice(0,1200),at:Date.now()}].slice(-200);save()};
+  $$('[data-bndel]',box).forEach(b=>b.onclick=()=>{data.notepad=(data.notepad||[]).filter(n=>n.id!==b.dataset.bndel);save()});
+}
+{const _rst6=T3.renderSheetTabs;T3.renderSheetTabs=function(){_rst6.apply(this,arguments);try{renderSheetDocs6()}catch(e){console.warn('[T6] documentos da ficha',e)}}}
+
+/* ---------- música (YouTube), playlist por momento e intervalo ---------- */
+const YT6={api:null,player:null,ready:null,sig:'',synth:null,blocked:false};
+if(prefs.musicVol===undefined)prefs.musicVol=60;
+const MOMENTS6=['Revelação da Sala','Investigação','Combate','Chefe','Calmaria','Tensão','Intervalo'];
+function ytId6(url){
+  const s=String(url||'').trim();if(/^[\w-]{11}$/.test(s))return s;
+  const m=s.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/|\/live\/)([\w-]{11})/);return m?m[1]:null;
+}
+T3._ytId=ytId6;
+function ytApi6(){
+  if(YT6.api)return YT6.api;
+  YT6.api=new Promise((ok,no)=>{
+    if(window.YT&&window.YT.Player)return ok();
+    const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{try{prev&&prev()}catch(e){}ok()};
+    const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{YT6.api=null;no(new Error('não consegui falar com o YouTube'))};document.head.append(s);
+    setTimeout(()=>{if(!(window.YT&&window.YT.Player)){YT6.api=null;no(new Error('o YouTube demorou demais para responder'))}},15000);
+  });
+  return YT6.api;
+}
+function ytPlayer6(){
+  if(YT6.ready)return YT6.ready;
+  YT6.ready=ytApi6().then(()=>new Promise(ok=>{
+    let host=$('mesaYTBox');if(!host){host=document.createElement('div');host.id='mesaYTBox';host.innerHTML='<div id="mesaYT"></div>';document.body.append(host)}
+    YT6.player=new window.YT.Player('mesaYT',{width:200,height:113,playerVars:{autoplay:1,controls:0,disablekb:1,playsinline:1,rel:0,modestbranding:1},events:{
+      onReady:()=>{try{YT6.player.setVolume(prefs.musicVol)}catch(e){}ok(YT6.player)},
+      onStateChange:e=>{
+        if(e.data===0){try{YT6.player.seekTo(0,true);YT6.player.playVideo()}catch(x){}} /* repete enquanto o Mestre não trocar */
+        if(e.data===1){YT6.blocked=false;const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
+      },
+      onError:()=>{if(isGM6())toast('O YouTube não deixou tocar esse vídeo (o dono pode ter bloqueado a reprodução fora do site).')}
+    }});
+  })).catch(e=>{YT6.ready=null;throw e});
+  return YT6.ready;
+}
+/* a música que deve estar tocando agora: no intervalo, a de espera */
+function wantMusic6(){
+  const st=M6.state;
+  if(st.pause?.on){const w=(st.playlist||[]).find(x=>/intervalo|espera|pausa/.test(normTxt(x.moment||'')));return w?{vid:w.vid,title:w.title,playing:true,pos:0,ts:st.pause.since||Date.now(),wait:true}:{synth:true,playing:true,ts:st.pause.since||0,wait:true}}
+  return st.music&&st.music.vid?st.music:null;
+}
+async function syncMusic6(){
+  const m=wantMusic6(),sig=m?[m.vid||'synth',m.ts,m.playing,m.pos].join('|'):'';
+  if(sig===YT6.sig)return;YT6.sig=sig;
+  if(!m||!m.playing||!m.synth)stopWait6();
+  if(!m||!m.playing){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}renderVol6();return}
+  if(m.synth){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}startWait6();renderVol6();return}
+  try{
+    const p=await ytPlayer6();if(YT6.sig!==sig)return;
+    p.setVolume(prefs.musicVol);p.loadVideoById({videoId:m.vid,startSeconds:Math.max(0,(Number(m.pos)||0)+(Date.now()-(m.ts||Date.now()))/1000)});
+    setTimeout(()=>{try{if(YT6.sig===sig&&![1,3].includes(p.getPlayerState())){YT6.blocked=true;renderVol6()}}catch(e){}},3500);
+  }catch(e){console.warn('[T6] música',e);if(isGM6())toast('Música: '+(e.message||'erro')+'.')}
+  renderVol6();
+}
+onState6(()=>{syncMusic6();if(M6.tab==='musica')renderMusic6();renderPause6()});
+M6.hooks.leave.push(()=>{YT6.sig='';stopWait6();try{YT6.player&&YT6.player.stopVideo()}catch(e){}$('mesaPause')?.classList.remove('show')});
+/* musiquinha de espera feita na hora (caixinha de música), quando a playlist não tem uma faixa "Intervalo" */
+function startWait6(){
+  if(YT6.synth)return;const c=actx();if(!c)return;
+  const scale=[523.25,587.33,659.25,783.99,880,1046.5],bass=[130.81,174.61,146.83,196];let i=0;
+  const tick=()=>{
+    const v=(prefs.musicVol||0)/100;if(!v||!A5.ctx)return;const t=A5.ctx.currentTime+.03,bar=Math.floor(i/8)%4;
+    if(i%8===0)o5('sine',bass[bar],t,2.4,{gain:.05*v,attack:.05,wet:.7});
+    const n=scale[(i*3+bar*2+(i%3===0?2:0))%scale.length];
+    if(i%2===0||Math.random()<.35){o5('triangle',n,t,.9,{gain:.035*v,wet:.8});o5('sine',n*2,t,.6,{gain:.012*v,wet:.8})}
+    i++;
+  };
+  YT6.synth=setInterval(tick,330);tick();
+}
+function stopWait6(){if(YT6.synth){clearInterval(YT6.synth);YT6.synth=null}}
+function setVol6(v){prefs.musicVol=Math.max(0,Math.min(100,Number(v)||0));savePrefs();try{YT6.player&&YT6.player.setVolume(prefs.musicVol)}catch(e){}}
+function renderVol6(){
+  const b=$('mbMusic');if(!b)return;const m=wantMusic6(),on=!!(m&&m.playing);
+  const label=on?(m.synth?'Música de espera':(m.title||'Música da mesa')):'Sem música';
+  if(!b.firstChild){
+    b.innerHTML=`<button type="button" class="mb-ico" id="mbMute" aria-label="Silenciar a música"></button><input type="range" id="mbVol" min="0" max="100" step="1" aria-label="Volume da música"><span class="mb-now" id="mbNow"></span><button type="button" class="btn small primary hide" id="mbUnlock">▶ Ativar som</button>`;
+    $('mbVol').oninput=e=>{setVol6(e.target.value);renderVol6()};
+    $('mbMute').onclick=()=>{if(prefs.musicVol>0){M6.volBack=prefs.musicVol;setVol6(0)}else setVol6(M6.volBack||60);renderVol6()};
+    $('mbUnlock').onclick=()=>{try{actx();YT6.player&&YT6.player.playVideo()}catch(e){}YT6.blocked=false;renderVol6()};
+  }
+  $('mbVol').value=prefs.musicVol;$('mbMute').textContent=prefs.musicVol>0?'🔊':'🔇';$('mbMute').title=prefs.musicVol>0?'Silenciar a música (só para você)':'Ligar a música';
+  $('mbNow').textContent=(on?'♪ ':'')+label;$('mbNow').classList.toggle('on',on);
+  $('mbUnlock').classList.toggle('hide',!(on&&YT6.blocked));
+  const pv=$('pauseVol');if(pv)pv.value=prefs.musicVol;
+}
+/* comandos do Mestre */
+function curPos6(){try{return YT6.player&&YT6.player.getCurrentTime?YT6.player.getCurrentTime():0}catch(e){return 0}}
+function playTrack6(id){const t=(M6.state.playlist||[]).find(x=>x.id===id);if(!t||!isGM6())return false;setState6({music:{vid:t.vid,title:t.title||'',moment:t.moment||'',playing:true,pos:0,ts:Date.now()}});return true}
+function pauseMusic6(){const m=M6.state.music;if(!m||!isGM6())return;setState6({music:{...m,playing:false,pos:curPos6(),ts:Date.now()}})}
+function resumeMusic6(){const m=M6.state.music;if(!m||!isGM6())return;setState6({music:{...m,playing:true,ts:Date.now()}})}
+function stopMusic6(){if(isGM6())setState6({music:null})}
+function addTrack6(url,title,moment){
+  const vid=ytId6(url);if(!vid)return null;
+  const t={id:'t'+rid(),vid,title:String(title||'').trim().slice(0,90),moment:String(moment||'').trim().slice(0,40)};
+  setState6({playlist:[...(M6.state.playlist||[]),t].slice(-80)});return t;
+}
+function findTrack6(q){
+  const n=normTxt(q).replace(/\b(a|o|as|os|da|do|de|para|pra|musica|trilha|som|momento|tema)\b/g,' ').replace(/\s+/g,' ').trim();if(!n)return null;
+  const pl=M6.state.playlist||[],words=n.split(' ');
+  let best=null,bs=0;
+  pl.forEach(t=>{const hay=normTxt((t.moment||'')+' '+(t.title||''));let s=0;if(normTxt(t.moment||'')===n)s+=10;if(hay.includes(n))s+=5;words.forEach(w=>{if(w.length>2&&hay.includes(w))s+=1});if(s>bs){bs=s;best=t}});
+  return bs>=1?best:null;
+}
+T3.music={add:addTrack6,play:playTrack6,pause:pauseMusic6,stop:stopMusic6,find:findTrack6,vol:setVol6};
+function renderMusic6(){
+  const box=$('mesaMusic');if(!box)return;const isM=isGM6(),st=M6.state,pl=st.playlist||[],m=st.music;
+  const act=document.activeElement&&box.contains(document.activeElement)&&/INPUT|SELECT/.test(document.activeElement.tagName);
+  if(act)return; /* não apaga o que o Mestre está digitando */
+  const groups={};pl.forEach(t=>{const k=t.moment||'Sem momento';(groups[k]=groups[k]||[]).push(t)});
+  box.innerHTML=`<div class="mu-now ${m&&m.playing?'on':''}"><div><small>${m?(m.playing?'Tocando agora':'Pausada'):'Nada tocando'}</small><b>${m?esc(m.title||'Música do YouTube'):'Escolha uma música da playlist'}</b>${m&&m.moment?`<span class="pill">${esc(m.moment)}</span>`:''}</div>${isM&&m?`<div class="inline">${m.playing?'<button type="button" class="btn small" id="muPause">⏸ Pausar</button>':'<button type="button" class="btn small primary" id="muResume">▶ Retomar</button>'}<button type="button" class="btn small" id="muStop">⏹ Parar</button></div>`:''}</div>
+   ${isM?`<form class="mu-form" id="muForm"><div class="field"><label for="muUrl">Link do YouTube</label><input id="muUrl" placeholder="https://www.youtube.com/watch?v=…" inputmode="url"></div><div class="field"><label for="muTitle">Nome (opcional)</label><input id="muTitle" maxlength="90" placeholder="Ex.: Tema do porão"></div><div class="field"><label for="muMoment">Momento</label><input id="muMoment" list="muMoments" maxlength="40" placeholder="Ex.: Revelação da Sala"><datalist id="muMoments">${MOMENTS6.map(x=>`<option value="${x}">`).join('')}</datalist></div><button class="btn primary small">＋ Adicionar à playlist</button></form><p class="sub">Uma música com o momento <b>Intervalo</b> vira a música de espera do botão ⏸ Intervalo. Você também pode pedir ao Perseus: “toca a música para revelação da sala”.</p>`:'<p class="sub">O Mestre escolhe a música. O volume é só seu: use o controle no topo da mesa.</p>'}
+   ${pl.length?Object.entries(groups).map(([k,list])=>`<h4>${esc(k)}</h4><ul class="mu-list">${list.map(t=>`<li class="${m&&m.vid===t.vid?'cur':''}">${isM?`<button type="button" class="btn small ${m&&m.vid===t.vid&&m.playing?'':'primary'}" data-mplay="${t.id}" aria-label="Tocar ${esc(t.title||'música')}">▶</button>`:''}<span class="mu-t">${esc(t.title||'Música do YouTube ('+t.vid+')')}</span>${isM?`<button type="button" class="bn-x" data-mdel="${t.id}" title="Tirar da playlist" aria-label="Tirar da playlist">✕</button>`:''}</li>`).join('')}</ul>`).join(''):(isM?'':'<p class="sub">A playlist ainda está vazia.</p>')}`;
+  const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
+  on('muPause',pauseMusic6);on('muResume',resumeMusic6);on('muStop',stopMusic6);
+  const f=$('muForm');if(f)f.onsubmit=e=>{e.preventDefault();const t=addTrack6($('muUrl').value,$('muTitle').value,$('muMoment').value);if(!t){toast('Não reconheci esse link do YouTube.');return}f.reset();fx5('confirm');toast('Música adicionada à playlist.')};
+  $$('[data-mplay]',box).forEach(b=>b.onclick=()=>{actx();playTrack6(b.dataset.mplay)});
+  $$('[data-mdel]',box).forEach(b=>b.onclick=()=>setState6({playlist:(M6.state.playlist||[]).filter(t=>t.id!==b.dataset.mdel)}));
+}
+/* intervalo: pausa a mesa para todos e toca a música de espera */
+function togglePause6(on){
+  if(!isGM6())return false;const cur=!!M6.state.pause?.on;on=on===undefined?!cur:!!on;if(on===cur)return on;
+  setState6({pause:on?{on:true,since:Date.now()}:{on:false,since:0}});return on;
+}
+T3.pause=togglePause6;
+function renderPause6(){
+  const p=M6.state.pause||{},isM=isGM6();
+  let o=$('mesaPause');
+  if(!p.on||!camp3()){if(o){o.classList.remove('show','mini');clearInterval(M6.pauseTick)}M6.pauseShown=false;return}
+  if(!o){
+    o=document.createElement('div');o.id='mesaPause';
+    o.innerHTML=`<div class="pause-card" role="dialog" aria-label="Intervalo"><div class="pause-ico" aria-hidden="true">⏸</div><h2>Intervalo</h2><p id="pauseMsg"></p><div class="pause-time" id="pauseTime">00:00</div><label class="pause-vol"><span>🔊 Volume da música de espera</span><input type="range" id="pauseVol" min="0" max="100" step="1"></label><div class="inline pause-act"><button type="button" class="btn primary" id="pauseResume">▶ Retomar a sessão</button><button type="button" class="btn small" id="pauseMin">Minimizar</button></div></div><button type="button" class="pause-pill" id="pausePill">⏸ Intervalo · toque para abrir</button>`;
+    document.body.append(o);
+    $('pauseVol').oninput=e=>{setVol6(e.target.value);renderVol6()};
+    $('pauseResume').onclick=()=>togglePause6(false);
+    $('pauseMin').onclick=()=>o.classList.add('mini');$('pausePill').onclick=()=>o.classList.remove('mini');
+  }
+  $('pauseMsg').textContent=isM?'A mesa está em pausa para todos. A música de espera está tocando.':'O Mestre pausou a sessão. Pegue uma água: a mesa volta já.';
+  $('pauseResume').style.display=isM?'':'none';$('pauseVol').value=prefs.musicVol;
+  if(!M6.pauseShown){M6.pauseShown=true;o.classList.remove('mini');fx5('round')}
+  o.classList.add('show');
+  clearInterval(M6.pauseTick);
+  const tick=()=>{const s=Math.max(0,Math.floor((Date.now()-(p.since||Date.now()))/1000));const e=$('pauseTime');if(e)e.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+  tick();M6.pauseTick=setInterval(tick,1000);
+}
+
+/* ---------- Perseus: bloco de notas e comandos do Mestre ---------- */
+const RX_ADD6=/^\s*(?:perseus[,:!]?\s*)?(?:por favor[,]?\s*)?(?:adiciona|adicione|adicionar|anota|anote|anotar|salva|salve|salvar|guarda|guarde|guardar|coloca|coloque|colocar|bota|bote|botar|escreve|escreva|escrever|registra|registre|registrar|poe|põe|ponha)\b(.*?)\b(?:n[oa]s?|a[os]?|em|pr[oa]|para [oa])\s+(?:meu\s+|minha\s+|minhas\s+|meus\s+)?(?:b\.?n\.?|bloco de notas|bloco|notas|anota[cç][oõ]es)(?![\wÀ-ÿ])\s*(?:que\b|[:\-–—,])?\s*(.*)$/i;
+const RX_ADD6B=/^\s*(?:b\.?n\.?|nota|anota[cç][aã]o)\s*[:\-–—]\s*(.+)$/i;
+async function mesaCommand6(q){
+  const raw=String(q||'').trim(),nq=normP(raw);if(!nq)return null;
+  const hasBN=/\b(bn|bloco de notas|bloco|minhas notas|minhas anotacoes|anotacoes)\b/.test(nq);
+  /* --- bloco de notas: qualquer pessoa, cada um no seu --- */
+  let m=raw.match(RX_ADD6),text='';
+  if(m)text=(m[2]||'').trim()||(m[1]||'').trim().replace(/^(a nota|uma nota|isso|que)\b[:,]?\s*/i,'');
+  else if((m=raw.match(RX_ADD6B)))text=m[1].trim();
+  if(text){
+    const n=bnAdd6(text);if(!n)return null;
+    const w=bnWhere6();
+    return{m:'smug',html:`📝 Anotado no ${w.kind==='gm'?'<b>BN do Mestre</b>':w.kind==='ch'?`<b>BN de ${esc(nm(w.ch))}</b>`:'<b>bloco de notas</b>'}:<br><i>${esc(n.t)}</i><br><span class="sub">Tenho ${bnList6().length} nota(s) guardada(s). Só você vê.</span>`};
+  }
+  if(hasBN&&/\b(limpa|limpar|esvazia|zera|apaga tudo|apagar tudo)\b/.test(nq)){
+    const k=bnList6().length;if(!k)return{html:'Seu BN já está vazio. Mais vazio que isso, só a minha paciência.'};
+    bnSave6([]);return{html:`🧹 Apaguei as ${k} nota(s) do seu BN.`};
+  }
+  const del=hasBN&&nq.match(/\b(apaga|apagar|remove|remover|exclui|excluir|deleta|tira|tirar)\b.*?\b(\d+)\b/);
+  if(del){const list=bnList6(),i=Number(del[2])-1;if(!list[i])return{m:'think',html:`Não existe a nota ${del[2]}. O seu BN tem ${list.length} nota(s).`};const t=list[i].t;bnDel6(list[i].id);return{html:`🗑 Apaguei a nota ${del[2]}: <i>${esc(t)}</i>`}}
+  if(hasBN&&/\b(o que|oque|quais|qual|mostra|mostre|mostrar|lista|listar|le|ler|leia|ve|ver|abre|abrir|consulta|consultar|tem|busca|buscar|procura|procurar|pesquisa|pesquisar|acha|achar|sobre|lembra)\b/.test(nq)){
+    const list=bnList6();
+    const sm=nq.match(/\b(?:sobre|por|com|que fal[ae] d[eoa]s?|a respeito d[eoa]s?)\s+(?:a |o |as |os |um |uma )?(.+)$/);
+    let term=sm?sm[1].replace(/\b(no|na|do|da|meu|minha|bn|bloco de notas|bloco|notas)\b/g,' ').replace(/\s+/g,' ').trim():'';
+    if(!list.length)return{html:'Seu BN está vazio. Diga <b>“adiciona no BN: …”</b> e eu guardo.'};
+    if(term){
+      const words=term.split(' ').filter(w=>w.length>2);
+      const hits=list.map((n,i)=>({n,i,s:words.reduce((s,w)=>s+(normP(n.t).includes(w)?1:0),0)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+      if(!hits.length)return{m:'think',html:`Procurei <b>${esc(term)}</b> no seu BN e não achei nada. Tenho ${list.length} nota(s) sobre outras coisas.`};
+      return{html:`🔎 No seu BN, sobre <b>${esc(term)}</b>:<ol class="bn-list">${hits.slice(0,8).map(x=>`<li value="${x.i+1}"><span class="bn-t">${esc(x.n.t)}</span><small>${bnDate6(x.n.at)}</small></li>`).join('')}</ol>`};
+    }
+    return{html:`📝 Seu BN tem ${list.length} nota(s):<ol class="bn-list">${list.slice(-12).map((n,i)=>`<li value="${Math.max(0,list.length-12)+i+1}"><span class="bn-t">${esc(n.t)}</span><small>${bnDate6(n.at)}</small></li>`).join('')}</ol>${list.length>12?'<span class="sub">Mostrei as 12 mais recentes. O resto está na aba 📝 Notas.</span>':''}`};
+  }
+  /* --- automação da mesa: só o Mestre --- */
+  const wantsMusic=/\b(toca|tocar|toque|solta|soltar)\b/.test(nq)||(/\b(coloca|colocar|bota|botar|poe|inicia|iniciar|comeca)\b/.test(nq)&&/\b(musica|trilha|som|playlist|tema)\b/.test(nq));
+  const stopsMusic=/\b(para|parar|pare|pausa|pausar|pause|desliga|desligar|tira|tirar|corta|cortar|silencia)\b.*\b(musica|trilha|som)\b/.test(nq);
+  const wantsMap=/\bmapa\b/.test(nq)&&/\b(muda|mudar|mude|troca|trocar|troque|coloca|colocar|coloque|abre|abrir|abra|carrega|carregar|mostra|mostrar|mostre|poe|bota|usa|usar)\b/.test(nq);
+  const wantsPause=/\b(intervalo)\b/.test(nq)&&/\b(inicia|iniciar|comeca|comecar|faz|fazer|chama|chamar|abre|abrir|pausa|pausar|encerra|encerrar|termina|terminar|acaba|acabar|retoma|retomar|volta|voltar)\b/.test(nq);
+  if(!(wantsMusic||stopsMusic||wantsMap||wantsPause))return null;
+  if(!camp3())return{m:'think',html:'Isso é coisa da <b>Visão de Mesa</b>. Abra uma campanha primeiro.'};
+  if(!isGM6())return{m:'smug',html:'Boa tentativa. 😼 Trocar o mapa, a música e o ritmo da mesa é trabalho do <b>Mestre</b>. Eu só obedeço a quem segura o escudo.'};
+  if(wantsPause){const off=/\b(encerra|encerrar|termina|terminar|acaba|acabar|retoma|retomar|volta|voltar)\b/.test(nq);togglePause6(!off);return{html:off?'▶ Intervalo encerrado. De volta ao sofrimento.':'⏸ Intervalo no ar. Coloquei a música de espera para todo mundo.'}}
+  if(stopsMusic&&!wantsMusic){if(!M6.state.music)return{html:'Não tem música tocando. Esse silêncio constrangedor é natural.'};pauseMusic6();return{html:'⏸ Música pausada para a mesa toda.'}}
+  if(wantsMusic){
+    const pl=M6.state.playlist||[];if(!pl.length)return{m:'think',html:'Sua playlist está vazia. Adicione músicas na aba <b>🎵 Música</b> e diga em que momento cada uma toca.'};
+    const what=nq.replace(/^.*?\b(toca|tocar|toque|solta|soltar|coloca|colocar|bota|botar|poe|inicia|iniciar|comeca)\b/,'');
+    const t=findTrack6(what);
+    if(!t)return{m:'think',html:`Não achei na playlist nada para <b>${esc(what.trim()||'isso')}</b>. Os momentos que eu conheço: ${[...new Set(pl.map(x=>x.moment||x.title||'sem nome'))].map(esc).join(', ')}.`};
+    actx();playTrack6(t.id);
+    return{m:'hype',html:`🎵 Tocando para a mesa: <b>${esc(t.title||'música do YouTube')}</b>${t.moment?` <span class="sub">(${esc(t.moment)})</span>`:''}.`};
+  }
+  if(wantsMap){
+    const what=nq.replace(/^.*\bmapa\b/,'').replace(/^\s*(da mesa|ativo|atual)?\s*(para|pro|pra|por|do|da|de|:)?\s*(o |a |os |as )?/,'').trim();
+    if(!T3.mapFind)return{m:'think',html:'O mapa ainda não carregou. Abra a Visão de Mesa e tente de novo.'};
+    const mp=T3.mapFind(what);
+    if(!mp)return{m:'think',html:`Não achei um mapa chamado <b>${esc(what||'?')}</b>. Mapas guardados: ${M6.maps.length?M6.maps.map(x=>esc(x.name)).join(', '):'nenhum ainda (envie um em 🗺 Mapas)'}.`};
+    T3.mapUse(mp.key);return{m:'hype',html:`🗺 Mapa trocado para <b>${esc(mp.name)}</b>. Todo mundo já está vendo.`};
+  }
+  return null;
+}
+T3.mesaCommand=mesaCommand6;
+{const _r6=respond;respond=async function(q){
+  let out=null;try{out=await mesaCommand6(q)}catch(e){console.warn('[T6] comando',e)}
+  if(out)return pReply(out.html,{m:out.m||'smug'});
+  return _r6(q);
+};T3.perseus.respond=respond}
+
+/* o Perseus sabe explicar as novidades */
+[
+ ['mesa-layout','Lugares na Visão de Mesa',['lugar','lugares','caixa m','caixa p','mestre no topo','ordem de chegada','narrador','falando como'],'Na <b>Visão de Mesa</b>, o Mestre fica na caixa do topo e os jogadores ocupam os lados na ordem em que chegaram, sempre equilibrados (com seis, três de cada lado). Embaixo de cada foto ficam Vital, Essência, Lucidez, a DF e os estados. O botão <b>⋯</b> abre os controles. O Mestre escolhe com um clique se está <b>narrando</b> (a máscara) ou falando como um NPC ou chefe.'],
+ ['mesa-mapa','Mapa tático e tokens',['mapa','token','tokens','grade','nevoa','névoa','regua','régua','camera','câmera','zoom','mover token'],'O centro da mesa é o <b>mapa</b>. O Mestre envia mapas em 🗺 <b>Mapas</b>, ajusta a grade e coloca os tokens. Cada jogador move só o <b>próprio token</b>; a câmera e o zoom são do Mestre e todo mundo acompanha. A <b>régua</b> mede em metros e a <b>névoa</b> esconde o que ainda não foi revelado.'],
+ ['mesa-call','Chamada de voz',['call','chamada','voz','microfone','mutar','mudo','sussurro','falar em particular','discord'],'O Mestre clica em <b>📞 Iniciar call</b> e todos na Visão de Mesa entram na hora. Quem fala fica com o <b>contorno verde</b> na foto. Use 🎙 para mutar. No <b>🤫 Sussurro</b>, o Mestre marca um ou mais jogadores e só eles se ouvem até ele voltar ao áudio geral.'],
+ ['mesa-musica','Música e intervalo',['musica','música','youtube','playlist','trilha','intervalo','pausa','volume da musica'],'Na aba <b>🎵 Música</b> o Mestre cola links do YouTube e diz o <b>momento</b> de cada música. Tocou, toca para todos; o volume é de cada um, no topo da mesa. O botão <b>⏸ Intervalo</b> pausa a sessão e põe a música de espera. O Mestre também pode me pedir: “toca a música para revelação da sala”.'],
+ ['mesa-docs','Imagens e documentos',['imagem','pop-up','popup','pista','pistas','documento','documentos','carta','enviar imagem'],'O Mestre usa <b>🖼 Enviar imagem</b> e escolhe: <b>todos</b> (fica na aba 📂 Documentos da mesa, e só ele apaga) ou <b>jogadores marcados</b> (aparece só para eles e fica na ficha, em Documentos / Pistas).'],
+ ['bn','Bloco de notas (BN)',['bn','bloco de notas','anotar','anotacao','anotação','notas','minhas notas'],'Me diga <b>“adiciona no BN: a senha da porta é 1904”</b> e eu guardo. Depois pergunte <b>“o que tem no meu BN?”</b> ou <b>“busca no BN sobre a porta”</b>. Cada jogador tem o seu, guardado na própria ficha, e o Mestre tem o dele. As notas também ficam na aba 📝 Notas.'],
+ ['rolar-atributo','Rolar atributo puro ou trocar o atributo',['atributo puro','rolar atributo','trocar atributo','outro atributo','rolar forca','teste de atributo'],'Na ficha, cada atributo tem um botão <b>🎲</b> para rolar o atributo puro (sem perícia, vale o maior dado). Em cada perícia há um seletor para escolher <b>com qual atributo</b> rolar aquele teste; o padrão já vem marcado. Na Visão de Mesa, o botão <b>🎲 Rolar</b> oferece as duas coisas.'],
+].forEach(([id,title,kws,a])=>{if(K.some(x=>x.id===id))return;const e={id,title,kws,a};e.nk=kws.map(normP);e.nt=normP(title).split(' ').filter(w=>!STOP.has(w)&&w.length>2);K.push(e)});
+
+/* ---------- liga tudo à Visão de Mesa ---------- */
+{const _rt6=window.renderTable;window.renderTable=function(){
+  _rt6.apply(this,arguments);
+  try{if(camp3()){joinMesa6();layoutMesa6()}}catch(e){console.error('[T6] mesa',e)}
+}}
+{const _rc6=renderCombatUI;renderCombatUI=function(){_rc6.apply(this,arguments);try{const t=$q('#mesaDock [data-dock="combate"]');if(t)t.classList.toggle('alert',!!camp3()?.combat?.active)}catch(e){}}}
+T3.mesaLayout=layoutMesa6;T3.mesaJoin=joinMesa6;T3.mesaLeave=leaveMesa6;
+/* sair da campanha encerra a call, a música e os canais da mesa */
+['backDashboard','portalLogout'].forEach(id=>$(id)?.addEventListener('click',()=>setTimeout(leaveMesa6,0)));
+/* ao abrir a campanha o jogador já fica ligado à mesa: a call, a música, o intervalo e as imagens
+   chegam mesmo que ele esteja com a ficha aberta */
+{const _rch6=renderCharacters;renderCharacters=function(){_rch6.apply(this,arguments);try{if(camp3()&&cloud6())joinMesa6()}catch(e){console.warn('[T6] entrar na mesa',e)}}}
+{const _rn6=render;render=function(){_rn6.apply(this,arguments);try{if(M6.campId)checkPrivateDocs6()}catch(e){}}}
+
+
+/* ===================================================================
+   TULPA · ETAPA 7 — mapa tático da Visão de Mesa (no lugar do Roll20)
+   Mapas enviados pelo Mestre, grade proporcional, tokens ligados às
+   fichas, câmera só do Mestre (todos acompanham), régua em metros e
+   névoa de guerra. Cada jogador move apenas o próprio token.
+   =================================================================== */
+const MAP7={cv:null,x:null,stage:null,img:null,imgKey:'',cam:{x:.5,y:.5,z:1},target:null,tool:'move',sel:null,drag:null,live:{},ruler:null,ring:null,raf:0,imgs:new Map(),fogSet:null,fogSig:'',brush:1,ptrs:new Map(),camSave:null,lastCast:0};
+T3.map=MAP7;
+const CELL0=70,COLS0=30,ROWS0=18;
+function mapWorld7(){const m=M6.state.map;return m&&m.w&&m.h?{W:m.w,H:m.h}:{W:CELL0*COLS0,H:CELL0*ROWS0}}
+function mapCfg7(){
+  const m=M6.state.map,c=(m&&M6.state.mapCfg?.[m.key])||{},{W,H}=mapWorld7();
+  const cols=Math.max(4,Math.min(120,Number(c.cols)||(m?Math.max(8,Math.round(W/CELL0)):COLS0))),cell=W/cols;
+  const ox=((Number(c.ox)||0)%cell+cell)%cell,oy=((Number(c.oy)||0)%cell+cell)%cell;
+  return{cols,cell,ox,oy,rows:Math.max(1,Math.ceil((H-oy)/cell)),show:c.show!==false,mpc:Number(c.mpc)>0?Number(c.mpc):1.5};
+}
+function mapView7(){
+  const st=MAP7.stage,cw=st?st.clientWidth:1,ch=st?st.clientHeight:1,{W,H}=mapWorld7(),fit=Math.min(cw/W,ch/H),s=fit*MAP7.cam.z;
+  return{cw,ch,W,H,s,tx:cw/2-MAP7.cam.x*W*s,ty:ch/2-MAP7.cam.y*H*s};
+}
+const w2s7=(v,wx,wy)=>[wx*v.s+v.tx,wy*v.s+v.ty];
+const s2w7=(v,sx,sy)=>[(sx-v.tx)/v.s,(sy-v.ty)/v.s];
+const gmUid7=()=>camp3()?.createdBy||null;
+function canMove7(tok){const ch=charById(tok.charId);return isGM6()||(!!ch&&!!uid3()&&ch.ownerId===uid3())}
+function tokPos7(t){const l=MAP7.live[t.id];return l&&l.until>Date.now()?l:t}
+
+/* ---------- montagem ---------- */
+function mapMount7(){
+  const st=$('mapStage');if(!st)return false;
+  if(MAP7.stage===st&&MAP7.cv)return true;
+  MAP7.stage=st;
+  st.innerHTML=`<canvas id="mapCanvas" aria-label="Mapa tático da mesa"></canvas><div class="map-tools" id="mapTools" role="toolbar" aria-label="Ferramentas do mapa"></div><div class="map-info" id="mapInfo" aria-live="polite"></div><div class="map-menu" id="mapMenu" hidden></div>`;
+  const cv=MAP7.cv=$('mapCanvas');MAP7.x=cv.getContext('2d');
+  try{new ResizeObserver(()=>mapSize7()).observe(st)}catch(e){window.addEventListener('resize',mapSize7)}
+  cv.addEventListener('pointerdown',mapDown7);cv.addEventListener('pointermove',mapMove7);
+  cv.addEventListener('pointerup',mapUp7);cv.addEventListener('pointercancel',mapUp7);
+  cv.addEventListener('wheel',mapWheel7,{passive:false});
+  cv.addEventListener('dblclick',e=>{if(!isGM6())return;const v=mapView7(),r=cv.getBoundingClientRect(),[wx,wy]=s2w7(v,e.clientX-r.left,e.clientY-r.top);mapCam7({x:wx/v.W,y:wy/v.H,z:MAP7.cam.z})});
+  cv.addEventListener('contextmenu',e=>e.preventDefault());
+  mapTools7();mapSize7();
+  return true;
+}
+function mapSize7(){
+  const cv=MAP7.cv,st=MAP7.stage;if(!cv||!st)return;
+  const dpr=Math.min(2,window.devicePixelRatio||1),w=Math.max(1,st.clientWidth),h=Math.max(1,st.clientHeight);
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}
+  MAP7.dpr=dpr;mapDraw7();
+}
+function mapTools7(){
+  const box=$('mapTools');if(!box)return;const isM=isGM6(),t=MAP7.tool,fog=M6.state.fog||{};
+  const sig=[isM,t,fog.on,MAP7.brush,!!M6.state.map].join();
+  if(box.dataset.sig===sig)return;box.dataset.sig=sig;
+  const b=(id,ico,label,on)=>`<button type="button" class="mt-btn ${on?'on':''}" data-mt="${id}" title="${label}" aria-label="${label}" aria-pressed="${on?'true':'false'}">${ico}</button>`;
+  box.innerHTML=`<div class="mt-row">${b('move','✥',isM?'Mover tokens e a câmera':'Mover o seu token',t==='move')}${b('ruler','📏','Régua: arraste para medir em metros',t==='ruler')}${isM?b('fog','🌫','Névoa de guerra',t==='reveal'||t==='hide'):''}<span class="mt-sep"></span>${isM?`${b('tokens','♟','Colocar ou tirar tokens')}${b('maps','🗺','Mapas')}${b('grid','▦','Ajustar a grade')}<span class="mt-sep"></span>${b('zout','−','Afastar')}${b('zin','＋','Aproximar')}${b('fit','⤢','Enquadrar o mapa inteiro')}`:''}${b('full','⛶','Tela cheia')}</div>
+   ${isM&&(t==='reveal'||t==='hide')?`<div class="mt-row mt-fog"><button type="button" class="mt-chip ${t==='reveal'?'on':''}" data-mt="reveal">Revelar</button><button type="button" class="mt-chip ${t==='hide'?'on':''}" data-mt="hide">Cobrir</button><label class="mt-chip">Pincel <select id="mtBrush" aria-label="Tamanho do pincel">${[1,3,5].map(n=>`<option value="${n}" ${MAP7.brush===n?'selected':''}>${n}×${n}</option>`).join('')}</select></label><button type="button" class="mt-chip" data-mt="fogall">Cobrir tudo</button><button type="button" class="mt-chip" data-mt="fognone">${fog.on?'Desligar névoa':'Névoa desligada'}</button></div>`:''}`;
+  $$('[data-mt]',box).forEach(x=>x.onclick=()=>mapTool7(x.dataset.mt));
+  const br=$('mtBrush');if(br)br.onchange=()=>{MAP7.brush=Number(br.value)||1};
+}
+function mapTool7(id){
+  const isM=isGM6();
+  if(id==='move'||id==='ruler'){MAP7.tool=id;if(id!=='ruler')MAP7.ruler=null}
+  else if(id==='fog'&&isM){MAP7.tool=MAP7.tool==='reveal'||MAP7.tool==='hide'?'move':'reveal';if(MAP7.tool==='reveal'&&!M6.state.fog?.on)setState6({fog:{on:true,open:[]}})}
+  else if((id==='reveal'||id==='hide')&&isM){MAP7.tool=id;if(!M6.state.fog?.on)setState6({fog:{on:true,open:[]}})}
+  else if(id==='fogall'&&isM)setState6({fog:{on:true,open:[]}});
+  else if(id==='fognone'&&isM){setState6({fog:{on:false,open:[]}});MAP7.tool='move'}
+  else if(id==='tokens'&&isM)mapTokensModal7();
+  else if(id==='maps'&&isM)mapMapsModal7();
+  else if(id==='grid'&&isM)mapGridModal7();
+  else if(id==='zin'&&isM)mapCam7({...MAP7.cam,z:MAP7.cam.z*1.25});
+  else if(id==='zout'&&isM)mapCam7({...MAP7.cam,z:MAP7.cam.z/1.25});
+  else if(id==='fit'&&isM)mapCam7({x:.5,y:.5,z:1});
+  else if(id==='full'){const st=MAP7.stage;try{document.fullscreenElement?document.exitFullscreen():st.requestFullscreen?.()}catch(e){}}
+  mapMenu7(null);mapTools7();mapDraw7();
+}
+
+/* ---------- câmera: só o Mestre move; os jogadores acompanham ---------- */
+function mapCam7(c,{live=false}={}){
+  if(!isGM6())return;
+  const z=Math.max(.4,Math.min(10,c.z)),x=Math.max(0,Math.min(1,c.x)),y=Math.max(0,Math.min(1,c.y));
+  MAP7.cam={x,y,z};MAP7.target=null;mapDraw7();
+  const now=Date.now();if(now-MAP7.lastCast>120){MAP7.lastCast=now;cast6({t:'cam',cam:MAP7.cam})}
+  clearTimeout(MAP7.camSave);MAP7.camSave=setTimeout(()=>{cast6({t:'cam',cam:MAP7.cam});setState6({cam:{...MAP7.cam}},{silent:true})},live?450:120);
+}
+function mapWheel7(e){
+  if(!isGM6())return;e.preventDefault();
+  const v=mapView7(),r=MAP7.cv.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top,[wx,wy]=s2w7(v,sx,sy);
+  const z=Math.max(.4,Math.min(10,MAP7.cam.z*Math.exp(-e.deltaY*.0015))),s2=v.s/MAP7.cam.z*z;
+  mapCam7({z,x:(wx-(sx-v.cw/2)/s2)/v.W,y:(wy-(sy-v.ch/2)/s2)/v.H},{live:true});
+}
+
+/* ---------- ponteiro ---------- */
+function mapPt7(e){const r=MAP7.cv.getBoundingClientRect(),v=mapView7(),sx=e.clientX-r.left,sy=e.clientY-r.top,[wx,wy]=s2w7(v,sx,sy);return{v,sx,sy,wx,wy}}
+function mapHit7(wx,wy){
+  const g=mapCfg7(),toks=M6.state.tokens||[];
+  for(let i=toks.length-1;i>=0;i--){const t=toks[i];if(!mapTokVisible7(t))continue;const p=tokPos7(t),sz=(t.s||1)*g.cell,cx=g.ox+p.x*g.cell+sz/2,cy=g.oy+p.y*g.cell+sz/2;if(Math.hypot(wx-cx,wy-cy)<=sz/2)return t}
+  return null;
+}
+function mapCellAt7(wx,wy){const g=mapCfg7();return[Math.floor((wx-g.ox)/g.cell),Math.floor((wy-g.oy)/g.cell)]}
+function mapDown7(e){
+  const p=mapPt7(e),isM=isGM6();MAP7.ptrs.set(e.pointerId,{sx:p.sx,sy:p.sy});
+  try{MAP7.cv.setPointerCapture(e.pointerId)}catch(x){}
+  mapMenu7(null);
+  if(isM&&MAP7.ptrs.size===2){const [a,b]=[...MAP7.ptrs.values()];MAP7.drag={kind:'pinch',d0:Math.hypot(a.sx-b.sx,a.sy-b.sy),z0:MAP7.cam.z};return}
+  if(MAP7.tool==='ruler'){const g=mapCfg7(),[cx,cy]=mapCellAt7(p.wx,p.wy);const a={x:g.ox+(cx+.5)*g.cell,y:g.oy+(cy+.5)*g.cell};MAP7.ruler={a,b:{...a}};MAP7.drag={kind:'ruler'};mapDraw7();return}
+  if(isM&&(MAP7.tool==='reveal'||MAP7.tool==='hide')){MAP7.drag={kind:'fog',set:new Set(M6.state.fog?.open||[])};mapFogPaint7(p);return}
+  const t=mapHit7(p.wx,p.wy);
+  if(t&&canMove7(t)){const g=mapCfg7(),q=tokPos7(t);MAP7.sel=t.id;MAP7.drag={kind:'tok',id:t.id,ox:p.wx-(g.ox+q.x*g.cell),oy:p.wy-(g.oy+q.y*g.cell),from:{x:q.x,y:q.y},moved:false,sx:p.sx,sy:p.sy};mapDraw7();return}
+  if(t){MAP7.sel=t.id;mapDraw7();return}
+  MAP7.sel=null;MAP7.ring=null;
+  if(isM)MAP7.drag={kind:'pan',sx:p.sx,sy:p.sy,cam:{...MAP7.cam}};
+  mapDraw7();
+}
+function mapMove7(e){
+  const d=MAP7.drag;if(MAP7.ptrs.has(e.pointerId)){const r=MAP7.cv.getBoundingClientRect();MAP7.ptrs.set(e.pointerId,{sx:e.clientX-r.left,sy:e.clientY-r.top})}
+  if(!d)return;const p=mapPt7(e);
+  if(d.kind==='pinch'){if(MAP7.ptrs.size<2)return;const [a,b]=[...MAP7.ptrs.values()];mapCam7({...MAP7.cam,z:d.z0*Math.hypot(a.sx-b.sx,a.sy-b.sy)/Math.max(10,d.d0)},{live:true});return}
+  if(d.kind==='pan'){const v=p.v;mapCam7({z:d.cam.z,x:d.cam.x-(p.sx-d.sx)/(v.s*v.W),y:d.cam.y-(p.sy-d.sy)/(v.s*v.H)},{live:true});return}
+  if(d.kind==='ruler'){MAP7.ruler.b={x:p.wx,y:p.wy};mapDraw7();return}
+  if(d.kind==='fog'){mapFogPaint7(p);return}
+  if(d.kind==='tok'){
+    if(!d.moved&&Math.hypot(p.sx-d.sx,p.sy-d.sy)<5)return;d.moved=true;
+    const g=mapCfg7(),x=(p.wx-d.ox-g.ox)/g.cell,y=(p.wy-d.oy-g.oy)/g.cell;
+    MAP7.live[d.id]={x,y,until:Date.now()+60000};
+    const now=Date.now();if(now-(d.cast||0)>130){d.cast=now;cast6({t:'tok',id:d.id,x:+x.toFixed(2),y:+y.toFixed(2)})}
+    mapDraw7();
+  }
+}
+function mapUp7(e){
+  MAP7.ptrs.delete(e.pointerId);try{MAP7.cv.releasePointerCapture(e.pointerId)}catch(x){}
+  const d=MAP7.drag;MAP7.drag=null;if(!d)return;
+  if(d.kind==='fog'){setState6({fog:{on:true,open:[...d.set].sort((a,b)=>a-b)}});return}
+  if(d.kind==='tok'){
+    const t=(M6.state.tokens||[]).find(x=>x.id===d.id);if(!t)return;
+    if(!d.moved){delete MAP7.live[d.id];mapMenu7(t,e);return}
+    const g=mapCfg7(),l=MAP7.live[d.id]||t,sz=t.s||1;
+    const x=Math.max(0,Math.min(g.cols-sz,Math.round(l.x))),y=Math.max(0,Math.min(g.rows-sz,Math.round(l.y)));
+    mapCommitMove7(d.id,x,y);
+  }
+  mapDraw7();
+}
+function mapFogPaint7(p){
+  const d=MAP7.drag,g=mapCfg7(),[cx,cy]=mapCellAt7(p.wx,p.wy),r=(MAP7.brush-1)/2,rev=MAP7.tool==='reveal';
+  for(let y=cy-r;y<=cy+r;y++)for(let x=cx-r;x<=cx+r;x++){if(x<0||y<0||x>=g.cols||y>=g.rows)continue;const k=y*g.cols+x;rev?d.set.add(k):d.set.delete(k)}
+  MAP7.fogSet=d.set;MAP7.fogSig='drag';mapDraw7();
+}
+/* mover: o Mestre grava direto; o jogador pede (função do banco ou, na reserva, o aparelho do Mestre confere) */
+async function mapCommitMove7(id,x,y){
+  MAP7.live[id]={x,y,until:Date.now()+5000};
+  if(isGM6()){setState6({tokens:(M6.state.tokens||[]).map(t=>t.id===id?{...t,x,y}:t)});delete MAP7.live[id];return}
+  const t=(M6.state.tokens||[]).find(q=>q.id===id);if(!t||!canMove7(t))return;
+  cast6({t:'tok',id,x,y});
+  if(M6.backend==='store'&&typeof sb()?.rpc==='function'){
+    try{const {error}=await sb().rpc('move_campaign_token',{p_campaign_id:camp3().id,p_token_id:id,p_x:x,p_y:y});if(!error)return;if(!noStore6(error))console.warn('[T7] mover token',error)}catch(e){console.warn('[T7] mover token',e)}
+  }
+  cast6({t:'req',kind:'move',id,x,y});
+}
+onCast6(p=>{
+  if(p.t==='cam'&&!isGM6()&&p.from===gmUid7()&&p.cam){MAP7.target={...p.cam};mapDraw7()}
+  if(p.t==='tok'&&p.id){MAP7.live[p.id]={x:Number(p.x)||0,y:Number(p.y)||0,until:Date.now()+2500};mapDraw7()}
+  if(p.t==='req'&&p.kind==='move'&&isGM6()){
+    const t=(M6.state.tokens||[]).find(q=>q.id===p.id),ch=t&&charById(t.charId);
+    if(!t||!ch||ch.ownerId!==p.from)return; /* só o dono move o próprio token */
+    const g=mapCfg7(),sz=t.s||1,x=Math.max(0,Math.min(g.cols-sz,Math.round(Number(p.x)||0))),y=Math.max(0,Math.min(g.rows-sz,Math.round(Number(p.y)||0)));
+    setState6({tokens:M6.state.tokens.map(q=>q.id===t.id?{...q,x,y}:q)});
+  }
+});
+
+/* ---------- menu do token ---------- */
+function mapMenu7(t,e){
+  const m=$('mapMenu');if(!m)return;
+  if(!t){m.hidden=true;return}
+  const ch=charById(t.charId),isM=isGM6(),g=mapCfg7();
+  m.innerHTML=`<b>${esc(nm(ch))}</b><div class="mm-row"><span class="sub">Alcance</span>${[3,6,9,15].map(n=>`<button type="button" class="mt-chip ${MAP7.ring&&MAP7.ring.id===t.id&&MAP7.ring.m===n?'on':''}" data-ring="${n}">${n} m</button>`).join('')}</div>${isM?`<div class="mm-row"><span class="sub">Tamanho</span>${[1,2,3].map(n=>`<button type="button" class="mt-chip ${(t.s||1)===n?'on':''}" data-size="${n}">${n}×</button>`).join('')}</div><div class="mm-row"><button type="button" class="mt-chip" data-focus>🎯 Focar a câmera</button><button type="button" class="mt-chip danger" data-rm>✕ Tirar do mapa</button></div>`:''}`;
+  const v=mapView7(),p=tokPos7(t),[sx,sy]=w2s7(v,g.ox+(p.x+(t.s||1))*g.cell,g.oy+p.y*g.cell);
+  m.hidden=false;m.style.left=Math.max(6,Math.min(v.cw-m.offsetWidth-6,sx+6))+'px';m.style.top=Math.max(6,Math.min(v.ch-m.offsetHeight-6,sy))+'px';
+  $$('[data-ring]',m).forEach(b=>b.onclick=()=>{const n=Number(b.dataset.ring);MAP7.ring=MAP7.ring&&MAP7.ring.id===t.id&&MAP7.ring.m===n?null:{id:t.id,m:n};mapMenu7(t);mapDraw7()});
+  $$('[data-size]',m).forEach(b=>b.onclick=()=>{setState6({tokens:M6.state.tokens.map(q=>q.id===t.id?{...q,s:Number(b.dataset.size)}:q)});mapMenu7(null)});
+  const f=$q('[data-focus]',m);if(f)f.onclick=()=>{const W=mapWorld7();mapCam7({x:(g.ox+(p.x+(t.s||1)/2)*g.cell)/W.W,y:(g.oy+(p.y+(t.s||1)/2)*g.cell)/W.H,z:Math.max(MAP7.cam.z,2)});mapMenu7(null)};
+  const r=$q('[data-rm]',m);if(r)r.onclick=()=>{setState6({tokens:M6.state.tokens.filter(q=>q.id!==t.id)});MAP7.sel=null;mapMenu7(null)};
+}
+
+/* ---------- desenho ---------- */
+function mapTokVisible7(t){
+  const ch=charById(t.charId);if(!ch)return false;
+  if(isGM6())return true;if(ch.ownerId===uid3())return true;
+  if(!inScene(ch))return false;
+  const f=M6.state.fog;if(f?.on){const g=mapCfg7(),p=tokPos7(t),k=Math.round(p.y)*g.cols+Math.round(p.x);if(!mapFog7().has(k))return false}
+  return true;
+}
+function mapFog7(){const f=M6.state.fog||{},sig=(f.open||[]).length+':'+(f.open||[])[0]+':'+(f.open||[]).slice(-1)[0]+':'+M6.state.rev;if(MAP7.drag?.kind==='fog')return MAP7.drag.set;if(MAP7.fogSig!==sig){MAP7.fogSig=sig;MAP7.fogSet=new Set(f.open||[])}return MAP7.fogSet}
+function mapTokImg7(ch){
+  const d=dOf6(ch),src=avOk(d.tokenAvatar)?d.tokenAvatar:avOk(d.avatar)?d.avatar:'';if(!src)return null;
+  const key=ch.id,sig=src.length+src.slice(-24);let e=MAP7.imgs.get(key);
+  if(!e||e.sig!==sig){const im=new Image();e={sig,im,ok:false};im.onload=()=>{e.ok=true;mapDraw7()};im.src=src;MAP7.imgs.set(key,e)}
+  return e.ok?e.im:null;
+}
+function mapDraw7(){if(MAP7.raf||!MAP7.cv)return;MAP7.raf=requestAnimationFrame(()=>{MAP7.raf=0;try{mapPaint7()}catch(e){console.warn('[T7] mapa',e)}})}
+function mapPaint7(){
+  const cv=MAP7.cv,x=MAP7.x;if(!cv||!x||!cv.isConnected)return;
+  let again=false;
+  /* jogadores seguem a câmera do Mestre com suavidade */
+  if(MAP7.target){const c=MAP7.cam,t=MAP7.target,k=.28;c.x+=(t.x-c.x)*k;c.y+=(t.y-c.y)*k;c.z+=(t.z-c.z)*k;if(Math.abs(t.x-c.x)+Math.abs(t.y-c.y)<.0006&&Math.abs(t.z-c.z)<.003){MAP7.cam={...t};MAP7.target=null}else again=true}
+  const dpr=MAP7.dpr||1,v=mapView7(),g=mapCfg7(),isM=isGM6(),dark=document.body.classList.contains('t3-dark');
+  x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,v.cw,v.ch);
+  x.fillStyle=dark?'#0d1117':'#241b14';x.fillRect(0,0,v.cw,v.ch);
+  const [x0,y0]=w2s7(v,0,0),mw=v.W*v.s,mh=v.H*v.s;
+  if(MAP7.img&&M6.state.map){x.imageSmoothingQuality='high';x.drawImage(MAP7.img,x0,y0,mw,mh)}
+  else{const gr=x.createLinearGradient(x0,y0,x0+mw,y0+mh);gr.addColorStop(0,dark?'#222b38':'#e9dcc0');gr.addColorStop(1,dark?'#1a212c':'#d6c3a0');x.fillStyle=gr;x.fillRect(x0,y0,mw,mh);
+    if(!(M6.state.tokens||[]).length){x.fillStyle=dark?'#ffffff18':'#5a3b2620';x.font=`700 ${Math.max(28,mh*.2)}px "Cormorant Garamond",Georgia,serif`;x.textAlign='center';x.textBaseline='middle';x.fillText('MESA',x0+mw/2,y0+mh/2)}}
+  const cs=g.cell*v.s;
+  if(g.show&&cs>=7){
+    x.beginPath();x.lineWidth=1;x.strokeStyle=MAP7.img?'rgba(255,255,255,.22)':(dark?'rgba(255,255,255,.1)':'rgba(70,45,25,.2)');
+    for(let c=0;c<=g.cols;c++){const sx=Math.round(x0+(g.ox+c*g.cell)*v.s)+.5;if(sx<-1||sx>v.cw+1||sx>x0+mw+1)continue;x.moveTo(sx,Math.max(0,y0));x.lineTo(sx,Math.min(v.ch,y0+mh))}
+    for(let r=0;r<=g.rows;r++){const sy=Math.round(y0+(g.oy+r*g.cell)*v.s)+.5;if(sy<-1||sy>v.ch+1||sy>y0+mh+1)continue;x.moveTo(Math.max(0,x0),sy);x.lineTo(Math.min(v.cw,x0+mw),sy)}
+    x.stroke();
+  }
+  /* tokens */
+  const now=Date.now(),cur=curEntry()?.characterId;
+  (M6.state.tokens||[]).forEach(t=>{
+    if(!mapTokVisible7(t))return;const ch=charById(t.charId),d=dOf6(ch),p=tokPos7(t);
+    if(MAP7.live[t.id]){if(MAP7.live[t.id].until<now)delete MAP7.live[t.id]}
+    const sz=(t.s||1)*cs,[sx,sy]=w2s7(v,g.ox+p.x*g.cell,g.oy+p.y*g.cell),cx=sx+sz/2,cy=sy+sz/2,r=Math.max(4,sz/2-Math.max(1.5,sz*.05));
+    if(cx<-sz||cy<-sz||cx>v.cw+sz||cy>v.ch+sz)return;
+    if(MAP7.ring&&MAP7.ring.id===t.id){const rr=(MAP7.ring.m/g.mpc)*cs+sz/2;x.beginPath();x.arc(cx,cy,rr,0,Math.PI*2);x.fillStyle='rgba(240,200,90,.13)';x.fill();x.setLineDash([6,5]);x.lineWidth=2;x.strokeStyle='rgba(240,200,90,.9)';x.stroke();x.setLineDash([]);
+      x.font='700 12px "IBM Plex Sans",system-ui,sans-serif';x.textAlign='center';x.textBaseline='bottom';x.fillStyle='#fff';x.strokeStyle='rgba(0,0,0,.7)';x.lineWidth=3;x.strokeText(MAP7.ring.m+' m',cx,cy-rr-3);x.fillText(MAP7.ring.m+' m',cx,cy-rr-3)}
+    const st=stIds(d),down=st.includes('morto')||st.includes('agonia');
+    x.save();x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.closePath();
+    x.shadowColor='rgba(0,0,0,.55)';x.shadowBlur=8;x.shadowOffsetY=2;x.fillStyle='#2b211b';x.fill();x.shadowColor='transparent';
+    x.clip();
+    const im=mapTokImg7(ch);
+    if(im){if(down)x.filter='grayscale(1) brightness(.6)';x.drawImage(im,cx-r,cy-r,r*2,r*2);x.filter='none'}
+    else{let h=0;for(const c of nm(ch))h=(h*31+c.charCodeAt(0))>>>0;x.fillStyle=down?'#555':AV_C[h%AV_C.length];x.fillRect(cx-r,cy-r,r*2,r*2);x.fillStyle='#fff';x.font=`700 ${Math.max(9,r*.8)}px "Cormorant Garamond",Georgia,serif`;x.textAlign='center';x.textBaseline='middle';x.fillText((nm(ch).split(/\s+/).slice(0,2).map(w=>[...w][0]).join('')||'?').toUpperCase(),cx,cy+1)}
+    x.restore();
+    const own=ch.ownerId&&ch.ownerId===uid3();
+    x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.lineWidth=Math.max(2,sz*.06);x.strokeStyle=down?'#777':gmChar6(ch)?'#c2493d':own?'#f0c85a':'#f4ead6';x.stroke();
+    if(cur===ch.id){x.beginPath();x.arc(cx,cy,r+4+Math.sin(now/260)*1.5,0,Math.PI*2);x.lineWidth=2.5;x.strokeStyle='rgba(240,200,90,.95)';x.stroke();again=true}
+    if(MAP7.sel===t.id){x.beginPath();x.arc(cx,cy,r+3,0,Math.PI*2);x.setLineDash([5,4]);x.lineWidth=2;x.strokeStyle='#fff';x.stroke();x.setLineDash([])}
+    if(down){x.font=`${Math.max(12,r)}px system-ui`;x.textAlign='center';x.textBaseline='middle';x.fillText('☠',cx,cy)}
+    if(sz>=26||MAP7.sel===t.id){const label=nm(ch);x.font=`600 ${Math.max(10,Math.min(13,sz*.2))}px "IBM Plex Sans",system-ui,sans-serif`;x.textAlign='center';x.textBaseline='top';const tw=x.measureText(label).width+10;x.fillStyle='rgba(20,14,10,.78)';x.beginPath();x.roundRect?x.roundRect(cx-tw/2,cy+r+3,tw,17,6):x.rect(cx-tw/2,cy+r+3,tw,17);x.fill();x.fillStyle='#fff';x.fillText(label,cx,cy+r+6)}
+  });
+  /* distância percorrida enquanto arrasta um token */
+  if(MAP7.drag?.kind==='tok'&&MAP7.drag.moved){const d=MAP7.drag,l=MAP7.live[d.id],t=(M6.state.tokens||[]).find(q=>q.id===d.id);if(l&&t){const h=(t.s||1)/2;mapRuler7(v,g,{x:g.ox+(d.from.x+h)*g.cell,y:g.oy+(d.from.y+h)*g.cell},{x:g.ox+(Math.round(l.x)+h)*g.cell,y:g.oy+(Math.round(l.y)+h)*g.cell})}}
+  /* névoa de guerra: os jogadores não veem nada por baixo; o Mestre vê escurecido */
+  const fog=M6.state.fog;
+  if(fog?.on){
+    const open=mapFog7();x.fillStyle=isM?'rgba(8,8,12,.55)':(dark?'#07090d':'#120d0a');
+    const c0=Math.max(0,Math.floor((-v.tx/v.s-g.ox)/g.cell)),c1=Math.min(g.cols-1,Math.ceil(((v.cw-v.tx)/v.s-g.ox)/g.cell)),r0=Math.max(0,Math.floor((-v.ty/v.s-g.oy)/g.cell)),r1=Math.min(g.rows-1,Math.ceil(((v.ch-v.ty)/v.s-g.oy)/g.cell));
+    for(let r=r0;r<=r1;r++){let run=-1;for(let c=c0;c<=c1+1;c++){const hid=c<=c1&&!open.has(r*g.cols+c);if(hid&&run<0)run=c;if(!hid&&run>=0){const [fx,fy]=w2s7(v,g.ox+run*g.cell,g.oy+r*g.cell);x.fillRect(Math.floor(fx),Math.floor(fy),Math.ceil((c-run)*cs)+1,Math.ceil(cs)+1);run=-1}}}
+    if(!isM&&(g.ox>0||g.oy>0)){const [ax,ay]=w2s7(v,0,0);x.fillRect(ax,ay,mw,g.oy*v.s);x.fillRect(ax,ay,g.ox*v.s,mh)}
+  }
+  if(MAP7.ruler)mapRuler7(v,g,MAP7.ruler.a,MAP7.ruler.b);
+  const info=$('mapInfo');if(info){const m=M6.state.map,txt=(m?m.name:'Sem mapa')+' · '+g.mpc.toLocaleString('pt-BR')+' m por quadrado'+(fog?.on?' · névoa ligada':'');if(info.textContent!==txt)info.textContent=txt}
+  if(again)mapDraw7();
+}
+function mapRuler7(v,g,a,b){
+  const x=MAP7.x,[ax,ay]=w2s7(v,a.x,a.y),[bx,by]=w2s7(v,b.x,b.y),cells=Math.max(Math.abs(b.x-a.x),Math.abs(b.y-a.y))/g.cell,m=Math.round(cells)*g.mpc;
+  x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.6)';x.stroke();x.lineWidth=1.6;x.strokeStyle='#f0c85a';x.setLineDash([7,5]);x.stroke();x.setLineDash([]);
+  [[ax,ay],[bx,by]].forEach(([px,py])=>{x.beginPath();x.arc(px,py,4,0,Math.PI*2);x.fillStyle='#f0c85a';x.fill()});
+  const label=m.toLocaleString('pt-BR')+' m · '+Math.round(cells)+' quadrado'+(Math.round(cells)===1?'':'s');
+  x.font='700 13px "IBM Plex Sans",system-ui,sans-serif';const tw=x.measureText(label).width+14,lx=Math.max(4,Math.min(v.cw-tw-4,bx+10)),ly=Math.max(4,Math.min(v.ch-26,by-28));
+  x.fillStyle='rgba(20,14,10,.86)';x.beginPath();x.roundRect?x.roundRect(lx,ly,tw,22,7):x.rect(lx,ly,tw,22);x.fill();x.fillStyle='#fff';x.textAlign='left';x.textBaseline='middle';x.fillText(label,lx+7,ly+11.5);
+}
+
+/* ---------- mapas guardados ---------- */
+async function mapRefresh7(){
+  try{M6.maps=(await stList6('map')).map(r=>({key:r.key,name:r.meta?.name||'Mapa',w:r.meta?.w||0,h:r.meta?.h||0}))}catch(e){console.warn('[T7] mapas',e)}
+  const l=$('mapList');if(l)mapListHtml7();
+}
+T3.mapRefreshList=mapRefresh7;
+function mapFind7(q){
+  const n=normTxt(q).replace(/\b(mapa|o|a|do|da|de|para|pra|pro)\b/g,' ').replace(/\s+/g,' ').trim();if(!n)return null;
+  const words=n.split(' ');let best=null,bs=0;
+  M6.maps.forEach(m=>{const h=normTxt(m.name);let s=0;if(h===n)s+=10;if(h.includes(n))s+=5;words.forEach(w=>{if(w.length>2&&h.includes(w))s++});if(s>bs){bs=s;best=m}});
+  return bs>=1?best:null;
+}
+function mapUse7(key){
+  if(!isGM6())return false;
+  if(!key){setState6({map:null,cam:{x:.5,y:.5,z:1},fog:{on:false,open:[]}});return true}
+  const m=M6.maps.find(x=>x.key===key);if(!m)return false;
+  setState6({map:{key:m.key,name:m.name,w:m.w,h:m.h},cam:{x:.5,y:.5,z:1},fog:{on:false,open:[]}});
+  MAP7.cam={x:.5,y:.5,z:1};cast6({t:'cam',cam:MAP7.cam});return true;
+}
+T3.mapFind=mapFind7;T3.mapUse=mapUse7;
+async function mapUpload7(file,name){
+  const im=await imgFit6(file,2400,950000),key='map:'+rid(),nmx=String(name||file.name||'Mapa').replace(/\.[a-z0-9]+$/i,'').trim().slice(0,60)||'Mapa';
+  await stPut6(key,'map',{meta:{name:nmx,w:im.w,h:im.h,at:Date.now()},data:im.data},null);
+  M6.assetCache[key]=im.data;await mapRefresh7();
+  if(!M6.maps.some(m=>m.key===key))M6.maps.push({key,name:nmx,w:im.w,h:im.h});
+  return key;
+}
+T3.mapUpload=mapUpload7;
+function mapListHtml7(){
+  const l=$('mapList');if(!l)return;const cur=M6.state.map?.key;
+  l.innerHTML=M6.maps.length?M6.maps.map(m=>`<li class="${m.key===cur?'cur':''}"><span class="mu-t">${esc(m.name)} <small>${m.w}×${m.h}</small></span><button type="button" class="btn small ${m.key===cur?'':'primary'}" data-muse="${esc(m.key)}">${m.key===cur?'Em uso':'Usar na mesa'}</button><button type="button" class="bn-x" data-mdel="${esc(m.key)}" title="Apagar mapa" aria-label="Apagar ${esc(m.name)}">✕</button></li>`).join(''):'<li class="sub">Nenhum mapa guardado ainda.</li>';
+  $$('[data-muse]',l).forEach(b=>b.onclick=()=>{mapUse7(b.dataset.muse);mapListHtml7()});
+  $$('[data-mdel]',l).forEach(b=>b.onclick=async()=>{if(!confirm('Apagar este mapa? Não dá para desfazer.'))return;const k=b.dataset.mdel;try{await stDel6(k);delete M6.assetCache[k];if(M6.state.map?.key===k)mapUse7(null);M6.maps=M6.maps.filter(m=>m.key!==k);mapListHtml7()}catch(e){toast('Não consegui apagar: '+(e?.message||'erro'))}});
+}
+function mapMapsModal7(){
+  openModal('MAPAS','Mapas da campanha',`<p class="sub">Envie a imagem do mapa (JPG, PNG ou WEBP). Ela é reduzida automaticamente e fica guardada na campanha.</p><div class="grid two"><div class="field"><label for="mpFile">Imagem do mapa</label><input type="file" id="mpFile" accept="image/*"></div><div class="field"><label for="mpName">Nome do mapa</label><input id="mpName" maxlength="60" placeholder="Ex.: Laboratório"></div></div><div class="inline"><button type="button" class="btn primary small" id="mpSend">Enviar mapa</button><button type="button" class="btn small" id="mpNone">Usar a mesa em branco</button><span class="sub" id="mpMsg"></span></div><h4>Guardados</h4><ul class="mu-list" id="mapList"></ul><p class="sub">Dica: peça ao Perseus “muda o mapa para o laboratório”.</p>`,'Fechar',()=>closeModal());
+  mapListHtml7();mapRefresh7();
+  $('mpNone').onclick=()=>{mapUse7(null);mapListHtml7()};
+  $('mpSend').onclick=async()=>{const f=$('mpFile').files&&$('mpFile').files[0];if(!f){toast('Escolha a imagem do mapa.');return}$('mpMsg').textContent='Enviando…';$('mpSend').disabled=true;try{const k=await mapUpload7(f,$('mpName').value);mapUse7(k);$('mpMsg').textContent='Mapa enviado e colocado na mesa.';$('mpFile').value='';$('mpName').value='';mapListHtml7()}catch(e){$('mpMsg').textContent='';toast('Não consegui enviar o mapa: '+(e?.message||'erro'))}finally{const b=$('mpSend');if(b)b.disabled=false}};
+}
+function mapGridModal7(){
+  const g=mapCfg7(),m=M6.state.map,key=m?m.key:'~blank';
+  openModal('GRADE','Ajustar a grade',`<p class="sub">Diga quantos quadrados cabem na largura do mapa. Os tokens se ajustam sozinhos ao tamanho do quadrado.</p><div class="grid two"><div class="field"><label for="gdCols">Quadrados na largura</label><input type="number" id="gdCols" min="4" max="120" value="${g.cols}"></div><div class="field"><label for="gdMpc">Metros por quadrado</label><input type="number" id="gdMpc" min="0.5" max="50" step="0.5" value="${g.mpc}"></div><div class="field"><label for="gdOx">Deslocar para a direita (px do mapa)</label><input type="number" id="gdOx" value="${Math.round(g.ox)}"></div><div class="field"><label for="gdOy">Deslocar para baixo (px do mapa)</label><input type="number" id="gdOy" value="${Math.round(g.oy)}"></div></div><label class="t3-check"><input type="checkbox" id="gdShow" ${g.show?'checked':''}> Mostrar as linhas da grade</label>`,'Concluir',()=>closeModal());
+  const apply=()=>{if(!m){toast('A mesa em branco usa a grade padrão. Envie um mapa para ajustar.');return}setState6({mapCfg:{...(M6.state.mapCfg||{}),[key]:{cols:Number($('gdCols').value)||g.cols,mpc:Number($('gdMpc').value)||1.5,ox:Number($('gdOx').value)||0,oy:Number($('gdOy').value)||0,show:$('gdShow').checked}}})};
+  ['gdCols','gdMpc','gdOx','gdOy','gdShow'].forEach(id=>{$(id).oninput=apply;$(id).onchange=apply});
+}
+function mapTokensModal7(){
+  const draw=()=>{
+    const on=new Map((M6.state.tokens||[]).map(t=>[t.charId,t])),list=chars3().slice().sort((a,b)=>(gmChar6(a)-gmChar6(b))||nm(a).localeCompare(nm(b),'pt-BR'));
+    $('tkList').innerHTML=list.length?list.map(ch=>`<li>${av5({...ch.data,avatar:avOk(ch.data?.tokenAvatar)?ch.data.tokenAvatar:ch.data?.avatar},'sm')}<span class="mu-t">${esc(nm(ch))} <small>${gmChar6(ch)?'Mestre':esc(ch.ownerLabel||'Jogador')}${inScene(ch)?'':' · fora da cena'}</small></span><button type="button" class="btn small ${on.has(ch.id)?'':'primary'}" data-tk="${ch.id}">${on.has(ch.id)?'Tirar do mapa':'Colocar no mapa'}</button></li>`).join(''):'<li class="sub">Nenhum personagem na campanha.</li>';
+    $$('[data-tk]').forEach(b=>b.onclick=()=>{mapToggleToken7(b.dataset.tk);draw()});
+  };
+  openModal('TOKENS','Tokens no mapa',`<p class="sub">Cada token já vem ligado à ficha do personagem e usa a imagem de token dele. Só o Mestre coloca e tira tokens.</p><div class="inline"><button type="button" class="btn small primary" id="tkScene">Colocar todos que estão na cena</button><button type="button" class="btn small" id="tkClear">Tirar todos</button></div><ul class="mu-list tk-list" id="tkList"></ul>`,'Concluir',()=>closeModal());
+  $('tkScene').onclick=()=>{chars3().filter(inScene).forEach(ch=>{if(!(M6.state.tokens||[]).some(t=>t.charId===ch.id))mapToggleToken7(ch.id)});draw()};
+  $('tkClear').onclick=()=>{setState6({tokens:[]});draw()};
+  draw();
+}
+function mapToggleToken7(charId){
+  if(!isGM6())return;const toks=M6.state.tokens||[];
+  if(toks.some(t=>t.charId===charId)){setState6({tokens:toks.filter(t=>t.charId!==charId)});return}
+  const g=mapCfg7(),W=mapWorld7(),cx=Math.round((MAP7.cam.x*W.W-g.ox)/g.cell),cy=Math.round((MAP7.cam.y*W.H-g.oy)/g.cell),used=new Set(toks.map(t=>t.x+','+t.y));
+  let x=cx,y=cy;for(let i=0;i<60&&used.has(x+','+y);i++){x=cx+(i%6)-2;y=cy+Math.floor(i/6)}
+  setState6({tokens:[...toks,{id:'k'+rid(),charId,x:Math.max(0,Math.min(g.cols-1,x)),y:Math.max(0,Math.min(g.rows-1,y)),s:1}]});
+}
+T3.mapToggleToken=mapToggleToken7;
+
+/* ---------- acompanha o estado da mesa ---------- */
+onState6((st,why)=>{
+  if(!mapMount7())return;
+  const key=st.map?.key||'';
+  if(key!==MAP7.imgKey){
+    MAP7.imgKey=key;MAP7.img=null;
+    if(key)assetData6(key).then(src=>{if(MAP7.imgKey!==key||!src)return;const im=new Image();im.onload=()=>{if(MAP7.imgKey===key){MAP7.img=im;mapDraw7()}};im.src=src}).catch(e=>console.warn('[T7] imagem do mapa',e));
+  }
+  if(st.cam&&!MAP7.drag){if(isGM6()||why==='carga')MAP7.cam={...st.cam};else MAP7.target={...st.cam}}
+  mapTools7();mapDraw7();
+});
+M6.hooks.layout.push(()=>mapDraw7());
+M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=null;MAP7.ruler=null;MAP7.live={}});
+{const _lm7=layoutMesa6;layoutMesa6=function(){_lm7.apply(this,arguments);try{if(mapMount7()){mapTools7();mapDraw7()}}catch(e){console.warn('[T7] mapa',e)}};T3.mesaLayout=layoutMesa6}
+
+
+/* ===================================================================
+   TULPA · ETAPA 8 — chamada de voz da mesa (estilo Discord)
+   WebRTC em malha (cada participante fala direto com os outros).
+   A sinalização usa o Realtime Broadcast do Supabase no canal
+   "tulpa-voice-<campanha>" e servidores STUN públicos, sem custo.
+   Só o Mestre inicia e encerra; todos entram automaticamente.
+   Sussurro: o Mestre isola o áudio com um ou mais jogadores.
+   =================================================================== */
+const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false};
+T3.voice=V8;
+if(prefs.callVol===undefined)prefs.callVol=100;
+const ICE8=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},{urls:'stun:stun.cloudflare.com:3478'}];
+const rtcOk8=()=>typeof RTCPeerConnection==='function';
+const vGm8=()=>camp3()?.createdBy||null;
+/* quem eu ouço e para quem meu microfone vai, de acordo com o sussurro */
+function vAllowed8(uid){
+  const w=M6.state.call?.whisper;if(!Array.isArray(w)||!w.length)return true;
+  const g=new Set([...w,vGm8()]),me=uid3();
+  return g.has(me)===g.has(uid);
+}
+function vSend8(o){try{if(V8.ch&&V8.live&&typeof V8.ch.send==='function')V8.ch.send({type:'broadcast',event:'v',payload:{...o,from:uid3(),call:V8.callId}})}catch(e){}}
+function vRoute8(){
+  V8.peers.forEach(p=>{const ok=vAllowed8(p.uid);if(p.track)p.track.enabled=ok&&!V8.muted;p.audio.muted=!ok;p.audio.volume=Math.max(0,Math.min(1,(prefs.callVol??100)/100))});
+}
+function vClosePeer8(uid){
+  const p=V8.peers.get(uid);if(!p)return;V8.peers.delete(uid);
+  clearTimeout(p.iceTimer);
+  try{p.pc.onicecandidate=p.pc.ontrack=p.pc.onconnectionstatechange=null;p.pc.close()}catch(e){}
+  try{p.track&&p.track.stop()}catch(e){}
+  try{p.audio.srcObject=null;p.audio.remove()}catch(e){}
+}
+function vPeer8(uid){
+  let p=V8.peers.get(uid);if(p)return p;
+  const pc=new RTCPeerConnection({iceServers:ICE8});
+  const audio=document.createElement('audio');audio.autoplay=true;audio.setAttribute('playsinline','');audio.style.display='none';document.body.append(audio);
+  p={uid,pc,audio,track:null,pending:[],iceOut:[],iceTimer:null,made:Date.now()};V8.peers.set(uid,p);
+  if(V8.stream&&V8.stream.getAudioTracks()[0]){p.track=V8.stream.getAudioTracks()[0].clone();pc.addTrack(p.track,V8.stream)}
+  else{try{pc.addTransceiver('audio',{direction:'recvonly'})}catch(e){}}
+  /* os candidatos de conexão saem em lotes para não estourar o limite de mensagens por segundo do Realtime */
+  pc.onicecandidate=e=>{if(!e.candidate)return;p.iceOut.push(e.candidate.toJSON?e.candidate.toJSON():e.candidate);clearTimeout(p.iceTimer);p.iceTimer=setTimeout(()=>{const cs=p.iceOut.splice(0);if(cs.length)vSend8({t:'ice',to:uid,cs})},220)};
+  pc.ontrack=e=>{audio.srcObject=e.streams&&e.streams[0]?e.streams[0]:new MediaStream([e.track]);vRoute8();const pr=audio.play();if(pr&&pr.catch)pr.catch(()=>{V8.blocked=true;voiceBar8()})};
+  pc.onconnectionstatechange=()=>{
+    const s=pc.connectionState;
+    if(s==='failed'||s==='closed'){vClosePeer8(uid);if(V8.on&&uid3()<uid)setTimeout(()=>{if(V8.on&&!V8.peers.has(uid))vOffer8(uid)},1500)}
+    voiceBar8();voicePaint8();
+  };
+  vRoute8();
+  return p;
+}
+async function vOffer8(uid){
+  try{const p=vPeer8(uid);const o=await p.pc.createOffer();await p.pc.setLocalDescription(o);vSend8({t:'offer',to:uid,sdp:{type:p.pc.localDescription.type,sdp:p.pc.localDescription.sdp}})}
+  catch(e){console.warn('[T8] oferta',e)}
+}
+async function vSignal8(m){
+  if(!V8.on||!m||m.from===uid3()||m.call!==V8.callId)return;
+  if(m.to&&m.to!==uid3())return;
+  const from=m.from;
+  try{
+    if(m.t==='hello'||m.t==='st'){
+      if(m.t==='st'){V8.states[from]={muted:!!m.muted,speaking:!!m.speaking,at:Date.now()};voicePaint8()}
+      if(!V8.peers.has(from)){if(uid3()<from)await vOffer8(from);else if(!m.to)vSend8({t:'hello',to:from})}
+      if(m.t==='hello'){V8.states[from]=V8.states[from]||{muted:false,speaking:false,at:Date.now()};voiceBar8();voicePaint8()}
+    }else if(m.t==='offer'){
+      let p=V8.peers.get(from);if(p&&p.pc.signalingState!=='stable'){vClosePeer8(from);p=null}
+      p=p||vPeer8(from);
+      await p.pc.setRemoteDescription(m.sdp);
+      for(const c of p.pending.splice(0))try{await p.pc.addIceCandidate(c)}catch(e){}
+      const a=await p.pc.createAnswer();await p.pc.setLocalDescription(a);vSend8({t:'answer',to:from,sdp:{type:p.pc.localDescription.type,sdp:p.pc.localDescription.sdp}});
+    }else if(m.t==='answer'){
+      const p=V8.peers.get(from);if(!p)return;
+      await p.pc.setRemoteDescription(m.sdp);
+      for(const c of p.pending.splice(0))try{await p.pc.addIceCandidate(c)}catch(e){}
+    }else if(m.t==='ice'){
+      const p=V8.peers.get(from),cs=m.cs||(m.c?[m.c]:[]);if(!p||!cs.length)return;
+      for(const c of cs){if(p.pc.remoteDescription&&p.pc.remoteDescription.type){try{await p.pc.addIceCandidate(c)}catch(e){}}else p.pending.push(c)}
+    }else if(m.t==='bye'){vClosePeer8(from);delete V8.states[from];voiceBar8();voicePaint8()}
+  }catch(e){console.warn('[T8] sinal '+m.t,e)}
+}
+/* detecção de voz: contorno verde enquanto a pessoa fala */
+function vVad8(){
+  vVadStop8();if(!V8.stream)return;
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext,ctx=new AC(),src=ctx.createMediaStreamSource(V8.stream),an=ctx.createAnalyser();
+    an.fftSize=512;an.smoothingTimeConstant=.5;src.connect(an);
+    const buf=new Uint8Array(an.fftSize);let last=0;
+    const iv=setInterval(()=>{
+      if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+      an.getByteTimeDomainData(buf);let s=0;for(let i=0;i<buf.length;i++){const v=(buf[i]-128)/128;s+=v*v}
+      const rms=Math.sqrt(s/buf.length),now=Date.now();if(rms>.035&&!V8.muted)last=now;
+      const sp=!V8.muted&&now-last<380;
+      if(sp!==V8.me.speaking){V8.me.speaking=sp;vSend8({t:'st',muted:V8.muted,speaking:sp});voicePaint8()}
+    },90);
+    V8.vad={ctx,iv};
+  }catch(e){console.warn('[T8] detecção de voz',e)}
+}
+function vVadStop8(){if(V8.vad){clearInterval(V8.vad.iv);try{V8.vad.ctx.close()}catch(e){}V8.vad=null}}
+async function vMic8(){
+  if(!navigator.mediaDevices?.getUserMedia)throw new Error('este navegador não libera o microfone aqui');
+  return navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+}
+/* entra na call da mesa (chamado sozinho quando o Mestre inicia) */
+async function voiceJoin8(id){
+  if(!id||V8.callId===id||V8.joining)return;
+  if(!rtcOk8()||!cloud6()||typeof sb().channel!=='function'){if(!V8.warned){V8.warned=true;toast('Este navegador não consegue entrar na chamada de voz.')}return}
+  voiceLeave8(true);
+  V8.joining=true;V8.callId=id;V8.on=true;V8.muted=false;V8.listenOnly=false;V8.states={};
+  const camp=camp3().id,gm=isGM6();
+  if(!gm){fx5('start');say('📞 O Mestre iniciou a <b>call</b>. Você já está dentro: é só falar. Use 🎙 no topo da mesa para mutar.')}
+  voiceBar8();
+  try{V8.stream=await vMic8()}
+  catch(e){V8.listenOnly=true;V8.stream=null;toast('Sem acesso ao microfone: você entrou só ouvindo. Libere o microfone no navegador e toque em “Ligar microfone”.')}
+  V8.joining=false;
+  if(V8.callId!==id||M6.campId!==camp){vStopStream8();return}
+  vVad8();
+  try{
+    const ch=sb().channel('tulpa-voice-'+camp,{config:{broadcast:{self:false}}});
+    ch.on('broadcast',{event:'v'},({payload})=>vSignal8(payload));
+    ch.subscribe(st=>{if(st==='SUBSCRIBED'&&V8.callId===id){V8.live=true;vSend8({t:'hello'});vSend8({t:'st',muted:V8.muted,speaking:false})}});
+    V8.ch=ch;
+  }catch(e){console.warn('[T8] canal de voz',e)}
+  clearInterval(V8.beat);
+  V8.beat=setInterval(()=>{if(!V8.on)return;vSend8({t:'st',muted:V8.muted,speaking:V8.me.speaking});const now=Date.now();Object.keys(V8.states).forEach(u=>{if(now-V8.states[u].at>15000&&!V8.peers.has(u))delete V8.states[u]});voiceBar8()},4000);
+  voiceBar8();voicePaint8();
+}
+function vStopStream8(){try{V8.stream&&V8.stream.getTracks().forEach(t=>t.stop())}catch(e){}V8.stream=null}
+function voiceLeave8(silent=false){
+  if(!V8.on&&!V8.ch)return;
+  vSend8({t:'bye'});
+  clearInterval(V8.beat);V8.beat=null;vVadStop8();
+  [...V8.peers.keys()].forEach(vClosePeer8);
+  vStopStream8();
+  try{if(V8.ch)sb()?.removeChannel(V8.ch)}catch(e){}
+  V8.ch=null;V8.live=false;V8.on=false;V8.callId='';V8.states={};V8.me.speaking=false;V8.blocked=false;V8.joining=false;
+  if(!silent){voiceBar8();voicePaint8()}
+}
+async function voiceRetryMic8(){
+  try{V8.stream=await vMic8();V8.listenOnly=false;vVad8();
+    /* refaz as ligações já com o microfone */
+    const ids=[...V8.peers.keys()];ids.forEach(vClosePeer8);vSend8({t:'bye'});setTimeout(()=>vSend8({t:'hello'}),300);toast('Microfone ligado.')}
+  catch(e){toast('O navegador ainda não liberou o microfone.')}
+  voiceBar8();
+}
+function voiceMute8(m){V8.muted=m===undefined?!V8.muted:!!m;vRoute8();if(V8.muted)V8.me.speaking=false;vSend8({t:'st',muted:V8.muted,speaking:false});voiceBar8();voicePaint8()}
+/* comandos do Mestre */
+function voiceStart8(){if(!isGM6())return false;if(!rtcOk8()){toast('Este navegador não tem suporte a chamadas de voz.');return false}actx();setState6({call:{on:true,id:'c'+rid(),whisper:null}});return true}
+function voiceEnd8(){if(!isGM6())return;setState6({call:{on:false,id:'',whisper:null}})}
+function voiceWhisper8(uids){if(!isGM6()||!M6.state.call?.on)return;const w=(uids||[]).filter(Boolean);setState6({call:{...M6.state.call,whisper:w.length?w:null}})}
+T3.voiceStart=voiceStart8;T3.voiceEnd=voiceEnd8;T3.voiceWhisper=voiceWhisper8;T3.voiceMute=voiceMute8;T3._vAllowed=vAllowed8;
+
+onState6(st=>{
+  const c=st.call||{};
+  if(c.on&&c.id){if(V8.callId!==c.id)voiceJoin8(c.id)}
+  else if(V8.on){const was=V8.on;voiceLeave8();if(was&&!isGM6())toast('O Mestre encerrou a call.')}
+  const wsig=JSON.stringify(c.whisper||null);
+  if(V8.on&&V8.wsig!==wsig){
+    const had=V8.wsig&&V8.wsig!=='null';V8.wsig=wsig;vRoute8();
+    if(!isGM6()){const w=c.whisper;if(w&&w.length){fx5('activate');say(w.includes(uid3())?'🤫 <b>Sussurro:</b> agora só você'+(w.length>1?'s':'')+' e o Mestre se ouvem. Os outros não escutam nada.':'🤫 O Mestre está em uma conversa particular. Você continua ouvindo o resto da mesa.')}else if(had)say('🔊 De volta ao áudio geral da mesa.')}
+  }
+  if(!V8.on)V8.wsig='null';
+  voiceBar8();voicePaint8();
+});
+M6.hooks.leave.push(()=>voiceLeave8());
+window.addEventListener('pagehide',()=>{try{vSend8({t:'bye'})}catch(e){}});
+
+/* ---------- barra da call ---------- */
+function vCount8(){const s=new Set(Object.keys(V8.states));V8.peers.forEach((p,u)=>s.add(u));return s.size+1}
+function voiceBar8(){
+  const box=$('mbCall');if(!box)return;
+  const isM=isGM6(),c=M6.state.call||{},w=Array.isArray(c.whisper)&&c.whisper.length?c.whisper:null,names=w?w.map(u=>nm(charOfUser6(u))||'jogador').join(', '):'';
+  const sig=[isM,c.on,V8.on,V8.muted,V8.listenOnly,V8.blocked,V8.joining,vCount8(),names,w&&w.includes(uid3())].join('|');
+  if(box.dataset.sig===sig)return;box.dataset.sig=sig;
+  if(!c.on){box.innerHTML=isM?'<button type="button" class="btn small primary" id="vcStart">📞 Iniciar call</button><span class="sub">Todos na mesa entram na hora.</span>':'<span class="sub vc-off">📞 Sem call no momento</span>';const s=$('vcStart');if(s)s.onclick=voiceStart8;return}
+  box.innerHTML=`<span class="vc-live"><i></i>${V8.joining?'Entrando na call…':`Na call · ${vCount8()}`}</span>
+   ${V8.listenOnly?'<button type="button" class="btn small primary" id="vcMic">🎙 Ligar microfone</button>':`<button type="button" class="btn small ${V8.muted?'danger':''}" id="vcMute" aria-pressed="${V8.muted}">${V8.muted?'🔇 Mudo':'🎙 Microfone'}</button>`}
+   <label class="mb-vol vc-vol" title="Volume das vozes (só para você)"><span aria-hidden="true">🗣</span><input type="range" id="vcVol" min="0" max="100" step="1" value="${prefs.callVol??100}" aria-label="Volume das vozes"></label>
+   ${V8.blocked?'<button type="button" class="btn small primary" id="vcUnlock">▶ Ativar áudio</button>':''}
+   ${isM?`<button type="button" class="btn small ${w?'primary':''}" id="vcWhisper">🤫 Sussurro</button>${w?'<button type="button" class="btn small" id="vcAll">↩ Áudio geral</button>':''}<button type="button" class="btn small danger" id="vcEnd">Encerrar call</button>`:''}
+   ${w?`<span class="vc-whisper">${isM?'Falando só com '+esc(names):w.includes(uid3())?'🤫 Conversa particular com o Mestre':'🤫 O Mestre está em conversa particular'}</span>`:''}`;
+  const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
+  on('vcMute',()=>voiceMute8());on('vcMic',voiceRetryMic8);on('vcEnd',()=>{if(confirm('Encerrar a call para todos?'))voiceEnd8()});on('vcAll',()=>voiceWhisper8([]));
+  on('vcUnlock',()=>{V8.peers.forEach(p=>{try{p.audio.play()}catch(e){}});V8.blocked=false;voiceBar8()});
+  on('vcWhisper',vWhisperModal8);
+  const v=$('vcVol');if(v)v.oninput=()=>{prefs.callVol=Number(v.value)||0;savePrefs();vRoute8()};
+}
+function vWhisperModal8(){
+  const players=seats6().players,cur=new Set(M6.state.call?.whisper||[]);
+  openModal('SUSSURRO','Falar em particular',`<p class="sub">Marque quem vai ouvir e falar com você. O áudio fica isolado: os outros jogadores não escutam nada dessa conversa e continuam se ouvindo entre si.</p><div class="sd-players">${players.length?players.map(s=>`<label class="t3-check"><input type="checkbox" value="${s.uid}" ${cur.has(s.uid)?'checked':''}> ${esc(nm(s.ch))}${V8.states[s.uid]||V8.peers.has(s.uid)?'':' <span class="sub">(fora da call)</span>'}</label>`).join(''):'<span class="sub">Nenhum jogador na campanha.</span>'}</div>`,'Começar sussurro',()=>{const ids=$$('#modalBody .sd-players input:checked').map(i=>i.value);closeModal();voiceWhisper8(ids);if(!ids.length)toast('Áudio geral da mesa.')});
+}
+/* contorno verde em quem fala; microfone cortado em quem está mudo */
+function voicePaint8(){
+  const me=uid3(),gm=vGm8(),c=M6.state.call||{},w=Array.isArray(c.whisper)&&c.whisper.length?new Set([...c.whisper,gm]):null;
+  const st=u=>u===me?{muted:V8.muted,speaking:V8.me.speaking,inCall:V8.on}:{...(V8.states[u]||{}),inCall:V8.on&&(!!V8.states[u]||V8.peers.has(u))};
+  $$('#tableCharacters .table-char.seat').forEach(card=>{
+    const u=card.dataset.uid,s=st(u),av=card.querySelector('.tc-head .av');
+    if(av){av.classList.toggle('speaking',!!(s.inCall&&s.speaking&&vAllowed8(u)));av.classList.toggle('muted',!!(s.inCall&&s.muted))}
+    card.classList.toggle('in-call',!!s.inCall);card.classList.toggle('whisper',!!(w&&w.has(u)&&(isGM6()||w.has(me))));
+  });
+  const mav=$q('#mAv .av');if(mav){const s=st(gm);mav.classList.toggle('speaking',!!(s.inCall&&s.speaking&&vAllowed8(gm)));mav.classList.toggle('muted',!!(s.inCall&&s.muted))}
+  $('mesaM')?.classList.toggle('in-call',!!st(gm).inCall);
+}
+T3.voiceBar=voiceBar8;T3.voicePaint=voicePaint8;
+M6.hooks.layout.push(()=>voicePaint8());
+{const _lm8=layoutMesa6;layoutMesa6=function(){_lm8.apply(this,arguments);try{voicePaint8()}catch(e){}};T3.mesaLayout=layoutMesa6}
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
