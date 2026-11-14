@@ -2043,6 +2043,11 @@ body.t3-dark .t3-bubold{background:#1f2733e6;color:#eef2f7;border-color:#e59a8c8
   .seat-more{width:38px;height:36px}
 }
 
+/* call: aviso de conexão e botão TURN */
+.vc-warn{flex:1 1 100%;font-size:12.5px;font-weight:600;padding:6px 10px;border-radius:8px;background:#4a2a14;color:#ffd9b8;line-height:1.35}
+#mbCall .btn.warn{border-color:#d98a3d;color:#ffd9b8}
+#turnUrl{padding:9px 10px;border-radius:8px;border:1px solid var(--line,#444);background:rgba(0,0,0,.25);color:inherit;font-size:16px;margin-top:4px}
+
 </style>
 <script id="tulpa-etapa3">
 (()=>{
@@ -6432,10 +6437,13 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false};
+const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set()};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
 const ICE8=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},{urls:'stun:stun.cloudflare.com:3478'}];
+/* servidores TURN (opcional): o Mestre cola o endereço de credenciais uma vez; ao iniciar a call, as credenciais vão no estado da mesa e todos usam */
+const turnClean8=l=>(Array.isArray(l)?l:[]).slice(0,12).map(o=>{const u=[].concat(o&&o.urls||[]).filter(x=>typeof x==='string'&&/^(turns?|stuns?):/i.test(x)).slice(0,8);if(!u.length)return null;const r={urls:u};if(typeof o.username==='string')r.username=o.username.slice(0,200);if(typeof o.credential==='string')r.credential=o.credential.slice(0,300);return r}).filter(Boolean);
+const iceServers8=()=>{const x=turnClean8(M6.state.call?.ice);return x.length?[...ICE8,...x]:ICE8};
 const rtcOk8=()=>typeof RTCPeerConnection==='function';
 const vGm8=()=>camp3()?.createdBy||null;
 /* quem eu ouço e para quem meu microfone vai, de acordo com o sussurro */
@@ -6450,16 +6458,18 @@ function vRoute8(){
 }
 function vClosePeer8(uid){
   const p=V8.peers.get(uid);if(!p)return;V8.peers.delete(uid);
-  clearTimeout(p.iceTimer);
+  clearTimeout(p.iceTimer);clearTimeout(p.wd);
   try{p.pc.onicecandidate=p.pc.ontrack=p.pc.onconnectionstatechange=null;p.pc.close()}catch(e){}
   try{p.track&&p.track.stop()}catch(e){}
   try{p.audio.srcObject=null;p.audio.remove()}catch(e){}
 }
 function vPeer8(uid){
   let p=V8.peers.get(uid);if(p)return p;
-  const pc=new RTCPeerConnection({iceServers:ICE8});
+  const pc=new RTCPeerConnection({iceServers:iceServers8()});
   const audio=document.createElement('audio');audio.autoplay=true;audio.setAttribute('playsinline','');audio.style.display='none';document.body.append(audio);
-  p={uid,pc,audio,track:null,pending:[],iceOut:[],iceTimer:null,made:Date.now()};V8.peers.set(uid,p);
+  p={uid,pc,audio,track:null,pending:[],iceOut:[],iceTimer:null,made:Date.now(),wd:null};V8.peers.set(uid,p);
+  /* se em 14 s não ligar, avisa na barra: quase sempre é rede restritiva e falta servidor TURN */
+  p.wd=setTimeout(()=>{if(V8.peers.get(uid)===p&&pc.connectionState!=='connected'){V8.bad.add(uid);voiceBar8()}},14000);
   if(V8.stream&&V8.stream.getAudioTracks()[0]){p.track=V8.stream.getAudioTracks()[0].clone();pc.addTrack(p.track,V8.stream)}
   else{try{pc.addTransceiver('audio',{direction:'recvonly'})}catch(e){}}
   /* os candidatos de conexão saem em lotes para não estourar o limite de mensagens por segundo do Realtime */
@@ -6467,7 +6477,9 @@ function vPeer8(uid){
   pc.ontrack=e=>{audio.srcObject=e.streams&&e.streams[0]?e.streams[0]:new MediaStream([e.track]);vRoute8();const pr=audio.play();if(pr&&pr.catch)pr.catch(()=>{V8.blocked=true;voiceBar8()})};
   pc.onconnectionstatechange=()=>{
     const s=pc.connectionState;
-    if(s==='failed'||s==='closed'){vClosePeer8(uid);if(V8.on&&uid3()<uid)setTimeout(()=>{if(V8.on&&!V8.peers.has(uid))vOffer8(uid)},1500)}
+    if(s==='connected'){V8.bad.delete(uid);clearTimeout(p.wd)}
+    if(s==='disconnected'){setTimeout(()=>{if(V8.peers.get(uid)===p&&pc.connectionState==='disconnected'&&uid3()<uid){try{pc.restartIce();vOffer8(uid)}catch(e){}}},3000)}
+    if(s==='failed'||s==='closed'){if(s==='failed')V8.bad.add(uid);vClosePeer8(uid);if(V8.on&&uid3()<uid)setTimeout(()=>{if(V8.on&&!V8.peers.has(uid))vOffer8(uid)},1500)}
     voiceBar8();voicePaint8();
   };
   vRoute8();
@@ -6499,7 +6511,7 @@ async function vSignal8(m){
     }else if(m.t==='ice'){
       const p=V8.peers.get(from),cs=m.cs||(m.c?[m.c]:[]);if(!p||!cs.length)return;
       for(const c of cs){if(p.pc.remoteDescription&&p.pc.remoteDescription.type){try{await p.pc.addIceCandidate(c)}catch(e){}}else p.pending.push(c)}
-    }else if(m.t==='bye'){vClosePeer8(from);delete V8.states[from];voiceBar8();voicePaint8()}
+    }else if(m.t==='bye'){vClosePeer8(from);V8.bad.delete(from);delete V8.states[from];voiceBar8();voicePaint8()}
   }catch(e){console.warn('[T8] sinal '+m.t,e)}
 }
 /* detecção de voz: contorno verde enquanto a pessoa fala */
@@ -6556,7 +6568,7 @@ function voiceLeave8(silent=false){
   [...V8.peers.keys()].forEach(vClosePeer8);
   vStopStream8();
   try{if(V8.ch)sb()?.removeChannel(V8.ch)}catch(e){}
-  V8.ch=null;V8.live=false;V8.on=false;V8.callId='';V8.states={};V8.me.speaking=false;V8.blocked=false;V8.joining=false;
+  V8.bad.clear();V8.ch=null;V8.live=false;V8.on=false;V8.callId='';V8.states={};V8.me.speaking=false;V8.blocked=false;V8.joining=false;
   if(!silent){voiceBar8();voicePaint8()}
 }
 async function voiceRetryMic8(){
@@ -6568,7 +6580,16 @@ async function voiceRetryMic8(){
 }
 function voiceMute8(m){V8.muted=m===undefined?!V8.muted:!!m;vRoute8();if(V8.muted)V8.me.speaking=false;vSend8({t:'st',muted:V8.muted,speaking:false});voiceBar8();voicePaint8()}
 /* comandos do Mestre */
-function voiceStart8(){if(!isGM6())return false;if(!rtcOk8()){toast('Este navegador não tem suporte a chamadas de voz.');return false}actx();setState6({call:{on:true,id:'c'+rid(),whisper:null}});return true}
+async function turnFetch8(){
+  const u=String(prefs.turnUrl||'').trim();if(!u)return [];
+  try{if(u[0]==='['||u[0]==='{'){const j=JSON.parse(u);return turnClean8(Array.isArray(j)?j:j.iceServers)}
+    if(!/^https:\/\//i.test(u))throw new Error('endereço');
+    const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error('http '+r.status);
+    const j=await r.json();const l=turnClean8(Array.isArray(j)?j:j.iceServers);if(!l.length)throw new Error('vazio');return l}
+  catch(e){console.warn('[T8] TURN',e);toast('Não consegui buscar o servidor TURN. A call vai começar sem ele.');return []}
+}
+function voiceStart8(){if(!isGM6())return false;if(!rtcOk8()){toast('Este navegador não tem suporte a chamadas de voz.');return false}actx();
+  (async()=>{const ice=await turnFetch8();setState6({call:{on:true,id:'c'+rid(),whisper:null,ice:ice.length?ice:null}})})();return true}
 function voiceEnd8(){if(!isGM6())return;setState6({call:{on:false,id:'',whisper:null}})}
 function voiceWhisper8(uids){if(!isGM6()||!M6.state.call?.on)return;const w=(uids||[]).filter(Boolean);setState6({call:{...M6.state.call,whisper:w.length?w:null}})}
 T3.voiceStart=voiceStart8;T3.voiceEnd=voiceEnd8;T3.voiceWhisper=voiceWhisper8;T3.voiceMute=voiceMute8;T3._vAllowed=vAllowed8;
@@ -6586,6 +6607,7 @@ onState6(st=>{
   voiceBar8();voicePaint8();
 });
 M6.hooks.leave.push(()=>voiceLeave8());
+document.addEventListener('pointerdown',()=>{if(V8.on&&V8.peers.size)V8.peers.forEach(p=>{if(p.audio.paused&&p.audio.srcObject){const r=p.audio.play();if(r&&r.then)r.then(()=>{if(V8.blocked){V8.blocked=false;voiceBar8()}}).catch(()=>{})}})},{passive:true});
 window.addEventListener('pagehide',()=>{try{vSend8({t:'bye'})}catch(e){}});
 
 /* ---------- barra da call ---------- */
@@ -6593,20 +6615,30 @@ function vCount8(){const s=new Set(Object.keys(V8.states));V8.peers.forEach((p,u
 function voiceBar8(){
   const box=$('mbCall');if(!box)return;
   const isM=isGM6(),c=M6.state.call||{},w=Array.isArray(c.whisper)&&c.whisper.length?c.whisper:null,names=w?w.map(u=>nm(charOfUser6(u))||'jogador').join(', '):'';
-  const sig=[isM,c.on,V8.on,V8.muted,V8.listenOnly,V8.blocked,V8.joining,vCount8(),names,w&&w.includes(uid3())].join('|');
+  const gmU=vGm8(),badN=[...V8.bad].map(u=>u===gmU?'Mestre':(nm(charOfUser6(u))||'jogador')).join(', '),hasTurn=!!(c.ice&&c.ice.length),cfgTurn=!!String(prefs.turnUrl||'').trim();
+  const sig=[isM,c.on,V8.on,V8.muted,V8.listenOnly,V8.blocked,V8.joining,vCount8(),names,w&&w.includes(uid3()),badN,hasTurn,cfgTurn].join('|');
   if(box.dataset.sig===sig)return;box.dataset.sig=sig;
-  if(!c.on){box.innerHTML=isM?'<button type="button" class="btn small primary" id="vcStart">📞 Iniciar call</button><span class="sub">Todos na mesa entram na hora.</span>':'<span class="sub vc-off">📞 Sem call no momento</span>';const s=$('vcStart');if(s)s.onclick=voiceStart8;return}
+  if(!c.on){box.innerHTML=isM?'<button type="button" class="btn small primary" id="vcStart">📞 Iniciar call</button><button type="button" class="btn small '+(cfgTurn?'':'warn')+'" id="vcTurn" title="Ajuda a voz a conectar em redes difíceis (4G, Wi-Fi de empresa)">🌐 Servidor TURN'+(cfgTurn?' ✓':'')+'</button><span class="sub">Todos na mesa entram na hora.</span>':'<span class="sub vc-off">📞 Sem call no momento</span>';const s=$('vcStart');if(s)s.onclick=voiceStart8;const tb=$('vcTurn');if(tb)tb.onclick=vTurnModal8;return}
   box.innerHTML=`<span class="vc-live"><i></i>${V8.joining?'Entrando na call…':`Na call · ${vCount8()}`}</span>
    ${V8.listenOnly?'<button type="button" class="btn small primary" id="vcMic">🎙 Ligar microfone</button>':`<button type="button" class="btn small ${V8.muted?'danger':''}" id="vcMute" aria-pressed="${V8.muted}">${V8.muted?'🔇 Mudo':'🎙 Microfone'}</button>`}
    <label class="mb-vol vc-vol" title="Volume das vozes (só para você)"><span aria-hidden="true">🗣</span><input type="range" id="vcVol" min="0" max="100" step="1" value="${prefs.callVol??100}" aria-label="Volume das vozes"></label>
    ${V8.blocked?'<button type="button" class="btn small primary" id="vcUnlock">▶ Ativar áudio</button>':''}
    ${isM?`<button type="button" class="btn small ${w?'primary':''}" id="vcWhisper">🤫 Sussurro</button>${w?'<button type="button" class="btn small" id="vcAll">↩ Áudio geral</button>':''}<button type="button" class="btn small danger" id="vcEnd">Encerrar call</button>`:''}
+   ${isM?`<button type="button" class="btn small ${hasTurn?'':'warn'}" id="vcTurn" title="Servidor TURN">🌐 TURN${hasTurn?' ✓':''}</button>`:''}
+   ${badN?`<span class="vc-warn" role="status">⚠ A voz não conectou com ${esc(badN)}. ${isM?'Provável rede restrita: configure o servidor TURN (🌐) e reinicie a call.':'Avise o Mestre: pode faltar um servidor TURN.'}</span>`:''}
    ${w?`<span class="vc-whisper">${isM?'Falando só com '+esc(names):w.includes(uid3())?'🤫 Conversa particular com o Mestre':'🤫 O Mestre está em conversa particular'}</span>`:''}`;
   const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
   on('vcMute',()=>voiceMute8());on('vcMic',voiceRetryMic8);on('vcEnd',()=>{if(confirm('Encerrar a call para todos?'))voiceEnd8()});on('vcAll',()=>voiceWhisper8([]));
   on('vcUnlock',()=>{V8.peers.forEach(p=>{try{p.audio.play()}catch(e){}});V8.blocked=false;voiceBar8()});
-  on('vcWhisper',vWhisperModal8);
+  on('vcWhisper',vWhisperModal8);on('vcTurn',vTurnModal8);
   const v=$('vcVol');if(v)v.oninput=()=>{prefs.callVol=Number(v.value)||0;savePrefs();vRoute8()};
+}
+function vTurnModal8(){
+  if(!isGM6())return;
+  openModal('CALL','Servidor TURN',`<p class="sub">Sem TURN, a voz só liga quando as redes dos jogadores permitem conexão direta. Em 4G, Wi-Fi de empresa ou alguns roteadores, isso falha e ninguém se ouve. O TURN faz a ponte e resolve.</p>
+  <ol class="sub" style="margin:8px 0 10px 18px;line-height:1.5"><li>Crie uma conta gratuita em <b>metered.ca</b> (Open Relay, 20 GB por mês).</li><li>No painel, abra <b>TURN Server</b> e copie o endereço de credenciais (termina com <code>/api/v1/turn/credentials?apiKey=…</code>).</li><li>Cole abaixo e salve. Ele fica só neste navegador; os jogadores recebem apenas credenciais temporárias.</li></ol>
+  <label class="sub" for="turnUrl">Endereço de credenciais</label><input id="turnUrl" type="text" autocomplete="off" spellcheck="false" placeholder="https://seuapp.metered.live/api/v1/turn/credentials?apiKey=…" value="${esc(prefs.turnUrl||'')}" style="width:100%">`,
+  'Salvar',()=>{const v=($('turnUrl').value||'').trim();prefs.turnUrl=v;savePrefs();closeModal();toast(v?'Servidor TURN salvo. Ele entra na próxima call que você iniciar.':'Servidor TURN removido.');voiceBar8()});
 }
 function vWhisperModal8(){
   const players=seats6().players,cur=new Set(M6.state.call?.whisper||[]);
