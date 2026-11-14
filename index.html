@@ -6489,7 +6489,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set()};
+const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set()};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
 const ICE8=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},{urls:'stun:stun.cloudflare.com:3478'}];
@@ -6504,7 +6504,7 @@ function vAllowed8(uid){
   const g=new Set([...w,vGm8()]),me=uid3();
   return g.has(me)===g.has(uid);
 }
-function vSend8(o){try{if(V8.ch&&V8.live&&typeof V8.ch.send==='function')V8.ch.send({type:'broadcast',event:'v',payload:{...o,from:uid3(),call:V8.callId}})}catch(e){}}
+function vSend8(o){try{if(V8.ch&&V8.live&&typeof V8.ch.send==='function')V8.ch.send({type:'broadcast',event:'v',payload:{...o,from:uid3(),call:V8.callId,sid:V8.sid}})}catch(e){}}
 function vRoute8(){
   V8.peers.forEach(p=>{const ok=vAllowed8(p.uid);if(p.track)p.track.enabled=ok&&!V8.muted;p.audio.muted=!ok;p.audio.volume=Math.max(0,Math.min(1,(prefs.callVol??100)/100))});
 }
@@ -6515,11 +6515,11 @@ function vClosePeer8(uid){
   try{p.track&&p.track.stop()}catch(e){}
   try{p.audio.srcObject=null;p.audio.remove()}catch(e){}
 }
-function vPeer8(uid){
+function vPeer8(uid,sid){
   let p=V8.peers.get(uid);if(p)return p;
   const pc=new RTCPeerConnection({iceServers:iceServers8()});
   const audio=document.createElement('audio');audio.autoplay=true;audio.setAttribute('playsinline','');audio.style.display='none';document.body.append(audio);
-  p={uid,pc,audio,track:null,pending:[],iceOut:[],iceTimer:null,made:Date.now(),wd:null};V8.peers.set(uid,p);
+  p={uid,pc,audio,track:null,pending:[],iceOut:[],iceTimer:null,made:Date.now(),wd:null,sid:sid||''};V8.peers.set(uid,p);
   /* se em 14 s não ligar, avisa na barra: quase sempre é rede restritiva e falta servidor TURN */
   p.wd=setTimeout(()=>{if(V8.peers.get(uid)===p&&pc.connectionState!=='connected'){V8.bad.add(uid);voiceBar8()}},14000);
   if(V8.stream&&V8.stream.getAudioTracks()[0]){p.track=V8.stream.getAudioTracks()[0].clone();pc.addTrack(p.track,V8.stream)}
@@ -6531,28 +6531,38 @@ function vPeer8(uid){
     const s=pc.connectionState;
     if(s==='connected'){V8.bad.delete(uid);clearTimeout(p.wd)}
     if(s==='disconnected'){setTimeout(()=>{if(V8.peers.get(uid)===p&&pc.connectionState==='disconnected'&&uid3()<uid){try{pc.restartIce();vOffer8(uid)}catch(e){}}},3000)}
-    if(s==='failed'||s==='closed'){if(s==='failed')V8.bad.add(uid);vClosePeer8(uid);if(V8.on&&uid3()<uid)setTimeout(()=>{if(V8.on&&!V8.peers.has(uid))vOffer8(uid)},1500)}
+    if(s==='failed'||s==='closed'){if(s==='failed')V8.bad.add(uid);vClosePeer8(uid);if(V8.on&&uid3()<uid)setTimeout(()=>{if(V8.on&&!V8.peers.has(uid))vOffer8(uid,(V8.states[uid]&&V8.states[uid].sid)||'')},1500)}
     voiceBar8();voicePaint8();
   };
   vRoute8();
   return p;
 }
-async function vOffer8(uid){
-  try{const p=vPeer8(uid);const o=await p.pc.createOffer();await p.pc.setLocalDescription(o);vSend8({t:'offer',to:uid,sdp:{type:p.pc.localDescription.type,sdp:p.pc.localDescription.sdp}})}
+async function vOffer8(uid,sid){
+  try{const p=vPeer8(uid,sid);const o=await p.pc.createOffer();await p.pc.setLocalDescription(o);vSend8({t:'offer',to:uid,sdp:{type:p.pc.localDescription.type,sdp:p.pc.localDescription.sdp}})}
   catch(e){console.warn('[T8] oferta',e)}
 }
 async function vSignal8(m){
   if(!V8.on||!m||m.from===uid3()||m.call!==V8.callId)return;
   if(m.to&&m.to!==uid3())return;
-  const from=m.from;
+  if(m.sid&&V8.dead.has(m.sid))return; /* mensagem atrasada de uma sessão que já foi descartada */
+  const from=m.from,old=V8.peers.get(from);
+  if(old&&m.sid){
+    if(!old.sid)old.sid=m.sid;
+    else if(old.sid!==m.sid){
+      /* a pessoa saiu e entrou de novo (o "bye" pode ter se perdido): a conexão velha não serve mais */
+      if(m.t==='answer'||m.t==='ice'||m.t==='bye')return;
+      V8.dead.add(old.sid);if(V8.dead.size>30)V8.dead.delete(V8.dead.values().next().value);
+      vClosePeer8(from);V8.bad.delete(from);delete V8.states[from];
+    }
+  }
   try{
     if(m.t==='hello'||m.t==='st'){
-      if(m.t==='st'){V8.states[from]={muted:!!m.muted,speaking:!!m.speaking,at:Date.now()};voicePaint8()}
-      if(!V8.peers.has(from)){if(uid3()<from)await vOffer8(from);else if(!m.to)vSend8({t:'hello',to:from})}
-      if(m.t==='hello'){V8.states[from]=V8.states[from]||{muted:false,speaking:false,at:Date.now()};voiceBar8();voicePaint8()}
+      if(m.t==='st'){V8.states[from]={muted:!!m.muted,speaking:!!m.speaking,at:Date.now(),sid:m.sid};voicePaint8()}
+      if(!V8.peers.has(from)){if(uid3()<from)await vOffer8(from,m.sid);else if(!m.to)vSend8({t:'hello',to:from})}
+      if(m.t==='hello'){V8.states[from]=V8.states[from]||{muted:false,speaking:false,at:Date.now(),sid:m.sid};voiceBar8();voicePaint8()}
     }else if(m.t==='offer'){
       let p=V8.peers.get(from);if(p&&p.pc.signalingState!=='stable'){vClosePeer8(from);p=null}
-      p=p||vPeer8(from);
+      p=p||vPeer8(from,m.sid);
       await p.pc.setRemoteDescription(m.sdp);
       for(const c of p.pending.splice(0))try{await p.pc.addIceCandidate(c)}catch(e){}
       const a=await p.pc.createAnswer();await p.pc.setLocalDescription(a);vSend8({t:'answer',to:from,sdp:{type:p.pc.localDescription.type,sdp:p.pc.localDescription.sdp}});
@@ -6593,7 +6603,7 @@ async function voiceJoin8(id){
   if(!id||V8.callId===id||V8.joining)return;
   if(!rtcOk8()||!cloud6()||typeof sb().channel!=='function'){if(!V8.warned){V8.warned=true;toast('Este navegador não consegue entrar na chamada de voz.')}return}
   voiceLeave8(true);
-  V8.joining=true;V8.callId=id;V8.on=true;V8.muted=false;V8.listenOnly=false;V8.states={};
+  V8.joining=true;V8.callId=id;V8.sid=Math.random().toString(36).slice(2,10);V8.on=true;V8.muted=false;V8.listenOnly=false;V8.states={};
   const camp=camp3().id,gm=isGM6();
   if(!gm){fx5('start');say('📞 O Mestre iniciou a <b>call</b>. Você já está dentro: é só falar. Use 🎙 no topo da mesa para mutar.')}
   voiceBar8();
@@ -6644,7 +6654,7 @@ function voiceStart8(){if(!isGM6())return false;if(!rtcOk8()){toast('Este navega
   (async()=>{const ice=await turnFetch8();setState6({call:{on:true,id:'c'+rid(),whisper:null,ice:ice.length?ice:null}})})();return true}
 function voiceEnd8(){if(!isGM6())return;setState6({call:{on:false,id:'',whisper:null}})}
 function voiceWhisper8(uids){if(!isGM6()||!M6.state.call?.on)return;const w=(uids||[]).filter(Boolean);setState6({call:{...M6.state.call,whisper:w.length?w:null}})}
-T3.voiceStart=voiceStart8;T3.voiceEnd=voiceEnd8;T3.voiceWhisper=voiceWhisper8;T3.voiceMute=voiceMute8;T3._vAllowed=vAllowed8;
+T3.voiceJoin=voiceJoin8;T3.voiceLeave=voiceLeave8;T3.voiceStart=voiceStart8;T3.voiceEnd=voiceEnd8;T3.voiceWhisper=voiceWhisper8;T3.voiceMute=voiceMute8;T3._vAllowed=vAllowed8;
 
 onState6(st=>{
   const c=st.call||{};
