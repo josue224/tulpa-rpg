@@ -2003,7 +2003,7 @@ body.t3-dark .doc-card{background:#1c2430;color:#eef2f7;border-color:#6d5a3a}
 .pause-vol input{accent-color:#e9b949}
 .pause-act{justify-content:center;margin-top:6px}
 .pause-act .btn.small{background:#3a2c22;border-color:#6b5a44;color:#f4ead6}
-#mesaYTBox{position:fixed;left:-400px;bottom:0;width:200px;height:113px;opacity:.01;pointer-events:none}
+#mesaYTBox{position:fixed;left:-400px;bottom:0;width:220px;height:220px;opacity:.01;pointer-events:none}
 
 /* rolagem: atributo puro e troca de atributo */
 .rp6-h{margin:10px 0 2px;font-size:1.1rem}
@@ -5897,21 +5897,27 @@ function ytPlayer6(){
   if(YT6.ready)return YT6.ready;
   YT6.ready=ytApi6().then(()=>new Promise(ok=>{
     let host=$('mesaYTBox');if(!host){host=document.createElement('div');host.id='mesaYTBox';host.innerHTML='<div id="mesaYT"></div>';document.body.append(host)}
-    YT6.player=new window.YT.Player('mesaYT',{width:200,height:113,playerVars:{autoplay:1,controls:0,disablekb:1,playsinline:1,rel:0,modestbranding:1},events:{
+    const pv={autoplay:1,controls:0,disablekb:1,playsinline:1,rel:0,modestbranding:1};
+    if(/^https?:$/.test(location.protocol))pv.origin=location.origin;
+    const cfg={width:220,height:220,playerVars:pv,events:{
       onReady:()=>{applyVol6();ok(YT6.player)},
       onStateChange:e=>{
         if(e.data===0){try{YT6.player.seekTo(0,true);YT6.player.playVideo()}catch(x){}} /* repete enquanto o Mestre não trocar */
-        if(e.data===1){YT6.retried=false;if(!YT6.muted)YT6.blocked=false;applyVol6();const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
+        if(e.data===1){YT6.retried=false;if(isGM6()){const vv=wantMusic6()?.vid,pl0=M6.state.playlist||[];if(vv&&pl0.some(x=>x.vid===vv&&x.bad))setState6({playlist:pl0.map(x=>x.vid===vv?{...x,bad:false}:x)},{silent:true})}if(!YT6.muted)YT6.blocked=false;applyVol6();const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
       },
       onError:e=>{
-        const c=e&&e.data,vid=M6.state.music?.vid||wantMusic6()?.vid;
+        const c=e&&e.data,m=wantMusic6(),vid=m&&m.vid;YT6.lastErr=c;
         if(c===5&&!YT6.retried&&vid){YT6.retried=true;setTimeout(()=>{try{YT6.player.loadVideoById(vid)}catch(x){}},900);return} /* falha momentânea do player: tenta uma vez de novo */
+        /* recusa só neste navegador (comum com bloqueador de rastreio): tenta o domínio alternativo do YouTube uma vez */
+        if([101,150,153].includes(c)&&!YT6.alt&&vid){YT6.alt=true;YT6.ready=null;YT6.sig='';try{YT6.player.destroy()}catch(x){}YT6.player=null;const h=$('mesaYTBox');if(h)h.innerHTML='<div id="mesaYT"></div>';setTimeout(syncMusic6,200);return}
         if(!isGM6())return;
-        const why={2:'O link dessa música parece inválido.',100:'Esse vídeo foi removido ou está privado.',101:'O dono desse vídeo não deixa tocar fora do YouTube.',150:'O dono desse vídeo não deixa tocar fora do YouTube.'}[c]||'O YouTube não conseguiu tocar esse vídeo.';
-        toast(why+' Tire da playlist e procure outra versão (por exemplo, “lyric video” ou o canal “Tópico”).');
-        const pl=M6.state.playlist||[];if(vid&&pl.some(x=>x.vid===vid&&!x.bad))setState6({playlist:pl.map(x=>x.vid===vid?{...x,bad:true}:x)});
+        const why={2:'O link dessa música parece inválido.',100:'Esse vídeo foi removido ou está privado.'}[c]||'O YouTube recusou tocar esse vídeo neste navegador (erro '+c+'). Os jogadores podem estar ouvindo normalmente.';
+        toast(why);
+        if(c===100||c===2){const pl=M6.state.playlist||[];if(vid&&pl.some(x=>x.vid===vid&&!x.bad))setState6({playlist:pl.map(x=>x.vid===vid?{...x,bad:true}:x)})}
       }
-    }});
+    }};
+    if(YT6.alt)cfg.host='https://www.youtube-nocookie.com';
+    YT6.player=new window.YT.Player('mesaYT',cfg);
   })).catch(e=>{YT6.ready=null;throw e});
   return YT6.ready;
 }
