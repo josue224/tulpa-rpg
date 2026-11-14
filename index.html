@@ -2048,6 +2048,12 @@ body.t3-dark .t3-bubold{background:#1f2733e6;color:#eef2f7;border-color:#e59a8c8
 #mbCall .btn.warn{border-color:#d98a3d;color:#ffd9b8}
 #turnUrl{padding:9px 10px;border-radius:8px;border:1px solid var(--line,#444);background:rgba(0,0,0,.25);color:inherit;font-size:16px;margin-top:4px}
 
+/* som bloqueado pelo navegador: aviso grande e diagnóstico da voz */
+#audioGate{position:fixed;left:16px;right:16px;bottom:16px;z-index:10000;display:none;padding:15px 16px;border-radius:12px;border:2px solid #35c26b;background:#0f3a24;color:#eafff2;font:700 16px/1.3 inherit;box-shadow:0 10px 30px rgba(0,0,0,.55);cursor:pointer;text-align:center}
+#audioGate.show{display:block}
+.vc-diag{list-style:none;margin:8px 0;padding:0;display:grid;gap:8px}
+.vc-diag li{padding:9px 11px;border-radius:9px;background:rgba(255,255,255,.05);line-height:1.4}
+
 </style>
 <script id="tulpa-etapa3">
 (()=>{
@@ -5847,12 +5853,34 @@ function renderSheetDocs6(){
 {const _rst6=T3.renderSheetTabs;T3.renderSheetTabs=function(){_rst6.apply(this,arguments);try{renderSheetDocs6()}catch(e){console.warn('[T6] documentos da ficha',e)}}}
 
 /* ---------- música (YouTube), playlist por momento e intervalo ---------- */
-const YT6={api:null,player:null,ready:null,sig:'',synth:null,blocked:false};
+const YT6={api:null,player:null,ready:null,sig:'',synth:null,blocked:false,muted:false,retried:false};
 if(prefs.musicVol===undefined)prefs.musicVol=60;
 const MOMENTS6=['Revelação da Sala','Investigação','Combate','Chefe','Calmaria','Tensão','Intervalo'];
 function ytId6(url){
   const s=String(url||'').trim();if(/^[\w-]{11}$/.test(s))return s;
-  const m=s.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/|\/live\/)([\w-]{11})/);return m?m[1]:null;
+  const m=s.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/|\/live\/|\/v\/)([\w-]{11})/);return m?m[1]:null;
+}
+/* confere o vídeo antes de entrar na playlist: título e se o dono deixa tocar fora do YouTube */
+async function ytInfo6(vid){
+  try{
+    const c=new AbortController(),tm=setTimeout(()=>c.abort(),6000);
+    const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+vid),{signal:c.signal});clearTimeout(tm);
+    if(r.ok){const j=await r.json();return{ok:true,title:String(j.title||'').slice(0,90)}}
+    if(r.status===401||r.status===403)return{ok:false,why:'embed'};
+    if(r.status===400||r.status===404)return{ok:false,why:'nf'};
+  }catch(e){}
+  return{ok:true,title:''}; /* não deu para conferir: deixa adicionar */
+}
+function applyVol6(){
+  const p=YT6.player;if(!p||typeof p.setVolume!=='function')return;
+  try{p.setVolume(prefs.musicVol);if(prefs.musicVol<=0)p.mute();else if(!YT6.muted&&p.isMuted&&p.isMuted())p.unMute()}catch(e){}
+}
+/* primeiro toque na tela: liga o som da música (o navegador só deixa tocar com som depois de um toque) */
+function unlockMusic6(){
+  try{actx()}catch(e){}
+  YT6.muted=false;YT6.blocked=false;const p=YT6.player;
+  if(p&&typeof p.unMute==='function'){try{p.unMute();applyVol6();if(p.getPlayerState()!==1&&wantMusic6()?.playing)p.playVideo()}catch(e){}}
+  renderVol6();
 }
 T3._ytId=ytId6;
 function ytApi6(){
@@ -5870,12 +5898,19 @@ function ytPlayer6(){
   YT6.ready=ytApi6().then(()=>new Promise(ok=>{
     let host=$('mesaYTBox');if(!host){host=document.createElement('div');host.id='mesaYTBox';host.innerHTML='<div id="mesaYT"></div>';document.body.append(host)}
     YT6.player=new window.YT.Player('mesaYT',{width:200,height:113,playerVars:{autoplay:1,controls:0,disablekb:1,playsinline:1,rel:0,modestbranding:1},events:{
-      onReady:()=>{try{YT6.player.setVolume(prefs.musicVol)}catch(e){}ok(YT6.player)},
+      onReady:()=>{applyVol6();ok(YT6.player)},
       onStateChange:e=>{
         if(e.data===0){try{YT6.player.seekTo(0,true);YT6.player.playVideo()}catch(x){}} /* repete enquanto o Mestre não trocar */
-        if(e.data===1){YT6.blocked=false;const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
+        if(e.data===1){YT6.retried=false;if(!YT6.muted)YT6.blocked=false;applyVol6();const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
       },
-      onError:()=>{if(isGM6())toast('O YouTube não deixou tocar esse vídeo (o dono pode ter bloqueado a reprodução fora do site).')}
+      onError:e=>{
+        const c=e&&e.data,vid=M6.state.music?.vid||wantMusic6()?.vid;
+        if(c===5&&!YT6.retried&&vid){YT6.retried=true;setTimeout(()=>{try{YT6.player.loadVideoById(vid)}catch(x){}},900);return} /* falha momentânea do player: tenta uma vez de novo */
+        if(!isGM6())return;
+        const why={2:'O link dessa música parece inválido.',100:'Esse vídeo foi removido ou está privado.',101:'O dono desse vídeo não deixa tocar fora do YouTube.',150:'O dono desse vídeo não deixa tocar fora do YouTube.'}[c]||'O YouTube não conseguiu tocar esse vídeo.';
+        toast(why+' Tire da playlist e procure outra versão (por exemplo, “lyric video” ou o canal “Tópico”).');
+        const pl=M6.state.playlist||[];if(vid&&pl.some(x=>x.vid===vid&&!x.bad))setState6({playlist:pl.map(x=>x.vid===vid?{...x,bad:true}:x)});
+      }
     }});
   })).catch(e=>{YT6.ready=null;throw e});
   return YT6.ready;
@@ -5894,8 +5929,12 @@ async function syncMusic6(){
   if(m.synth){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}startWait6();renderVol6();return}
   try{
     const p=await ytPlayer6();if(YT6.sig!==sig)return;
-    p.setVolume(prefs.musicVol);p.loadVideoById({videoId:m.vid,startSeconds:Math.max(0,(Number(m.pos)||0)+(Date.now()-(m.ts||Date.now()))/1000)});
-    setTimeout(()=>{try{if(YT6.sig===sig&&![1,3].includes(p.getPlayerState())){YT6.blocked=true;renderVol6()}}catch(e){}},3500);
+    /* sem nenhum toque na página o navegador só deixa tocar mudo: começa mudo e liga o som no primeiro toque */
+    const act=!!(navigator.userActivation&&navigator.userActivation.hasBeenActive);
+    YT6.muted=!act;YT6.blocked=!act;YT6.retried=false;
+    try{if(act)p.unMute();else p.mute()}catch(e){}
+    applyVol6();p.loadVideoById({videoId:m.vid,startSeconds:Math.max(0,(Number(m.pos)||0)+(Date.now()-(m.ts||Date.now()))/1000)});
+    setTimeout(()=>{try{if(YT6.sig===sig&&![1,3].includes(p.getPlayerState())){YT6.muted=true;YT6.blocked=true;p.mute();p.playVideo();renderVol6()}}catch(e){}},3500);
   }catch(e){console.warn('[T6] música',e);if(isGM6())toast('Música: '+(e.message||'erro')+'.')}
   renderVol6();
 }
@@ -5915,7 +5954,7 @@ function startWait6(){
   YT6.synth=setInterval(tick,330);tick();
 }
 function stopWait6(){if(YT6.synth){clearInterval(YT6.synth);YT6.synth=null}}
-function setVol6(v){prefs.musicVol=Math.max(0,Math.min(100,Number(v)||0));savePrefs();try{YT6.player&&YT6.player.setVolume(prefs.musicVol)}catch(e){}}
+function setVol6(v){prefs.musicVol=Math.max(0,Math.min(100,Number(v)||0));savePrefs();applyVol6()}
 function renderVol6(){
   const b=$('mbMusic');if(!b)return;const m=wantMusic6(),on=!!(m&&m.playing);
   const label=on?(m.synth?'Música de espera':(m.title||'Música da mesa')):'Sem música';
@@ -5923,7 +5962,7 @@ function renderVol6(){
     b.innerHTML=`<button type="button" class="mb-ico" id="mbMute" aria-label="Silenciar a música"></button><input type="range" id="mbVol" min="0" max="100" step="1" aria-label="Volume da música"><span class="mb-now" id="mbNow"></span><button type="button" class="btn small primary hide" id="mbUnlock">▶ Ativar som</button>`;
     $('mbVol').oninput=e=>{setVol6(e.target.value);renderVol6()};
     $('mbMute').onclick=()=>{if(prefs.musicVol>0){M6.volBack=prefs.musicVol;setVol6(0)}else setVol6(M6.volBack||60);renderVol6()};
-    $('mbUnlock').onclick=()=>{try{actx();YT6.player&&YT6.player.playVideo()}catch(e){}YT6.blocked=false;renderVol6()};
+    $('mbUnlock').onclick=()=>unlockMusic6();
   }
   $('mbVol').value=prefs.musicVol;$('mbMute').textContent=prefs.musicVol>0?'🔊':'🔇';$('mbMute').title=prefs.musicVol>0?'Silenciar a música (só para você)':'Ligar a música';
   $('mbNow').textContent=(on?'♪ ':'')+label;$('mbNow').classList.toggle('on',on);
@@ -5956,10 +5995,17 @@ function renderMusic6(){
   const groups={};pl.forEach(t=>{const k=t.moment||'Sem momento';(groups[k]=groups[k]||[]).push(t)});
   box.innerHTML=`<div class="mu-now ${m&&m.playing?'on':''}"><div><small>${m?(m.playing?'Tocando agora':'Pausada'):'Nada tocando'}</small><b>${m?esc(m.title||'Música do YouTube'):'Escolha uma música da playlist'}</b>${m&&m.moment?`<span class="pill">${esc(m.moment)}</span>`:''}</div>${isM&&m?`<div class="inline">${m.playing?'<button type="button" class="btn small" id="muPause">⏸ Pausar</button>':'<button type="button" class="btn small primary" id="muResume">▶ Retomar</button>'}<button type="button" class="btn small" id="muStop">⏹ Parar</button></div>`:''}</div>
    ${isM?`<form class="mu-form" id="muForm"><div class="field"><label for="muUrl">Link do YouTube</label><input id="muUrl" placeholder="https://www.youtube.com/watch?v=…" inputmode="url"></div><div class="field"><label for="muTitle">Nome (opcional)</label><input id="muTitle" maxlength="90" placeholder="Ex.: Tema do porão"></div><div class="field"><label for="muMoment">Momento</label><input id="muMoment" list="muMoments" maxlength="40" placeholder="Ex.: Revelação da Sala"><datalist id="muMoments">${MOMENTS6.map(x=>`<option value="${x}">`).join('')}</datalist></div><button class="btn primary small">＋ Adicionar à playlist</button></form><p class="sub">Uma música com o momento <b>Intervalo</b> vira a música de espera do botão ⏸ Intervalo. Você também pode pedir ao Perseus: “toca a música para revelação da sala”.</p>`:'<p class="sub">O Mestre escolhe a música. O volume é só seu: use o controle no topo da mesa.</p>'}
-   ${pl.length?Object.entries(groups).map(([k,list])=>`<h4>${esc(k)}</h4><ul class="mu-list">${list.map(t=>`<li class="${m&&m.vid===t.vid?'cur':''}">${isM?`<button type="button" class="btn small ${m&&m.vid===t.vid&&m.playing?'':'primary'}" data-mplay="${t.id}" aria-label="Tocar ${esc(t.title||'música')}">▶</button>`:''}<span class="mu-t">${esc(t.title||'Música do YouTube ('+t.vid+')')}</span>${isM?`<button type="button" class="bn-x" data-mdel="${t.id}" title="Tirar da playlist" aria-label="Tirar da playlist">✕</button>`:''}</li>`).join('')}</ul>`).join(''):(isM?'':'<p class="sub">A playlist ainda está vazia.</p>')}`;
+   ${pl.length?Object.entries(groups).map(([k,list])=>`<h4>${esc(k)}</h4><ul class="mu-list">${list.map(t=>`<li class="${m&&m.vid===t.vid?'cur':''}">${isM?`<button type="button" class="btn small ${m&&m.vid===t.vid&&m.playing?'':'primary'}" data-mplay="${t.id}" aria-label="Tocar ${esc(t.title||'música')}">▶</button>`:''}<span class="mu-t">${t.bad?'<span title="O YouTube não deixa tocar esse vídeo aqui. Tire e procure outra versão." aria-label="Não toca aqui">⚠ </span>':''}${esc(t.title||'Música do YouTube ('+t.vid+')')}</span>${isM?`<button type="button" class="bn-x" data-mdel="${t.id}" title="Tirar da playlist" aria-label="Tirar da playlist">✕</button>`:''}</li>`).join('')}</ul>`).join(''):(isM?'':'<p class="sub">A playlist ainda está vazia.</p>')}`;
   const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
   on('muPause',pauseMusic6);on('muResume',resumeMusic6);on('muStop',stopMusic6);
-  const f=$('muForm');if(f)f.onsubmit=e=>{e.preventDefault();const t=addTrack6($('muUrl').value,$('muTitle').value,$('muMoment').value);if(!t){toast('Não reconheci esse link do YouTube.');return}f.reset();fx5('confirm');toast('Música adicionada à playlist.')};
+  const f=$('muForm');if(f)f.onsubmit=async e=>{e.preventDefault();
+    const url=$('muUrl').value,ttl=$('muTitle').value,mom=$('muMoment').value,vid=ytId6(url),btn=f.querySelector('button');
+    if(!vid){toast(/[?&]list=/.test(url)&&!/[?&]v=/.test(url)?'Esse é o link de uma playlist inteira. Abra um vídeo dela e copie o link do vídeo.':'Não reconheci esse link. Copie o endereço do vídeo na barra do navegador ou no botão Compartilhar do YouTube.');return}
+    if(btn)btn.disabled=true;
+    const info=await ytInfo6(vid);
+    if(!info.ok){if(btn)btn.disabled=false;toast(info.why==='embed'?'O dono desse vídeo não deixa tocar fora do YouTube. Procure outra versão da música (por exemplo, “lyric video” ou o canal “Tópico”).':'Não encontrei esse vídeo. Ele pode estar privado ou ter sido removido.');return}
+    const t=addTrack6(url,ttl||info.title,mom);if(btn)btn.disabled=false;if(!t){toast('Não reconheci esse link do YouTube.');return}
+    try{f.reset()}catch(x){}fx5('confirm');toast('Música adicionada: '+(t.title||'sem nome')+'.')};
   $$('[data-mplay]',box).forEach(b=>b.onclick=()=>{actx();playTrack6(b.dataset.mplay)});
   $$('[data-mdel]',box).forEach(b=>b.onclick=()=>setState6({playlist:(M6.state.playlist||[]).filter(t=>t.id!==b.dataset.mdel)}));
 }
@@ -6607,15 +6653,34 @@ onState6(st=>{
   voiceBar8();voicePaint8();
 });
 M6.hooks.leave.push(()=>voiceLeave8());
-document.addEventListener('pointerdown',()=>{if(V8.on&&V8.peers.size)V8.peers.forEach(p=>{if(p.audio.paused&&p.audio.srcObject){const r=p.audio.play();if(r&&r.then)r.then(()=>{if(V8.blocked){V8.blocked=false;voiceBar8()}}).catch(()=>{})}})},{passive:true});
+/* som bloqueado pelo navegador (voz ou música): aviso grande e liga no primeiro toque na tela */
+const audioNeed8=()=>!!((V8.on&&V8.blocked)||(YT6.blocked&&wantMusic6()?.playing));
+function unlockAudio8(){
+  try{actx()}catch(e){}
+  V8.peers.forEach(p=>{if(p.audio.srcObject){const r=p.audio.play();if(r&&r.catch)r.catch(()=>{V8.blocked=true;voiceBar8()})}});
+  V8.blocked=false;
+  try{unlockMusic6()}catch(e){}
+  voiceBar8();audioGateTick8();
+}
+function audioGateTick8(){
+  if(V8.on)V8.peers.forEach(p=>{if(p.audio.srcObject&&p.audio.paused){const r=p.audio.play();if(r&&r.catch)r.catch(()=>{if(!V8.blocked){V8.blocked=true;voiceBar8()}})}});
+  let g=$('audioGate');const need=audioNeed8();
+  if(!need){if(g)g.classList.remove('show');return}
+  if(!g){g=document.createElement('button');g.id='audioGate';g.type='button';g.textContent='🔊 Toque aqui para ligar o som da mesa';g.onclick=unlockAudio8;document.body.append(g)}
+  g.classList.add('show');
+}
+['pointerdown','keydown','touchend'].forEach(ev=>document.addEventListener(ev,()=>{if(audioNeed8())unlockAudio8()},{capture:true,passive:true}));
+setInterval(audioGateTick8,1200);
 window.addEventListener('pagehide',()=>{try{vSend8({t:'bye'})}catch(e){}});
 
 /* ---------- barra da call ---------- */
+/* quem não conectou: calculado na hora (não fica aviso velho depois que a conexão sobe) */
+function vBad8(){const s=new Set(V8.bad),now=Date.now();V8.peers.forEach((p,u)=>{if(p.pc.connectionState==='connected')s.delete(u);else if(now-p.made>14000)s.add(u)});return [...s]}
 function vCount8(){const s=new Set(Object.keys(V8.states));V8.peers.forEach((p,u)=>s.add(u));return s.size+1}
 function voiceBar8(){
   const box=$('mbCall');if(!box)return;
   const isM=isGM6(),c=M6.state.call||{},w=Array.isArray(c.whisper)&&c.whisper.length?c.whisper:null,names=w?w.map(u=>nm(charOfUser6(u))||'jogador').join(', '):'';
-  const gmU=vGm8(),badN=[...V8.bad].map(u=>u===gmU?'Mestre':(nm(charOfUser6(u))||'jogador')).join(', '),hasTurn=!!(c.ice&&c.ice.length),cfgTurn=!!String(prefs.turnUrl||'').trim()||turnClean8(M6.state.turn).length>0;
+  const gmU=vGm8(),badN=vBad8().map(u=>u===gmU?'Mestre':(nm(charOfUser6(u))||'jogador')).join(', '),hasTurn=!!(c.ice&&c.ice.length),cfgTurn=!!String(prefs.turnUrl||'').trim()||turnClean8(M6.state.turn).length>0;
   const sig=[isM,c.on,V8.on,V8.muted,V8.listenOnly,V8.blocked,V8.joining,vCount8(),names,w&&w.includes(uid3()),badN,hasTurn,cfgTurn].join('|');
   if(box.dataset.sig===sig)return;box.dataset.sig=sig;
   if(!c.on){box.innerHTML=isM?'<button type="button" class="btn small primary" id="vcStart">📞 Iniciar call</button><button type="button" class="btn small '+(cfgTurn?'':'warn')+'" id="vcTurn" title="Ajuda a voz a conectar em redes difíceis (4G, Wi-Fi de empresa)">🌐 Servidor TURN'+(cfgTurn?' ✓':'')+'</button><span class="sub">Todos na mesa entram na hora.</span>':'<span class="sub vc-off">📞 Sem call no momento</span>';const s=$('vcStart');if(s)s.onclick=voiceStart8;const tb=$('vcTurn');if(tb)tb.onclick=vTurnModal8;return}
@@ -6624,14 +6689,28 @@ function voiceBar8(){
    <label class="mb-vol vc-vol" title="Volume das vozes (só para você)"><span aria-hidden="true">🗣</span><input type="range" id="vcVol" min="0" max="100" step="1" value="${prefs.callVol??100}" aria-label="Volume das vozes"></label>
    ${V8.blocked?'<button type="button" class="btn small primary" id="vcUnlock">▶ Ativar áudio</button>':''}
    ${isM?`<button type="button" class="btn small ${w?'primary':''}" id="vcWhisper">🤫 Sussurro</button>${w?'<button type="button" class="btn small" id="vcAll">↩ Áudio geral</button>':''}<button type="button" class="btn small danger" id="vcEnd">Encerrar call</button>`:''}
+   <button type="button" class="btn small" id="vcDiag" title="Ver como está a conexão de voz" aria-label="Diagnóstico da voz">🔎</button>
    ${isM?`<button type="button" class="btn small ${hasTurn?'':'warn'}" id="vcTurn" title="Servidor TURN">🌐 TURN${hasTurn?' ✓':''}</button>`:''}
    ${badN?`<span class="vc-warn" role="status">⚠ A voz não conectou com ${esc(badN)}. ${isM?'Provável rede restrita: configure o servidor TURN (🌐) e reinicie a call.':'Avise o Mestre: pode faltar um servidor TURN.'}</span>`:''}
    ${w?`<span class="vc-whisper">${isM?'Falando só com '+esc(names):w.includes(uid3())?'🤫 Conversa particular com o Mestre':'🤫 O Mestre está em conversa particular'}</span>`:''}`;
   const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
   on('vcMute',()=>voiceMute8());on('vcMic',voiceRetryMic8);on('vcEnd',()=>{if(confirm('Encerrar a call para todos?'))voiceEnd8()});on('vcAll',()=>voiceWhisper8([]));
-  on('vcUnlock',()=>{V8.peers.forEach(p=>{try{p.audio.play()}catch(e){}});V8.blocked=false;voiceBar8()});
-  on('vcWhisper',vWhisperModal8);on('vcTurn',vTurnModal8);
+  on('vcUnlock',()=>unlockAudio8());
+  on('vcWhisper',vWhisperModal8);on('vcTurn',vTurnModal8);on('vcDiag',vDiagModal8);
   const v=$('vcVol');if(v)v.oninput=()=>{prefs.callVol=Number(v.value)||0;savePrefs();vRoute8()};
+}
+/* diagnóstico: mostra por onde a voz está passando e se os pacotes chegam */
+async function vDiagModal8(){
+  const rows=[];
+  for(const [u,p] of V8.peers){
+    let pin=0,pout=0,route='?';
+    try{const st=await p.pc.getStats(),by={};let sel=null;st.forEach(x=>{by[x.id]=x;if(x.type==='inbound-rtp'&&x.kind==='audio')pin=x.packetsReceived||0;if(x.type==='outbound-rtp'&&x.kind==='audio')pout=x.packetsSent||0;if(x.type==='candidate-pair'&&x.nominated&&x.state==='succeeded')sel=x});
+      if(sel){const l=by[sel.localCandidateId],r=by[sel.remoteCandidateId];route=[l&&l.candidateType,r&&r.candidateType].map(x=>x==='relay'?'servidor TURN':x==='srflx'?'direto (STUN)':x==='host'?'rede local':x||'?').join(' ↔ ')}}catch(e){}
+    const nome=u===vGm8()?'Mestre':(nm(charOfUser6(u))||'jogador');
+    rows.push(`<li><b>${esc(nome)}</b>: ${p.pc.connectionState==='connected'?'✅ conectado':'⚠ '+esc(p.pc.connectionState)}<br><span class="sub">Rota: ${esc(route)} · recebendo ${pin} pacotes · enviando ${pout} pacotes · ${p.audio.paused?'🔇 som parado neste aparelho (toque na tela)':'🔊 som tocando'}${p.track&&!p.track.enabled?' · seu microfone está cortado para essa pessoa':''}</span></li>`);
+  }
+  const mic=V8.listenOnly?'sem acesso ao microfone':V8.muted?'mudo':V8.stream?'ligado':'desligado';
+  openModal('CALL','Diagnóstico da voz',`<p class="sub">Meu microfone: <b>${mic}</b> · servidor TURN na campanha: <b>${turnClean8(M6.state.call?.ice).length?'sim':'não'}</b></p>${rows.length?`<ul class="vc-diag">${rows.join('')}</ul>`:'<p class="sub">Ninguém conectado ainda.</p>'}<p class="sub">Se aparecer “recebendo 0 pacotes” com a conexão ativa, a outra pessoa não está enviando som (microfone mudo ou sem permissão). Se o som estiver parado, toque na tela.</p>`,'Fechar',()=>closeModal());
 }
 function vTurnModal8(){
   if(!isGM6())return;
