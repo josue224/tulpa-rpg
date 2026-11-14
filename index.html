@@ -2056,6 +2056,29 @@ body.t3-dark .t3-bubold{background:#1f2733e6;color:#eef2f7;border-color:#e59a8c8
 
 #updBanner{position:fixed;left:16px;right:16px;top:12px;z-index:10001;padding:12px 14px;border-radius:12px;border:2px solid #d98a3d;background:#4a2a14;color:#ffe9d2;font:700 15px/1.3 inherit;text-align:center;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.5)}
 
+/* chat da mesa */
+#mesaChat{display:flex;flex-direction:column;gap:10px}
+.chat-list{display:flex;flex-direction:column;gap:8px;min-height:180px;max-height:min(48vh,460px);overflow-y:auto;padding:4px 2px;scroll-behavior:smooth}
+.chat-msg{align-self:flex-start;max-width:88%;padding:8px 11px;border-radius:12px 12px 12px 4px;background:#eadfc6;color:#2c2118}
+body.t3-dark .chat-msg{background:#262f3c;color:#eef2f7}
+.chat-msg.me{align-self:flex-end;border-radius:12px 12px 4px 12px;background:#d9e6d3}
+body.t3-dark .chat-msg.me{background:#24402f}
+.chat-msg.gm{box-shadow:inset 3px 0 0 #8e3e34}
+.chat-msg.priv{background:#e6d8f0;color:#2a1a38}
+body.t3-dark .chat-msg.priv{background:#3f2a5c;color:#f1e6ff}
+.chat-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:12.5px;margin-bottom:2px}
+.chat-meta time{margin-left:auto;opacity:.65;font-size:11.5px}
+.chat-tag{font-size:11.5px;font-weight:600;opacity:.85}
+.chat-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.4}
+.chat-empty{margin:auto;text-align:center}
+.chat-form{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:end}
+.chat-to{display:grid;gap:2px;font-size:12px}
+.chat-to select{padding:9px 8px;border-radius:10px;font-size:16px;max-width:150px}
+.chat-form textarea{resize:none;padding:9px 11px;border-radius:10px;font-size:16px;line-height:1.35;min-height:42px;max-height:120px;font-family:inherit}
+.chat-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.dock-tabs button .dock-badge{display:inline-block;min-width:18px;height:18px;line-height:18px;margin-left:6px;padding:0 5px;border-radius:9px;background:#c0392b;color:#fff;font-size:11px;font-weight:700;text-align:center;vertical-align:middle}
+@media (max-width:860px){.chat-form{grid-template-columns:1fr auto}.chat-to{grid-column:1/-1}.chat-to select{max-width:none;width:100%}.chat-msg{max-width:94%}}
+
 </style>
 <script id="tulpa-etapa3">
 (()=>{
@@ -5391,11 +5414,12 @@ function ensureMesaDom6(){
   const center=document.createElement('div');center.id='mesaCenter';
   center.innerHTML=`<section id="mesaM" class="mesa-m" aria-label="Mestre"></section>
    <section id="mapStage" class="map-stage" aria-label="Mesa: mapa tático"><div class="map-empty"><b>MESA</b><span>O mapa aparece aqui.</span></div></section>
-   <section id="mesaDock" class="mesa-dock"><div class="dock-tabs" role="tablist">${[['combate','⚔ Combate'],['rolagens','🎲 Rolagens'],['docs','📂 Documentos'],['musica','🎵 Música'],['notas','📝 Notas']].map(([id,l])=>`<button type="button" role="tab" data-dock="${id}">${l}</button>`).join('')}</div>${['combate','rolagens','docs','musica','notas'].map(id=>`<div class="dock-pane" data-pane="${id}" hidden></div>`).join('')}</section>`;
+   <section id="mesaDock" class="mesa-dock"><div class="dock-tabs" role="tablist">${[['combate','⚔ Combate'],['rolagens','🎲 Rolagens'],['chat','💬 Chat'],['docs','📂 Documentos'],['musica','🎵 Música'],['notas','📝 Notas']].map(([id,l])=>`<button type="button" role="tab" data-dock="${id}">${l}</button>`).join('')}</div>${['combate','rolagens','chat','docs','musica','notas'].map(id=>`<div class="dock-pane" data-pane="${id}" hidden></div>`).join('')}</section>`;
   tp.insertBefore(bar,box);tp.insertBefore(w,box);w.append(center,box);
   const gate=document.createElement('div');gate.id='mesaGate';gate.hidden=true;w.append(gate);
   $$('[data-dock]',center).forEach(b=>b.onclick=()=>setDock6(b.dataset.dock,true));
   paneEl6('rolagens').innerHTML='<div id="mesaQuick" class="mesa-quick"></div>';
+  paneEl6('chat').innerHTML='<div id="mesaChat"></div>';
   paneEl6('docs').innerHTML='<div id="mesaDocs"></div>';
   paneEl6('musica').innerHTML='<div id="mesaMusic"></div>';
   paneEl6('notas').innerHTML='<div id="mesaNotes"></div>';
@@ -5406,7 +5430,7 @@ function setDock6(id,user=false){
   M6.tab=id;if(user)M6.tabUser=Date.now();
   $$('#mesaDock [data-dock]').forEach(b=>{const on=b.dataset.dock===id;b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false')});
   $$('#mesaDock [data-pane]').forEach(p=>{p.hidden=p.dataset.pane!==id});
-  if(id==='docs')renderDocs6();if(id==='musica')renderMusic6();if(id==='notas')renderNotes6();if(id==='rolagens')renderQuick6();
+  if(id==='chat'&&typeof renderChat9==='function')renderChat9();if(id==='docs')renderDocs6();if(id==='musica')renderMusic6();if(id==='notas')renderNotes6();if(id==='rolagens')renderQuick6();
 }
 /* o painel de ação em combate passa a morar na aba Combate */
 ensureCombatPanel=function(){
@@ -6491,7 +6515,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='14/11 17:01';
+const BUILD8='14/11 17:22';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -6510,6 +6534,16 @@ function vAllowed8(uid){
 function vSend8(o){try{if(V8.ch&&V8.live&&typeof V8.ch.send==='function')V8.ch.send({type:'broadcast',event:'v',payload:{...o,from:uid3(),call:V8.callId,sid:V8.sid,b:BUILD8}})}catch(e){}}
 function vRoute8(){
   V8.peers.forEach(p=>{const ok=vAllowed8(p.uid);if(p.track)p.track.enabled=ok&&!V8.muted;p.audio.muted=!ok;p.audio.volume=Math.max(0,Math.min(1,(prefs.callVol??100)/100))});
+}
+/* oferta que ficou sem resposta (mensagem perdida): reenvia a mesma oferta */
+function vResend8(){
+  const now=Date.now();
+  V8.peers.forEach(p=>{
+    if(p.pc.signalingState!=='have-local-offer'||!p.pc.localDescription)return;
+    if(now-(p.offerAt||p.made)<5000||(p.resent||0)>=3)return;
+    p.resent=(p.resent||0)+1;p.offerAt=now;
+    vSend8({t:'offer',to:p.uid,sdp:{type:p.pc.localDescription.type,sdp:p.pc.localDescription.sdp}});
+  });
 }
 function vClosePeer8(uid){
   const p=V8.peers.get(uid);if(!p)return;V8.peers.delete(uid);
@@ -6541,11 +6575,11 @@ function vPeer8(uid,sid){
   return p;
 }
 async function vOffer8(uid,sid){
-  try{const p=vPeer8(uid,sid);const o=await p.pc.createOffer();await p.pc.setLocalDescription(o);vSend8({t:'offer',to:uid,sdp:{type:p.pc.localDescription.type,sdp:p.pc.localDescription.sdp}})}
+  try{const p=vPeer8(uid,sid);const o=await p.pc.createOffer();await p.pc.setLocalDescription(o);p.offerAt=Date.now();vSend8({t:'offer',to:uid,sdp:{type:p.pc.localDescription.type,sdp:p.pc.localDescription.sdp}})}
   catch(e){console.warn('[T8] oferta',e)}
 }
 async function vSignal8(m){
-  if(!V8.on||!m||m.from===uid3()||m.call!==V8.callId)return;
+  if(!V8.on||!V8.live||!m||m.from===uid3()||m.call!==V8.callId)return;
   if(m.to&&m.to!==uid3())return;
   if(m.sid&&V8.dead.has(m.sid))return; /* mensagem atrasada de uma sessão que já foi descartada */
   const from=m.from,old=V8.peers.get(from);V8.vers[from]=m.b||'antiga';
@@ -6622,7 +6656,7 @@ async function voiceJoin8(id){
     V8.ch=ch;
   }catch(e){console.warn('[T8] canal de voz',e)}
   clearInterval(V8.beat);
-  V8.beat=setInterval(()=>{if(!V8.on)return;vSend8({t:'st',muted:V8.muted,speaking:V8.me.speaking});const now=Date.now();Object.keys(V8.states).forEach(u=>{if(now-V8.states[u].at>15000&&!V8.peers.has(u))delete V8.states[u]});voiceBar8()},4000);
+  V8.beat=setInterval(()=>{if(!V8.on)return;vResend8();vSend8({t:'st',muted:V8.muted,speaking:V8.me.speaking});const now=Date.now();Object.keys(V8.states).forEach(u=>{if(now-V8.states[u].at>15000&&!V8.peers.has(u))delete V8.states[u]});voiceBar8()},4000);
   voiceBar8();voicePaint8();
 }
 function vStopStream8(){try{V8.stream&&V8.stream.getTracks().forEach(t=>t.stop())}catch(e){}V8.stream=null}
@@ -6778,6 +6812,128 @@ T3.build=BUILD8;
 T3.voiceBar=voiceBar8;T3.voicePaint=voicePaint8;
 M6.hooks.layout.push(()=>voicePaint8());
 {const _lm8=layoutMesa6;layoutMesa6=function(){_lm8.apply(this,arguments);try{voicePaint8()}catch(e){}};T3.mesaLayout=layoutMesa6}
+
+
+/* ===================================================================
+   TULPA · ETAPA 9 — chat da mesa
+   Mensagens para todos ou em particular (Mestre, ou outro jogador).
+   Vai pelo canal ao vivo da mesa (sem tabela nova). Cada pessoa guarda
+   as últimas mensagens no próprio navegador; quem entra depois recebe o
+   histórico do Mestre, se ele estiver na mesa.
+   =================================================================== */
+const CH9={list:[],ids:new Set(),unread:0,asked:false,last:0,campId:null,draft:'',to:''};
+const CHMAX9=150,CHTXT9=600;
+const chKey9=()=>'tulpa_chat_'+(camp3()?.id||'x')+'_'+(uid3()||'x');
+function chLoad9(){
+  const id=camp3()?.id||null;if(CH9.campId===id)return;
+  CH9.campId=id;CH9.list=[];CH9.ids=new Set();CH9.unread=0;CH9.asked=false;
+  if(!id)return;
+  const l=lsGet6(chKey9(),[]);if(Array.isArray(l))l.forEach(m=>chAdd9(m,true));
+}
+function chSave9(){try{lsSet6(chKey9(),CH9.list.slice(-CHMAX9))}catch(e){}}
+function chName9(uid,fallback){
+  if(uid&&uid===(camp3()?.createdBy))return 'Mestre';
+  const c=uid?charOfUser6(uid):null;return(c&&nm(c))||fallback||'Jogador';
+}
+function chValid9(m){
+  return m&&typeof m==='object'&&typeof m.id==='string'&&m.id.length<=40&&typeof m.text==='string'&&m.text.trim()&&typeof m.from==='string'
+    &&(m.to==null||(Array.isArray(m.to)&&m.to.length<=8&&m.to.every(x=>typeof x==='string')));
+}
+const chVisible9=m=>{const me=uid3();return m.to==null||m.from===me||(m.to||[]).includes(me)};
+function chAdd9(m,quiet){
+  if(!chValid9(m)||CH9.ids.has(m.id)||!chVisible9(m))return false;
+  const x={id:m.id,t:Number(m.t)||Date.now(),from:m.from,n:String(m.n||'').slice(0,40),to:m.to==null?null:m.to.slice(0,8),text:String(m.text).slice(0,CHTXT9)};
+  CH9.ids.add(x.id);CH9.list.push(x);
+  if(CH9.list.length>CHMAX9*2){const cut=CH9.list.splice(0,CH9.list.length-CHMAX9);cut.forEach(c=>CH9.ids.delete(c.id))}
+  if(!quiet)CH9.list.sort((a,b)=>a.t-b.t);
+  return true;
+}
+/* destinos possíveis */
+function chTargets9(){
+  const me=uid3(),gm=camp3()?.createdBy,out=[{v:'',l:'Todos'}];
+  if(gm&&gm!==me)out.push({v:gm,l:'Mestre (particular)'});
+  seats6().players.forEach(s=>{if(s.uid&&s.uid!==me)out.push({v:s.uid,l:nm(s.ch)+' (particular)'})});
+  return out;
+}
+function chSend9(text,to){
+  text=String(text||'').trim().slice(0,CHTXT9);if(!text)return false;
+  if(!M6.live){toast('A mesa está sem conexão ao vivo: a mensagem não sairia.');return false}
+  const now=Date.now();if(now-CH9.last<350)return false;CH9.last=now;
+  const me=uid3(),m={id:'m'+rid(),t:now,from:me,n:chName9(me),to:to?[to]:null,text};
+  chAdd9(m);chSave9();cast6({t:'chat',m});
+  CH9.unread=0;renderChat9(true);chBadge9();
+  return true;
+}
+T3.chat={send:chSend9,list:()=>CH9.list.slice(),unread:()=>CH9.unread};
+/* recebimento */
+onCast6(p=>{
+  if(p.t==='chat'){
+    chLoad9();
+    const m=p.m;if(!m||m.from!==p.from)return; /* a origem tem de ser quem mandou */
+    if(!chAdd9(m))return;
+    chSave9();
+    if(M6.tab==='chat'&&!document.hidden){renderChat9()}
+    else{CH9.unread++;chBadge9();try{fx5('click')}catch(e){}
+      toast('💬 '+chName9(m.from,m.n)+(m.to?' (particular)':'')+': '+String(m.text).slice(0,70)+(m.text.length>70?'…':''))}
+    return}
+  if(p.t==='chat?'&&isGM6()&&p.from&&p.from!==uid3()){
+    chLoad9();const to=p.from;
+    const msgs=CH9.list.filter(m=>m.to==null||m.to.includes(to)||m.from===to).slice(-80);
+    if(msgs.length)cast6({t:'chath',to,msgs});return}
+  if(p.t==='chath'&&p.to===uid3()&&Array.isArray(p.msgs)){
+    chLoad9();let n=0;p.msgs.slice(-80).forEach(m=>{if(chAdd9(m,true))n++});
+    if(n){CH9.list.sort((a,b)=>a.t-b.t);chSave9();if(M6.tab==='chat')renderChat9()}return}
+  if(p.t==='chatclear'&&p.from===camp3()?.createdBy){CH9.list=[];CH9.ids=new Set();CH9.unread=0;chSave9();chBadge9();if(M6.tab==='chat')renderChat9()}
+});
+/* quem entra pede o histórico ao Mestre (uma vez por entrada) */
+M6.hooks.layout.push(()=>{
+  chLoad9();
+  if(!CH9.asked&&M6.live&&!isGM6()&&camp3()?.createdBy&&M6.present&&M6.present[camp3().createdBy]){CH9.asked=true;cast6({t:'chat?'})}
+  chBadge9();
+});
+M6.hooks.leave.push(()=>{CH9.campId=null});
+function chBadge9(){
+  const b=$q('#mesaDock [data-dock="chat"]');if(!b)return;
+  let s=b.querySelector('.dock-badge');
+  if(CH9.unread>0){if(!s){s=document.createElement('span');s.className='dock-badge';b.append(s)}s.textContent=CH9.unread>9?'9+':String(CH9.unread)}
+  else if(s)s.remove();
+}
+const chTime9=t=>{try{return new Date(t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(e){return''}};
+function renderChat9(forceBottom){
+  const box=$('mesaChat');if(!box)return;chLoad9();
+  if(M6.tab==='chat'){CH9.unread=0;chBadge9()}
+  const me=uid3(),isM=isGM6();
+  if(!box.firstChild){
+    box.innerHTML=`<div class="chat-list" id="chatList" role="log" aria-live="polite" aria-label="Mensagens da mesa"></div>
+    <form class="chat-form" id="chatForm" autocomplete="off"><label class="chat-to"><span>Para</span><select id="chatTo" aria-label="Destinatário"></select></label><textarea id="chatText" rows="1" maxlength="${CHTXT9}" placeholder="Escreva uma mensagem…" aria-label="Mensagem"></textarea><button class="btn primary" id="chatSend">Enviar</button></form>
+    <div class="chat-foot"><span class="sub" id="chatNote"></span>${isM?'<button type="button" class="btn small" id="chatClear">🧹 Limpar para todos</button>':''}</div>`;
+    const f=$('chatForm'),ta=$('chatText');
+    f.onsubmit=e=>{e.preventDefault();if(chSend9(ta.value,$('chatTo').value)){ta.value='';CH9.draft='';ta.style.height=''}ta.focus()};
+    ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();f.requestSubmit()}});
+    ta.addEventListener('input',()=>{CH9.draft=ta.value;ta.style.height='auto';ta.style.height=Math.min(120,ta.scrollHeight)+'px'});
+    $('chatTo').onchange=()=>{CH9.to=$('chatTo').value};
+    const cl=$('chatClear');if(cl)cl.onclick=()=>{if(confirm('Apagar o chat para todos na mesa?')){CH9.list=[];CH9.ids=new Set();chSave9();cast6({t:'chatclear'});renderChat9()}};
+  }
+  /* destinatários: atualiza sem perder a escolha */
+  const sel=$('chatTo'),tg=chTargets9(),sig=tg.map(x=>x.v).join('|');
+  if(sel.dataset.sig!==sig){sel.dataset.sig=sig;sel.innerHTML=tg.map(x=>`<option value="${esc(x.v)}">${esc(x.l)}</option>`).join('');}
+  if(tg.some(x=>x.v===CH9.to))sel.value=CH9.to;else{CH9.to='';sel.value=''}
+  const ta=$('chatText');if(ta&&ta.value!==CH9.draft&&document.activeElement!==ta)ta.value=CH9.draft;
+  const live=!!M6.live;$('chatSend').disabled=!live;$('chatNote').textContent=live?'Enter envia · Shift+Enter quebra a linha. Mensagens particulares só aparecem para quem participa delas.':'Sem conexão ao vivo com a mesa. Tente recarregar a página.';
+  /* lista */
+  const list=$('chatList'),near=list.scrollHeight-list.scrollTop-list.clientHeight<80;
+  const sig2=CH9.list.length+':'+(CH9.list[CH9.list.length-1]?.id||'');
+  if(list.dataset.sig!==sig2||forceBottom){
+    list.dataset.sig=sig2;
+    list.innerHTML=CH9.list.length?CH9.list.map(m=>{
+      const mine=m.from===me,who=mine?'Você':chName9(m.from,m.n),priv=m.to!=null;
+      const dest=priv?(mine?' → '+(m.to.map(u=>chName9(u)).join(', ')):' → você'):'';
+      return `<div class="chat-msg ${mine?'me':''} ${priv?'priv':''} ${m.from===camp3()?.createdBy?'gm':''}"><div class="chat-meta"><b>${esc(who)}</b>${priv?`<span class="chat-tag">🤫 particular${esc(dest)}</span>`:''}<time>${chTime9(m.t)}</time></div><div class="chat-text">${esc(m.text)}</div></div>`}).join(''):'<p class="sub chat-empty">Ninguém falou ainda. Escreva a primeira mensagem.</p>';
+    if(near||forceBottom||CH9.list[CH9.list.length-1]?.from===me)list.scrollTop=list.scrollHeight;
+  }
+}
+T3.renderChat=renderChat9;
+{const _l9=layoutMesa6;layoutMesa6=function(){_l9.apply(this,arguments);try{if(M6.tab==='chat')renderChat9();else chBadge9()}catch(e){}};T3.mesaLayout=layoutMesa6}
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
