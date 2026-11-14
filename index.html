@@ -6581,7 +6581,7 @@ async function voiceRetryMic8(){
 function voiceMute8(m){V8.muted=m===undefined?!V8.muted:!!m;vRoute8();if(V8.muted)V8.me.speaking=false;vSend8({t:'st',muted:V8.muted,speaking:false});voiceBar8();voicePaint8()}
 /* comandos do Mestre */
 async function turnFetch8(){
-  const u=String(prefs.turnUrl||'').trim();if(!u)return [];
+  const u=String(prefs.turnUrl||'').trim();if(!u)return turnClean8(M6.state.turn);
   try{if(u[0]==='['||u[0]==='{'){const j=JSON.parse(u);return turnClean8(Array.isArray(j)?j:j.iceServers)}
     if(!/^https:\/\//i.test(u))throw new Error('endereço');
     const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error('http '+r.status);
@@ -6615,7 +6615,7 @@ function vCount8(){const s=new Set(Object.keys(V8.states));V8.peers.forEach((p,u
 function voiceBar8(){
   const box=$('mbCall');if(!box)return;
   const isM=isGM6(),c=M6.state.call||{},w=Array.isArray(c.whisper)&&c.whisper.length?c.whisper:null,names=w?w.map(u=>nm(charOfUser6(u))||'jogador').join(', '):'';
-  const gmU=vGm8(),badN=[...V8.bad].map(u=>u===gmU?'Mestre':(nm(charOfUser6(u))||'jogador')).join(', '),hasTurn=!!(c.ice&&c.ice.length),cfgTurn=!!String(prefs.turnUrl||'').trim();
+  const gmU=vGm8(),badN=[...V8.bad].map(u=>u===gmU?'Mestre':(nm(charOfUser6(u))||'jogador')).join(', '),hasTurn=!!(c.ice&&c.ice.length),cfgTurn=!!String(prefs.turnUrl||'').trim()||turnClean8(M6.state.turn).length>0;
   const sig=[isM,c.on,V8.on,V8.muted,V8.listenOnly,V8.blocked,V8.joining,vCount8(),names,w&&w.includes(uid3()),badN,hasTurn,cfgTurn].join('|');
   if(box.dataset.sig===sig)return;box.dataset.sig=sig;
   if(!c.on){box.innerHTML=isM?'<button type="button" class="btn small primary" id="vcStart">📞 Iniciar call</button><button type="button" class="btn small '+(cfgTurn?'':'warn')+'" id="vcTurn" title="Ajuda a voz a conectar em redes difíceis (4G, Wi-Fi de empresa)">🌐 Servidor TURN'+(cfgTurn?' ✓':'')+'</button><span class="sub">Todos na mesa entram na hora.</span>':'<span class="sub vc-off">📞 Sem call no momento</span>';const s=$('vcStart');if(s)s.onclick=voiceStart8;const tb=$('vcTurn');if(tb)tb.onclick=vTurnModal8;return}
@@ -6636,9 +6636,17 @@ function voiceBar8(){
 function vTurnModal8(){
   if(!isGM6())return;
   openModal('CALL','Servidor TURN',`<p class="sub">Sem TURN, a voz só liga quando as redes dos jogadores permitem conexão direta. Em 4G, Wi-Fi de empresa ou alguns roteadores, isso falha e ninguém se ouve. O TURN faz a ponte e resolve.</p>
-  <ol class="sub" style="margin:8px 0 10px 18px;line-height:1.5"><li>Crie uma conta gratuita em <b>metered.ca</b> (Open Relay, 20 GB por mês).</li><li>No painel, abra <b>TURN Server</b> e copie o endereço de credenciais (termina com <code>/api/v1/turn/credentials?apiKey=…</code>).</li><li>Cole abaixo e salve. Ele fica só neste navegador; os jogadores recebem apenas credenciais temporárias.</li></ol>
-  <label class="sub" for="turnUrl">Endereço de credenciais</label><input id="turnUrl" type="text" autocomplete="off" spellcheck="false" placeholder="https://seuapp.metered.live/api/v1/turn/credentials?apiKey=…" value="${esc(prefs.turnUrl||'')}" style="width:100%">`,
-  'Salvar',()=>{const v=($('turnUrl').value||'').trim();prefs.turnUrl=v;savePrefs();closeModal();toast(v?'Servidor TURN salvo. Ele entra na próxima call que você iniciar.':'Servidor TURN removido.');voiceBar8()});
+  <ol class="sub" style="margin:8px 0 10px 18px;line-height:1.5"><li>Crie uma conta gratuita em <b>metered.ca</b> (Open Relay, 20 GB por mês).</li><li>No painel, abra <b>TURN Server</b> e copie o endereço de credenciais (termina com <code>/api/v1/turn/credentials?apiKey=…</code>).</li><li>Cole abaixo e salve. Pode ser esse endereço ou a lista <code>iceServers</code> (JSON) do painel do Metered.</li></ol>
+  <p class="sub">${turnClean8(M6.state.turn).length?'✓ Já há um servidor TURN salvo nesta campanha. Cole outro para trocar, ou deixe vazio e salve para remover.':prefs.turnUrl?'✓ Há um endereço salvo neste navegador. Cole outro para trocar, ou deixe vazio e salve para remover.':'Nenhum servidor TURN salvo ainda.'}</p><label class="sub" for="turnUrl">Endereço de credenciais ou lista iceServers</label><input id="turnUrl" type="text" autocomplete="off" spellcheck="false" placeholder="https://seuapp.metered.live/api/v1/turn/credentials?apiKey=…" value="" style="width:100%">`,
+  'Salvar',()=>{
+    const v=($('turnUrl').value||'').trim(),had=!!(prefs.turnUrl||turnClean8(M6.state.turn).length);
+    if(!v&&!had){closeModal();return}
+    if(v&&(v[0]==='['||v[0]==='{')){let l=[];try{const j=JSON.parse(v);l=turnClean8(Array.isArray(j)?j:j.iceServers)}catch(e){}
+      if(!l.length){toast('Não entendi essa lista. Cole o iceServers do Metered ou o endereço de credenciais.');return}
+      prefs.turnUrl='';savePrefs();setState6({turn:l})}
+    else if(v){if(!/^https:\/\//i.test(v)){toast('O endereço precisa começar com https://');return}prefs.turnUrl=v;savePrefs();setState6({turn:null})}
+    else{prefs.turnUrl='';savePrefs();setState6({turn:null})}
+    closeModal();toast(v?'Servidor TURN salvo. Ele entra na próxima call que você iniciar.':'Servidor TURN removido.');voiceBar8()});
 }
 function vWhisperModal8(){
   const players=seats6().players,cur=new Set(M6.state.call?.whisper||[]);
