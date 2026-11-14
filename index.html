@@ -8,6 +8,8 @@
 <meta name="theme-color" content="#090b10">
 <meta name="tulpa-build" content="2026-11-07-etapa2-combate-encerrar-excluir-tulpa-2">
 <title>TULPA RPG — Registro de Agente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#090b10;--panel:#11151d;--panel2:#171d27;--line:#2a3442;--muted:#8d9aaa;--text:#edf2f7;--accent:#b7d7d5;--accent2:#70aaa7;--red:#b95e65;--gold:#c8a66a;--shadow:0 18px 50px #0008}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#23323b 0%,#0b1017 48%,#080a0f 100%);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
@@ -267,7 +269,7 @@ portalHome();
 (()=>{
 const $id=id=>document.getElementById(id), camp=()=>portalStore.campaigns.find(c=>c.id===portalCampaignId);
 const safe=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function tone(kind='click'){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=new C(),now=ctx.currentTime;const notes=kind==='dice'?[520,760,430,900]:kind==='start'?[220,330,440]:[660];notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=kind==='dice'?'triangle':'sine';o.frequency.setValueAtTime(f,now+i*.055);g.gain.setValueAtTime(.0001,now+i*.055);g.gain.exponentialRampToValueAtTime(.09,now+i*.055+.012);g.gain.exponentialRampToValueAtTime(.0001,now+i*.055+.13);o.connect(g);g.connect(ctx.destination);o.start(now+i*.055);o.stop(now+i*.055+.15)});setTimeout(()=>ctx.close(),900)}catch(e){}}
+function tone(kind='click'){if(window.tulpaFx5){window.tulpaFx5(kind);return}try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=new C(),now=ctx.currentTime;const notes=kind==='dice'?[520,760,430,900]:kind==='start'?[220,330,440]:[660];notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=kind==='dice'?'triangle':'sine';o.frequency.setValueAtTime(f,now+i*.055);g.gain.setValueAtTime(.0001,now+i*.055);g.gain.exponentialRampToValueAtTime(.09,now+i*.055+.012);g.gain.exponentialRampToValueAtTime(.0001,now+i*.055+.13);o.connect(g);g.connect(ctx.destination);o.start(now+i*.055);o.stop(now+i*.055+.15)});setTimeout(()=>ctx.close(),900)}catch(e){}}
 // Sound on all existing and future dice rolls.
 const originalRoll=window.rollSkill; if(typeof originalRoll==='function')window.rollSkill=function(skill){tone('dice');return originalRoll(skill)};
 function ensureTools(){
@@ -316,6 +318,7 @@ const prevShowApp=window.showApp;if(typeof prevShowApp==='function')window.showA
 const $=id=>document.getElementById(id), campaign=()=>portalStore.campaigns.find(c=>c.id===portalCampaignId), safeText=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // Sons sintetizados, sem arquivos externos. Cada família possui identidade sonora própria.
 function fx(kind='click',element=''){
+ if(window.tulpaFx5){window.tulpaFx5(kind,element);return}
  try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=new AC(),t=ctx.currentTime;
  const patterns={click:[[740,0,.055,'sine']],confirm:[[520,0,.09,'sine'],[780,.08,.13,'sine']],error:[[220,0,.16,'sawtooth'],[165,.12,.18,'sawtooth']],turn:[[392,0,.13,'triangle'],[523,.12,.13,'triangle'],[659,.24,.24,'triangle']],round:[[261,0,.18,'sine'],[392,.15,.18,'sine'],[523,.3,.2,'sine'],[784,.48,.35,'sine']],activate:[[440,0,.1,'triangle'],[660,.08,.1,'triangle'],[880,.16,.24,'triangle']],learn:[[523,0,.12,'sine'],[659,.1,.12,'sine'],[784,.2,.12,'sine'],[1046,.3,.3,'sine']],cast:[[180,0,.2,'sawtooth'],[330,.12,.2,'triangle'],[520,.25,.3,'sine']]};
  let p=patterns[kind]||patterns.click;if(kind==='cast'){const sets={Natureza:[150,220,330,440],Inexistência:[90,140,210,300],Ilusão:[660,520,780,1040],Verdade:[440,660,880,990],Fé:[330,495,660,990],Sol:[330,440,495,660,990],Desrealização:[150,140,220,210,300],Apofenia:[90,520,210,780,1040],Confabulação:[660,440,780,880,1040],Metáfora:[440,330,660,495,990]};p=(sets[element]||sets.Fé).map((f,i)=>[f,i*.12,.28,i%2?'triangle':'sine'])}
@@ -1207,7 +1210,7 @@ document.addEventListener('click',e=>{const begin=e.target.closest('#beginCombat
    const pop=ensurePopup(),row=popupQueue.shift();
    if(!row){pop.classList.remove('show');return}
    fillPopup(pop,row);pop.classList.add('show');
-   try{window.tulpaFx?.('confirm')}catch(e){}
+   try{window.tulpaRollFx?window.tulpaRollFx(pop,{d20:true,who:[row.character_name]}):window.tulpaFx?.('confirm')}catch(e){}
    popupTimer=setTimeout(showNextPopup,popupQueue.length?3200:8000);
  }
  function queuePopup(r){
@@ -1254,6 +1257,7 @@ document.addEventListener('click',e=>{const begin=e.target.closest('#beginCombat
  function registerRoll(row){
    if(!row||!row.id)return;
    if(row.detail&&row.detail.cmb){shownRolls.add(row.id);window.tulpaOnCombatRow&&window.tulpaOnCombatRow(row);if(!['res','rollx'].includes(row.detail.cmb))return}
+   if(!(row.detail&&row.detail.cmb))try{window.tulpaNarrateRoll?.({id:row.id,name:row.character_name,skill:row.skill,dice:row.dice,total:row.total,created_at:row.created_at})}catch(e){}
    if(!rollHistory.some(r=>r.id===row.id)){
      rollHistory.unshift(row);
      rollHistory.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
@@ -1648,6 +1652,147 @@ body.t3-dark .typing i{background:#e59a8c}
 .pm .pai{margin-top:6px;font-size:10.5px;opacity:.6}
 body.t3-dark .t3-tier{background:#3a3022;color:#f0dcb8}body.t3-dark .t3-tier.t10{background:#1e3550;color:#cfe3fb}body.t3-dark .t3-tier.t15{background:#5a3c08;color:#ffe2a6}
 body.t3-dark .t3-summon{background:#2a2236;color:#eee;border-color:#6d5a88}body.t3-dark .t3-leet{color:#ff7aa0}
+</style>
+<style id="tulpa-v5">
+/* ===== TULPA · ETAPA 5 — acabamento visual, fotos e efeitos ===== */
+:root{
+  --f-display:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;
+  --f-ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --ring:#3f6f6a;
+  --lift:0 1px 0 #fffaf0b0 inset,0 1px 2px #3826150f,0 14px 30px -14px #3826154d;
+}
+html[data-theme="dark"]{--ring:#8fd0c8;--lift:0 1px 0 #ffffff0d inset,0 1px 2px #0006,0 16px 32px -16px #000c}
+
+/* tipografia: Cormorant para títulos, Plex Sans para leitura e controles */
+body{font-family:var(--f-ui);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-feature-settings:"kern","liga"}
+button,input,select,textarea{font-family:var(--f-ui)}
+h1,h2,h3,h4,.portal-card h2,.campaign-item h3,.table-char h3,.modal h2,.rp-title,#t3Roll .rp-title,#rollPopup .rp-title{font-family:var(--f-display);font-weight:700;letter-spacing:.002em}
+.hero h1,.portal-hero h1{font-weight:600;letter-spacing:-.012em;line-height:1.02}
+.portal-hero h1{font-size:clamp(46px,7.4vw,84px)}
+.panel h2,.portal-panel h2,.panel-head h2{font-size:1.5rem;text-transform:none;letter-spacing:.004em;line-height:1.15}
+.panel h3{font-size:1.2rem}
+.table-char h3{font-size:1.5rem;line-height:1.1;margin:0}
+.portal-card h2{font-size:1.45rem}
+.brand b,.portal-brand b{font-family:var(--f-ui);font-weight:600}
+.bigresult,.stat .value,.t3-settotal,.resource-row b,.die{font-variant-numeric:tabular-nums lining-nums}
+.bigresult{font-family:var(--f-display);font-weight:700}
+.sub,.muted{line-height:1.5}
+::selection{background:#8e3e34;color:#fff3df}
+
+/* textura de papel bem leve por cima do fundo */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .15 0 0 0 0 .1 0 0 0 0 .06 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
+html[data-theme="dark"] body::before{opacity:.07;filter:invert(1)}
+
+/* superfícies */
+.panel,.portal-panel,.portal-card,.table-char,.campaign-item,.master-panel,.combat-panel{border-radius:16px;box-shadow:var(--lift)}
+.portal-card{transition:transform .22s var(--ease),box-shadow .22s var(--ease),border-color .2s,background .2s}
+.portal-card:hover{transform:translateY(-3px);box-shadow:0 1px 0 #fffaf0b0 inset,0 22px 40px -18px #38261566}
+.table-char{border-left-width:1px;position:relative;overflow:hidden;padding:18px}
+.table-char::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#a34d3e,#6f2c25)}
+.topbar{backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px)}
+
+/* controles */
+.btn,.pbtn,.resource-actions button,.t3-seg button,.navbtn,.scene-eye{transition:transform .14s var(--ease),box-shadow .2s var(--ease),background .18s,border-color .18s,color .18s}
+.btn{font-weight:600;letter-spacing:.004em;border-radius:10px}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 18px -10px #38261580}
+.btn:active,.resource-actions button:active,.pbtn:active{transform:translateY(0) scale(.97)}
+.btn.primary{box-shadow:inset 0 1px 0 #ffffff33,0 10px 20px -12px #8e3e34}
+.btn[disabled],.btn:disabled{transform:none;box-shadow:none}
+.field input,.field select,.field textarea,.search,.portal-input{border-radius:10px;transition:border-color .18s,box-shadow .18s,background .18s}
+.field label,.field-label{font-weight:600;letter-spacing:.08em}
+.pill,.tag{font-family:var(--f-ui);font-weight:600;letter-spacing:.04em}
+.resource-actions button{border-radius:8px;font-weight:700}
+:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:6px}
+*{scrollbar-width:thin;scrollbar-color:#a58c6799 transparent}
+html[data-theme="dark"] *{scrollbar-color:#5a6779 transparent}
+
+/* barras de recurso */
+.resource-bar{height:10px;border-radius:999px;overflow:hidden;box-shadow:inset 0 1px 2px #0000002e}
+.resource-bar span{display:block;height:100%;border-radius:999px;transition:width .7s var(--ease);box-shadow:inset 0 1px 0 #ffffff59}
+.resource-row{position:relative}
+.resource-row label{font-weight:600;letter-spacing:.08em}
+.float5{position:absolute;right:6px;top:-6px;font:700 15px/1 var(--f-ui);pointer-events:none;animation:float5 1.05s var(--ease) forwards;text-shadow:0 1px 0 #fff8}
+.float5.down{color:#b3261e}.float5.up{color:#2f7d3a}
+html[data-theme="dark"] .float5{text-shadow:0 1px 2px #000}
+html[data-theme="dark"] .float5.down{color:#ff8a7a}html[data-theme="dark"] .float5.up{color:#7fdc8c}
+@keyframes float5{0%{transform:translateY(8px) scale(.8);opacity:0}18%{transform:translateY(0) scale(1.15);opacity:1}100%{transform:translateY(-26px) scale(1);opacity:0}}
+.table-char.fx-hit{animation:card-hit .5s var(--ease)}
+.table-char.fx-heal{animation:card-heal .7s var(--ease)}
+@keyframes card-hit{0%{transform:translateX(0);box-shadow:0 0 0 0 #b3261e00}15%{transform:translateX(-7px);box-shadow:0 0 0 3px #b3261eaa,0 0 34px #b3261e66}35%{transform:translateX(6px)}55%{transform:translateX(-4px)}75%{transform:translateX(2px)}100%{transform:translateX(0)}}
+@keyframes card-heal{0%{box-shadow:0 0 0 0 #2f7d3a00}35%{box-shadow:0 0 0 3px #2f7d3a99,0 0 30px #2f7d3a55}100%{box-shadow:var(--lift)}}
+
+/* foto de perfil */
+.av{--s:44px;width:var(--s);height:var(--s);flex:0 0 var(--s);border-radius:26%;display:inline-grid;place-items:center;overflow:hidden;vertical-align:middle;
+  background:var(--avc,#8e3e34);background:linear-gradient(150deg,color-mix(in srgb,var(--avc,#8e3e34) 78%,#fff),var(--avc,#8e3e34) 70%);color:#fff6e6;
+  box-shadow:0 0 0 2px #fbf4e4,0 0 0 3.5px var(--av-ring,#a98447),0 8px 16px -8px #000a;transition:filter .3s,box-shadow .3s}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.av b{font-family:var(--f-display);font-weight:700;font-style:italic;font-size:calc(var(--s)*.44);line-height:1;letter-spacing:.01em}
+.av.sm{--s:30px}.av.lg{--s:62px}.av.xl{--s:104px}
+.av.low{--av-ring:#c0392b}
+.av.down{filter:grayscale(1) brightness(.72)}
+html[data-theme="dark"] .av{box-shadow:0 0 0 2px #171d26,0 0 0 3.5px var(--av-ring,#c8a66a),0 8px 16px -8px #000}
+.tc-head{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.tc-id{min-width:0;flex:1}
+.tc-id .owner{margin-top:4px}
+.tc-head .scene-eye{margin:0;align-self:flex-start}
+.combatant.has-av{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center}
+.combatant.has-av>.av{grid-row:1 / span 3}
+.combatant.has-av>*:not(.av){grid-column:2;min-width:0}
+.av-edit{display:flex;align-items:center;gap:18px;margin:4px 0 18px;padding-bottom:18px;border-bottom:1px solid #9d846155}
+.av-btn{border:0;background:none;padding:0;cursor:pointer;border-radius:26%;transition:transform .2s var(--ease)}
+.av-btn:hover{transform:scale(1.04) rotate(-1.5deg)}
+.av-txt{display:flex;flex-direction:column;gap:6px;min-width:0}
+.av-txt b{font-family:var(--f-display);font-size:1.25rem}
+.rp-avs{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0 6px}
+.rp-vs{font-size:20px;opacity:.7}
+@media(max-width:560px){.av-edit{gap:14px}.av.xl{--s:84px}.av.lg{--s:54px}}
+
+/* rolagens: dados girando, carimbo do resultado, crítico e falha */
+.die{transition:transform .2s var(--ease)}
+.fx-rolling .die{animation:die-tumble .13s linear infinite}
+.fx-rolling .bigresult,.fx-rolling .t3-settotal,.fx-rolling .rp-detail{opacity:0}
+.fx-settled .bigresult{animation:stamp5 .46s var(--ease) both}
+.fx-settled .t3-settotal,.fx-settled .rp-detail{animation:fade5 .4s .1s both}
+.fx-settled .die.best{animation:die-pop .42s var(--ease)}
+@keyframes die-tumble{0%{transform:rotate(-9deg) translateY(-2px)}50%{transform:rotate(9deg) translateY(2px)}100%{transform:rotate(-9deg) translateY(-2px)}}
+@keyframes die-pop{0%{transform:scale(1)}45%{transform:scale(1.28) rotate(-4deg)}100%{transform:scale(1)}}
+@keyframes stamp5{0%{transform:scale(2);opacity:0;filter:blur(4px)}60%{transform:scale(.93);opacity:1;filter:none}100%{transform:scale(1)}}
+@keyframes fade5{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fx-crit .bigresult{color:#b8860b!important;text-shadow:0 0 22px #f4c95daa,0 0 2px #fff}
+.fx-crit .die.best{background:linear-gradient(145deg,#e9b949,#b8860b)!important;border-color:#8a6508!important;color:#2b1d05!important;box-shadow:0 0 16px #f4c95dcc}
+#t3Roll.fx-crit,#rollPopup.fx-crit{border-color:#d4a017!important;box-shadow:0 0 0 2px #f4c95d66,0 0 60px #f4c95d88,0 24px 60px #0006}
+.fx-fumble .bigresult{color:#6d1f1a!important;animation:stamp5 .46s var(--ease) both,wobble5 .5s .46s var(--ease)}
+.fx-fumble .die{filter:grayscale(.7)}
+.fx-fumble .dice{animation:shake5 .45s var(--ease)}
+html[data-theme="dark"] .fx-fumble .bigresult{color:#ff8a7a!important}
+html[data-theme="dark"] .fx-crit .bigresult{color:#f4c95d!important}
+@keyframes shake5{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@keyframes wobble5{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}65%{transform:rotate(5deg)}}
+.fx-host{position:relative}
+.spark{position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;background:radial-gradient(#fff,#f4c95d 55%,#d4a01700);pointer-events:none;opacity:0;animation:spark5 .85s var(--ease) forwards}
+@keyframes spark5{0%{transform:translate(-50%,-50%) scale(.4);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.15);opacity:0}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* Visão de Mesa no celular: rótulo e botões em cima, barra inteira embaixo */
+body.t3-mobile .table-char .resource-row{grid-template-columns:1fr auto;grid-template-areas:"l a" "b b";row-gap:6px;align-items:center;margin-top:12px}
+body.t3-mobile .table-char .resource-row>label{grid-area:l}
+body.t3-mobile .table-char .resource-row>div:not(.resource-actions){grid-area:b}
+body.t3-mobile .table-char .resource-row>.resource-actions{grid-area:a}
+.table-char>.btn.small{margin-right:8px}
+
+/* barra do topo da ficha: uma linha só, sem quebrar os botões */
+body.t3-desktop .top-actions{gap:7px;flex-wrap:nowrap;min-width:0;overflow-x:auto;scrollbar-width:none}
+body.t3-desktop .top-actions>*{flex:0 0 auto;white-space:nowrap}
+body.t3-desktop .top-actions .pill{max-width:150px;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+@media(max-width:1500px){body.t3-desktop .top-actions #tulpaCloudStatus{display:none}}
+body.t3-dark #t3Roll.fx-crit,body.t3-dark #rollPopup.fx-crit{border-color:#f4c95d!important}
+body.t3-dark .fx-crit .die.best{background:linear-gradient(145deg,#e9b949,#b8860b)!important;border-color:#f4c95d!important;color:#2b1d05!important}
+
 </style>
 <script id="tulpa-etapa3">
 (()=>{
@@ -2282,13 +2427,14 @@ function rollModal(skill,r,title){
 }
 rollSkill=function(skill){
   const ch={data,vocations,tracks},r=doRoll(ch,skill);
-  consumeOnce(data,r.calc);save();renderTalents();renderSkills();fx3('dice');rollModal(skill,r);
+  consumeOnce(data,r.calc);save();renderTalents();renderSkills();rollModal(skill,r);
+  window.tulpaRollFx?window.tulpaRollFx($('modalBody'),{d20:true,crit:r.best===20,fumble:r.best===1,who:[data.name]}):fx3('dice');
   T3.shareSheetRoll?.(skill,r);
-  T3.perseusReact?.(r.best===20?'nat20':(r.best===1?'nat1':''));
+  T3.narrateRoll?T3.narrateRoll({name:data.name,skill,dice:[r.best],total:r.total}):T3.perseusReact?.(r.best===20?'nat20':(r.best===1?'nat1':''));
 };
 
 /* ---- persistência de qualquer ficha que eu controle ---- */
-const pubSummary=d=>{const h=!!d?.hideStats;return{name:d?.name||'Personagem sem nome',stage:Number(d?.stage)||1,vital:h?0:Number(d?.vital)||0,lucidity:h?0:Number(d?.lucidity)||0,essence:h?0:Number(d?.essence)||0,statuses:(d?.statuses||[]).map(s=>typeof s==='string'?s:s.id),df:Number(E.defenseInfo(d||{attributes:{}}).DF)||10,hideStats:h,temp:h?0:Number(d?.vitalTemp)||0,dying:((d?.statuses||[]).find(s=>(s.id||s)==='agonia')||{}).turns??null}};
+const pubSummary=d=>{const h=!!d?.hideStats;return{name:d?.name||'Personagem sem nome',stage:Number(d?.stage)||1,vital:h?0:Number(d?.vital)||0,lucidity:h?0:Number(d?.lucidity)||0,essence:h?0:Number(d?.essence)||0,statuses:(d?.statuses||[]).map(s=>typeof s==='string'?s:s.id),df:Number(E.defenseInfo(d||{attributes:{}}).DF)||10,hideStats:h,temp:h?0:Number(d?.vitalTemp)||0,dying:((d?.statuses||[]).find(s=>(s.id||s)==='agonia')||{}).turns??null,...(avOk(d?.avatar)?{avatar:d.avatar}:{})}};
 function combatCache(d,voc,trk){
   try{const c=skillCalc3({data:d,vocations:voc||vocations,tracks:trk||tracks},'Reflexo');d.combatCache={reflexDice:Math.max(1,Math.min(8,c.n)),reflexBonus:Math.max(-30,Math.min(60,c.bonus)),at:Date.now()}}catch(e){}
 }
@@ -2442,10 +2588,10 @@ T3.applyPrefs=applyPrefs;
 function seg(key,opts){return `<div class="t3-seg" data-pref="${key}">${opts.map(([v,l])=>`<button type="button" class="${String(prefs[key])===String(v)?'on':''}" data-v="${v}">${l}</button>`).join('')}</div>`}
 function openSettings(){
   const now=detectMobile()?'celular':'computador';
-  openModal('APARÊNCIA','Tema e visualização',`<div class="field"><label>Tema</label>${seg('theme',[['light','☀ Claro'],['dark','☾ Escuro'],['auto','Automático']])}</div><div class="field" style="margin-top:12px"><label>Visualização</label>${seg('view',[['auto','Automática'],['mobile','📱 Celular'],['desktop','🖥 Computador']])}<span class="sub">Detectado agora: <b>${now}</b> (${window.innerWidth}×${window.innerHeight}). “Automática” se ajusta sozinha ao girar a tela.</span></div><div class="field" style="margin-top:12px"><label>Tamanho do texto</label>${seg('text',[['normal','Normal'],['large','Grande'],['xl','Extra grande']])}</div><div class="field" style="margin-top:12px"><label>Rolagens feitas dentro da ficha</label>${seg('shareSheet',[[false,'🔒 Privadas'],[true,'🎲 Mostrar na mesa']])}<span class="sub">Em “Mostrar na mesa” elas aparecem na tela de todos e no histórico, como as da Visão de Mesa.</span></div><div class="field" style="margin-top:12px"><label>Perseus (gato assistente)</label>${seg('perseus',[[true,'🐱 Mostrar'],[false,'Esconder']])}<span class="sub">Dicas, explicações das regras e guias passo a passo.</span></div>`,'Pronto',closeModal);
+  openModal('APARÊNCIA','Tema e visualização',`<div class="field"><label>Tema</label>${seg('theme',[['light','☀ Claro'],['dark','☾ Escuro'],['auto','Automático']])}</div><div class="field" style="margin-top:12px"><label>Visualização</label>${seg('view',[['auto','Automática'],['mobile','📱 Celular'],['desktop','🖥 Computador']])}<span class="sub">Detectado agora: <b>${now}</b> (${window.innerWidth}×${window.innerHeight}). “Automática” se ajusta sozinha ao girar a tela.</span></div><div class="field" style="margin-top:12px"><label>Tamanho do texto</label>${seg('text',[['normal','Normal'],['large','Grande'],['xl','Extra grande']])}</div><div class="field" style="margin-top:12px"><label>Rolagens feitas dentro da ficha</label>${seg('shareSheet',[[false,'🔒 Privadas'],[true,'🎲 Mostrar na mesa']])}<span class="sub">Em “Mostrar na mesa” elas aparecem na tela de todos e no histórico, como as da Visão de Mesa.</span></div><div class="field" style="margin-top:12px"><label>Perseus (gato assistente)</label>${seg('perseus',[[true,'🐱 Mostrar'],[false,'Esconder']])}<span class="sub">Dicas, explicações das regras e guias passo a passo.</span></div><div class="field" style="margin-top:12px"><label>Sons</label>${seg('sound',[['on','🔊 Ligados'],['low','🔉 Baixos'],['off','🔇 Desligados']])}<span class="sub">Dados, acertos, críticos, turnos e rituais.</span></div>`,'Pronto',closeModal);
   $$('.t3-seg button',$('modalBody')).forEach(b=>b.onclick=()=>{
     const key=b.parentElement.dataset.pref;let v=b.dataset.v;if(v==='true')v=true;if(v==='false')v=false;
-    prefs[key]=v;savePrefs();applyPrefs();T3.perseusApply?.();
+    prefs[key]=v;savePrefs();applyPrefs();T3.perseusApply?.();if(key==='sound')T3.fx?.('confirm');
     $$('button',b.parentElement).forEach(x=>x.classList.toggle('on',x===b));
   });
 }
@@ -3032,16 +3178,14 @@ function processRow(row,live=true){
   else if(dt.cmb==='res'){
     const p=CB.pending[dt.aid];if(p&&p.targets[dt.targetId])p.targets[dt.targetId].res=row;
     CB.log.unshift({kind:'res',dt,at:row.created_at});CB.log=CB.log.slice(0,30);
-    if(live&&dt.crit&&dt.hit)T3.perseusReact?.('crit');
-    if(live&&(dt.statuses||[]).includes('agonia'))T3.perseusReact?.('dying');
-    if(live&&(dt.statuses||[]).includes('morto'))T3.perseusReact?.('dead');
+    if(live)T3.narrateRes?.(dt);
     if(live&&(dt.statuses||[]).includes('agonia'))toast('☠ '+dt.targetName+' está Morrendo! Sutura Bruta ou Síntese Cirúrgica podem salvá-lo.');
     if(live&&(dt.statuses||[]).includes('morto'))toast('☠ '+dt.targetName+' morreu.');
     if(live){queuePopup(dt);const att=charById(dt.attackerId);if(att&&controls(att)){if(dt.extraAtk)mutateChar(att,d=>{d.combatExtra=(Number(d.combatExtra)||0)+dt.extraAtk})}}
   }else if(dt.cmb==='mark'){CB.pending={};CB.log=[];CB.promptQueue=[]
   }else if(dt.cmb==='fx')onFx(row,live);
-  else if(dt.cmb==='init'){if(live&&Date.now()-Date.parse(row.created_at)<60000)showRollPopup({eyebrow:'INICIATIVA',title:'Ordem de ação',sub:'Reflexo de cada participante',sets:(dt.rolls||[]).slice(0,14).map(x=>({label:x.name,dice:x.dice||[],bonus:(x.total||0)-Math.max(0,...(x.dice||[0])),total:x.total,hi:'max'}))})}
-  else if(dt.cmb==='rollx'){if(live&&!dt.quiet&&row.roller_id!==uid3()&&Date.now()-Date.parse(row.created_at)<60000)showRollPopup({eyebrow:dt.eyebrow||'ROLAGEM',title:`${row.character_name} · ${row.skill}`,sets:[{label:`${(row.dice||[]).length}d${dt.sides||20}`,dice:row.dice||[],bonus:row.bonus,total:row.total,hi:(dt.sides||20)===20?'max':null}],big:row.total,detail:dt.note?esc(dt.note):''})}
+  else if(dt.cmb==='init'){if(live&&Date.now()-Date.parse(row.created_at)<60000){const top=(dt.rolls||[]).slice().sort((a,b)=>(b.total||0)-(a.total||0))[0];if(top)setTimeout(()=>T3.narrate?.('init',{n:top.name}),900)}if(live&&Date.now()-Date.parse(row.created_at)<60000)showRollPopup({eyebrow:'INICIATIVA',title:'Ordem de ação',sub:'Reflexo de cada participante',sets:(dt.rolls||[]).slice(0,14).map(x=>({label:x.name,dice:x.dice||[],bonus:(x.total||0)-Math.max(0,...(x.dice||[0])),total:x.total,hi:'max'}))})}
+  else if(dt.cmb==='rollx'){if(live&&!dt.quiet)T3.narrateRoll?.({id:row.id,name:row.character_name,skill:row.skill,dice:row.dice,total:row.total,sides:dt.sides||20,created_at:row.created_at});if(live&&!dt.quiet&&row.roller_id!==uid3()&&Date.now()-Date.parse(row.created_at)<60000)showRollPopup({d20:(dt.sides||20)===20,eyebrow:dt.eyebrow||'ROLAGEM',title:`${row.character_name} · ${row.skill}`,sets:[{label:`${(row.dice||[]).length}d${dt.sides||20}`,dice:row.dice||[],bonus:row.bonus,total:row.total,hi:(dt.sides||20)===20?'max':null}],big:row.total,detail:dt.note?esc(dt.note):''})}
   else if(dt.cmb==='item')applyItemRow(dt);
   else if(dt.cmb==='log'){CB.log.unshift({kind:'log',text:dt.text,at:row.created_at});CB.log=CB.log.slice(0,30)}
   renderCombatUI();
@@ -3124,13 +3268,14 @@ function nextRoll(){
   const o=RQ.q.shift();if(!o){p.classList.remove('show');return}
   p.className='show '+(o.tone||'');
   p.innerHTML=`<div class="rp-eyebrow">${esc(o.eyebrow||'ROLAGEM')}</div><div class="rp-title">${esc(o.title||'')}</div>${o.sub?`<div class="rp-sub">${esc(o.sub)}</div>`:''}${(o.sets||[]).map(setHtml).join('')}${o.big!=null?`<div class="bigresult">${esc(o.big)}</div>`:''}${o.detail?`<div class="rp-detail">${o.detail}</div>`:''}<div class="rp-hint">Toque para fechar</div>`;
-  fx3(o.tone==='bad'||o.tone==='hit'?'error':'confirm');try{navigator.vibrate&&navigator.vibrate(o.tone==='bad'?[80,40,80]:35)}catch(e){}
+  if(window.tulpaRollFx)window.tulpaRollFx(p,{d20:!!o.d20,crit:o.crit,fumble:o.fumble,tone:{bad:'violent',hit:'hit',ok:o.block?'block':'dodge'}[o.tone]||'',who:String(o.title||'').split(/ · | ⚔ /)});else fx3(o.tone==='bad'||o.tone==='hit'?'error':'confirm');
+  try{navigator.vibrate&&navigator.vibrate(o.tone==='bad'?[80,40,80]:35)}catch(e){}
   RQ.timer=setTimeout(nextRoll,RQ.q.length?3800:10000);
 }
 /* mostra a rolagem na tela e a registra no histórico da mesa */
 async function announceRoll(ch,label,{dice=[],sides=20,bonus=0,total=0,note='',share=true,popup=true,eyebrow='ROLAGEM'}={}){
   const c=ch||{id:null,data};
-  if(popup)showRollPopup({eyebrow,title:`${nm(c)} · ${label}`,sets:[{label:`${dice.length}d${sides}`,dice,bonus,total,hi:sides===20?'max':null}],big:total,detail:note?esc(note):''});
+  if(popup)showRollPopup({d20:sides===20,eyebrow,title:`${nm(c)} · ${label}`,sets:[{label:`${dice.length}d${sides}`,dice,bonus,total,hi:sides===20?'max':null}],big:total,detail:note?esc(note):''});
   if(share&&camp3()&&sb()&&c.id){try{await insertRow(c,label,{dice,bonus,total,detail:{cmb:'rollx',sides,note,eyebrow}})}catch(e){console.warn('[T3] histórico',e)}}
 }
 function rollAnn(ch,label,expr,eyebrow='ROLAGEM'){const pd=E.parseDice(expr),rr=E.rollExpr(expr);announceRoll(ch,label,{dice:rr.rolls,sides:pd.s,bonus:rr.mod,total:rr.total,eyebrow});return rr.total}
@@ -3139,7 +3284,7 @@ function queuePopup(dt){
   const sets=[{label:`Ataque · ${dt.atk?.skill||''}`,dice:dt.atk?.dice||[],bonus:dt.atk?.bonus||0,total:dt.ATA,hi:'max'},{label:`${dt.def?.skill||'Defesa'}${dt.DF>10?' · DF '+dt.DF:''}`,dice:dt.def?.dice||[],bonus:dt.def?.bonus||0,total:dt.RF,hi:'max'}];
   const di=dt.dmgInfo;
   if(dt.hit&&di)sets.push({label:`Dano ${di.dado}${di.usedCrit?' (crítico: dados rolados 2×)':''}`,dice:[...di.normal,...(di.usedCrit?di.crit:[])],bonus:di.flat,total:di.total,note:dt.dmg.final!==di.total?`Após absorção/resistência: ${dt.dmg.final}`:''});
-  showRollPopup({eyebrow:'CONFRONTO',title:`${dt.attackerName} ⚔ ${dt.targetName}`,sub:dt.weapon,sets,big:dt.label+(dt.crit?' · CRÍTICO':''),tone:{esquiva:'ok',defesa:'ok',retaliacao:'ok',normal:'hit',violento:'bad'}[dt.outcome],
+  showRollPopup({crit:!!(dt.crit&&dt.hit),fumble:false,block:dt.outcome==='defesa',eyebrow:'CONFRONTO',title:`${dt.attackerName} ⚔ ${dt.targetName}`,sub:dt.weapon,sets,big:dt.label+(dt.crit?' · CRÍTICO':''),tone:{esquiva:'ok',defesa:'ok',retaliacao:'ok',normal:'hit',violento:'bad'}[dt.outcome],
     detail:esc(dt.text)+(dt.hit?`<br><b>${dt.dmg.final} de dano</b>${dt.statuses?.length?' · '+dt.statuses.map(x=>esc(STATUS_BY_ID[x]?.name||x)).join(', '):''}`:'')+(dt.notes||[]).map(n=>`<br><span class="sub">${esc(n)}</span>`).join('')});
 }
 const miniDice=(dice,hi)=>{const a=(dice||[]).map(Number),b=hi&&a.length?Math.max(...a):null;return `<span class="t3-mini">${a.map(x=>`<i class="${hi&&x===b?'best':''}">${x}</i>`).join('')}</span>`};
@@ -4425,6 +4570,281 @@ renderCfg=function(){
  ['municao','Munição e Arma Favorita',['municao','recarga','recarregar','arma favorita','devastador mental','espada do pensamento'],'Armas de disparo podem <b>controlar munição</b> (marque no Inventário): cada ataque gasta 1 “Munição solta”. No <b>Arsenal Mental</b> e na <b>Lâmina Psíquica</b>, marque a <b>★ Arma Favorita</b>: no Estágio 10 ela ganha +1 dado de dano e +2 na margem de ameaça.',G('inventory','#invBody')],
  ['caido-sonolento','Caído, Sonolento e estados de 1d4',['caido','levantar','sonolento','adormecer','1d4 turnos','duracao do estado'],'<b>Caído</b>: o atacante corpo a corpo ganha vantagem; no seu turno use <b>⬆ Levantar</b> (1 ação). <b>Sonolento</b>: marque cada falha em Concentração no contador (0/3); na 3ª você adormece (Paralisado). Estados de talentos como Briga Tremenda duram <b>1d4 turnos</b>, rolados na hora e descontados sozinhos.',G('states','#stActive')],
  ['ia-perseus','Como ligar a IA do Perseus',['conectar ia','ia do perseus','gemini','groq','pollinations','chave de api','inteligencia artificial'],'Clique em ⚙ no chat. O padrão é a <b>Pollinations</b>, grátis e sem chave. Para respostas melhores, cole uma chave grátis do <b>Gemini</b> (aistudio.google.com) ou da <b>Groq</b> (console.groq.com). Sem internet, eu respondo pelo manual.']
+].forEach(([id,title,kws,a,go])=>{if(K.some(x=>x.id===id))return;const e={id,title,kws,a,...(go&&go.tab?{go:[go]}:{})};e.nk=kws.map(normP);e.nt=normP(title).split(' ').filter(w=>!STOP.has(w)&&w.length>2);K.push(e)});
+
+
+/* ===================================================================
+   TULPA · ETAPA 5 — som, efeitos de rolagem, foto de perfil e Perseus narrador
+   =================================================================== */
+
+/* ---------- motor de som (um único AudioContext, com reverberação leve) ---------- */
+const A5={ctx:null,out:null,wet:null,last:{}};
+if(prefs.sound===undefined)prefs.sound='on';
+const vol5=()=>prefs.sound==='off'?0:prefs.sound==='low'?.4:1;
+function actx(){
+  if(A5.ctx){if(A5.ctx.state==='suspended')A5.ctx.resume().catch(()=>{});return A5.ctx}
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;
+  const c=A5.ctx=new AC();A5.out=c.createGain();A5.out.gain.value=.9;
+  const comp=c.createDynamicsCompressor();A5.out.connect(comp);comp.connect(c.destination);
+  const len=Math.floor(c.sampleRate*1.4),buf=c.createBuffer(2,len,c.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}
+  const cv=c.createConvolver();cv.buffer=buf;A5.wet=c.createGain();A5.wet.gain.value=.22;A5.wet.connect(cv);cv.connect(A5.out);
+  if(c.state==='suspended')c.resume().catch(()=>{});
+  return c;
+}
+function env5(g,t,a,d,peak){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,peak),t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d)}
+function send5(g,wet){g.connect(A5.out);if(wet){const w=A5.ctx.createGain();w.gain.value=wet;g.connect(w);w.connect(A5.wet)}}
+function o5(type,f,t,dur,{to,gain=.08,attack=.008,wet=.5,detune=0}={}){
+  const c=A5.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur);o.detune.value=detune;
+  env5(g,t,attack,dur,gain*vol5());o.connect(g);send5(g,wet);o.start(t);o.stop(t+attack+dur+.05);
+}
+function n5(t,dur,{freq=2000,q=1,type='bandpass',gain=.1,to,wet=.2}={}){
+  const c=A5.ctx,len=Math.max(1,Math.floor(c.sampleRate*(dur+.02))),b=c.createBuffer(1,len,c.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+  const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=type;f.frequency.setValueAtTime(freq,t);
+  if(to)f.frequency.exponentialRampToValueAtTime(to,t+dur);f.Q.value=q;
+  const g=c.createGain();env5(g,t,.004,dur,gain*vol5());s.connect(f);f.connect(g);send5(g,wet);s.start(t);s.stop(t+dur+.05);
+}
+const S5={
+  click:t=>o5('sine',900,t,.05,{to:620,gain:.05,wet:.1}),
+  confirm:t=>{o5('triangle',659,t,.12,{gain:.06});o5('triangle',988,t+.09,.2,{gain:.06})},
+  error:t=>{o5('sawtooth',196,t,.18,{to:130,gain:.05,wet:.2});n5(t,.12,{freq:300,type:'lowpass',gain:.08})},
+  dice:t=>{const k=5+Math.floor(Math.random()*3);for(let i=0;i<k;i++){const tt=t+Math.pow(i/k,1.4)*.42+Math.random()*.02;n5(tt,.03,{freq:1800+Math.random()*2600,q:3,gain:.16-.012*i});o5('triangle',240+Math.random()*160,tt,.035,{gain:.035,wet:.15})}},
+  crit:t=>{[523,659,784,1047,1319].forEach((f,i)=>{o5('triangle',f,t+i*.07,.5,{gain:.07});o5('sine',f*2,t+i*.07,.6,{gain:.025,detune:8})});n5(t+.3,.6,{freq:7000,q:.7,type:'highpass',gain:.03,wet:.6})},
+  fumble:t=>{o5('sawtooth',330,t,.5,{to:82,gain:.06,wet:.3});o5('sine',233,t+.02,.5,{to:60,gain:.06});n5(t+.42,.2,{freq:180,type:'lowpass',gain:.2})},
+  hit:t=>{n5(t,.14,{freq:520,type:'lowpass',gain:.3});o5('sine',140,t,.2,{to:48,gain:.22,wet:.2})},
+  violent:t=>{S5.hit(t);n5(t+.03,.09,{freq:3200,q:2,gain:.14});o5('sine',90,t+.05,.4,{to:36,gain:.25})},
+  dodge:t=>n5(t,.28,{freq:500,to:3200,q:1.4,gain:.12,wet:.4}),
+  block:t=>{n5(t,.06,{freq:2400,q:5,gain:.2});o5('triangle',310,t,.18,{gain:.08});o5('triangle',467,t,.22,{gain:.05})},
+  heal:t=>{o5('sine',523,t,.5,{to:1047,gain:.06});[1319,1568,2093].forEach((f,i)=>o5('sine',f,t+.2+i*.08,.3,{gain:.03}))},
+  turn:t=>{o5('sine',784,t,.4,{gain:.06});o5('sine',1175,t+.14,.5,{gain:.05})},
+  round:t=>[110,165,220,331].forEach((f,i)=>o5('sine',f,t,1.6-i*.2,{gain:.09-.015*i,attack:.02,wet:.8})),
+  start:t=>{n5(t,.5,{freq:200,to:1400,q:.8,gain:.08});[147,220,294].forEach((f,i)=>o5('sawtooth',f,t+.1+i*.12,.5,{gain:.04,wet:.6}))},
+  activate:t=>[440,660,880].forEach((f,i)=>o5('triangle',f,t+i*.08,.26,{gain:.06})),
+  learn:t=>[523,659,784,1047].forEach((f,i)=>o5('sine',f,t+i*.1,.34,{gain:.06})),
+  dying:t=>[0,.28,.9,1.18].forEach((d,i)=>o5('sine',70,t+d,.16,{to:45,gain:i%2?.2:.28,wet:.1})),
+  dead:t=>[98,196,247,294].forEach((f,i)=>o5('sine',f,t,2.4,{gain:.1-.02*i,attack:.01,wet:.9})),
+  collapse:t=>{n5(t,.9,{freq:300,to:5000,q:.6,gain:.1,wet:.6});o5('sawtooth',220,t,.9,{to:233,gain:.04});o5('sawtooth',311,t,.9,{to:294,gain:.04})},
+  meow:t=>o5('sine',620,t,.16,{to:980,gain:.03,wet:.2}),
+};
+const CAST5={Natureza:[150,220,330,440],Inexistência:[90,140,210,300],Ilusão:[660,520,780,1040],Verdade:[440,660,880,990],Fé:[330,495,660,990],Sol:[330,440,495,660,990],Desrealização:[150,140,220,210,300],Apofenia:[90,520,210,780,1040],Confabulação:[660,440,780,880,1040],Metáfora:[440,330,660,495,990]};
+function fx5(kind='click',element=''){
+  try{
+    if(!vol5())return;const c=actx();if(!c)return;
+    const now=performance.now();if(now-(A5.last[kind]||0)<90)return;A5.last[kind]=now;
+    const t=c.currentTime+.01;
+    if(kind==='cast'){(CAST5[element]||CAST5['Fé']).forEach((f,i)=>o5(i%2?'triangle':'sine',f,t+i*.12,.34,{gain:.06,wet:.7}));return}
+    (S5[kind]||S5.click)(t);
+  }catch(e){}
+}
+window.tulpaFx5=fx5;window.tulpaFx=fx5;T3.fx=fx5;T3._a5=A5;T3._s5=S5;
+
+/* ---------- foto de perfil ---------- */
+const AV_C=['#8e3e34','#7a5a2b','#3f6f6a','#4a4f86','#6d3f6b','#44566b'];
+const avOk=a=>typeof a==='string'&&a.length<90000&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(a);
+function av5(d,cls=''){
+  const n=String(d?.name||'?').trim()||'?',ini=(n.split(/\s+/).filter(w=>/[\p{L}\p{N}]/u.test(w)).slice(0,2).map(w=>[...w][0]).join('')||'?').toUpperCase();
+  let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))>>>0;
+  const st=stIds(d||{}),mx=STAGES[d?.stage]||STAGES[1],low=(Number(d?.vital)||0)<=mx.vt/3;
+  const state=st.includes('morto')||st.includes('agonia')?'down':low?'low':'';
+  return `<span class="av ${cls} ${state}" style="--avc:${AV_C[h%AV_C.length]}">${avOk(d?.avatar)?`<img src="${d.avatar}" alt="">`:`<b>${esc(ini)}</b>`}</span>`;
+}
+T3.avatar=av5;T3._avLoad=avLoad;
+function charByName(name){
+  const n=String(name||'').trim();if(!n)return null;
+  const c=chars3().find(x=>nm(x)===n);if(c)return c.data;
+  return data&&data.name===n?data:null;
+}
+async function avLoad(file){
+  if(!file)return;
+  if(!/^image\//.test(file.type)){toast('Escolha um arquivo de imagem (JPG, PNG ou WEBP).');return}
+  if(file.size>20e6){toast('Essa imagem é grande demais (máximo de 20 MB).');return}
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>no(new Error('imagem inválida'));i.src=url});
+    const S=192,cv=document.createElement('canvas');cv.width=cv.height=S;
+    const w=img.naturalWidth,h=img.naturalHeight,m=Math.min(w,h),x=cv.getContext('2d');
+    x.fillStyle='#2b211b';x.fillRect(0,0,S,S);
+    x.imageSmoothingQuality='high';x.drawImage(img,(w-m)/2,(h-m)*.3,m,m,0,0,S,S);
+    let q=.86,out=cv.toDataURL('image/jpeg',q);
+    while(out.length>30000&&q>.4){q-=.08;out=cv.toDataURL('image/jpeg',q)}
+    if(!avOk(out))throw new Error('não consegui converter a imagem');
+    data.avatar=out;save();fx5('confirm');toast('Foto do personagem atualizada.');
+  }catch(e){toast('Não consegui usar essa imagem: '+(e.message||'erro')+'.')}
+  finally{URL.revokeObjectURL(url)}
+}
+function avEditor(){
+  const p=$q('#tab-overview .panel');if(!p)return;
+  let w=$('avEdit');
+  if(!w){
+    w=document.createElement('div');w.id='avEdit';w.className='av-edit';
+    w.innerHTML=`<button type="button" class="av-btn" id="avBtn" aria-label="Trocar a foto do personagem"></button><div class="av-txt"><b>Foto do personagem</b><span class="sub">Aparece na ficha, na Visão de Mesa e nas rolagens. Vale para personagens, NPCs e chefes.</span><div class="inline"><button type="button" class="btn small" id="avPick">Escolher foto</button><button type="button" class="btn small" id="avDel">Remover</button></div></div><input type="file" id="avFile" accept="image/*" hidden>`;
+    (p.querySelector('.panel-head')||p.firstElementChild).after(w);
+    const pick=()=>$('avFile').click();
+    $('avBtn').onclick=pick;$('avPick').onclick=pick;
+    $('avFile').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';avLoad(f)};
+    $('avDel').onclick=()=>{if(!data.avatar)return;delete data.avatar;save();toast('Foto removida.')};
+  }
+  $('avBtn').innerHTML=av5(data,'xl');$('avDel').style.display=data.avatar?'':'none';
+}
+{const _r5=render;render=function(){_r5.apply(this,arguments);try{avEditor()}catch(e){console.warn('[T5] foto',e)}}}
+
+/* ---------- Visão de Mesa: fotos, barras animadas e marcas de dano/cura ---------- */
+const T5={prev:{},turnKey:null,seenRolls:new Set()};
+function floatNum(host,txt,cls){const f=document.createElement('span');f.className='float5 '+cls;f.textContent=txt;host.appendChild(f);setTimeout(()=>f.remove(),1100)}
+function decorateTable(){
+  const c=camp3();if(!c)return;
+  const hidden=ch=>!!ch.data?.hideStats&&role3()!=='master'&&ch.ownerId!==uid3();
+  $$('#tableCharacters .table-char').forEach(card=>{
+    const ch=charById(card.dataset.cid);if(!ch)return;const d=ch.data||{};
+    if(!card.querySelector('.tc-head')){
+      const h3=card.querySelector('h3'),own=card.querySelector('.owner'),eye=card.querySelector('.scene-eye');
+      if(h3){const head=document.createElement('div');head.className='tc-head';const id=document.createElement('div');id.className='tc-id';
+        h3.before(head);head.insertAdjacentHTML('beforeend',av5(d,'lg'));id.append(h3);if(own)id.append(own);head.append(id);if(eye)head.append(eye)}
+    }
+    if(hidden(ch))return;
+    const mx=STAGES[d.stage]||STAGES[1],cur={vital:[Number(d.vital)||0,mx.vt],lucidity:[Number(d.lucidity)||0,mx.luc],essence:[Number(d.essence)||0,mx.es]};
+    const old=T5.prev[ch.id];
+    if(old){
+      const bars=$$('.resource-bar',card);
+      [['vital','vt'],['lucidity','luc'],['essence','es']].forEach(([k,cls])=>{
+        const delta=cur[k][0]-old[k][0];if(!delta)return;
+        const bar=bars.find(b=>b.classList.contains(cls)),sp=bar&&bar.querySelector('span');
+        if(sp&&!reduce5()){const to=sp.style.width;sp.style.transition='none';sp.style.width=(old[k][1]?Math.max(0,Math.min(100,old[k][0]/old[k][1]*100)):0)+'%';void sp.offsetWidth;sp.style.transition='';sp.style.width=to}
+        if(bar)floatNum(bar.parentElement,(delta>0?'+':'−')+Math.abs(delta),delta>0?'up':'down');
+        if(k==='vital'){card.classList.remove('fx-hit','fx-heal');void card.offsetWidth;card.classList.add(delta<0?'fx-hit':'fx-heal');setTimeout(()=>card.classList.remove('fx-hit','fx-heal'),700)}
+      });
+    }
+    T5.prev[ch.id]=cur;
+  });
+  /* fotos na ordem de combate */
+  const cm=c.combat,order=cm?.order||[];
+  $$('#roundRoster .combatant').forEach((el,i)=>{if(el.querySelector('.av'))return;const ch=charById(order[i]?.characterId);if(ch){el.insertAdjacentHTML('afterbegin',av5(ch.data,'sm'));el.classList.add('has-av')}});
+}
+{const _rt5=window.renderTable;window.renderTable=function(){_rt5.apply(this,arguments);try{decorateTable()}catch(e){console.warn('[T5] mesa',e)}}}
+{const _rc5=renderCombatUI;renderCombatUI=function(){_rc5.apply(this,arguments);try{decorateTable();watchTurn()}catch(e){console.warn('[T5] combate',e)}}}
+
+/* ---------- efeitos visuais e sonoros das rolagens ---------- */
+const reduce5=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+function sparks5(host){
+  if(reduce5())return;host.classList.add('fx-host');
+  for(let i=0;i<18;i++){const s=document.createElement('i');s.className='spark';const a=Math.random()*Math.PI*2,r=70+Math.random()*110;
+    s.style.setProperty('--dx',Math.cos(a)*r+'px');s.style.setProperty('--dy',Math.sin(a)*r+'px');s.style.animationDelay=(Math.random()*.12)+'s';host.appendChild(s);setTimeout(()=>s.remove(),1100)}
+}
+window.tulpaRollFx=function(box,{d20=false,crit,fumble,tone='',rattle=true,who=[]}={}){
+  try{
+    if(!box)return;
+    /* fotos de quem rolou */
+    const people=(who||[]).map(charByName).filter(Boolean),title=box.querySelector('.rp-title');
+    if(people.length&&title&&!box.querySelector('.rp-avs'))title.insertAdjacentHTML('beforebegin',`<div class="rp-avs">${people.map(p=>av5(p,'lg')).join(people.length>1?'<span class="rp-vs">⚔</span>':'')}</div>`);
+    const dice=$$('.die',box);
+    const first=box.querySelector('.dice'),fv=first?$$('.die',first).map(e=>Number(e.textContent)).filter(Number.isFinite):[];
+    const best=fv.length?Math.max(...fv):0;
+    const isCrit=crit!==undefined?!!crit:(d20&&best===20),isFum=fumble!==undefined?!!fumble:(d20&&fv.length>0&&best===1);
+    const vals=dice.map(e=>e.textContent);
+    box.classList.remove('fx-crit','fx-fumble','fx-settled','fx-rolling');
+    if(rattle&&dice.length)fx5('dice');
+    const fin=()=>{
+      dice.forEach((e,i)=>{e.textContent=vals[i]});box.classList.remove('fx-rolling');box.classList.add('fx-settled');
+      if(isCrit){box.classList.add('fx-crit');sparks5(box.querySelector('.bigresult')||box);fx5('crit')}
+      else if(isFum){box.classList.add('fx-fumble');fx5('fumble')}
+      else if(tone)fx5(tone);else if(!dice.length)fx5('confirm');
+    };
+    if(reduce5()||!dice.length){fin();return}
+    box.classList.add('fx-rolling');
+    let n=0;const iv=setInterval(()=>{dice.forEach((e,i)=>{const mxv=Math.max(Number(vals[i])||1,d20||/best|discard/.test(e.className)?20:6);e.textContent=1+Math.floor(Math.random()*mxv)});if(++n>=7){clearInterval(iv);fin()}},62);
+  }catch(e){console.warn('[T5] efeito de rolagem',e)}
+};
+
+/* ---------- Perseus narrador: comenta a sessão com o nome de quem jogou ---------- */
+const NAR={
+  nat20:['<b>{n}</b> tirou <b>20 natural</b> em {s}! Guardem essa data, vai virar feriado.','VINTE em {s}! <b>{n}</b>, de onde saiu isso? Eu vi o seu histórico.','<b>{n}</b> acabou de gastar a sorte do mês inteiro em {s}. Valeu a pena.','20 natural! <b>{n}</b>, eu quase aplaudi. Não tenho polegar, mas a intenção conta.','<b>{n}</b> rolou 20 em {s}. O dado está pedindo desculpas pelas outras vezes.','Alguém anota: <b>{n}</b>, {s}, 20 natural. Vai precisar de testemunha depois.'],
+  nat1:['<b>{n}</b> tirou <b>1</b> em {s}. O dado olhou pra ficha e disse “não”.','Um 1 em {s}. <b>{n}</b>, isso não foi uma rolagem, foi um pedido de socorro.','<b>{n}</b> conseguiu errar {s} de um jeito que nem o manual previu.','1 natural! <b>{n}</b>, eu vou fingir que não vi. (Eu vi. Todo mundo viu.)','<b>{n}</b> e o dado terminaram o relacionamento agora, em {s}.','Silêncio na mesa. <b>{n}</b> tirou 1 em {s} e eu preciso respeitar o luto.'],
+  high:['<b>{n}</b> fez <b>{x}</b> em {s}. Competência é sempre uma surpresa agradável.','{x} em {s}! <b>{n}</b> veio trabalhar hoje.','<b>{n}</b> mandou {x} em {s}. Mestre, pode chorar no banho.','Olha só, <b>{n}</b> com {x} em {s}. Tem gente que lê a ficha, afinal.'],
+  low:['<b>{n}</b> fez {x} em {s}. Foi uma tentativa. Tecnicamente.','{x} em {s}. <b>{n}</b>, o importante é participar.','<b>{n}</b> tirou {x} em {s}. Eu, que sou um gato, faria melhor dormindo.','{x}. <b>{n}</b>, a gente finge que era um teste de humildade.'],
+  mid:['<b>{n}</b> rolou {s}: {x}. Nem herói nem vergonha. Um dia comum de trabalho.','{s} de <b>{n}</b> deu {x}. O Mestre que decida se isso basta.','<b>{n}</b>, {x} em {s}. Estou anotando tudo, só para constar.'],
+  hit:['<b>{a}</b> acertou <b>{t}</b> com {w}: <b>{x} de dano</b>. Isso vai doer amanhã.','{x} de dano em <b>{t}</b>. <b>{a}</b> não veio fazer amigos.','<b>{a}</b> acerta <b>{t}</b>! {x} de dano. Alguém tem gelo?','<b>{t}</b> levou {x} de <b>{a}</b>. Eu senti daqui, e eu nem tenho ficha.'],
+  violent:['<b>ACERTO VIOLENTO!</b> <b>{a}</b> amassou <b>{t}</b>: {x} de dano e ainda ganha outra ação.','<b>{a}</b> pegou <b>{t}</b> desprevenido. {x} de dano. Feio de ver, lindo de narrar.','<b>{t}</b> nem viu de onde veio. <b>{a}</b>, {x} de dano e direito a bis.'],
+  crit:['<b>CRÍTICO!</b> <b>{a}</b> em <b>{t}</b>: {x} de dano. Alguém recolhe os dentes.','<b>{a}</b> critou em <b>{t}</b>! {x} de dano. Isso não foi um ataque, foi um recado.','CRÍTICO de <b>{a}</b>! <b>{t}</b>, sinto muito. Na verdade não, foi lindo.'],
+  dodge:['<b>{t}</b> desviou de <b>{a}</b>. Elegante. Quase felino.','<b>{a}</b> atacou o ar. O ar está bem, obrigado. <b>{t}</b> também.','<b>{t}</b> saiu da frente e <b>{a}</b> acertou o vazio com muita convicção.','Errou! <b>{a}</b>, o alvo era <b>{t}</b>, não a parede.'],
+  block:['A proteção de <b>{t}</b> segurou o golpe de <b>{a}</b>. Dinheiro bem gasto.','<b>{a}</b> bateu, a defesa de <b>{t}</b> respondeu “hoje não”.','<b>{t}</b> aguentou firme. <b>{a}</b>, tenta bater com mais vontade.'],
+  retal:['<b>RETALIAÇÃO!</b> <b>{t}</b> desviou com folga e vai devolver. <b>{a}</b>, eu começaria a rezar.','<b>{t}</b> esquivou e ganhou uma ação extra. <b>{a}</b> acabou de armar o próprio problema.','<b>{a}</b> errou feio e <b>{t}</b> agradece a oportunidade.'],
+  dying:['<b>{t}</b> caiu e está <b>Morrendo</b>! Três turnos, pessoal. Alguém tem uma atadura?','<b>{t}</b> no chão. Sutura Bruta existe, e este seria um ótimo momento para lembrar dela.','<b>{t}</b> está Morrendo. Não é hora de saquear o inimigo, é hora de salvar o colega.'],
+  dead:['<b>{t}</b> morreu. Um minuto de silêncio. Eu tiro a gravata em respeito. (Não tiro, mas penso nisso.)','Descanse em paz, <b>{t}</b>. Foi uma ficha muito bonita.','<b>{t}</b> não resistiu. Alguém avisa a família. E o Mestre, que parece feliz demais.'],
+  turn:['Vez de <b>{n}</b>. Sem pressão. (Com pressão.)','<b>{n}</b>, o palco é seu. Tenta não cair dele.','Agora é <b>{n}</b>. Estou assistindo, e eu julgo.','<b>{n}</b> na vez. Um talento de graça e uma ação. Usa com sabedoria.','Vai, <b>{n}</b>. A mesa inteira finge que não está torcendo contra.'],
+  round:['<b>Rodada {x}</b>. Todo mundo ainda vivo? Não respondam, eu estou contando.','Começa a rodada {x}. Os efeitos por rodada acabaram de andar.','Rodada {x}. O Mestre sorriu. Eu não gostei.'],
+  init:['<b>{n}</b> age primeiro. Reflexo de gato. Quase.','A ordem saiu, e <b>{n}</b> puxa a fila. Sem desculpas agora.','<b>{n}</b> ganhou a iniciativa. Os outros que esperem sentados.'],
+  start:['Combate começou! Eu fico aqui em cima, onde é seguro.','Protocolo de Confronto. Guardem os lanches e rolem Reflexo.'],
+};
+const NAR_PRI={dead:5,dying:5,crit:4,nat20:4,nat1:4,violent:3,retal:3,init:3,start:3,hit:2,dodge:2,block:2,round:2,high:1,low:1,turn:1,mid:0};
+const NAR_MOOD={nat20:'hype',crit:'hype',violent:'hype',high:'hype',nat1:'sad',dead:'sad',dying:'sad',low:'sad'};
+T5.lastLine={};
+function narrate(kind,ctx={}){
+  try{
+    if(!prefs.perseus||!prefs.perseusReacts||!NAR[kind])return false;
+    const pri=NAR_PRI[kind]||0,now=Date.now();
+    if(now-(T5.narAt||0)<3200&&pri<=(T5.narPri||0))return false;
+    let pool=NAR[kind].filter(l=>l!==T5.lastLine[kind]);if(!pool.length)pool=NAR[kind];
+    const line=rnd(pool);T5.lastLine[kind]=line;
+    const html=line.replace(/\{(\w+)\}/g,(m,k)=>esc(ctx[k]??'')).replace(/\s+com \./,'.').replace(/ com :/,':');
+    T5.narAt=now;T5.narPri=pri;setTimeout(()=>{if(T5.narAt===now)T5.narPri=0},3200);
+    PS.lastReact=now;mood(NAR_MOOD[kind]||'smug');
+    if(PS.open)addMsg('p','🎙 '+html,false);else say(html,pri>=4?7000:5200);
+    if(pri>=3)fx5('meow');
+    return true;
+  }catch(e){return false}
+}
+T3.narrate=narrate;
+/* rolagem de perícia (da ficha, da mesa ou de outro jogador) */
+function narrateRoll(o){
+  try{
+    const name=o.name||o.character_name,skill=o.skill,dice=(o.dice||[]).map(Number),total=Number(o.total)||0;
+    if(!name||!skill||!dice.length)return;
+    if(o.sides&&o.sides!==20)return;
+    if(o.id){if(T5.seenRolls.has(o.id))return;T5.seenRolls.add(o.id)}
+    if(o.created_at&&Date.now()-Date.parse(o.created_at)>25000)return;
+    const key=name+'|'+skill+'|'+total,now=Date.now();if(T5.rollKey===key&&now-(T5.rollAt||0)<5000)return;T5.rollKey=key;T5.rollAt=now;
+    const best=Math.max(...dice),ctx={n:name,s:skill,x:total};
+    if(best===20)return narrate('nat20',ctx);
+    if(best===1)return narrate('nat1',ctx);
+    if(total>=22)return narrate('high',ctx);
+    if(total<=6)return narrate('low',ctx);
+    if(Math.random()<.4)narrate('mid',ctx);
+  }catch(e){}
+}
+T3.narrateRoll=narrateRoll;window.tulpaNarrateRoll=narrateRoll;
+/* resultado de um confronto */
+function narrateRes(dt){
+  try{
+    const ctx={a:dt.attackerName,t:dt.targetName,w:dt.weapon||'o que tinha na mão',x:dt.dmg?.final??0},st=dt.statuses||[];
+    if(st.includes('morto')){fx5('dead');return narrate('dead',ctx)}
+    if(st.includes('agonia')){fx5('dying');return narrate('dying',ctx)}
+    if(dt.crit&&dt.hit)return narrate('crit',ctx);
+    const k={violento:'violent',normal:'hit',esquiva:'dodge',defesa:'block',retaliacao:'retal'}[dt.outcome];
+    if(k)narrate(k,ctx);
+  }catch(e){}
+}
+T3.narrateRes=narrateRes;
+/* troca de turno e de rodada */
+function watchTurn(){
+  const cm=camp3()?.combat;
+  if(!cm?.active||cm.phase!=='active'){if(T5.turnKey&&T5.turnKey!=='off'){T5.turnKey='off'}return}
+  const cur=curEntry();if(!cur)return;
+  const key=cm.round+':'+cur.characterId,first=T5.turnKey===null||T5.turnKey==='off',prevRound=T5.round;
+  if(key===T5.turnKey)return;T5.turnKey=key;T5.round=cm.round;
+  if(first)return;
+  const ch=charById(cur.characterId);if(!ch||isDyingCh(ch)||stIds(ch.data).includes('morto'))return;
+  if(prevRound&&cm.round>prevRound){fx5('round');if(narrate('round',{x:cm.round}))return}
+  else fx5('turn');
+  narrate('turn',{n:nm(ch)});
+}
+
+/* o Perseus sabe explicar as novidades */
+[
+ ['foto-perfil','Foto de perfil do personagem',['foto','foto de perfil','avatar','imagem do personagem','retrato','fotinha','trocar foto'],'Na ficha, em <b>Visão geral › Identificação do agente</b>, clique em <b>Escolher foto</b>. Eu recorto e reduzo a imagem sozinho. A foto aparece na ficha, nos cards da <b>Visão de Mesa</b>, na ordem de combate e nas rolagens. Vale para personagens, NPCs e chefes. Sem foto, fica um monograma com as iniciais.',{tab:'overview',sel:'#avEdit'}],
+ ['sons','Sons e efeitos',['som','sons','efeitos sonoros','volume','mudo','silenciar','barulho'],'Os sons de dado, acerto, crítico, turno e ritual podem ficar <b>ligados, baixos ou desligados</b> em <b>⚙ Aparência › Sons</b>. As animações respeitam a opção “reduzir movimento” do seu aparelho.'],
+ ['narrador','Perseus narrando a sessão',['narrar','narrador','comentar','comentarios','comenta as rolagens','parar de comentar'],'Eu comento as rolagens e o combate com o nome de quem jogou: 20 natural, 1 natural, acertos, esquivas, críticos, quem caiu e de quem é a vez. Para me calar (que grosseria), clique em ⚙ no meu chat e desmarque <b>Comentar rolagens e acontecimentos</b>.'],
 ].forEach(([id,title,kws,a,go])=>{if(K.some(x=>x.id===id))return;const e={id,title,kws,a,...(go&&go.tab?{go:[go]}:{})};e.nk=kws.map(normP);e.nt=normP(title).split(' ').filter(w=>!STOP.has(w)&&w.length>2);K.push(e)});
 
 window.tulpaPubSummary=pubSummary;
