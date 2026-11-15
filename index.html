@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="15/11 12:22">
+<meta name="tulpa-build" content="15/11 14:52">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -561,8 +561,10 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
    participants:(Array.isArray(state?.participants)?state.participants:[]).map(x=>({characterId:String(x.characterId||''),name:String(x.name||'Participante'),rolled:!!x.rolled})).filter(x=>x.characterId),
    order:(Array.isArray(state?.order)?state.order:[]).map(x=>({characterId:String(x.characterId||''),name:String(x.name||'Participante'),done:!!x.done})).filter(x=>x.characterId)
  });
- function openCombatView(){
+ /* a mesa de combate abre sozinha UMA vez por combate. Antes ela era reaberta a cada atualização em tempo real e tirava o jogador da ficha enquanto ele editava */
+ function openCombatView(force){
    if(role()!=='player')return;
+   {const cc=currentCampaign();if(cc?.combat?.active&&!force){if(window.__cbOpened===cc.id)return;window.__cbOpened=cc.id}else if(cc&&!cc.combat?.active)window.__cbOpened=''}
    if(activeCharacterId&&typeof syncActiveCharacter==='function')syncActiveCharacter();
    document.body.classList.add('app-locked');$id('portal').classList.remove('hide');$id('portal').style.display='block';$id('portal').setAttribute('aria-hidden','false');
    $id('portalDashboard').classList.add('hide');$id('campaignHub').classList.remove('hide');$id('charactersPanel').classList.add('hide');$id('tablePanel').classList.remove('hide');
@@ -571,7 +573,7 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
  async function loadCombatState(campaignId){
    const {data,error}=await sb.from('campaign_runtime').select('combat_state').eq('campaign_id',campaignId).maybeSingle();
    if(error)throw error;
-   const c=currentCampaign();if(c?.id===campaignId)c.combat=cleanCombatState(data?.combat_state||{});
+   const c=currentCampaign();if(c?.id===campaignId){c.combat=cleanCombatState(data?.combat_state||{});if(!c.combat.active&&window.__cbOpened===c.id)window.__cbOpened=''}
  }
  async function fetchCombatRolls(campaignId){
    const {data,error}=await sb.from('campaign_reflex_rolls').select('character_id,roller_id,dice,bonus,total,created_at').eq('campaign_id',campaignId);
@@ -663,9 +665,13 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
    const sheetMap=new Map(sheets.map(x=>[x.character_id,x]));
    const c=currentCampaign();
    if(!c||c.id!==campaignId)return;
+   const prevChars=c.characters||[];
    c.characters=(rows||[]).map(r=>{
      const sh=sheetMap.get(r.id);
      const summary=r.public_data||{};
+     /* ficha mexida há poucos segundos neste aparelho: o banco ainda pode estar com a cópia anterior, então vale a cópia local */
+     const keep=prevChars.find(x=>x.id===r.id&&x._sheetAvailable&&window.__dirty&&Date.now()-(window.__dirty[r.id]||0)<6000);
+     if(keep)return{...keep,ownerId:r.owner_id,ownerLabel:(!r.owner_id||r.owner_id===c.createdBy)?'Mestre':r.owner_label,inScene:r.in_scene};
      const characterData=sh?.sheet_data?{...blank(),...sh.sheet_data}:{...blank(),...summary};
      normalizeAgeAndService(characterData);
      return {
@@ -686,6 +692,7 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
    if(role()==='player'&&c.combat?.active)openCombatView();
  }
  async function cloudOpenCampaign(id){
+   window.__cbOpened='';
    portalCampaignId=id;
    updateCampaignBadge();
    const c=portalStore.campaigns.find(x=>x.id===id);
@@ -785,12 +792,16 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
    }catch(e){fail('criar personagem',e)}
    finally{if(button)button.disabled=false}
  }
+ /* ids das fichas que este aparelho acabou de gravar: o eco do próprio salvamento não refaz a tela */
+ const OWN_WRITE_AT={};
  function persistCloudCharacter(){
    saveTimer=null; /* nada pendente: a gravação começou */
+   window.__sheetBusy=Date.now()+8000; /* até a gravação terminar, uma ficha que chega de fora não pode trocar a que está sendo editada */
    const ch=currentCharacter();
    if(!ch||!uid()||!window.tulpaCloudUser)return;
    const snapshot={id:ch.id,campaignId:portalCampaignId,ownerId:ch.ownerId,data:clone(data),vocations:clone(vocations),tracks:clone(tracks)};
    saveQueue=saveQueue.then(async()=>{
+     OWN_WRITE_AT[snapshot.id]=Date.now();(window.__dirty=window.__dirty||{})[snapshot.id]=Date.now();
      const {error:ce}=await sb.from('characters').update({
        public_data:publicSummary(snapshot.data),updated_at:new Date().toISOString()
      }).eq('id',snapshot.id);
@@ -801,9 +812,11 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
        updated_by:uid(),updated_at:new Date().toISOString()
      },{onConflict:'character_id'});
      if(se)throw se;
+     window.__sheetBusy=Date.now()+1500;
      setCloudBadge('Salvo na nuvem');
      setSheetSaveStatus('Salvo na nuvem · '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
    }).catch(e=>{
+     window.__sheetBusy=0;
      setCloudBadge('Falha ao salvar');
      setSheetSaveStatus('Erro ao salvar na nuvem');
      fail('salvar ficha',e);
@@ -834,12 +847,13 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
  function subscribeCampaign(id){
    if(realtimeChannel)sb.removeChannel(realtimeChannel);
    realtimeChannel=sb.channel('tulpa-campaign-'+id)
-     .on('postgres_changes',{event:'*',schema:'public',table:'characters',filter:'campaign_id=eq.'+id},async()=>{if(!cloudLoading)try{await loadCampaignCharacters(id)}catch(e){console.error(e)}})
+     .on('postgres_changes',{event:'*',schema:'public',table:'characters',filter:'campaign_id=eq.'+id},async payload=>{if(payload?.new?.id&&Date.now()-(OWN_WRITE_AT[payload.new.id]||0)<3000)return;if(!cloudLoading)try{await loadCampaignCharacters(id)}catch(e){console.error(e)}})
      .on('postgres_changes',{event:'*',schema:'public',table:'campaign_runtime',filter:'campaign_id=eq.'+id},async payload=>{
        const c=currentCampaign();if(!c||c.id!==id)return;
        const nextState=cleanCombatState(payload.new?.combat_state||{}),previousRound=Number(c.combat?.round)||0;
        if(role()==='master'&&nextState.active&&nextState.round>previousRound)window.tulpaExpireRoundEffects?.();
        c.combat=nextState;
+       if(!c.combat.active&&window.__cbOpened===c.id)window.__cbOpened='';
        if(c.combat.active&&role()==='player')openCombatView();
        renderTable();
      })
@@ -853,7 +867,7 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
            await loadCampaignCharacters(id);
            if(activeCharacterId===payload.new.character_id){
              const fresh=currentCampaign()?.characters.find(c=>c.id===activeCharacterId);
-             if(fresh?._sheetAvailable){if(saveTimer!==null&&window.tulpaMergeSheet){data=window.tulpaMergeSheet(data,clone(fresh.data))}else{data={...blank(),...clone(fresh.data)};vocations=clone(fresh.vocations||vocations);tracks=clone(fresh.tracks||tracks)}render()}
+             if(fresh?._sheetAvailable){if((saveTimer!==null||Date.now()<(window.__sheetBusy||0))&&window.tulpaMergeSheet){data=window.tulpaMergeSheet(data,clone(fresh.data))}else{data={...blank(),...clone(fresh.data)};vocations=clone(fresh.vocations||vocations);tracks=clone(fresh.tracks||tracks)}render()}
            }
          }catch(e){console.error(e)}
        }
@@ -3228,8 +3242,9 @@ async function persistRemote(ch){
 }
 function mutateChar(ch,fn){
   if(!ch)return;
+  (window.__dirty=window.__dirty||{})[ch.id]=Date.now();
   if(ch.id===activeCharacterId){fn(data);save()}
-  else{fn(ch.data);persistRemote(ch).catch(e=>{console.error(e);toast('Falha ao salvar '+(ch.data?.name||'personagem'))})}
+  else{fn(ch.data);persistRemote(ch).then(()=>{window.__dirty[ch.id]=Date.now()}).catch(e=>{console.error(e);toast('Falha ao salvar '+(ch.data?.name||'personagem'))})}
   try{if(!$('tablePanel').classList.contains('hide'))renderTable()}catch(e){}
 }
 const controls=ch=>!!ch&&(role3()==='master'?(!ch.ownerId||ch.ownerId===uid3()):ch.ownerId===uid3());
@@ -3998,7 +4013,7 @@ function processRow(row,live=true){
     if(live)T3.narrateRes?.(dt);
     if(live&&(dt.statuses||[]).includes('agonia'))toast('☠ '+dt.targetName+' está Morrendo! Sutura Bruta ou Síntese Cirúrgica podem salvá-lo.');
     if(live&&(dt.statuses||[]).includes('morto'))toast('☠ '+dt.targetName+' morreu.');
-    if(live){queuePopup(dt);const att=charById(dt.attackerId);if(att&&controls(att)){if(dt.extraAtk&&TURN.actor===att.id){const dd=att.id===activeCharacterId?data:att.data;if(dd.violentKey!==TURN.key){mutateChar(att,d=>{d.violentKey=TURN.key;d.combatExtra=Math.min(1,(Number(d.combatExtra)||0)+1)});toast('⚔ Acerto Violento: +1 Ação Padrão neste turno (só uma vez por turno).')}}}}
+    if(live){queuePopup(dt);const att=charById(dt.attackerId);if(att&&controls(att)){if(dt.extraAtk&&TURN.actor===att.id){const dd=att.id===activeCharacterId?data:att.data;if(dd.violentKey!==TURN.key&&dd.violentRow!==row.id&&!TURN.violentGiven){TURN.violentGiven=true;mutateChar(att,d=>{d.violentKey=TURN.key;d.violentRow=row.id;d.combatExtra=1});toast('⚔ Acerto Violento: +1 Ação Padrão neste turno (só uma vez por turno).')}}}}
   }else if(dt.cmb==='mark'){CB.pending={};CB.log=[];CB.promptQueue=[]
   }else if(dt.cmb==='fx')onFx(row,live);
   else if(dt.cmb==='init'){if(live&&Date.now()-Date.parse(row.created_at)<60000){const top=(dt.rolls||[]).slice().sort((a,b)=>(b.total||0)-(a.total||0))[0];if(top)setTimeout(()=>T3.narrate?.('init',{n:top.name}),900)}if(live&&Date.now()-Date.parse(row.created_at)<60000)showRollPopup({eyebrow:'INICIATIVA',title:'Ordem de ação',sub:'Reflexo de cada participante',sets:(dt.rolls||[]).slice(0,14).map(x=>({label:x.name,dice:x.dice||[],bonus:(x.total||0)-Math.max(0,...(x.dice||[0])),total:x.total,hi:'max'}))})}
@@ -4227,7 +4242,7 @@ async function resolveFor(aid,tid,defRow){
     });
   }
   if(a.noDefense)res={...res,extraAtk:0};
-  if(res.extraDef){const dk=TURN.key||('r'+(camp3()?.combat?.round||0));if(dT.retalKey!==dk&&!(Number(dT.retalExtra)>0))mutateChar(ch,d=>{d.retalKey=dk;d.retalExtra=1;d.retalTarget=a.attackerId});else{res={...res,extraDef:0};out.notes.push('Retaliação já usada neste turno: sem nova ação extra.')}}
+  if(res.extraDef){const dk=TURN.key||('r'+(camp3()?.combat?.round||0));const rg=(CB.retalGiven=CB.retalGiven||{}),rk=ch.id+'|'+dk;if(dT.retalKey!==dk&&!rg[rk]&&!(Number(dT.retalExtra)>0)){rg[rk]=1;mutateChar(ch,d=>{d.retalKey=dk;d.retalExtra=1;d.retalTarget=a.attackerId})}else{res={...res,extraDef:0};out.notes.push('Retaliação já usada neste turno: sem nova ação extra.')}}
   if(cov&&canDefend)out.notes.push(`Cobertura parcial: +${cov} na defesa.`);
   const detail={cmb:'res',cover:cov,aid,targetId:tid,targetName:nm(ch),attackerId:a.attackerId,attackerName:a.attackerName,weapon:a.weapon.name,mode:dd.mode,outcome:res.outcome,label:res.label,text:res.text,hit:res.hit,crit:res.crit,ATA:res.ATA,RF:res.RF,DB:10,DF:dd.df,dmg:{final:out.final,absorbed:out.absorbed,resisted:out.resisted},statuses:stAdd,notes:out.notes,forced:!!res.forced,extraAtk:res.extraAtk,extraDef:res.extraDef,atk:atkView,react:dd.react||'',def:{skill:dd.mode==='reflexo'?'Reflexo':dd.mode==='none'?'Sem defesa':'Esquiva',dice:defRow.dice||[],bonus:defRow.bonus||0,total:defRow.total},dmgInfo};
   try{await insertRow(ch,'Resultado do confronto',{dice:[],bonus:0,total:out.final,detail})}catch(e){fail3('registrar resultado',e)}
@@ -4291,19 +4306,22 @@ function syncTurn(){
   const e=curEntry(),cm=camp3()?.combat;if(!e){TURN.key='';return}
   const key=`${cm.round}:${cm.turnIndex}:${e.characterId}`;
   if(key===TURN.key)return;
-  TURN.key=key;TURN.actor=e.characterId;TURN.actionUsed=false;TURN.talentUsed=false;TURN.summonUsed=[];
+  TURN.key=key;TURN.actor=e.characterId;TURN.actionUsed=false;TURN.talentUsed=false;TURN.summonUsed=[];TURN.extraUsed=false;TURN.violentGiven=false;
   const ch=charById(e.characterId);
   const down=ch&&(isDyingCh(ch)||isDeadCh(ch));
   if(down){TURN.actionUsed=true;if(controls(ch))toast('⏭ Turno de '+nm(ch)+' pulado ('+(isDeadCh(ch)?'Morto':'Morrendo')+').');autoSkip();return}
   if(ch&&controls(ch)&&role3()==='player'){toast('⚔ É a sua vez, '+nm(ch)+'!');try{navigator.vibrate&&navigator.vibrate([160,70,160])}catch(e){}}
   if(ch&&controls(ch)&&(ch._sheetAvailable||ch.id===activeCharacterId))setTimeout(()=>{processTurnStart(ch);renderCombatUI()},200);
 }
-const actionsLeft=ch=>{const isTurn=TURN.actor===ch.id;return(isTurn&&!TURN.actionUsed?1:0)+(Number((ch.id===activeCharacterId?data:ch.data).combatExtra)||0)};
 const retalOf=ch=>Number((ch.id===activeCharacterId?data:ch.data).retalExtra)||0;
+/* quem não tem a vez só age com a Retaliação (a ação extra de defesa) */
+const actionsLeft=ch=>{const isTurn=TURN.actor===ch.id;return(isTurn&&!TURN.actionUsed?1:0)+((isTurn&&TURN.extraUsed)?0:Math.min(1,Number((ch.id===activeCharacterId?data:ch.data).combatExtra)||0))+(isTurn?0:retalOf(ch))};
 function spend(ch,kind='std'){
   if(kind==='retal'){mutateChar(ch,d=>{d.retalExtra=Math.max(0,(Number(d.retalExtra)||0)-1);if(!d.retalExtra)d.retalTarget=null});return}
   if(TURN.actor===ch.id&&!TURN.actionUsed){TURN.actionUsed=true;return}
-  mutateChar(ch,d=>{d.combatExtra=Math.max(0,(Number(d.combatExtra)||0)-1)});
+  if(TURN.actor!==ch.id&&retalOf(ch)>0){spend(ch,'retal');return}
+  if(TURN.actor===ch.id)TURN.extraUsed=true;
+  mutateChar(ch,d=>{d.combatExtra=0});
 }
 
 /* ---------- ataque ---------- */
@@ -4415,7 +4433,7 @@ function resetLeftovers(act){
   chars3().filter(c=>controls(c)&&(c._sheetAvailable||c.id===activeCharacterId)).forEach(c=>{const d=c.id===activeCharacterId?data:c.data;if((Number(d.combatExtra)||0)||(Number(d.retalExtra)||0)||d.retalTarget)mutateChar(c,x=>{x.combatExtra=0;x.retalExtra=0;x.retalTarget=null})});
 }
 function onCombatEnd(){
-  TURN.key='';TURN.actor=null;TURN.actionUsed=false;TURN.talentUsed=false;CB.pending={};CB.promptQueue=[];
+  TURN.key='';TURN.actor=null;TURN.actionUsed=false;TURN.talentUsed=false;TURN.extraUsed=false;TURN.violentGiven=false;CB.pending={};CB.promptQueue=[];
   chars3().filter(c=>controls(c)&&(c._sheetAvailable||c.id===activeCharacterId)).forEach(c=>mutateChar(c,x=>{x.statuses=(x.statuses||[]).filter(s=>!STATUS_BY_ID[s.id]?.untilTurn);x.combatExtra=0;x.retalExtra=0;x.retalTarget=null;const n=endSceneEffects(x);if(n.length)setTimeout(()=>toast(nm(c)+': '+n.join(' ')),300)}));
   if(role3()==='master'){const any=chars3()[0];if(any)insertRow(any,'Combate encerrado',{detail:{cmb:'mark',kind:'end'}}).catch(()=>{})}
 }
@@ -5208,10 +5226,12 @@ setInterval(syncMasterBtn,1500);
 {const _r4=render;render=function(){_r4();try{syncMasterBtn()}catch(e){}}}
 
 /* ---------- merge: atualização externa (Mestre) chegando com edição local pendente ---------- */
-const MERGE_REMOTE=['vital','vitalTemp','lucidity','essence','statuses','activeEffects','combatExtra','retalExtra','retalTarget','hideStats','suturaAtiva','suturaRompe','collapsePending','dying'];
+const MERGE_REMOTE=['vital','vitalTemp','lucidity','essence','statuses','activeEffects','combatExtra','violentKey','violentRow','retalExtra','retalTarget','hideStats','suturaAtiva','suturaRompe','collapsePending','dying'];
 window.tulpaMergeSheet=function(local,remote){
   const out={...blank(),...local};
   MERGE_REMOTE.forEach(k=>{if(k in remote)out[k]=remote[k];else delete out[k]});
+  /* ação extra já gasta não volta por uma cópia remota antiga */
+  if('combatExtra' in local&&'combatExtra' in remote)out.combatExtra=Math.min(Number(local.combatExtra)||0,Number(remote.combatExtra)||0);
   return out;
 };
 
@@ -5834,7 +5854,8 @@ function acceptState6(st,why='remoto'){
 /* só o Mestre altera o estado da mesa */
 function setState6(patch,{silent=false}={}){
   if(!isGM6()){console.warn('[T6] só o Mestre altera a mesa');return false}
-  M6.state={...M6.state,...patch,rev:(Number(M6.state.rev)||0)+1};
+  /* a revisão acompanha o relógio: o servidor soma +1 a cada token movido e, com um contador simples, esse +1 empatava com a edição ainda não gravada do Mestre (a troca de mapa se perdia) */
+  M6.state={...M6.state,...patch,rev:Math.max((Number(M6.state.rev)||0)+1,Date.now())};
   if(!silent)applyState6('local');
   clearTimeout(M6.saveTimer);M6.saveTimer=setTimeout(flushState6,220);
   return true;
@@ -7092,7 +7113,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='15/11 12:22';
+const BUILD8='15/11 14:52';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -9814,7 +9835,8 @@ const AREA_TALENT_M14=6;              /* raio padrão de habilidades em área */
 
 const d14=ch=>ch?(ch.id===activeCharacterId?data:(ch.data||{})):{};
 const inCb14=()=>{const cm=camp3()?.combat;return!!(cm?.active&&cm.phase==='active')};
-const cur14=()=>{const e=curEntry();return e?charById(e.characterId):null};
+/* durante uma retaliação, quem tem a ação extra usa o mesmo painel (mover, talentos, itens…) sem tomar a vez de ninguém */
+const cur14=()=>{if(CB14.rActor&&retalOn14()){const rc=charById(CB14.rActor);if(rc)return rc}const e=curEntry();return e?charById(e.characterId):null};
 const tok14=id=>(M6.state.tokens||[]).find(t=>t.charId===id)||null;
 const mpc14=()=>mapCfg7().mpc;
 const m2px14=m=>m/mpc14()*mapCfg7().cell;
@@ -10310,7 +10332,10 @@ function bar14(){
 function hud14(force){
   if(!mount14())return;bar14();
   const h=$('cbHud');if(!h)return;
-  const a=CB14.aim,cur=cur14(),isM=isGM6(),mineAll=chars3().filter(controls);
+  const a=CB14.aim,isM=isGM6(),mineAll=chars3().filter(controls);
+  /* retaliação de um personagem meu enquanto a vez é de outro: ele age com o painel completo */
+  {const ce=curEntry(),ct=ce?charById(ce.characterId):null;const rx=(!a&&inCb14()&&retalOn14())?mineAll.find(x=>inScene(x)&&retalOf(x)>0&&(!isM||!x.ownerId)&&x!==ct):null;CB14.rActor=rx?rx.id:null}
+  const cur=cur14();
   let sig,html='';
   if(a){
     const n=a.kind==='pick'?a.sel.size:0;
@@ -10326,11 +10351,13 @@ function hud14(force){
     const myT=myTurn14()&&!(isM&&cur.ownerId&&cur.ownerId!==uid3());
     if(myT&&!isDown(cur)&&retalOn14()&&CB14.retal.cid!==cur.id){const rw=charById(CB14.retal.cid);sig='rwme|'+CB14.retal.cid;html=`<div class="cbh-aim"><span>⏸ <b>${esc(nm(rw))}</b> ganhou uma Retaliação e age agora. Sua vez continua logo depois.</span></div>`}
     else if(myT&&!isDown(cur)){
-      const d=d14(cur),m=E.computeMods(d),blocked=m.flags.has('semAgir'),left=actionsLeft(cur),extra=Number(d.combatExtra)||0,info=mvInfo14(cur),mv=mvState14(cur),mleft=Math.max(0,info.max-mv.used);
+      const d=d14(cur),m=E.computeMods(d),blocked=m.flags.has('semAgir'),left=actionsLeft(cur),extra=(TURN.extraUsed&&TURN.actor===cur.id)?0:Math.min(1,Number(d.combatExtra)||0),info=mvInfo14(cur),mv=mvState14(cur),mleft=Math.max(0,info.max-mv.used);
       const quickUsed=CB14.quick===TURN.key,st=stIds(d),inv=E.ensureInv(d),quickItems=inv.items.filter(i=>['cintura','bandoleira'].includes(i.loc)),hasAoe=E.quickWeapons(d).some(i=>aoe14(i.w)),re=retalOf(cur);
       sig=JSON.stringify(['me',cur.id,TURN.key,left,extra,fmtM14(mleft),info.max,mv.run,TURN.talentUsed,quickUsed,re,blocked,st.join(),inv.mochila,quickItems.length,hasAoe,info.canRun]);
       const pct=info.max?mleft/info.max*100:0;
-      html=`<div class="cbh-pills">
+      const ra=CB14.rActor===cur.id;
+      const raBan=ra?`<div class="cbh-aim"><span>↩ <b>${esc(nm(cur))}</b> tem a <b>Retaliação</b> (não pode ser esquivada). Pode contra-atacar ou usar outra opção; a vez de quem está jogando continua.</span><span class="cbh-btns"><button type="button" class="btn small primary" data-cbre="${cur.id}">⚔ Contra-atacar</button><button type="button" class="btn small" data-cbskip="${cur.id}">Abrir mão</button></span></div>`:'';
+      html=`${raBan}<div class="cbh-pills">
         <span class="cbp mv ${mleft<=0?'off':''}" title="${info.why?esc(info.why):'9 m por turno'}"><b><i>👣</i><span>Movimento</span></b><span class="mvbar"><s style="width:${pct.toFixed(1)}%"></s></span><em>${info.locked&&mleft<=.05?'🔒 ':''}${fmtM14(mleft)} / ${fmtM14(info.max)} m${mv.run?' · disparada':''}</em></span>
         <span class="cbp ${left>0?'':'off'}" title="Atacar, curar, conjurar, perícia, alerta, levantar, sacar da mochila"><b><i>⚔</i><span>Ação Padrão</span></b><em>${left} / ${1+extra}${extra?' (+1 violento)':''}</em></span>
         <span class="cbp free ${TURN.talentUsed?'off':''}" title="1 talento por turno sem gastar a Ação Padrão"><b><i>⚡</i><span>Talento</span></b><em>${TURN.talentUsed?'usado':'livre'}</em></span>
@@ -10347,7 +10374,7 @@ function hud14(force){
         <button type="button" class="btn small" data-cb="sut" ${blocked||left<=0?'disabled':''}><i>🩹</i><span class="l">Sutura</span><span class="s">Sutura</span></button>
         <button type="button" class="btn small" data-cb="other" ${blocked||left<=0?'disabled':''}><i>⌖</i><span class="l">Perícia</span><span class="s">Perícia</span></button>
         ${inv.mochila?'<button type="button" class="btn small" data-cb="drop" title="Ação livre: solta a mochila no chão"><i>🎒</i><span class="l">Soltar mochila</span><span class="s">Mochila</span></button>':''}
-        <button type="button" class="btn small danger" data-cb="end"><i>✔</i><span class="l">Concluir turno</span><span class="s">Passar</span></button>
+        ${ra?'':'<button type="button" class="btn small danger" data-cb="end"><i>✔</i><span class="l">Concluir turno</span><span class="s">Passar</span></button>'}
       </div>${info.max===0?`<p class="cbh-note">🚫 Sem movimento: ${esc(info.why)}.</p>`:''}${blocked?'<p class="cbh-note">🚫 Você não pode agir neste estado.</p>':''}`;
     }else{
       const reCh=mineAll.find(x=>inScene(x)&&retalOf(x)>0);const rw=retalOn14()&&!(reCh&&CB14.retal.cid===reCh.id)?charById(CB14.retal.cid):null;
@@ -10371,7 +10398,7 @@ function hud14(force){
   on('[data-cbskip]',e=>retalSkip14(e.currentTarget.dataset.cbskip));
   on('[data-cb]',e=>act14(e.currentTarget.dataset.cb));
 }
-T3.cbHud=hud14;
+T3.cbHud=hud14;T3.retalStart14=dt=>retalStart14(dt);T3.setRetal14=(id,n)=>mutateChar(charById(id),d=>{d.retalExtra=n});
 /* na tela cheia só aparece o que está dentro do mapa: janelas, rolagens e avisos vão junto e voltam depois */
 const FLOAT14=['modalWrap','t3Roll','toast','mgInv'];
 function floatHome14(){
@@ -10385,7 +10412,7 @@ function act14(k){
   const cur=cur14();if(!cur)return;
   if(k==='force'){window.tulpaAdvanceTurn?.(true,true);return}
   if(!myTurn14()){toast('Não é a sua vez.');return}
-  if(k==='atk')return startAttack(cur);
+  if(k==='atk'){if(CB14.rActor===cur.id&&retalOf(cur)>0)return startAttack(cur,{retal:true});return startAttack(cur)}
   if(k==='throw')return startAttack(cur,{areaOnly:true});
   if(k==='abil')return abilitiesMenu(cur);
   if(k==='alert')return alertAction(cur);
