@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="14/11 22:47">
+<meta name="tulpa-build" content="14/11 23:39">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2235,6 +2235,77 @@ body.mg-on{overflow:hidden}
 
 .mg-rot{display:none;margin:0;text-align:center;font-size:13px;color:#ffd36b}
 @media (orientation:portrait){.mg-rot{display:block}}
+
+/* ---------- dificuldade do Perseus ---------- */
+.mg-dpick{max-width:760px}
+.mg-diff{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0}
+.mg-dbtn{--dc:#9b5cff;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:14px;border-radius:14px;border:1px solid #ffffff26;background:#ffffff0b;color:#f4ead6;cursor:pointer;min-height:44px;font:inherit}
+.mg-dbtn b{font-size:17px}
+.mg-dico{font-size:26px;line-height:1}
+.mg-dtx{font-size:13px;line-height:1.4;color:#cfc3b0}
+.mg-dbtn.d-facil{--dc:#17b26a}.mg-dbtn.d-medio{--dc:#f2b310}.mg-dbtn.d-dificil{--dc:#ff7a1a}.mg-dbtn.d-pesadelo{--dc:#e0233b}
+.mg-dbtn:hover{border-color:var(--dc)}
+.mg-dbtn.on{border:2px solid var(--dc);background:color-mix(in srgb,var(--dc) 18%,transparent);padding:13px}
+.mg-dbtn:focus-visible{outline:3px solid #ffd36b;outline-offset:2px}
+.mg-dbtn.d-pesadelo b{color:#ff8a8a}
+.mg-diff.mini{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:6px 0 4px}
+.mg-diff.mini .mg-dbtn{flex-direction:row;align-items:center;justify-content:center;padding:8px 6px;gap:6px}
+.mg-diff.mini .mg-dbtn.on{padding:7px 5px}
+.mg-diff.mini .mg-dtx{display:none}
+.mg-diff.mini .mg-dico{font-size:18px}
+.mg-diff.mini b{font-size:14px}
+@media (max-width:420px){.mg-diff{grid-template-columns:1fr 1fr}.mg-diff.mini{grid-template-columns:1fr 1fr}}
+
+/* ---------- tela cheia / celular deitado: o jogo ocupa tudo e os controles ficam por cima, translúcidos ---------- */
+.mg-full-btn{width:auto;padding:0 12px;border-radius:21px;font-size:15px;font-weight:700;white-space:nowrap}
+@media (max-width:420px){.mg-full-btn span{display:none}.mg-full-btn{width:42px;padding:0}}
+body.mg-ov #mgRoot{width:100vw;height:100vh;height:100dvh;inset:0;background:#000}
+body.mg-ov #mgRoot .mg-top{position:absolute;top:0;left:0;right:0;z-index:4;background:none;border:0;padding:max(6px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) 0 max(8px,env(safe-area-inset-left));pointer-events:none}
+body.mg-ov #mgRoot .mg-top>*{pointer-events:auto}
+body.mg-ov #mgTitle{visibility:hidden}
+body.mg-ov .mg-tb{width:38px;height:38px;font-size:16px;background:#0000004d;border-color:#ffffff40;opacity:.6}
+body.mg-ov .mg-full-btn{width:38px;padding:0}
+body.mg-ov .mg-full-btn span{display:none}
+body.mg-ov .mg-main{padding:0;overflow:hidden}
+body.mg-ov .mg-game{position:relative;gap:0;height:100%}
+body.mg-ov .mg-hud{position:absolute;top:10px;left:60px;right:110px;z-index:3;pointer-events:none;text-shadow:0 1px 3px #000,0 0 8px #000;font-size:13px}
+body.mg-ov .mg-rot,body.mg-ov .mg-keys{display:none}
+body.mg-ov .mg-stage{height:100%}
+body.mg-ov .mg-over{border-radius:0}
+body.mg-ov .mg-pad{position:absolute;left:0;right:0;bottom:0;z-index:3;justify-content:space-between;align-items:flex-end;padding:0 max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));pointer-events:none}
+body.mg-ov .mg-pad>div{pointer-events:auto;flex:none;gap:12px}
+body.mg-ov .mg-pad-lr>div{flex:1;justify-content:space-between;pointer-events:none}
+body.mg-ov .mg-pad-lr .mg-pb{pointer-events:auto}
+body.mg-ov .mg-pb{flex:none;width:76px;min-width:0;height:76px;border-radius:50%;border:1px solid #ffffffb3;background:#ffffff1f;opacity:.28;font-size:26px;transition:opacity .12s ease,background-color .12s ease;box-shadow:none}
+body.mg-ov .mg-pb.wide{width:96px;font-size:18px;border-radius:38px}
+body.mg-ov .mg-pb.on{opacity:.55;background:#9b5cff59;border-color:#e2d2ff}
+@media (prefers-reduced-motion:reduce){body.mg-ov .mg-pb{transition:none}}
+
+/* ---------- ✋ levantar a mão ---------- */
+#mesaPause.locked .pause-pill{display:none!important}
+.mb-hand{gap:6px}
+.hand-btn{min-height:36px}
+.hand-btn.up{background:linear-gradient(135deg,#ffd36b,#e9a90c)!important;border-color:#b9850a!important;color:#2a1a00!important;font-weight:800;box-shadow:0 0 0 0 #f2b31099;animation:hand13 1.6s ease-out infinite}
+.hand-none{font-size:13px}
+.hand-title{font-weight:800;color:#a46f00}
+body.t3-dark .hand-title{color:#ffd36b}
+.hand-chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:4px 6px 4px 4px;border-radius:18px;border:1px solid #d4a017;background:#fff3cc;color:#3a2600;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+body.t3-dark .hand-chip{background:#3b2d0a;color:#ffe7a3;border-color:#c99a1b}
+.hand-chip .hand-n{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#f2b310;color:#2a1a00;font-size:12px}
+.hand-chip .hand-ok{font-size:12px;font-weight:700;padding:2px 8px;border-radius:12px;background:#ffffff99}
+body.t3-dark .hand-chip .hand-ok{background:#ffffff1f}
+.hand-chip:hover .hand-ok{background:#17b26a;color:#fff}
+.hand-chip:focus-visible,.hand-badge:focus-visible{outline:3px solid #ffd36b;outline-offset:2px}
+#mesaWrap .table-char.seat{position:relative}
+.table-char.hand-up{box-shadow:0 0 0 2px #f2b310,0 0 22px -4px #f2b310cc!important}
+.hand-badge{position:absolute;top:-14px;right:-10px;z-index:5;display:inline-flex;align-items:center;gap:6px;min-width:40px;height:40px;padding:0 8px;justify-content:center;border-radius:20px;border:2px solid #fff6d6;background:radial-gradient(circle at 35% 30%,#ffe9a6,#f2b310 60%,#c98d00);color:#2a1a00;font-size:22px;line-height:1;box-shadow:0 0 0 0 #f2b310aa,0 6px 14px -6px #000;animation:hand13 1.6s ease-out infinite;font-family:inherit}
+button.hand-badge{cursor:pointer}
+.hand-badge .hand-ok{display:none;font-size:12px;font-weight:800;white-space:nowrap}
+button.hand-badge:hover .hand-ok,button.hand-badge:focus-visible .hand-ok{display:inline}
+@keyframes hand13{0%{box-shadow:0 0 0 0 #f2b310b3,0 6px 14px -6px #000}70%{box-shadow:0 0 0 12px #f2b31000,0 6px 14px -6px #000}100%{box-shadow:0 0 0 0 #f2b31000,0 6px 14px -6px #000}}
+@media (prefers-reduced-motion:reduce){.hand-badge,.hand-btn.up{animation:none}}
+@media (pointer:coarse){button.hand-badge .hand-ok{display:inline}}
+@media (max-width:560px){.hand-badge{top:-12px;right:-6px;height:36px;min-width:36px;font-size:19px}.hand-chip{font-size:13px}}
 
 /* Gerado por gen_palette.py: camada de paletas (não edite à mão). */
 html body.t3-pal{color:var(--text);background:radial-gradient(ellipse at 50% -18%,color-mix(in oklab,var(--text) 3%,var(--panel)) 0%,color-mix(in oklab,var(--panel) 24%,var(--bg)) 55%,var(--bg) 100%)!important}
@@ -5612,7 +5683,7 @@ T3.mesaSet=setState6;T3.mesaState=()=>M6.state;
 function onCast6(fn){M6.hooks.cast.push(fn)}
 function cast6(o){try{if(M6.ch&&M6.live&&typeof M6.ch.send==='function')M6.ch.send({type:'broadcast',event:'m',payload:{...o,from:uid3()}})}catch(e){}}
 function trackMe6(){
-  try{if(M6.ch&&M6.live&&typeof M6.ch.track==='function')M6.ch.track({uid:uid3(),role:role3(),name:myLabel(),charId:M6.myChar||null,at:M6.joinedAt})}catch(e){}
+  try{if(M6.ch&&M6.live&&typeof M6.ch.track==='function')M6.ch.track({uid:uid3(),role:role3(),name:myLabel(),charId:M6.myChar||null,at:M6.joinedAt,hand:M6.myHand||0})}catch(e){}
 }
 function presentUids6(){return Object.keys(M6.present)}
 function readPresence6(){
@@ -6351,10 +6422,12 @@ function renderPause6(){
     document.body.append(o);
     $('pauseVol').oninput=e=>{setVol6(e.target.value);renderVol6()};
     $('pauseResume').onclick=()=>togglePause6(false);
-    $('pauseMin').onclick=()=>o.classList.add('mini');$('pausePill').onclick=()=>o.classList.remove('mini');
+    $('pauseMin').onclick=()=>{if(isGM6())o.classList.add('mini')};$('pausePill').onclick=()=>o.classList.remove('mini');
   }
   $('pauseMsg').textContent=isM?'A mesa está em pausa para todos. A música de espera está tocando.':'O Mestre pausou a sessão. Pegue uma água: a mesa volta já.';
   $('pauseResume').style.display=isM?'':'none';$('pauseVol').value=prefs.musicVol;
+  /* jogadores não minimizam nem fecham o intervalo: só o Mestre encerra */
+  $('pauseMin').hidden=!isM;$('pauseMin').style.display=isM?'':'none';o.classList.toggle('locked',!isM);if(!isM)o.classList.remove('mini');
   if(!M6.pauseShown){M6.pauseShown=true;o.classList.remove('mini');fx5('round')}
   o.classList.add('show');
   clearInterval(M6.pauseTick);
@@ -6834,7 +6907,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='14/11 22:47';
+const BUILD8='14/11 23:39';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -8157,7 +8230,13 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'🎮 Mini-games de intervalo',w:'a',open:1,b:`Durante o ⏸ Intervalo aparece o botão <b>🎮 Mini-Games de Intervalo</b> e o <b>Placar da Pausa</b>. São 6 jogos inspirados no Pou, com até 6 pessoas por sala, cada uma com um Perseus de cor diferente. Quando o Mestre retoma a sessão, os jogos fecham sozinhos na tela de todos.`},
+  {t:'✋ Levantar a mão, dificuldade do Perseus e tela cheia',w:'a',open:1,b:`<ul>
+   <li><b>✋ Levantar a Mão</b> ${TP}: botão na barra da mesa, ao lado da call. O card ganha um ✋ dourado que todos veem e o Mestre ouve um aviso discreto.</li>
+   <li><b>✓ Baixar Mão</b> ${TM}: clique no nome na barra (ou no ✋ do card) quando der a palavra. Com várias mãos, use <b>Baixar Todas as Mãos</b>. A lista segue a ordem em que levantaram.</li>
+   <li><b>Dificuldade do Perseus</b> no Tulpa Volley e no Jogo da Velha: 🌱 Fácil, ⚖️ Médio, 🔥 Difícil e 💀 Pesadelo. No Pesadelo do Jogo da Velha, o melhor resultado possível é empatar.</li>
+   <li><b>⛶ Tela Cheia</b> nos jogos. No celular deitado, o jogo ocupa a tela toda e os botões ficam translúcidos por cima.</li>
+   <li><b>Intervalo travado</b> para jogadores: só o Mestre encerra. Dá para ir e voltar entre a espera e os mini-games.</li></ul>`},
+  {t:'🎮 Mini-games de intervalo',w:'a',b:`Durante o ⏸ Intervalo aparece o botão <b>🎮 Mini-Games de Intervalo</b> e o <b>Placar da Pausa</b>. São 6 jogos inspirados no Pou, com até 6 pessoas por sala, cada uma com um Perseus de cor diferente. Quando o Mestre retoma a sessão, os jogos fecham sozinhos na tela de todos.`},
   {t:'Etapa 11 · Neblina só no cômodo atual, portas, luzes e lanterna',w:'a',b:`<ul>
    <li><b>Neblina sem memória:</b> um cômodo só fica limpo enquanto o seu token está dentro. Ao sair, a névoa volta em cerca de 0,2 s. Pela porta aberta você vê só o feixe do vão; porta fechada bloqueia tudo.</li>
    <li><b>Fechar portas:</b> qualquer um abre e fecha uma porta destrancada. O cadeado é só do Mestre.</li>
@@ -8199,7 +8278,8 @@ const GUIDE11=[
   {t:'Chamada de voz',w:'a',b:`${TM} clica em <b>📞 Iniciar call</b> e todos na Visão de Mesa entram. Quem fala ganha o <b>contorno verde</b> na foto. 🎙 muta o seu microfone. ${TM} O <b>🤫 Sussurro</b> marca jogadores que se ouvem em particular. Se você não escuta ninguém, toque na tela: o navegador bloqueia o som até o primeiro toque. O botão <b>🔎</b> mostra a versão e a rota de cada pessoa; versões diferentes pedem Ctrl+F5.`},
   {t:'Chat',w:'a',b:'Aba <b>💬 Chat</b> do dock da mesa. Escolha para quem enviar: <b>Todos</b>, o <b>Mestre</b> ou um jogador (particular). O histórico fica neste aparelho; o selo vermelho mostra mensagens novas.'},
   {t:'Música e Intervalo',w:'m',b:`Aba <b>🎵 Música</b>: cole links do YouTube e dê um <b>momento</b> a cada um (ex.: Revelação da Sala). Uma música com o momento <b>Intervalo</b> vira a música de espera do botão <b>⏸ Intervalo</b>, que pausa a sessão. Também dá para pedir ao Perseus: “toca a música para revelação da sala”.`},
-  {t:'🎮 Mini-games de intervalo',w:'a',b:`<ul><li>Só durante o <b>⏸ Intervalo</b>: o botão fica no centro da tela de pausa, junto do <b>🏆 Placar da Pausa</b> (recordes e vitórias do dia).</li><li><b>Solo / Contra o Perseus</b> ou <b>👥 Sala até 6</b>. Na sala, o anfitrião usa <b>✉ Convidar Jogadores</b> (pessoas marcadas ou chamado aberto); quem recebe vê <b>Aceitar Desafio</b>. Salas abertas também aparecem na lista do hub.</li><li>Cada jogador entra com um Perseus de uma cor (Roxo Místico, Carmesim, Esmeralda, Dourado, Ciano, Prata). O Perseus original é a IA.</li><li><b>🏐 Tulpa Volley</b> (até 3×3, 5 pontos), <b>🦇 Voo Além do Véu</b> e <b>⬆️ Salto Astral</b> (os outros aparecem como fantasmas), <b>🧪 Coleta de Essência</b> (3 vidas, mesma arena), <b>🧠 Eco da Memória</b> (eliminação) e <b>❌ Jogo da Velha Teosófico</b> (quem vence fica).</li><li>Controles: ${KB11('A')}${KB11('D')} ou setas, ${KB11('W')}/${KB11('Espaço')} para pular ou bater as asas, clique. No celular aparecem botões grandes ou basta tocar.</li><li>${TM} Ao clicar em ▶ Retomar a sessão, os jogos fecham na tela de todos.</li></ul>`},
+  {t:'🎮 Mini-games de intervalo',w:'a',b:`<ul><li>Só durante o <b>⏸ Intervalo</b>: o botão fica no centro da tela de pausa, junto do <b>🏆 Placar da Pausa</b> (recordes e vitórias do dia).</li><li><b>Solo / Contra o Perseus</b> ou <b>👥 Sala até 6</b>. Na sala, o anfitrião usa <b>✉ Convidar Jogadores</b> (pessoas marcadas ou chamado aberto); quem recebe vê <b>Aceitar Desafio</b>. Salas abertas também aparecem na lista do hub.</li><li>Cada jogador entra com um Perseus de uma cor (Roxo Místico, Carmesim, Esmeralda, Dourado, Ciano, Prata). O Perseus original é a IA.</li><li><b>🏐 Tulpa Volley</b> (até 3×3, 5 pontos), <b>🦇 Voo Além do Véu</b> e <b>⬆️ Salto Astral</b> (os outros aparecem como fantasmas), <b>🧪 Coleta de Essência</b> (3 vidas, mesma arena), <b>🧠 Eco da Memória</b> (eliminação) e <b>❌ Jogo da Velha Teosófico</b> (quem vence fica).</li><li>Controles: ${KB11('A')}${KB11('D')} ou setas, ${KB11('W')}/${KB11('Espaço')} para pular ou bater as asas, clique. No celular aparecem botões grandes ou basta tocar.</li><li><b>Dificuldade</b> (Volley e Jogo da Velha contra o Perseus): 🌱 Fácil, ⚖️ Médio, 🔥 Difícil, 💀 Pesadelo. A última escolha fica guardada. Numa sala de Volley, o anfitrião escolhe o nível do Perseus que completa o time menor.</li><li><b>⛶ Tela Cheia</b> no topo do jogo. Com o celular deitado, o jogo ocupa a tela inteira e os botões ficam translúcidos (mais visíveis só enquanto você aperta). O primeiro toque já pede a tela cheia do navegador.</li><li>Jogadores não fecham nem minimizam o intervalo. O ✕ dos mini-games volta para a tela de espera.</li><li>${TM} Ao clicar em ▶ Retomar a sessão, os jogos fecham na tela de todos.</li></ul>`},
+  {t:'✋ Levantar a mão',w:'a',b:`${TP} <b>✋ Levantar a Mão</b> fica na barra da mesa. Clique de novo para abaixar. A mão continua levantada se você recarregar a página e some se você sair da mesa. ${TM} vê quem levantou, em ordem de chegada, com o ✋ dourado no card. <b>✓ Baixar Mão</b> baixa a de um jogador e <b>Baixar Todas as Mãos</b> baixa todas. O aviso sonoro toca só para o Mestre.`},
   {t:'Volume da música',w:'p',b:'O volume é de cada um e fica no topo da mesa. Mudar o seu não muda o que os outros ouvem. Se aparecer um aviso de áudio bloqueado, toque na tela uma vez.'},
   {t:'Imagens, pistas e documentos',w:'m',b:'<b>🖼 Enviar imagem</b>: para <b>todos</b> (fica na aba 📂 Documentos da mesa e só você apaga) ou para <b>jogadores marcados</b> (aparece só para eles e fica na ficha, em Documentos / Pistas).'},
  ]},
@@ -8306,6 +8386,15 @@ const mb32=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.
 const hrand=(seed,i,k=0)=>mb32((seed^Math.imul(i+1,0x9E3779B1)^Math.imul(k+7,0x85EBCA77))>>>0)();
 const clamp12=(v,a,b)=>Math.max(a,Math.min(b,v));
 const pick12=a=>a[Math.floor(Math.random()*a.length)];
+/* dificuldade do Perseus: guardada por aparelho */
+const DIFF12={
+  facil:{n:'Fácil',ico:'🌱',d:'Reage devagar, erra de vez em quando e joga na defesa.'},
+  medio:{n:'Médio',ico:'⚖️',d:'Equilibrado: acompanha a bola e devolve jogadas normais.'},
+  dificil:{n:'Difícil',ico:'🔥',d:'Calcula a trajetória, prevê quiques na parede e busca ângulos difíceis.'},
+  pesadelo:{n:'Pesadelo',ico:'💀',d:'Reflexos quase instantâneos, cortadas na rede e provocações ácidas.'},
+};
+const diffGet=()=>{let v='medio';try{v=localStorage.getItem('tulpa_mg_diff')||v}catch(e){}return DIFF12[v]?v:'medio'};
+const diffSet=v=>{if(!DIFF12[v])return;try{localStorage.setItem('tulpa_mg_diff',v)}catch(e){}};
 
 /* ---------- quem sou eu na sala ---------- */
 function mgName(){
@@ -8397,18 +8486,47 @@ function boardRender(){['mgBoardPause','mgBoardHub'].forEach(id=>{const e=$(id);
 function mgRootEl(){
   let r=$('mgRoot');if(r)return r;
   r=document.createElement('div');r.id='mgRoot';r.setAttribute('role','dialog');r.setAttribute('aria-label','Mini-games de intervalo');
-  r.innerHTML=`<div class="mg-top"><button type="button" class="mg-tb" id="mgBack" aria-label="Voltar">←</button><b id="mgTitle">🎮 Mini-Games de Intervalo</b><button type="button" class="mg-tb" id="mgClose" aria-label="Fechar e voltar ao intervalo">✕</button></div><div class="mg-main" id="mgMain"></div>`;
+  r.innerHTML=`<div class="mg-top"><button type="button" class="mg-tb" id="mgBack" aria-label="Voltar">←</button><b id="mgTitle">🎮 Mini-Games de Intervalo</b><button type="button" class="mg-tb mg-full-btn" id="mgFull" hidden aria-pressed="false" title="Tela cheia">⛶<span> Tela Cheia</span></button><button type="button" class="mg-tb" id="mgClose" aria-label="Fechar e voltar ao intervalo">✕</button></div><div class="mg-main" id="mgMain"></div>`;
   document.body.append(r);
-  $('mgClose').onclick=()=>mgClose();$('mgBack').onclick=()=>mgBack();
+  $('mgClose').onclick=()=>mgClose();$('mgBack').onclick=()=>mgBack();$('mgFull').onclick=()=>mgFull();
   return r;
 }
-function mgTitle(t){const e=$('mgTitle');if(e)e.textContent=t}
+function mgTitle(t){const e=$('mgTitle');if(e)e.textContent=t;mgLayout()}
+/* ---------- tela cheia e modo paisagem ----------
+   ⛶ pede a tela cheia do navegador (Fullscreen API). No iPhone, que não deixa,
+   o jogo ocupa a tela inteira só pelo CSS. Celular deitado no jogo = mesmo visual,
+   e o primeiro toque na partida também pede a tela cheia de verdade. */
+const fsEl12=()=>document.fullscreenElement||document.webkitFullscreenElement||null;
+function fsExit12(){try{if(fsEl12())(document.exitFullscreen||document.webkitExitFullscreen).call(document)?.catch?.(()=>{})}catch(e){}try{screen.orientation?.unlock?.()}catch(e){}MG.fsNative=false;MG.fsAuto=false}
+function fsReq12(auto){
+  const r=$('mgRoot');if(!r||fsEl12())return;const f=r.requestFullscreen||r.webkitRequestFullscreen;if(!f)return;
+  try{const p=f.call(r,{navigationUI:'hide'});MG.fsNative=true;MG.fsAuto=!!auto;
+    const lock=()=>{if(MG.W>MG.H)screen.orientation?.lock?.('landscape')?.catch?.(()=>{})};
+    if(p&&p.then)p.then(lock,()=>{MG.fsNative=false;MG.fsAuto=false});else lock()}catch(e){}
+}
+function mgFull(on){
+  on=on??!MG.full;MG.full=!!on;
+  if(on)fsReq12(false);else fsExit12();
+  mgLayout();
+}
+function mgLayout(){
+  const game=MG.open&&MG.view==='game',land=game&&touch12()&&window.innerWidth>window.innerHeight;
+  if(!game&&(MG.full||MG.fsNative)){MG.full=false;fsExit12()}
+  if(game&&!land&&MG.fsAuto&&!MG.full)fsExit12();
+  const b=document.body;b.classList.toggle('mg-land',land);b.classList.toggle('mg-full',game&&!!MG.full);b.classList.toggle('mg-ov',game&&(land||!!MG.full));
+  const fb=$('mgFull');if(fb){fb.hidden=!game;fb.setAttribute('aria-pressed',MG.full?'true':'false');fb.title=MG.full?'Sair da tela cheia':'Tela cheia';fb.setAttribute('aria-label',fb.title)}
+  if(game)requestAnimationFrame(mgFit);
+}
+T3.mgFull=mgFull;
+document.addEventListener('fullscreenchange',()=>{if(!fsEl12()&&MG.fsNative){MG.fsNative=false;MG.fsAuto=false;if(MG.full){MG.full=false;mgLayout()}}});
+document.addEventListener('webkitfullscreenchange',()=>{if(!fsEl12()&&MG.fsNative){MG.fsNative=false;if(MG.full){MG.full=false;mgLayout()}}});
+window.addEventListener('orientationchange',()=>setTimeout(mgLayout,120));
 function mgOpen(){
   if(!M6.state.pause?.on){toast('Os mini-games abrem durante o ⏸ Intervalo.');return}
   actx();mgJoinCh();sprLoad();mgRootEl().classList.add('show');MG.open=true;document.body.classList.add('mg-on');
   if(MG.room)(MG.g?null:mgLobby());else mgHub();
 }
-function mgClose(){mgLeaveRoom();mgStop();const r=$('mgRoot');if(r)r.classList.remove('show');MG.open=false;document.body.classList.remove('mg-on')}
+function mgClose(){mgLeaveRoom();mgStop();const r=$('mgRoot');if(r)r.classList.remove('show');MG.open=false;document.body.classList.remove('mg-on');mgLayout()}
 function mgBack(){if(MG.view==='hub'){mgClose();return}mgLeaveRoom();mgHub()}
 T3.mgOpen=mgOpen;T3.mgClose=mgClose;
 
@@ -8418,7 +8536,7 @@ function mgHub(){
   MG.view='hub';mgStop();mgTitle('🎮 Mini-Games de Intervalo');
   const m=$('mgMain');if(!m)return;
   m.innerHTML=`<div class="mg-hub"><div class="mg-grid">${Object.entries(GAMES12).map(([id,g])=>`<article class="mg-card"><div class="mg-ico" aria-hidden="true">${g.ico}</div><div class="mg-txt"><h3>${g.name}</h3><p>${g.desc}</p></div><div class="mg-cbtn"><button type="button" class="btn small" data-solo="${id}">${g.solo}</button><button type="button" class="btn small primary" data-multi="${id}">👥 Sala até 6</button></div></article>`).join('')}</div><aside class="mg-side"><div id="mgRooms"></div><div class="mg-board" id="mgBoardHub"></div></aside></div>`;
-  $$('[data-solo]',m).forEach(b=>b.onclick=()=>mgCreate(b.dataset.solo,false));
+  $$('[data-solo]',m).forEach(b=>b.onclick=()=>GAMES12[b.dataset.solo].ai?mgDiffPick(b.dataset.solo):mgCreate(b.dataset.solo,false));
   $$('[data-multi]',m).forEach(b=>b.onclick=()=>mgCreate(b.dataset.multi,true));
   roomsRender();boardRender();
 }
@@ -8429,11 +8547,22 @@ function roomsRender(){
   if(e.dataset.h!==h){e.dataset.h=h;e.innerHTML=h;$$('[data-join]',e).forEach(b=>b.onclick=()=>mgJoinRoom(b.dataset.join))}
 }
 
+/* escolha de dificuldade antes da partida contra o Perseus */
+function diffChips(cur,attr){return`<div class="mg-diff" role="radiogroup" aria-label="Dificuldade do Perseus">${Object.entries(DIFF12).map(([k,d])=>`<button type="button" role="radio" aria-checked="${k===cur}" class="mg-dbtn d-${k} ${k===cur?'on':''}" ${attr}="${k}"><span class="mg-dico" aria-hidden="true">${d.ico}</span><b>${d.n}</b><span class="mg-dtx">${d.d}</span></button>`).join('')}</div>`}
+function mgDiffPick(g){
+  const def=GAMES12[g];if(!def)return;MG.view='diff';mgStop();mgTitle(def.ico+' '+def.name);
+  const m=$('mgMain');if(!m)return;
+  m.innerHTML=`<div class="mg-lobby mg-dpick"><h2>${def.ico} ${def.name}</h2><p class="sub">Escolha a dificuldade do Perseus.</p>${diffChips(diffGet(),'data-diff')}<div class="mg-lbtn"><button type="button" class="btn small" id="mgDiffBack">Voltar</button></div></div>`;
+  $$('[data-diff]',m).forEach(b=>b.onclick=()=>{diffSet(b.dataset.diff);mgCreate(g,false,b.dataset.diff)});
+  $('mgDiffBack').onclick=()=>mgHub();
+  m.querySelector('.mg-dbtn.on')?.focus();
+}
+
 /* ---------- salas ---------- */
-function mgCreate(g,multi){
+function mgCreate(g,multi,diff){
   const def=GAMES12[g];if(!def)return;mgLeaveRoom();
   const me={u:uid3(),n:mgName(),c:0};
-  MG.room={id:'r'+rid(),g,mode:multi?'multi':(def.ai?'ai':'solo'),host:uid3(),hn:me.n,players:[me],st:'lobby'};
+  MG.room={id:'r'+rid(),g,mode:multi?'multi':(def.ai?'ai':'solo'),host:uid3(),hn:me.n,players:[me],st:'lobby',diff:DIFF12[diff]?diff:diffGet()};
   if(multi){mgPublish();mgLobby()}else mgStartHost();
 }
 function mgPublish(){const r=MG.room;if(!r||r.host!==uid3()||r.mode!=='multi')return;mgSend('room',{r})}
@@ -8455,8 +8584,10 @@ function mgLobby(){
   m.innerHTML=`<div class="mg-lobby"><h2>${g.ico} ${g.name} <span class="sub">· sala multiplayer</span></h2><p class="sub">${host?'Você é o anfitrião. Convide a mesa e comece quando quiser.':'Aguardando '+esc(r.hn)+' começar a partida.'}</p>
    <ul class="mg-players">${r.players.map(p=>`<li><span class="mg-dot" style="background:${mgCol(p.c)}"></span><b>${esc(p.n)}</b><span class="sub">${mgColName(p.c)}${p.u===r.host?' · anfitrião':''}${p.u===uid3()?' · você':''}</span></li>`).join('')}${Array.from({length:MG_MAX-r.players.length},()=>'<li class="empty">vaga livre</li>').join('')}</ul>
    <p class="sub mg-rule">${g.rule||''}</p>
+   ${r.g==='volley'?(host?`<p class="mgb-h">Dificuldade do Perseus quando ele completar um time</p>${diffChips(r.diff||'medio','data-ldiff').replace('mg-diff','mg-diff mini')}`:`<p class="sub">Perseus, se entrar: ${DIFF12[r.diff||'medio'].ico} ${DIFF12[r.diff||'medio'].n}</p>`):''}
    <div class="mg-lbtn">${host?`<button type="button" class="btn" id="mgInvite">✉ Convidar Jogadores</button><button type="button" class="btn primary" id="mgStart" ${r.players.length<2?'disabled':''}>▶ Começar</button>`:''}<button type="button" class="btn small" id="mgLeave">Sair da sala</button></div>
    ${host&&r.players.length<2?'<p class="sub">Precisa de pelo menos 2 jogadores na sala. Sozinho, use o modo solo ou contra o Perseus.</p>':''}<div id="mgInvBox"></div></div>`;
+  $$('[data-ldiff]',m).forEach(b=>b.onclick=()=>{diffSet(b.dataset.ldiff);MG.room.diff=b.dataset.ldiff;mgPublish();mgLobby()});
   const inv=$('mgInvite');if(inv)inv.onclick=mgInvitePanel;
   const st=$('mgStart');if(st)st.onclick=()=>{if(MG.room.players.length>=2)mgStartHost()};
   $('mgLeave').onclick=()=>{mgLeaveRoom();mgHub()};
@@ -8494,7 +8625,7 @@ function mgStartLocal(room,seed,t0){
   const pad=touch12()?def.pad||'':'';
   m.innerHTML=`<div class="mg-game">${def.W>def.H&&touch12()?'<p class="mg-rot">📱 Gire o celular para ver a quadra maior</p>':''}<div class="mg-hud" id="mgHud"></div><div class="mg-stage" id="mgStage"><canvas id="mgCv" aria-label="${esc(def.name)}"></canvas><div class="mg-over" id="mgOver" hidden></div></div>${pad?`<div class="mg-pad mg-pad-${pad}" id="mgPad">${padHtml(pad)}</div>`:`<p class="mg-keys sub">${touch12()?def.touch:def.keys}</p>`}</div>`;
   MG.W=def.W;MG.H=def.H;
-  const C={room,seed,t0,def,me:uid3(),host:room.host===uid3(),net:room.mode==='multi',players:room.players.map(p=>({...p})),
+  const C={room,seed,t0,def,diff:DIFF12[room.diff]?room.diff:'medio',me:uid3(),host:room.host===uid3(),net:room.mode==='multi',players:room.players.map(p=>({...p})),
     send:(t,o)=>{if(room.mode==='multi')mgSend(t,{...o,id:room.id})},
     say:(txt,net=true)=>{MG.say={txt,until:Date.now()+3000};if(net&&room.mode==='multi'&&room.host===uid3())mgSend('say',{id:room.id,txt})},
     finish:res=>mgFinish(room,res),
@@ -8502,6 +8633,7 @@ function mgStartLocal(room,seed,t0){
   MG.C=C;MG.g=def.make(C);
   const cv=$('mgCv');MG.cv=cv;MG.x=cv.getContext('2d');
   const pt=e=>{const rc=cv.getBoundingClientRect();return[(e.clientX-rc.left)*MG.W/rc.width,(e.clientY-rc.top)*MG.H/rc.height]};
+  $('mgMain').onpointerdown=()=>{if(document.body.classList.contains('mg-land')&&!fsEl12())fsReq12(true)};
   cv.addEventListener('pointerdown',e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}MG.g?.ptr?.('down',...pt(e),e)});
   cv.addEventListener('pointermove',e=>MG.g?.ptr?.('move',...pt(e),e));
   cv.addEventListener('pointerup',e=>MG.g?.ptr?.('up',...pt(e),e));
@@ -8521,7 +8653,7 @@ function mgFit(){
   const s=Math.min(r.width/MG.W,r.height/MG.H),w=Math.max(1,Math.floor(MG.W*s)),h=Math.max(1,Math.floor(MG.H*s)),dpr=Math.min(2,window.devicePixelRatio||1);
   cv.style.width=w+'px';cv.style.height=h+'px';cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);MG.sc=cv.width/MG.W;
 }
-window.addEventListener('resize',()=>{if(MG.view==='game')mgFit()});
+window.addEventListener('resize',()=>{if(MG.open)mgLayout();if(MG.view==='game')mgFit()});
 function mgStop(){cancelAnimationFrame(MG.raf);MG.raf=0}
 function mgLoop(now){
   MG.raf=requestAnimationFrame(mgLoop);
@@ -8641,6 +8773,18 @@ const SAY12={
   tttMulti:['Jogada ousada. Ou distraída.','Estou só assistindo. E julgando.','Essa casa era óbvia, hein.'],
   eco:['{n} esqueceu a sequência. A Lucidez manda lembranças.','{n} caiu. Memória de peixe, não de gato.','Menos um. Eu lembraria até de olhos fechados.'],
   fall:['Gravidade: 1. Você: 0.','Voar não é para todos.','Tente bater as asas. É o básico.'],
+  aiPoint_facil:['Ops, foi sem querer. Juro.','Ponto meu! Acho que foi sorte.','Eu tô só aquecendo as patinhas.'],
+  humanPoint_facil:['Boa! Você tem jeito pra coisa.','Mandou bem. Eu tava distraído com uma mosca.','Ponto seu! Merecido.'],
+  aiPoint_pesadelo:['Eu calculei essa trajetória antes de você nascer.','Isso não foi um ponto. Foi uma aula.','Seus reflexos são de Estágio 1. Os meus, de entidade.','Pode pedir para o Mestre rolar outra iniciativa. Não vai ajudar.','Sete vidas e nenhuma foi gasta com você.'],
+  humanPoint_pesadelo:['Anotado. Vou me vingar com juros.','Um ponto. Guarde de lembrança, não vai ter outro.','Hm. Alguém andou treinando escondido.'],
+  spike:['CORTADA. Chora no BN.','Isso se chama cortada. Pesquisa depois.','Nem a Lucidez te salvaria dessa.'],
+  spike_pesadelo:['CORTADA. Senta e observa como se faz.','A rede é só decoração pra mim.','Pode sair da quadra, a bola não volta.'],
+  aiWin:['Vitória. Como previsto pelo gato.','Fim de jogo. Eu ganhei e você aprendeu.'],
+  aiWin_pesadelo:['Pesadelo cumprido. Volte quando tiver evoluído de Estágio.','Você escolheu Pesadelo. Eu só obedeci.'],
+  humanWin:['Ok, você venceu. Vou fingir que deixei.','Parabéns. Não conte para ninguém.'],
+  humanWin_pesadelo:['Você venceu o Pesadelo?! Vou exigir revisão do Véu.','Impossível. Inaceitável. Revanche. Agora.'],
+  tttAi_pesadelo:['Já vi essa jogada em 9 universos. Perdi em nenhum.','Cada casa que você marca é uma casa que eu previ.','Empate é o melhor que você consegue aqui. E olhe lá.'],
+  tttAi_facil:['Hmm, onde eu ponho... aqui?','Eu sou só um gatinho jogando.','Você joga bem, sabia?'],
 };
 const sayFmt=(a,o={})=>pick12(a).replace(/\{(\w+)\}/g,(_,k)=>o[k]??'');
 
@@ -8653,29 +8797,95 @@ function volley(C){
   const place=()=>ps.forEach(p=>{const m=ps.filter(q=>q.team===p.team),k=m.indexOf(p),n=m.length;p.x=p.team?NX+(W-NX)*(k+1)/(n+1):NX*(k+1)/(n+1);p.y=GY-R;p.vx=0;p.vy=0;p.in=p.in||{l:0,r:0,j:0};p.dx=p.x;p.dy=p.y;p.f=p.team?-1:1});
   place();
   const S={b:{x:200,y:120,vx:0,vy:0},sc:[0,0],wait:1.2,acc:0,snapAt:0,hits:0,shown:0,end:false};
-  const serve=t=>{S.b={x:t?NX+190:NX-190,y:110,vx:0,vy:0};S.wait=1.1};
+  const serve=t=>{S.b={x:t?NX+190:NX-190,y:110,vx:0,vy:0};S.wait=1.1;S.fresh=true};
   serve(Math.random()<.5?0:1);
   const me=ps.find(p=>p.u===C.me),inp={l:0,r:0,j:0};
-  const tname=t=>{const h=ps.filter(p=>p.team===t&&!p.ai);return h.length?h.map(p=>p.n).join(' + '):'Perseus'};
-  function aiIn(p){
-    const b=S.b,side=p.team,lo=side?NX+R+6:R,hi=side?W-R:NX-R-6;let tx=side?NX+200:NX-200;
-    const mine=side?b.x>NX:b.x<NX,coming=side?b.vx>0:b.vx<0;
-    if(mine||coming){const tgt=GY-R-24,disc=b.vy*b.vy+2*GB*(tgt-b.y),t=disc>0?(b.vy+Math.sqrt(disc))/GB:.3;let px=b.x+b.vx*t;if(px<0)px=-px;if(px>W)px=2*W-px;tx=px+(side?14:-14)}
-    tx=clamp12(tx,lo,hi);const I={l:0,r:0,j:0};
-    if(p.x<tx-10)I.r=1;else if(p.x>tx+10)I.l=1;
-    if(mine&&Math.abs(b.x-p.x)<70&&b.y>GY-190&&b.y<GY-70&&b.vy>-80)I.j=1;
+  const tname=t=>{const h=ps.filter(p=>p.team===t&&!p.ai);return h.length?h.map(p=>p.n).join(' + '):'Perseus · '+(DIFF12[C.diff]||DIFF12.medio).n};
+  /* ----- IA do Perseus: prevê a trajetória, pula, corta e mira ----- */
+  const AIP={
+    facil:   {sp:.7, re:.4, err:80,jump:.4, spike:0,  aim:0,  back:250,slip:.16,net:false,naive:true},
+    medio:   {sp:.9, re:.16,err:24,jump:.85,spike:.15,aim:.35,back:180,slip:0,  net:false},
+    dificil: {sp:1,  re:.07,err:6, jump:1,  spike:.55,aim:.85,back:160,slip:0,  net:true},
+    pesadelo:{sp:1.14,re:.015,err:0,jump:1, spike:.92,aim:1,  back:125,slip:0,  net:true},
+  }[C.diff]||{};
+  const HITY=GY-2*R-BR+6; /* altura em que o Perseus no chão encosta na bola */
+  /* simula a bola (gravidade, paredes, teto e, nos níveis altos, a rede) até ela descer na altura y0 do lado 'side' */
+  function predict(side,y0,useNet){
+    let {x,y,vx,vy}=S.b;const h=1/120;
+    if(S.wait>0)return{x,t:S.wait+Math.sqrt(Math.max(0,2*(y0-y)/GB))};
+    for(let t=0;t<3;t+=h){
+      vy+=GB*h;x+=vx*h;y+=vy*h;
+      if(x<BR){x=BR;vx=Math.abs(vx)*.9}if(x>W-BR){x=W-BR;vx=-Math.abs(vx)*.9}if(y<BR){y=BR;vy=Math.abs(vy)*.8}
+      if(useNet&&y+BR>NT&&x+BR>NX-5&&x-BR<NX+5){if(y<NT+4){y=NT-BR;vy=-Math.abs(vy)*.7;vx+=x<NX?-80:80}else if(x<NX){x=NX-5-BR;vx=-Math.abs(vx)*.8}else{x=NX+5+BR;vx=Math.abs(vx)*.8}}
+      if(vy>0&&y>=y0&&(side?x>NX:x<NX))return{x,t};
+      if(y+BR>=GY)return{x,t};
+    }
+    return{x,t:3};
+  }
+  function aiThink(p){
+    const b=S.b,side=p.team,dir=side?1:-1,mine=side?b.x>NX:b.x<NX,coming=side?b.vx>0:b.vx<0;
+    let tx=side?NX+AIP.back:NX-AIP.back;p.aiNear=false;
+    if(S.wait>0&&mine){
+      if(p.aiServe==null)p.aiServe=6+Math.random()*30;           /* saque com ângulo diferente a cada vez */
+      tx=b.x+dir*p.aiServe;
+    }else if(mine||coming){
+      p.aiServe=null;
+      const pr=AIP.naive?(()=>{const b=S.b,disc=b.vy*b.vy+2*GB*(HITY-b.y),t=disc>0?(-b.vy+Math.sqrt(disc))/GB:.3;let x=b.x+b.vx*t;if(x<0)x=-x;if(x>W)x=2*W-x;return{x}})():predict(side,HITY,AIP.net); /* Fácil: conta simples, sem simular */
+      p.aiNear=Math.abs(pr.x-NX)<160;
+      const off=p.aiSpk&&p.aiNear?20:10+Math.random()*16;          /* fica atrás da bola para empurrá-la ao outro lado */
+      tx=pr.x+dir*off;
+    }else{p.aiServe=null;p.aiSpk=Math.random()<AIP.spike}
+    tx+=(Math.random()-.5)*2*AIP.err;
+    if(AIP.slip&&Math.random()<AIP.slip)tx=p.x;                        /* Fácil: às vezes hesita */
+    p.aiTx=tx;p.aiCanJ=Math.random()<AIP.jump;
+  }
+  function aiIn(p,h){
+    const b=S.b,side=p.team,lo=side?NX+R+6:R,hi=side?W-R:NX-R-6;
+    p.aiCd=(p.aiCd||0)-h;if(p.aiCd<=0||p.aiTx==null){p.aiCd=AIP.re*(.7+Math.random()*.6);aiThink(p)}
+    const tx=clamp12(p.aiTx,lo,hi),I={l:0,r:0,j:0};
+    if(p.x<tx-8)I.r=1;else if(p.x>tx+8)I.l=1;
+    const mine=side?b.x>NX:b.x<NX,dx=Math.abs(b.x-p.x);
+    if(mine&&S.wait<=0&&p.aiCanJ){
+      if(p.aiSpk&&p.aiNear&&dx<62&&b.y>NT-215&&b.y<NT+20&&b.vy>-200)I.j=1;   /* cortada perto da rede */
+      else if(dx<(AIP.net?58:70)&&b.y>GY-(AIP.net?230:190)&&b.y<GY-75&&b.vy>-120)I.j=1;
+    }
     return I;
   }
+  /* depois do toque do Perseus: cortada, bola mirada no buraco do time adversário ou erro (Fácil) */
+  function aiHit(p,b){
+    const dir=p.team?-1:1,air=p.y<GY-R-40;
+    if(air&&p.aiSpk&&Math.abs(b.x-NX)<180&&b.y<NT-BR){
+      const vx=dir*(380+Math.random()*(C.diff==='pesadelo'?190:130)),t=(Math.abs(NX-b.x)+BR+6)/Math.abs(vx),vyMax=(NT-BR-10-b.y-.5*GB*t*t)/t;
+      if(vyMax>-140){b.vx=clamp12(vx,-560,560);b.vy=clamp12(vyMax-20,-140,320);S.spike=p.team;S.spikes=(S.spikes||0)+1;return true}
+    }
+    if(AIP.slip&&Math.random()<AIP.slip){b.vx*=.45;return true}         /* Fácil: toque fraco */
+    const fresh=S.fresh;S.fresh=false;
+    if(Math.random()>=AIP.aim)return false;
+    const opp=ps.filter(q=>q.team!==p.team),a=p.team?R+10:NX+40,z=p.team?NX-40:W-R-10;
+    let best=null,bs=-1,vys=[-360,-420,-480,-540,-600,-680,-760];if(b.y<NT-90)vys.push(-240,-120,0,150,300); /* bola alta: tiro reto ou para baixo */
+    if(fresh){best=a+(z-a)*Math.random();const k=Math.floor(Math.random()*4);vys=vys.slice(k).concat(vys.slice(0,k))} /* saque: alvo e altura sorteados */
+    else for(let i=0;i<9;i++){const x=a+(z-a)*i/8,s=Math.min(...opp.map(q=>Math.abs(q.x-x)))+(i===0||i===8?18:0)+Math.random()*20;if(s>bs){bs=s;best=x}}
+    for(const vy of vys){
+      const t=(-vy+Math.sqrt(vy*vy+2*GB*(GY-BR-b.y)))/GB,vx=(best-b.x)/t;if(Math.abs(vx)>560)continue;
+      const xe=NX+dir*(6+BR),tn=(xe-b.x)/vx;if(!(tn>0))continue;  /* a bola precisa passar inteira pela rede */
+      const tm=Math.min(tn,Math.max(0,-vy/GB)),ym=b.y+vy*tm+.5*GB*tm*tm;if(ym<BR+2)continue;          /* sem bater no teto */
+      const yn=b.y+vy*tn+.5*GB*tn*tn;if(yn<NT-BR-8){b.vx=vx;b.vy=vy;return true}
+    }
+    return false;
+  }
+  const say=k=>SAY12[k+'_'+C.diff]||SAY12[k];
   function point(t){
-    S.sc[t]++;fx5('mgCoin');
+    S.sc[t]++;fx5('mgCoin');const spk=S.spike===t;S.spike=null;
     if(S.sc[t]>=5){S.end=true;const rows=ps.map(p=>({u:p.u,n:p.n,c:p.c,s:S.sc[p.team],w:p.team===t}));
-      C.finish({title:(multi?'Vitória de '+tname(t):(t===1?'O Perseus venceu':'Você venceu o Perseus!'))+` · ${S.sc[0]} × ${S.sc[1]}`,rows});return}
+      C.finish({title:(multi?'Vitória de '+tname(t):(t===1?'O Perseus venceu':'Você venceu o Perseus!'))+` · ${S.sc[0]} × ${S.sc[1]}`,rows});
+      if(!multi)C.say(t===1?sayFmt(say('aiWin')):sayFmt(say('humanWin')));return}
     serve(t);
-    const txt=multi?(ps.some(p=>p.ai&&p.team===t)?sayFmt(SAY12.aiPoint):sayFmt(SAY12.multiPoint,{t:tname(t)})):sayFmt(t===1?SAY12.aiPoint:SAY12.humanPoint);
+    const ai=ps.some(p=>p.ai&&p.team===t);
+    const txt=spk&&ai?sayFmt(say('spike')):multi?(ai?sayFmt(say('aiPoint')):sayFmt(SAY12.multiPoint,{t:tname(t)})):sayFmt(t===1?say('aiPoint'):say('humanPoint'));
     C.say(txt);
   }
   function phys(h){
-    ps.forEach(p=>{const I=p.ai?aiIn(p):p.in,sp=p.ai?SP*.88:SP;p.vx=(I.r-I.l)*sp;if(p.vx)p.f=p.vx>0?1:-1;
+    ps.forEach(p=>{const I=p.ai?aiIn(p,h):p.in,sp=p.ai?SP*AIP.sp:SP;p.vx=(I.r-I.l)*sp;if(p.vx)p.f=p.vx>0?1:-1;if(p.cd>0)p.cd-=h;
       if(I.j&&p.y>=GY-R-.5){p.vy=JV;if(p.u===C.me)fx5('mgJump')}
       p.vy+=G*h;p.x+=p.vx*h;p.y+=p.vy*h;if(p.y>GY-R){p.y=GY-R;p.vy=0}
       p.x=clamp12(p.x,p.team?NX+6+R:R,p.team?W-R:NX-6-R)});
@@ -8686,13 +8896,14 @@ function volley(C){
       if(b.y<NT+4){b.y=NT-BR;b.vy=-Math.abs(b.vy)*.7;b.vx+=b.x<NX?-80:80}
       else if(b.x<NX){b.x=NX-5-BR;b.vx=-Math.abs(b.vx)*.8}else{b.x=NX+5+BR;b.vx=Math.abs(b.vx)*.8}
     }
-    ps.forEach(p=>{const dx=b.x-p.x,dy=b.y-p.y,d=Math.hypot(dx,dy);if(d>=R+BR||d<1e-6)return;
+    ps.forEach(p=>{if(p.cd>0)return;const dx=b.x-p.x,dy=b.y-p.y,d=Math.hypot(dx,dy);if(d>=R+BR||d<1e-6)return;
       const nx=dx/d,ny=dy/d;b.x=p.x+nx*(R+BR);b.y=p.y+ny*(R+BR);
       const sp=Math.max(480,Math.hypot(b.vx,b.vy)*.92);let vx=nx*sp+p.vx*.4,vy=ny*sp+Math.min(0,p.vy)*.25;
       if(vy>-320)vy=-320-Math.random()*80;
       /* empurra a bola para o lado do adversário */
       if(p.team===0&&vx<60)vx=Math.max(vx,60+Math.random()*120);if(p.team===1&&vx>-60)vx=Math.min(vx,-60-Math.random()*120);
-      b.vx=clamp12(vx,-540,540);b.vy=Math.max(-780,vy);S.hits++});
+      b.vx=clamp12(vx,-540,540);b.vy=Math.max(-780,vy);S.hits++;S.spike=null;
+      if(p.ai&&aiHit(p,b))p.cd=.18;S.fresh=false;p.aiTx=null});
     if(b.y+BR>=GY){b.y=GY-BR;point(b.x<NX?1:0)}
   }
   function snap(){C.send('snap',{b:[S.b.x,S.b.y,S.b.vx,S.b.vy].map(v=>Math.round(v)),p:ps.map(p=>[p.u,Math.round(p.x),Math.round(p.y),p.f]),sc:S.sc,w:S.wait>0?1:0,h:S.hits})}
@@ -8700,6 +8911,8 @@ function volley(C){
   let keepAt=0;
   return{
     st:()=>S,ps:()=>typeof ps!=="undefined"?ps:null,
+    /* para os testes: roda a física sem desenhar */
+    sim(sec){for(let t=0;t<sec&&!S.end;t+=1/120)phys(1/120)},aip:()=>AIP,
     key(code,down){const v=down?1:0;if(code==='KeyA'||code==='ArrowLeft')inp.l=v;else if(code==='KeyD'||code==='ArrowRight')inp.r=v;else if(code==='KeyW'||code==='ArrowUp'||code==='Space')inp.j=v;else return;sendIn()},
     ptr(){},
     step(dt){
@@ -8967,10 +9180,40 @@ function eco(C){
 
 /* ---------- ❌⭕ Jogo da Velha Teosófico (o anfitrião julga) ---------- */
 const LINES12=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+/* IA do Jogo da Velha por dificuldade.
+   Fácil: muitas vezes joga ao acaso e nem sempre bloqueia. Médio: ganha se der, bloqueia, prefere centro e cantos.
+   Difícil: minimax, mas às vezes escolhe uma jogada só "boa". Pesadelo: minimax perfeito (no máximo empate). */
+function tttWin(b){for(const l of LINES12)if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[0]]===b[l[2]])return b[l[0]];return null}
+function tttMinimax(b,me,op,turn,depth){
+  const w=tttWin(b);if(w===me)return 10-depth;if(w===op)return depth-10;if(b.every(Boolean))return 0;
+  let best=turn===me?-99:99;
+  for(let i=0;i<9;i++){if(b[i])continue;b[i]=turn;const v=tttMinimax(b,me,op,turn===me?op:me,depth+1);b[i]=null;best=turn===me?Math.max(best,v):Math.min(best,v)}
+  return best;
+}
+function tttPick(b0,me,op,diff){
+  const b=b0.slice(),free=b.map((v,i)=>v?null:i).filter(i=>i!=null);if(!free.length)return null;
+  const finds=who=>{for(const l of LINES12){const v=l.map(i=>b[i]);if(v.filter(z=>z===who).length===2&&v.includes(null))return l[v.indexOf(null)]}return null};
+  if(diff==='facil'){
+    const w=finds(me);if(w!=null&&Math.random()<.7)return w;
+    const k=finds(op);if(k!=null&&Math.random()<.4)return k;
+    return pick12(free);
+  }
+  if(diff==='dificil'||diff==='pesadelo'){
+    const sc=free.map(i=>{b[i]=me;const v=tttMinimax(b,me,op,op,1);b[i]=null;return{i,v}});
+    const top=Math.max(...sc.map(s=>s.v));
+    if(diff==='dificil'&&Math.random()<.2){const ok=sc.filter(s=>s.v>=0&&s.v<top);if(ok.length)return pick12(ok).i}
+    const best=sc.filter(s=>s.v===top).map(s=>s.i);
+    return best.includes(4)?4:pick12(best);
+  }
+  let i=finds(me);if(i==null)i=finds(op);
+  if(i==null){if(Math.random()<.7)i=[4,0,2,6,8,1,3,5,7].find(k=>!b[k]);else i=pick12(free)}
+  return i;
+}
+T3.tttPick=tttPick;
 function velha(C){
   const W=480,H=560,OX=45,OY=110,CS=130;
   const ai=!C.net,S={b:Array(9).fill(null),x:null,o:null,turn:null,q:[],wins:{},line:null,st:'play',win:null};
-  const info=u=>u==='~ai'?{n:'Perseus',c:-1}:(C.players.find(p=>p.u===u)||{n:'?',c:0});
+  const info=u=>u==='~ai'?{n:'Perseus · '+(DIFF12[C.diff]||DIFF12.medio).n,c:-1}:(C.players.find(p=>p.u===u)||{n:'?',c:0});
   function winner(b){for(const l of LINES12)if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[0]]===b[l[2]])return l;return null}
   function bcast(){if(C.net)C.send('tstate',{b:S.b,x:S.x,o:S.o,turn:S.turn,q:S.q,wins:S.wins,line:S.line,st:S.st,win:S.win})}
   function newMatch(x,o){S.b=Array(9).fill(null);S.x=x;S.o=o;S.turn=x;S.line=null;S.st='play';S.win=null;bcast()}
@@ -8986,11 +9229,9 @@ function velha(C){
     bcast();if(ai&&S.turn==='~ai'&&S.st==='play')setTimeout(aiMove,650);return true;
   }
   function aiMove(){
-    if(S.st!=='play'||S.turn!=='~ai')return;const b=S.b,free=b.map((v,i)=>v?null:i).filter(i=>i!=null);
-    const finds=who=>{for(const l of LINES12){const v=l.map(i=>b[i]);if(v.filter(z=>z===who).length===2&&v.includes(null))return l[v.indexOf(null)]}return null};
-    let i=finds('~ai');if(i==null)i=finds(S.x);
-    if(i==null){if(Math.random()<.7){i=[4,0,2,6,8,1,3,5,7].find(k=>!b[k])}else i=pick12(free)}
-    apply(i,'~ai');if(S.st==='play'&&Math.random()<.45)C.say(sayFmt(SAY12.tttAi));
+    if(S.st!=='play'||S.turn!=='~ai')return;
+    const i=tttPick(S.b,'~ai',S.x,C.diff);
+    apply(i,'~ai');if(S.st==='play'&&Math.random()<.45)C.say(sayFmt(SAY12['tttAi_'+C.diff]||SAY12.tttAi));
   }
   function next(){
     if(!C.host)return;
@@ -9040,6 +9281,129 @@ const GAMES12={
   velha:{name:'Jogo da Velha Teosófico',short:'Velha',ico:'❌',solo:'🤖 Contra o Perseus',ai:true,desc:'Partida rápida com os Perseus coloridos. Quem vence continua na mesa.',rule:'1 contra 1 com fila: quem vence fica, o próximo da fila desafia. Até 6 na sala.',W:480,H:560,pad:'',keys:'Clique numa casa',touch:'Toque numa casa',unit:'',make:velha},
 };
 T3.games=GAMES12;
+
+
+/* ===================================================================
+   TULPA · ✋ Levantar a Mão
+   O jogador levanta ou abaixa a mão pela barra da mesa (ao lado da call).
+   O estado vai na presença do canal da mesa (handRaised = hand > 0) e
+   também por transmissão, para chegar na hora. Quem sai da mesa perde a
+   mão levantada sozinho. O Mestre vê o ✋ dourado no card do jogador, ouve
+   um aviso discreto e baixa uma mão ou todas.
+   =================================================================== */
+const HAND13={hands:{},castAt:{},sig:'',barSig:''};
+T3.hand=HAND13;T3.myHand=()=>M6.myHand||0;
+S5.hand=t=>{o5('sine',784,t,.22,{gain:.045,wet:.5});o5('sine',1175,t+.11,.34,{gain:.04,wet:.55})};
+
+const handName13=u=>{const ch=charOfUser6(u);return String((ch&&nm(ch))||M6.present?.[u]?.name||'Jogador').slice(0,32)};
+const handKey13=()=>'tulpa_hand_'+(camp3()?.id||'x');
+/* quem está com a mão levantada agora, em ordem de quem levantou primeiro */
+function handList13(){return Object.entries(HAND13.hands).filter(([u,at])=>at>0&&(u===uid3()||!M6.live||!Object.keys(M6.present||{}).length||M6.present[u])).sort((a,b)=>a[1]-b[1]).map(([u])=>u)}
+T3.handList=handList13;
+
+function handSet13(on,quiet){
+  if(isGM6()||!camp3())return;
+  const at=on?Date.now():0;if(!!M6.myHand===!!on)return;
+  M6.myHand=at;HAND13.hands[uid3()]=at;HAND13.castAt[uid3()]=Date.now();
+  try{sessionStorage.setItem(handKey13(),String(at))}catch(e){}
+  trackMe6();cast6({t:'hand',on:!!on,at});
+  if(!quiet){fx5('click');toast(on?'✋ Mão levantada. O Mestre foi avisado.':'Mão abaixada.')}
+  handPaint13();
+}
+T3.handSet=handSet13;
+function handDown13(u){
+  if(!isGM6())return;
+  const all=u==='*',list=all?handList13():[u];
+  list.forEach(x=>{HAND13.hands[x]=0;HAND13.castAt[x]=Date.now()});
+  cast6({t:'hand-down',u});fx5('confirm');handPaint13();
+}
+T3.handDown=handDown13;
+
+/* um aviso só para o Mestre quando alguém novo levanta a mão */
+function handNew13(u,before){
+  if(!isGM6()||u===uid3()||before)return;
+  fx5('hand');HAND13.beeps=(HAND13.beeps||0)+1;
+  const n=handName13(u);
+  if(!document.hidden)toast(`✋ ${n} levantou a mão.`);
+}
+function handFromPresence13(){
+  const now=Date.now();
+  Object.entries(M6.present||{}).forEach(([u,p])=>{
+    if(u===uid3())return;
+    if(now-(HAND13.castAt[u]||0)<4000)return;
+    const before=HAND13.hands[u]>0,at=Number(p?.hand)||0;HAND13.hands[u]=at;
+    if(at>0)handNew13(u,before);
+  });
+  handPaint13();
+}
+onCast6(p=>{
+  if(p.t==='hand'&&p.from&&p.from!==uid3()){
+    const before=HAND13.hands[p.from]>0;HAND13.hands[p.from]=p.on?(Number(p.at)||Date.now()):0;HAND13.castAt[p.from]=Date.now();
+    if(p.on)handNew13(p.from,before);handPaint13();
+  }
+  if(p.t==='hand-down'){
+    const all=p.u==='*';
+    if(all)Object.keys(HAND13.hands).forEach(u=>{HAND13.hands[u]=0;HAND13.castAt[u]=Date.now()});
+    else if(p.u){HAND13.hands[p.u]=0;HAND13.castAt[p.u]=Date.now()}
+    if(!isGM6()&&M6.myHand&&(all||p.u===uid3())){
+      M6.myHand=0;try{sessionStorage.setItem(handKey13(),'0')}catch(e){}trackMe6();
+      toast('✓ O Mestre baixou sua mão.');
+    }
+    handPaint13();
+  }
+  /* quem chega depois pergunta; cada jogador responde com a própria mão */
+  if(p.t==='hand?'&&!isGM6()&&M6.myHand)cast6({t:'hand',on:true,at:M6.myHand});
+});
+M6.hooks.layout.push(handFromPresence13);
+M6.hooks.leave.push(()=>{HAND13.hands={};HAND13.castAt={};M6.myHand=0;HAND13.sig='';HAND13.barSig=''});
+
+/* ---------- desenho: botão na barra, lista do Mestre e ✋ nos cards ---------- */
+function handBar13(){
+  const bar=$('mesaBar');if(!bar)return;
+  let g=$('mbHand');
+  if(!g){g=document.createElement('div');g.id='mbHand';g.className='mb-group mb-hand';const call=$('mbCall');if(call)call.after(g);else bar.prepend(g)}
+  const isM=isGM6(),list=handList13(),mine=!!M6.myHand;
+  const sig=[isM,mine,list.map(u=>u+':'+handName13(u)).join(',')].join('|');
+  if(HAND13.barSig===sig&&g.childNodes.length)return;HAND13.barSig=sig;
+  if(!isM){
+    g.innerHTML=`<button type="button" class="btn small hand-btn ${mine?'up':''}" id="handBtn" aria-pressed="${mine}">${mine?'✋ Abaixar a Mão':'✋ Levantar a Mão'}</button>`;
+    $('handBtn').onclick=()=>handSet13(!M6.myHand);
+    return;
+  }
+  if(!list.length){g.innerHTML='<span class="sub hand-none">✋ Nenhuma mão levantada</span>';return}
+  g.innerHTML=`<span class="hand-title" role="status">✋ ${list.length===1?'1 mão levantada':list.length+' mãos levantadas'}</span>${list.map((u,i)=>`<button type="button" class="hand-chip" data-hdown="${esc(u)}" title="Baixar a mão de ${esc(handName13(u))}"><span class="hand-n">${i+1}</span>${esc(handName13(u))}<span class="hand-ok">✓ Baixar Mão</span></button>`).join('')}${list.length>1?'<button type="button" class="btn small" id="handAll">Baixar Todas as Mãos</button>':''}`;
+  $$('[data-hdown]',g).forEach(b=>b.onclick=()=>handDown13(b.dataset.hdown));
+  const a=$('handAll');if(a)a.onclick=()=>handDown13('*');
+}
+function handCards13(){
+  const up=new Set(handList13()),isM=isGM6();
+  $$('#tableCharacters .table-char[data-uid]').forEach(card=>{
+    const u=card.dataset.uid,on=up.has(u)&&card.classList.contains('seat');
+    card.classList.toggle('hand-up',on);
+    let b=card.querySelector('.hand-badge');
+    if(!on){b?.remove();return}
+    const want=isM?'m':'p';
+    if(b&&b.dataset.k===want)return;b?.remove();
+    b=document.createElement(isM?'button':'span');b.className='hand-badge';b.dataset.k=want;
+    if(isM){b.type='button';b.title='Baixar a mão de '+handName13(u);b.setAttribute('aria-label',b.title);b.innerHTML='<span aria-hidden="true">✋</span><span class="hand-ok">✓ Baixar Mão</span>';b.onclick=e=>{e.stopPropagation();handDown13(u)}}
+    else{b.setAttribute('role','img');b.setAttribute('aria-label','Mão levantada');b.textContent='✋'}
+    card.append(b);
+  });
+}
+function handPaint13(){if(!camp3())return;try{handBar13();handCards13()}catch(e){console.warn('[T13] mão',e)}}
+T3.handPaint=handPaint13;
+onState6(handPaint13);
+/* os cards da mesa são redesenhados por outros módulos: confere de vez em quando */
+setInterval(()=>{if(camp3()&&$('mesaBar'))handPaint13()},900);
+
+/* ao entrar (ou recarregar), recupera a própria mão e pergunta pelas dos outros */
+let handBoot13='';
+setInterval(()=>{
+  const c=camp3();if(!c||!M6.live||handBoot13===c.id)return;handBoot13=c.id;
+  if(!isGM6()){let at=0;try{at=Number(sessionStorage.getItem(handKey13()))||0}catch(e){}if(at){M6.myHand=at;HAND13.hands[uid3()]=at;trackMe6()}}
+  cast6({t:'hand?'});handPaint13();
+},700);
+M6.hooks.leave.push(()=>{handBoot13=''});
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
