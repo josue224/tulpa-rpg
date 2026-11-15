@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="14/11 23:39">
+<meta name="tulpa-build" content="15/11 00:20">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2306,6 +2306,8 @@ button.hand-badge:hover .hand-ok,button.hand-badge:focus-visible .hand-ok{displa
 @media (prefers-reduced-motion:reduce){.hand-badge,.hand-btn.up{animation:none}}
 @media (pointer:coarse){button.hand-badge .hand-ok{display:inline}}
 @media (max-width:560px){.hand-badge{top:-12px;right:-6px;height:36px;min-width:36px;font-size:19px}.hand-chip{font-size:13px}}
+.vc-fix{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.vc-fix .btn{min-height:36px}
 
 /* Gerado por gen_palette.py: camada de paletas (não edite à mão). */
 html body.t3-pal{color:var(--text);background:radial-gradient(ellipse at 50% -18%,color-mix(in oklab,var(--text) 3%,var(--panel)) 0%,color-mix(in oklab,var(--panel) 24%,var(--bg)) 55%,var(--bg) 100%)!important}
@@ -6907,7 +6909,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='14/11 23:39';
+const BUILD8='15/11 00:20';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -6986,7 +6988,7 @@ async function vSignal8(m){
   }
   try{
     if(m.t==='hello'||m.t==='st'){
-      if(m.t==='st'){V8.states[from]={muted:!!m.muted,speaking:!!m.speaking,at:Date.now(),sid:m.sid};voicePaint8()}
+      if(m.t==='st'){const lt=m.speaking?Date.now():(V8.states[from]?.talkAt||0);V8.states[from]={muted:!!m.muted,speaking:!!m.speaking,at:Date.now(),sid:m.sid,talkAt:lt};voicePaint8()}
       if(!V8.peers.has(from)){if(uid3()<from)await vOffer8(from,m.sid);else if(!m.to)vSend8({t:'hello',to:from})}
       if(m.t==='hello'){V8.states[from]=V8.states[from]||{muted:false,speaking:false,at:Date.now(),sid:m.sid};voiceBar8();voicePaint8()}
     }else if(m.t==='offer'){
@@ -7002,6 +7004,7 @@ async function vSignal8(m){
     }else if(m.t==='ice'){
       const p=V8.peers.get(from),cs=m.cs||(m.c?[m.c]:[]);if(!p||!cs.length)return;
       for(const c of cs){{const t=(c&&c.candidate||'').match(/ typ (\w+)/);if(t)p.rc[t[1]]=(p.rc[t[1]]||0)+1}if(p.pc.remoteDescription&&p.pc.remoteDescription.type){try{await p.pc.addIceCandidate(c)}catch(e){}}else p.pending.push(c)}
+    }else if(m.t==='fix'){vMicSwap8('fix');
     }else if(m.t==='bye'){vClosePeer8(from);V8.bad.delete(from);delete V8.states[from];voiceBar8();voicePaint8()}
   }catch(e){console.warn('[T8] sinal '+m.t,e)}
 }
@@ -7015,7 +7018,7 @@ function vVad8(){
     const iv=setInterval(()=>{
       if(ctx.state==='suspended')ctx.resume().catch(()=>{});
       an.getByteTimeDomainData(buf);let s=0;for(let i=0;i<buf.length;i++){const v=(buf[i]-128)/128;s+=v*v}
-      const rms=Math.sqrt(s/buf.length),now=Date.now();if(rms>.035&&!V8.muted)last=now;
+      const rms=Math.sqrt(s/buf.length),now=Date.now();V8.me.level=rms;if(rms>.002)V8.me.heard=now;if(rms>.035&&!V8.muted)last=now;
       const sp=!V8.muted&&now-last<380;
       if(sp!==V8.me.speaking){V8.me.speaking=sp;vSend8({t:'st',muted:V8.muted,speaking:sp});voicePaint8()}
     },90);
@@ -7036,7 +7039,7 @@ async function voiceJoin8(id){
   const camp=camp3().id,gm=isGM6();
   if(!gm){fx5('start');say('📞 O Mestre iniciou a <b>call</b>. Você já está dentro: é só falar. Use 🎙 no topo da mesa para mutar.')}
   voiceBar8();
-  try{V8.stream=await vMic8()}
+  try{V8.stream=await vMic8();vMicWatch8()}
   catch(e){V8.listenOnly=true;V8.stream=null;toast('Sem acesso ao microfone: você entrou só ouvindo. Libere o microfone no navegador e toque em “Ligar microfone”.')}
   V8.joining=false;
   if(V8.callId!==id||M6.campId!==camp){vStopStream8();return}
@@ -7063,7 +7066,7 @@ function voiceLeave8(silent=false){
   if(!silent){voiceBar8();voicePaint8()}
 }
 async function voiceRetryMic8(){
-  try{V8.stream=await vMic8();V8.listenOnly=false;vVad8();
+  try{vStopStream8();V8.stream=await vMic8();vMicWatch8();V8.listenOnly=false;vVad8();
     /* refaz as ligações já com o microfone */
     const ids=[...V8.peers.keys()];ids.forEach(vClosePeer8);vSend8({t:'bye'});setTimeout(()=>vSend8({t:'hello'}),300);toast('Microfone ligado.')}
   catch(e){toast('O navegador ainda não liberou o microfone.')}
@@ -7144,19 +7147,111 @@ function voiceBar8(){
   on('vcWhisper',vWhisperModal8);on('vcTurn',vTurnModal8);on('vcDiag',vDiagModal8);
   const v=$('vcVol');if(v)v.oninput=()=>{prefs.callVol=Number(v.value)||0;savePrefs();vRoute8()};
 }
-/* diagnóstico: mostra por onde a voz está passando e se os pacotes chegam */
-async function vDiagModal8(){
-  const rows=[];
+/* ---------- recuperação da voz ----------
+   1) Meu microfone parou (aparelho trocado, fone Bluetooth, outro programa pegou o mic,
+      o sistema cortou): pego o microfone de novo e troco a trilha em todas as conexões
+      com replaceTrack, sem derrubar a call.
+   2) Quem ouve percebe: a pessoa diz que está falando (detecção de voz dela) e aqui não
+      chega som. Primeiro reinicia o som local; depois pede para ela trocar o microfone;
+      por fim refaz a conexão com ela. */
+function vMicWatch8(){
+  const t=V8.stream&&V8.stream.getAudioTracks()[0];if(!t||t._w8)return;t._w8=1;
+  t.addEventListener('ended',()=>{if(V8.on&&V8.stream&&V8.stream.getAudioTracks()[0]===t)vMicSwap8('ended')});
+  t.addEventListener('mute',()=>{clearTimeout(V8.muteT);V8.muteT=setTimeout(()=>{if(V8.on&&t.muted&&V8.stream&&V8.stream.getAudioTracks()[0]===t)vMicSwap8('mute')},2500)});
+}
+function vSenderOf8(p){
+  const ss=p.pc.getSenders?p.pc.getSenders():[];
+  return ss.find(x=>x.track&&x.track===p.track)||ss.find(x=>x.track&&x.track.kind==='audio')||(p.pc.getTransceivers?p.pc.getTransceivers().find(x=>x.receiver&&x.receiver.track&&x.receiver.track.kind==='audio')?.sender:null)||null;
+}
+async function vMicSwap8(why){
+  if(!V8.on||V8.listenOnly||V8.swapping)return false;
+  if(why!=='manual'&&Date.now()-(V8.swapFail||0)<20000)return false;
+  V8.swapping=true;let ok=false;
+  try{
+    const ns=await vMic8(),nt=ns.getAudioTracks()[0];if(!nt)throw new Error('sem trilha');
+    const old=V8.stream;V8.stream=ns;vMicWatch8();
+    const rebuild=[];
+    for(const [u,p] of V8.peers){
+      const snd=vSenderOf8(p),cl=nt.clone();
+      if(snd&&p.track){try{await snd.replaceTrack(cl);try{p.track.stop()}catch(e){}p.track=cl;continue}catch(e){}}
+      try{cl.stop()}catch(e){}rebuild.push(u);
+    }
+    try{old&&old.getTracks().forEach(t=>t.stop())}catch(e){}
+    vRoute8();vVad8();ok=true;V8.swaps=(V8.swaps||0)+1;
+    rebuild.forEach(u=>vRebuild8(u));
+    if(why!=='device')toast('🎙 Microfone reconectado.');
+  }catch(e){V8.swapFail=Date.now();console.warn('[T8] trocar microfone',e);if(why!=='device')toast('Não consegui pegar o microfone de novo. Confira se outro programa está usando e toque em 🔎 → Reconectar meu microfone.')}
+  V8.swapping=false;voiceBar8();return ok;
+}
+T3.voiceMicSwap=vMicSwap8;
+/* refaz só a conexão com uma pessoa */
+function vRebuild8(u){
+  if(!V8.on)return;vClosePeer8(u);V8.bad.delete(u);vSend8({t:'bye',to:u});
+  setTimeout(()=>vSend8({t:'hello'}),400);
+}
+T3.voiceRebuild=vRebuild8;
+/* reinicia o som que chega de uma pessoa (o elemento de áudio pode travar) */
+function vReplay8(p){
+  try{const tr=p.pc.getReceivers().map(r=>r.track).filter(t=>t&&t.kind==='audio'&&t.readyState==='live');
+    p.audio.pause();p.audio.srcObject=tr.length?new MediaStream(tr):p.audio.srcObject;vRoute8();
+    const r=p.audio.play();if(r&&r.catch)r.catch(()=>{V8.blocked=true;voiceBar8()})}catch(e){}
+}
+async function vStats8(p){
+  const o={pin:0,pout:0,ein:null,lin:null,lout:null,route:'?'};
+  try{const st=await p.pc.getStats(),by={};let sel=null;
+    st.forEach(x=>{by[x.id]=x;
+      if(x.type==='inbound-rtp'&&x.kind==='audio'){o.pin=x.packetsReceived||0;if(x.totalAudioEnergy!=null)o.ein=x.totalAudioEnergy;if(x.audioLevel!=null)o.lin=x.audioLevel}
+      if(x.type==='outbound-rtp'&&x.kind==='audio')o.pout=x.packetsSent||0;
+      if(x.type==='media-source'&&x.kind==='audio'&&x.audioLevel!=null)o.lout=x.audioLevel;
+      if(x.type==='candidate-pair'&&x.nominated&&x.state==='succeeded')sel=x});
+    if(sel){const l=by[sel.localCandidateId],r=by[sel.remoteCandidateId];o.route=[l&&l.candidateType,r&&r.candidateType].map(x=>x==='relay'?'servidor TURN':x==='srflx'?'direto (STUN)':x==='host'?'rede local':x||'?').join(' ↔ ')}}catch(e){}
+  return o;
+}
+/* vigia a cada 3 s */
+setInterval(async()=>{
+  if(!V8.on)return;
+  /* meu microfone: trilha encerrada ou cortada pelo sistema */
+  const t=V8.stream&&V8.stream.getAudioTracks()[0];
+  if(t&&!V8.listenOnly&&!V8.swapping&&(t.readyState==='ended'||(t.muted&&Date.now()-(V8.mutedSince||(V8.mutedSince=Date.now()))>3000)))vMicSwap8(t.readyState==='ended'?'ended':'mute');
+  if(t&&!t.muted)V8.mutedSince=0;
   for(const [u,p] of V8.peers){
-    let pin=0,pout=0,route='?';
-    try{const st=await p.pc.getStats(),by={};let sel=null;st.forEach(x=>{by[x.id]=x;if(x.type==='inbound-rtp'&&x.kind==='audio')pin=x.packetsReceived||0;if(x.type==='outbound-rtp'&&x.kind==='audio')pout=x.packetsSent||0;if(x.type==='candidate-pair'&&x.nominated&&x.state==='succeeded')sel=x});
-      if(sel){const l=by[sel.localCandidateId],r=by[sel.remoteCandidateId];route=[l&&l.candidateType,r&&r.candidateType].map(x=>x==='relay'?'servidor TURN':x==='srflx'?'direto (STUN)':x==='host'?'rede local':x||'?').join(' ↔ ')}}catch(e){}
+    if(p.pc.connectionState!=='connected')continue;
+    const s=await vStats8(p),st=V8.states[u]||{},talk=(!!st.speaking||Date.now()-(st.talkAt||0)<3500)&&!st.muted&&Date.now()-(st.at||0)<6000&&vAllowed8(u)&&!p.audio.muted;
+    const prev=p.last8||s;p.last8=s;
+    const silent=s.ein!=null?(s.ein-(prev.ein||0))<1e-7:(s.lin||0)<.0005;
+    const noPk=s.pin<=prev.pin;
+    if(talk&&(silent||noPk)){p.dumb=(p.dumb||0)+1;
+      if(p.dumb===2)vReplay8(p);
+      else if(p.dumb===4)vSend8({t:'fix',to:u});
+      else if(p.dumb===7){p.dumb=0;vRebuild8(u);console.warn('[T8] sem som de '+u+': refazendo a conexão')}
+    }else if(!silent)p.dumb=0;
+  }
+},3000);
+let devT8=0;
+try{navigator.mediaDevices?.addEventListener?.('devicechange',()=>{clearTimeout(devT8);devT8=setTimeout(()=>{if(V8.on&&V8.stream&&!V8.listenOnly)vMicSwap8('device')},1500)})}catch(e){}
+
+/* diagnóstico: mostra por onde a voz está passando, se os pacotes chegam e se tem som de verdade */
+async function vDiagModal8(){
+  const rows=[],lv=v=>v==null?'?':v<.002?'silêncio':v<.02?'baixo':'com som';
+  const list=[...V8.peers],A=await Promise.all(list.map(([u,p])=>vStats8(p)));
+  await new Promise(r=>setTimeout(r,400));const B=await Promise.all(list.map(([u,p])=>vStats8(p)));
+  for(let i=0;i<list.length;i++){
+    const [u,p]=list[i],a=A[i],b=B[i];
     const nome=u===vGm8()?'Mestre':(nm(charOfUser6(u))||'jogador');
     const cnt=o=>['host','srflx','relay'].map(k=>k+' '+(o[k]||0)).join(', '),ver=V8.vers[u]||'?',igual=ver===BUILD8;
-    rows.push(`<li><b>${esc(nome)}</b>: ${p.pc.connectionState==='connected'?'✅ conectado':'⚠ '+esc(p.pc.connectionState)}<br><span class="sub">Versão do site dele: ${esc(ver)}${igual?'':' ⚠ diferente da sua ('+BUILD8+'): peça para recarregar com Ctrl+F5'} · caminhos meus: ${cnt(p.lc)} · caminhos dele: ${cnt(p.rc)}${p.rc.relay?'':' (sem servidor TURN do lado dele)'}<br>Rota: ${esc(route)} · recebendo ${pin} pacotes · enviando ${pout} pacotes · ${p.audio.paused?'🔇 som parado neste aparelho (toque na tela)':'🔊 som tocando'}${p.track&&!p.track.enabled?' · seu microfone está cortado para essa pessoa':''}</span></li>`);
+    const inE=a.ein!=null&&b.ein!=null?(b.ein-a.ein)/.4:null,st=V8.states[u]||{};
+    const chega=b.pin>a.pin?(inE!=null?(inE>1e-6?'🔊 chegando com som':'🔇 chegando em silêncio'):'chegando'):'⚠ parado';
+    rows.push(`<li><b>${esc(nome)}</b>: ${p.pc.connectionState==='connected'?'✅ conectado':'⚠ '+esc(p.pc.connectionState)}${st.muted?' · 🔇 está mudo':st.speaking?' · 🗣 falando agora':''}<br><span class="sub">Versão do site dele: ${esc(ver)}${igual?'':' ⚠ diferente da sua ('+BUILD8+'): peça para recarregar com Ctrl+F5'} · caminhos meus: ${cnt(p.lc)} · caminhos dele: ${cnt(p.rc)}${p.rc.relay?'':' (sem servidor TURN do lado dele)'}<br>Rota: ${esc(a.route)} · recebendo ${b.pin} pacotes (${chega}) · enviando ${b.pout} pacotes${b.pout>a.pout?'':' ⚠ parado'} · ${p.audio.paused?'🔇 som parado neste aparelho (toque na tela)':'🔊 som tocando'}${p.track&&!p.track.enabled?' · seu microfone está cortado para essa pessoa':''}</span><span class="vc-fix"><button type="button" class="btn small" data-vre="${esc(u)}">🔊 Reiniciar o som dela aqui</button><button type="button" class="btn small" data-vrb="${esc(u)}">↻ Refazer conexão</button></span></li>`);
   }
+  const t=V8.stream&&V8.stream.getAudioTracks()[0];
+  const mt=!t?'':t.readyState==='ended'?' · ⚠ o microfone foi desligado pelo aparelho':t.muted?' · ⚠ o sistema está cortando o microfone':'';
   const mic=V8.listenOnly?'sem acesso ao microfone':V8.muted?'mudo':V8.stream?'ligado':'desligado';
-  openModal('CALL','Diagnóstico da voz',`<p class="sub">Meu microfone: <b>${mic}</b> · servidor TURN na campanha: <b>${turnClean8(M6.state.call?.ice).length?'sim':'não'}</b></p>${rows.length?`<ul class="vc-diag">${rows.join('')}</ul>`:'<p class="sub">Ninguém conectado ainda.</p>'}<p class="sub">Se aparecer “recebendo 0 pacotes” com a conexão ativa, a outra pessoa não está enviando som (microfone mudo ou sem permissão). Se o som estiver parado, toque na tela.</p>`,'Fechar',()=>closeModal());
+  const ago=V8.me.heard?Math.round((Date.now()-V8.me.heard)/1000):null;
+  const cap=!t||V8.listenOnly?'':` · captando agora: <b>${lv(V8.me.level)}</b>${ago!=null&&ago>20?` (último som há ${ago} s)`:''}`;
+  openModal('CALL','Diagnóstico da voz',`<p class="sub">Meu microfone: <b>${mic}</b>${mt}${cap}${t&&t.label?` · aparelho: ${esc(t.label.slice(0,60))}`:''} · servidor TURN na campanha: <b>${turnClean8(M6.state.call?.ice).length?'sim':'não'}</b></p>${!V8.listenOnly&&V8.stream?'<p><button type="button" class="btn small primary" id="vcMicSwap">🎙 Reconectar meu microfone</button></p>':''}${rows.length?`<ul class="vc-diag">${rows.join('')}</ul>`:'<p class="sub">Ninguém conectado ainda.</p>'}<p class="sub">Se “captando agora” fica em silêncio enquanto você fala, o seu microfone parou: use <b>Reconectar meu microfone</b> ou confira o microfone escolhido no sistema. Se aparecer “chegando em silêncio” enquanto a outra pessoa fala, o microfone dela é que parou: peça para ela abrir este 🔎 e reconectar. “Refazer conexão” liga de novo só com aquela pessoa, sem derrubar a call.</p>`,'Fechar',()=>closeModal());
+  const ms=$('vcMicSwap');if(ms)ms.onclick=async()=>{ms.disabled=true;ms.textContent='Reconectando…';await vMicSwap8('manual');closeModal();vDiagModal8()};
+  $$('[data-vre]').forEach(x=>x.onclick=()=>{const p=V8.peers.get(x.dataset.vre);if(p)vReplay8(p);toast('Som reiniciado.')});
+  $$('[data-vrb]').forEach(x=>x.onclick=()=>{vRebuild8(x.dataset.vrb);closeModal();toast('Refazendo a conexão. Leva uns segundos.')});
 }
 function vTurnModal8(){
   if(!isGM6())return;
