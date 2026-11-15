@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="15/11 07:37">
+<meta name="tulpa-build" content="15/11 07:49">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -6788,6 +6788,8 @@ function mapDown7(e){
   mapMenu7(null);
   if(MAP7.ptrs.size===2){const [a,b]=[...MAP7.ptrs.values()];MAP7.drag={kind:'pinch',d0:Math.hypot(a.sx-b.sx,a.sy-b.sy),z0:MAP7.cam.z};return}
   if(T3.cbDown&&T3.cbDown(e,p))return;
+  /* botão direito segurado = mover o mapa em qualquer ferramenta; o esquerdo fica livre para editar */
+  if(e.button===2&&e.pointerType==='mouse'){MAP7.drag={kind:'pan',sx:p.sx,sy:p.sy,cam:{...MAP7.cam}};return}
   if(tacDown10(e,p))return;
   if(MAP7.tool==='ruler'){const g=mapCfg7(),[cx,cy]=mapCellAt7(p.wx,p.wy);const a={x:g.ox+(cx+.5)*g.cell,y:g.oy+(cy+.5)*g.cell};MAP7.ruler={a,b:{...a}};MAP7.drag={kind:'ruler'};mapDraw7();return}
   if(isM&&(MAP7.tool==='reveal'||MAP7.tool==='hide')){MAP7.drag={kind:'fog',set:new Set(M6.state.fog?.open||[])};mapFogPaint7(p);return}
@@ -7068,7 +7070,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='15/11 07:37';
+const BUILD8='15/11 07:49';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -7996,7 +7998,7 @@ function polyClose10(){
 }
 function editDown10(e,p){
   const v=p.v,m=TAC10.edit,geo=geo10();
-  if(e.button===2){if(m==='wall')chainEnd10();else if(m==='room')polyClose10();return true}
+  if(e.button===2)return true;/* o direito move o mapa; duplo clique esquerdo confirma (dblclick) */
   if(m==='wall'){
     const [sx,sy]=snap10(p.wx,p.wy,v);
     if(TAC10.chain){const [lx,ly]=TAC10.chain;if(hyp10(sx-lx,sy-ly)*v.s<4)return true;geo.walls.push({id:'w'+rid(),a:[lx,ly],b:[sx,sy]});geoSet10(geo)}
@@ -8326,7 +8328,7 @@ function actButton10(){
   b.textContent=near?(near.kind==='sw'?(swLamps10(geo10(),near.obj).some(lampBase10)?'💡 Apagar a luz':'💡 Acender a luz'):(near.obj.door.locked&&!isGM6()?'🔒 Tentar abrir':doorOpen10(near.obj)?'✋ Fechar porta':'✋ Abrir porta')):'✋ Interagir';
   if(h){const msg=TAC10.placing?'Clique no local do mapa onde o token deve aparecer (Esc cancela).':(isGM6()&&MAP7.tool==='edit')?editHint10():(!touch&&t&&canMove7(t)&&!TAC10.hintSeen?'WASD ou setas: andar · mouse ou Q/E: virar · Espaço ou toque em E: interagir · F: lanterna · Shift: correr':(t&&canMove7(t)&&geo10().dark&&hasLight10(charById(t.charId))&&!torchOn10(t)?'Está escuro: aperte F (ou o botão 🔦) para ligar a lanterna.':''));h.hidden=!msg;h.textContent=msg}
 }
-function editHint10(){return{wall:'Parede: clique para marcar pontos; clique duplo, Enter ou botão direito termina a linha.',door:'Porta: clique numa parede para torná-la porta, ou clique dois pontos para criar uma porta nova.',room:'Cômodo: clique os cantos; feche clicando no primeiro ponto (ou Enter).',roomfog:'Névoa do cômodo: clique dentro de um cômodo para revelar ou recolocar a névoa.',rough:'Terreno difícil: clique dentro de um cômodo. Em combate, andar ali custa o dobro (9 m viram 4,5 m).',lamp:'Lâmpada: clique dentro de um cômodo para colocar; clique numa lâmpada para ligar ou apagar.',sw:'Interruptor: clique perto de uma parede do cômodo. Ele liga e apaga as lâmpadas daquele cômodo.',erase:'Apagar: clique numa parede, porta, lâmpada, interruptor ou dentro de um cômodo.'}[TAC10.edit]||''}
+function editHint10(){return{wall:'Parede: clique para marcar pontos; clique duplo (ou Enter) termina a linha. Segure o botão direito para mover o mapa.',door:'Porta: clique numa parede para torná-la porta, ou clique dois pontos para criar uma porta nova.',room:'Cômodo: clique os cantos; clique duplo (ou Enter, ou o primeiro ponto) confirma. Segure o botão direito para mover o mapa.',roomfog:'Névoa do cômodo: clique dentro de um cômodo para revelar ou recolocar a névoa.',rough:'Terreno difícil: clique dentro de um cômodo. Em combate, andar ali custa o dobro (9 m viram 4,5 m).',lamp:'Lâmpada: clique dentro de um cômodo para colocar; clique numa lâmpada para ligar ou apagar.',sw:'Interruptor: clique perto de uma parede do cômodo. Ele liga e apaga as lâmpadas daquele cômodo.',erase:'Apagar: clique numa parede, porta, lâmpada, interruptor ou dentro de um cômodo.'}[TAC10.edit]||''}
 
 /* ---------- ponteiro: editor, laser, posicionar token, mirar ---------- */
 function tacDown10(e,p){
@@ -8557,7 +8559,7 @@ const GUIDE11=[
   {t:'Lanterna',w:'p',b:`Vale para quem tem no inventário Lanterna, Tocha, Lampião, Vela, Isqueiro, Sinalizador e similares (itens "no chão" não contam). O botão <b>🔦</b> da barra e a tecla ${KB11('F')} ligam e desligam, com clique metálico. Ela começa <b>desligada</b>. Ligada, projeta um facho de 60° e 8 quadrados pela frente do token e revela interruptores no escuro. Aliados com linha de visão para a área também enxergam o feixe.`},
   {t:'Lâmpadas e interruptores',w:'a',b:`<ul><li>${TM} No editor, <b>🔆 Lâmpada</b>: clique dentro de um cômodo. <b>💡 Interruptor</b>: clique perto de uma parede. Ele liga e apaga as lâmpadas do mesmo cômodo. Sem cômodo, a lâmpada ilumina um raio de 6 quadrados.</li><li>Lâmpada acesa ilumina o cômodo todo para quem está dentro. Por uma porta aberta, só a parte que o seu cone alcança.</li><li>${TP} No escuro, o ícone 💡 só aparece quando o facho, o círculo de tato ou uma área acesa passa por cima dele.</li><li>${TM} Clique numa lâmpada para ligar ou apagar à distância. O editor tem "Ligar todas" e "Apagar todas as luzes".</li></ul>`},
   {t:'⚡ Queda de energia',w:'m',b:'O botão <b>⚡</b> da barra faz as luzes piscarem por cerca de 1,4 s para todos e deixa todas as lâmpadas do mapa apagadas. Para religar, clique nas lâmpadas ou use "Ligar todas as luzes" no editor.'},
-  {t:'Editor de mapa',w:'m',b:`Botão <b>✏️</b>:<ul><li><b>🧱 Parede:</b> clique pontos; clique duplo, ${KB11('Enter')} ou botão direito termina.</li><li><b>🚪 Porta:</b> clique numa parede para virar porta, ou dois pontos para criar uma.</li><li><b>▢ Cômodo:</b> clique os cantos e feche no primeiro ponto (ou ${KB11('Enter')}).</li><li><b>🌫 Névoa do cômodo:</b> revela ou recobre para todos.</li><li><b>🔆 Lâmpada</b> e <b>💡 Interruptor</b> (veja acima).</li><li><b>✂ Apagar</b> paredes, portas, lâmpadas, interruptores ou cômodos.</li><li><b>🧲 Ímã</b> encaixa nos meios-quadrados e nas pontas existentes. ${KB11('Ctrl')}${KB11('Z')} ou ⤺ desfaz.</li><li>Em mapa com desenho próprio, trace as paredes por cima: o site não detecta paredes na imagem.</li></ul>`},
+  {t:'Editor de mapa',w:'m',b:`Botão <b>✏️</b>:<ul><li><b>🧱 Parede:</b> clique pontos; clique duplo (ou ${KB11('Enter')}) termina. Em qualquer ferramenta, <b>segure o botão direito</b> e arraste para mover o mapa.</li><li><b>🚪 Porta:</b> clique numa parede para virar porta, ou dois pontos para criar uma.</li><li><b>▢ Cômodo:</b> clique os cantos; clique duplo (ou ${KB11('Enter')}) confirma.</li><li><b>🌫 Névoa do cômodo:</b> revela ou recobre para todos.</li><li><b>🔆 Lâmpada</b> e <b>💡 Interruptor</b> (veja acima).</li><li><b>✂ Apagar</b> paredes, portas, lâmpadas, interruptores ou cômodos.</li><li><b>🧲 Ímã</b> encaixa nos meios-quadrados e nas pontas existentes. ${KB11('Ctrl')}${KB11('Z')} ou ⤺ desfaz.</li><li>Em mapa com desenho próprio, trace as paredes por cima: o site não detecta paredes na imagem.</li></ul>`},
   {t:'Ponto de destaque (laser)',w:'m',b:`O botão <b>🔴</b> (ou segurar ${KB11('L')}) mostra um ponto pulsando para todos, com uma onda a cada clique. Bom para apontar um detalhe do mapa durante a narração.`},
   {t:'Mapas, grade e tokens',w:'m',b:'<b>🗺 Mapas</b> envia e escolhe imagens; <b>#</b> ajusta a grade (colunas e metros por quadrado). <b>♟ Tokens</b> coloca e tira personagens: "＋ Adicionar token" fecha a janela e o token nasce onde você clicar; "Mudar de lugar" funciona igual. Clicar num token abre o menu: alcance (3, 6, 9 ou 15 m), tamanho (1×, 2× ou 3×), centralizar na sua tela e tirar do mapa.'},
   {t:'Névoa por quadrado (pincel)',w:'m',b:'O botão <b>▦</b> abre o pincel de 1×1, 3×3 ou 5×5 para revelar ou cobrir quadrados da grade, com "Cobrir tudo" e "Desligar névoa". É independente da névoa por cômodo.'},
