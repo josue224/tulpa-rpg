@@ -1,7 +1,7 @@
 -- =====================================================================
 -- TULPA RPG · Motor tático do mapa (movimento com direção e portas)
 -- Rode UMA vez no SQL Editor do Supabase, DEPOIS do tulpa-mesa.sql.
--- Só CRIA duas funções novas: não apaga nem altera tabela nenhuma.
+-- Só CRIA três funções novas: não apaga nem altera tabela nenhuma.
 -- Sem este arquivo o site continua funcionando: o aparelho do Mestre
 -- confere e grava o movimento e as portas (precisa do Mestre na mesa).
 -- =====================================================================
@@ -90,3 +90,67 @@ begin
 end $$;
 revoke all on function public.use_campaign_door(uuid, text, text) from public, anon;
 grant execute on function public.use_campaign_door(uuid, text, text) to authenticated;
+
+-- 3) Luz: ligar/desligar a lanterna do próprio token ('torch') ou as lâmpadas de um interruptor ('switch').
+--    Qualquer membro da campanha aciona um interruptor; a lanterna só o dono do token (ou o Mestre).
+--    Respostas: 'on', 'off' ou 'none' (nada a fazer: o site tenta pelo aparelho do Mestre).
+create or replace function public.set_campaign_light(
+  p_campaign_id uuid, p_kind text, p_map_key text, p_ref text, p_on boolean
+) returns text
+language plpgsql security definer set search_path = public
+as $$
+declare
+  v_state  jsonb;
+  v_tokens jsonb;
+  v_lamps  jsonb;
+  v_idx    int;
+  v_char   text;
+  v_room   text;
+  v_sw     jsonb;
+begin
+  if not public.is_campaign_member(p_campaign_id) then
+    raise exception 'Você não participa desta campanha.' using errcode = '42501';
+  end if;
+  if p_on is null then return 'none'; end if;
+  select value into v_state from public.campaign_store
+   where campaign_id = p_campaign_id and key = 'state' for update;
+  if v_state is null then return 'none'; end if;
+
+  if p_kind = 'torch' then
+    v_tokens := coalesce(v_state -> 'tokens', '[]'::jsonb);
+    select (ord - 1)::int, tok ->> 'charId' into v_idx, v_char
+      from jsonb_array_elements(v_tokens) with ordinality as t(tok, ord)
+     where tok ->> 'id' = p_ref limit 1;
+    if v_idx is null then return 'none'; end if;
+    if not (public.is_campaign_master(p_campaign_id) or exists (
+      select 1 from public.characters c
+       where c.id::text = v_char and c.campaign_id = p_campaign_id and c.owner_id = auth.uid())) then
+      raise exception 'Você só pode ligar a lanterna do seu personagem.' using errcode = '42501';
+    end if;
+    v_tokens := jsonb_set(v_tokens, array[v_idx::text, 'lt'], to_jsonb(p_on), true);
+    v_state := jsonb_set(v_state, '{tokens}', v_tokens);
+
+  elsif p_kind = 'switch' then
+    select sw into v_sw
+      from jsonb_array_elements(coalesce(v_state -> 'geo' -> p_map_key -> 'sws', '[]'::jsonb)) as t(sw)
+     where sw ->> 'id' = p_ref limit 1;
+    if v_sw is null then return 'none'; end if;
+    v_room := v_sw ->> 'room';
+    if v_room is null then return 'none'; end if;  -- sem cômodo: o Mestre resolve pelo aparelho dele
+    select jsonb_agg(case when l ->> 'room' = v_room then jsonb_set(l, '{on}', to_jsonb(p_on), true) else l end order by ord)
+      into v_lamps
+      from jsonb_array_elements(coalesce(v_state -> 'geo' -> p_map_key -> 'lamps', '[]'::jsonb)) with ordinality as t(l, ord);
+    if v_lamps is null or not exists (
+      select 1 from jsonb_array_elements(v_lamps) l where l ->> 'room' = v_room) then return 'none'; end if;
+    v_state := jsonb_set(v_state, array['geo', p_map_key, 'lamps'], v_lamps);
+  else
+    return 'none';
+  end if;
+
+  v_state := jsonb_set(v_state, '{rev}', to_jsonb(coalesce((v_state ->> 'rev')::bigint, 0) + 1));
+  update public.campaign_store set value = v_state, updated_at = now()
+   where campaign_id = p_campaign_id and key = 'state';
+  return case when p_on then 'on' else 'off' end;
+end $$;
+revoke all on function public.set_campaign_light(uuid, text, text, text, boolean) from public, anon;
+grant execute on function public.set_campaign_light(uuid, text, text, text, boolean) to authenticated;

@@ -6720,7 +6720,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='14/11 19:37';
+const BUILD8='14/11 21:21';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -7156,7 +7156,7 @@ T3.renderChat=renderChat9;
 const TAC10={
   edit:'wall',snap:true,follow:true,armed:false,undo:[],chain:null,poly:null,doorA:null,placing:null,
   hover:null,disp:{},doorLive:{},laser:{pts:[],rip:[],last:0,from:''},vs:null,vsAt:0,
-  polyCache:new Map(),blk:null,blkSig:'',frameAt:0,dt:0,noV2:false,noDoorFn:false,lastExploreSave:0
+  polyCache:new Map(),blk:null,blkSig:'',frameAt:0,dt:0,noV2:false,noDoorFn:false,noLightFn:false,lampLive:{},ltLive:{},fogA:{},flick:null
 };
 T3.tac=TAC10;
 const TAU10=Math.PI*2;
@@ -7165,6 +7165,9 @@ const LAMP_FOV10=Math.PI/3;       /* facho da lanterna: 60° */
 const LAMP_RANGE10=8;             /* alcance da lanterna em quadrados */
 const SPEED10=3.4;                /* quadrados por segundo andando */
 const ROT10=Math.PI*1.1;          /* giro por segundo com Q/E */
+const LAMP_R10=6;                 /* alcance de uma lâmpada sem cômodo, em quadrados */
+const FLICK_MS10=1400;            /* duração do piscar na queda de energia */
+const FADE_S10=.2;                /* transição da névoa de um cômodo */
 const LIGHT_RE10=/lanterna|tocha|lampi[aã]o|l[aâ]mpada|vela\b|isqueiro|sinalizador|fonte de luz|flashlight|celular/i;
 
 /* ---------- geometria ---------- */
@@ -7202,7 +7205,9 @@ function normGeo10(g){
     if(w.door)o.door={open:!!w.door.open,locked:!!w.door.locked};return o});
   const rooms=(Array.isArray(g.rooms)?g.rooms:[]).filter(r=>r&&Array.isArray(r.pts)&&r.pts.length>=3).slice(0,120).map(r=>({
     id:String(r.id||('r'+rid())).slice(0,24),name:String(r.name||'Cômodo').slice(0,40),pts:r.pts.slice(0,64).map(p=>[rnd10(p[0]),rnd10(p[1])]),open:!!r.open,reset:Number(r.reset)||0}));
-  return{walls,rooms,dark:!!g.dark};
+  const lamps=(Array.isArray(g.lamps)?g.lamps:[]).filter(l=>l&&isFinite(l.x)&&isFinite(l.y)).slice(0,120).map(l=>({id:String(l.id||('l'+rid())).slice(0,24),x:rnd10(l.x),y:rnd10(l.y),room:l.room?String(l.room).slice(0,24):null,on:!!l.on}));
+  const sws=(Array.isArray(g.sws)?g.sws:[]).filter(q=>q&&isFinite(q.x)&&isFinite(q.y)).slice(0,120).map(q=>({id:String(q.id||('s'+rid())).slice(0,24),x:rnd10(q.x),y:rnd10(q.y),room:q.room?String(q.room).slice(0,24):null}));
+  return{walls,rooms,lamps,sws,dark:!!g.dark};
 }
 function geo10(){return normGeo10((M6.state.geo||{})[geoKey10()])}
 function geoSet10(next,{undo=true}={}){
@@ -7247,6 +7252,15 @@ function hasLight10(ch){
   return items.some(i=>i&&LIGHT_RE10.test(String(i.name||''))&&i.loc!=='chao'&&(i.qty==null||Number(i.qty)>0));
 }
 T3.hasLight=hasLight10;
+/* lanterna: tem o item E está ligada (token.lt; o aviso ao vivo vale até o banco confirmar) */
+function torchOn10(t){const ch=charById(t.charId);if(!ch||!hasLight10(ch))return false;const l=TAC10.ltLive[t.id];return l?!!l.on:!!t.lt}
+/* lâmpadas: estado gravado (ou aviso ao vivo); na queda de energia elas piscam */
+function lampBase10(l){const v=TAC10.lampLive[l.id];return v?!!v.on:!!l.on}
+const flickOn10=now=>((Math.floor(now/65)*2654435761)>>>0)%100<42;
+function lampOn10(l){if(!lampBase10(l))return false;const f=TAC10.flick;return f&&Date.now()<f.until?flickOn10(Date.now()):true}
+/* um interruptor controla as lâmpadas do mesmo cômodo (sem cômodo: as sem cômodo num raio de 8 quadrados) */
+function swLamps10(geo,sw){const cell=mapCfg7().cell;return geo.lamps.filter(l=>sw.room?l.room===sw.room:(!l.room&&hyp10(l.x-sw.x,l.y-sw.y)<=8*cell))}
+T3.torchOn=torchOn10;T3.lampOn=lampOn10;
 
 /* ---------- posição exibida: suaviza (lerp) o que chega pela rede ---------- */
 function pos10(t){
@@ -7320,35 +7334,44 @@ function tokView10(t,geo){
   const ch=charById(t.charId),[fx,fy,a,cx,cy]=front10(t),g=mapCfg7(),R=tokR10(t);
   if(geo.dark){
     const polys=[{poly:visPoly10(cx,cy,0,TAU10,R*2.4),ox:cx,oy:cy,r:R*2.4,soft:true}];
-    if(hasLight10(ch))polys.push({poly:visPoly10(fx,fy,a,LAMP_FOV10,LAMP_RANGE10*g.cell),ox:fx,oy:fy,r:LAMP_RANGE10*g.cell,lamp:true});
+    if(torchOn10(t))polys.push({poly:visPoly10(fx,fy,a,LAMP_FOV10,LAMP_RANGE10*g.cell),ox:fx,oy:fy,r:LAMP_RANGE10*g.cell,lamp:true});
     return polys;
   }
   return[{poly:visPoly10(fx,fy,a,FOV10,Infinity),ox:fx,oy:fy,r:0,cone:true}];
 }
 
-/* ---------- cômodos explorados (guardado só neste aparelho, por jogador) ---------- */
-const expKey10=()=>'tulpa_exp_'+(camp3()?.id||'x')+'_'+(uid3()||'x');
-function explored10(){if(!TAC10.exp||TAC10.expKey!==expKey10()){TAC10.expKey=expKey10();TAC10.exp=lsGet6(TAC10.expKey,{})||{}}return TAC10.exp[geoKey10()]||(TAC10.exp[geoKey10()]={})}
-function markExplored10(room){const e=explored10();if(e[room.id]===room.reset)return;e[room.id]=room.reset;const now=Date.now();if(now-TAC10.lastExploreSave>600){TAC10.lastExploreSave=now;lsSet6(TAC10.expKey,TAC10.exp)}else setTimeout(()=>lsSet6(TAC10.expKey,TAC10.exp),700)}
+/* ---------- cômodos: a névoa só some enquanto o jogador está dentro (sem memória) ---------- */
 const roomAt10=(rooms,x,y)=>rooms.filter(r=>inPoly10(x,y,r.pts));
 
 /* ---------- estado de visão do quadro atual ---------- */
+function litOf10(geo,l,mine){
+  const room=l.room&&geo.rooms.find(r=>r.id===l.room),clips=mine.flatMap(m=>m.clips||[]);
+  if(room)return{l,room,poly:room.pts,inside:mine.some(m=>inPoly10(m.cx,m.cy,room.pts)),clips};
+  return{l,room:null,poly:visPoly10(l.x,l.y,0,TAU10,LAMP_R10*mapCfg7().cell),inside:false,clips};
+}
+/* o ponto está numa área acesa que este jogador enxerga (dentro do cômodo, ou pelo cone através de uma porta aberta)? */
+const litAt10=(vs,x,y)=>vs.lit.some(L=>inPoly10(x,y,L.poly)&&(L.inside||L.clips.some(c=>inPoly10(x,y,c))));
 function computeView10(){
-  const geo=geo10(),isM=isGM6(),out={geo,mode:geo.dark?'dark':geo.rooms.length?'rooms':'open',mine:[],others:[],fog:[],gm:[]};
+  const geo=geo10(),isM=isGM6(),out={geo,mode:geo.dark?'dark':geo.rooms.length?'rooms':'open',mine:[],others:[],fog:[],gm:[],lit:[]};
   const toks=(M6.state.tokens||[]).filter(t=>charById(t.charId));
+  const lamps=geo.dark?geo.lamps.filter(lampOn10):[];
   if(isM){
-    toks.forEach(t=>{const ch=charById(t.charId);if(gmChar6(ch)&&!(geo.dark&&hasLight10(ch)))return;out.gm.push({t,ch,views:tokView10(t,geo),player:!gmChar6(ch)})});
+    toks.forEach(t=>{const ch=charById(t.charId);if(gmChar6(ch)&&!(geo.dark&&torchOn10(t)))return;out.gm.push({t,ch,views:tokView10(t,geo),player:!gmChar6(ch)})});
+    out.lit=lamps.map(l=>{const L=litOf10(geo,l,[]);L.inside=true;return L});
     return out;
   }
   const mine=myToks10();
   mine.forEach(t=>{const [cx,cy]=tokCenter10(t);out.mine.push({t,views:tokView10(t,geo),los:geo.dark?visPoly10(cx,cy,0,TAU10,Infinity):null,cx,cy})});
   if(out.mode==='rooms'){
-    const exp=explored10(),cur=new Set();
-    out.mine.forEach(m=>roomAt10(geo.rooms,m.cx,m.cy).forEach(r=>{cur.add(r.id);markExplored10(r)}));
-    out.fog=geo.rooms.filter(r=>!r.open&&!cur.has(r.id)&&exp[r.id]!==r.reset);
+    const cur=new Set();out.mine.forEach(m=>roomAt10(geo.rooms,m.cx,m.cy).forEach(r=>cur.add(r.id)));
+    out.fog=geo.rooms.filter(r=>!r.open&&!cur.has(r.id));
   }
   if(out.mode==='dark'){
-    toks.forEach(t=>{if(mine.includes(t))return;const ch=charById(t.charId);if(!hasLight10(ch))return;const [fx,fy,a]=front10(t);out.others.push({poly:visPoly10(fx,fy,a,LAMP_FOV10,LAMP_RANGE10*mapCfg7().cell),ox:fx,oy:fy,r:LAMP_RANGE10*mapCfg7().cell})});
+    toks.forEach(t=>{if(mine.includes(t)||!torchOn10(t))return;const [fx,fy,a]=front10(t);out.others.push({poly:visPoly10(fx,fy,a,LAMP_FOV10,LAMP_RANGE10*mapCfg7().cell),ox:fx,oy:fy,r:LAMP_RANGE10*mapCfg7().cell})});
+    if(lamps.length){
+      out.mine.forEach(m=>{const [fx,fy,a]=front10(m.t);m.clips=[visPoly10(fx,fy,a,FOV10,Infinity),m.views[0].poly]});
+      out.lit=lamps.map(l=>litOf10(geo,l,out.mine));
+    }
   }
   return out;
 }
@@ -7361,12 +7384,24 @@ function tokVisible10(t){
   const [x,y]=tokCenter10(t);
   if(vs.mode==='dark'){
     if(vs.mine.some(m=>m.views.some(v=>inPoly10(x,y,v.poly))))return true;
+    if(litAt10(vs,x,y))return true;
     return vs.others.some(o=>inPoly10(x,y,o.poly)&&vs.mine.some(m=>m.los&&inPoly10(x,y,m.los)));
   }
   const fogged=vs.fog.some(r=>inPoly10(x,y,r.pts));if(!fogged)return true;
   return vs.mine.some(m=>m.views.some(v=>inPoly10(x,y,v.poly)));
 }
-T3.tokVisible=tokVisible10;T3.computeView=()=>computeView10();T3.tokView=t=>tokView10(t,geo10());T3.tokCenter=t=>tokCenter10(t);
+/* interruptor: no escuro só aparece quando o campo de visão ativo (facho, tato ou área acesa) passa por cima */
+function swVisible10(s){
+  if(isGM6())return true;
+  const vs=view10(),geo=vs.geo;if(vs.mode==='open')return true;
+  const room=s.room&&geo.rooms.find(r=>r.id===s.room);let px=s.x,py=s.y;
+  if(room){const c=room.pts.reduce((a,p)=>[a[0]+p[0]/room.pts.length,a[1]+p[1]/room.pts.length],[0,0]),d=hyp10(c[0]-s.x,c[1]-s.y)||1;px=s.x+(c[0]-s.x)/d*4;py=s.y+(c[1]-s.y)/d*4}
+  /* o ponto logo à frente do interruptor, do lado de quem olha */
+  const seen=vs.mine.some(m=>m.views.some(o=>{const d=hyp10(o.ox-s.x,o.oy-s.y)||1;return inPoly10(s.x+(o.ox-s.x)/d*4,s.y+(o.oy-s.y)/d*4,o.poly)}));
+  if(vs.mode==='rooms')return seen||!vs.fog.some(r=>inPoly10(px,py,r.pts));
+  return seen||litAt10(vs,px,py);
+}
+T3.tokVisible=tokVisible10;T3.swVisible=swVisible10;T3.computeView=()=>computeView10();T3.tokView=t=>tokView10(t,geo10());T3.tokCenter=t=>tokCenter10(t);
 
 /* ---------- desenho ---------- */
 function path10(x,v,pts){if(!pts||!pts.length)return;x.moveTo(pts[0][0]*v.s+v.tx,pts[0][1]*v.s+v.ty);for(let i=1;i<pts.length;i++)x.lineTo(pts[i][0]*v.s+v.tx,pts[i][1]*v.s+v.ty);x.closePath()}
@@ -7418,16 +7453,21 @@ const pcol10=id=>{let h=7;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0
 function paintOver10(x,v,g,isM){
   const vs=view10(),geo=vs.geo,dark=document.body.classList.contains('t3-dark');
   if(!isM){
-    if(vs.mode==='rooms'&&vs.fog.length){
-      const fx=fogCanvas10();fx.fillStyle=dark?'#07090d':'#120d0a';
-      fx.beginPath();vs.fog.forEach(r=>path10(fx,v,r.pts));fx.fill();
-      vs.mine.forEach(m=>m.views.forEach(o=>lightCut10(fx,v,o)));
-      x.drawImage(TAC10.fogCv,0,0,v.cw,v.ch);
+    if(vs.mode==='rooms'){
+      /* cada cômodo tem a sua opacidade de névoa (sobe e desce em ~200 ms quando o jogador sai ou entra) */
+      const FA=TAC10.fogA,rs=geo.rooms.filter(r=>!r.open&&FA[r.id]>.01);
+      if(rs.length){
+        const fx=fogCanvas10();fx.fillStyle=dark?'#07090d':'#120d0a';
+        rs.forEach(r=>{fx.globalAlpha=Math.min(1,FA[r.id]);fx.beginPath();path10(fx,v,r.pts);fx.fill()});fx.globalAlpha=1;
+        vs.mine.forEach(m=>m.views.forEach(o=>lightCut10(fx,v,o)));
+        x.drawImage(TAC10.fogCv,0,0,v.cw,v.ch);
+      }
     }else if(vs.mode==='dark'){
       const fx=fogCanvas10();fx.fillStyle='rgba(2,2,4,.985)';fx.fillRect(0,0,v.cw,v.ch);
       vs.mine.forEach(m=>m.views.forEach(o=>lightCut10(fx,v,o)));
       if(vs.others.length&&vs.mine.some(m=>m.los)){fx.save();fx.beginPath();vs.mine.forEach(m=>m.los&&path10(fx,v,m.los));fx.clip();vs.others.forEach(o=>lightCut10(fx,v,o));fx.restore()}
-      x.drawImage(TAC10.fogCv,0,0,v.cw,v.ch);
+      cutLit10(fx,v,vs);
+      x.drawImage(TAC10.fogCv,0,0,v.cw,v.ch);tintLit10(x,v,vs);
       x.save();x.globalCompositeOperation='screen';[...vs.mine.flatMap(m=>m.views.filter(o=>o.lamp)),...vs.others].forEach(o=>{const [sx,sy]=w2s7(v,o.ox,o.oy),gr=x.createRadialGradient(sx,sy,0,sx,sy,o.r*v.s);gr.addColorStop(0,'rgba(255,214,140,.16)');gr.addColorStop(1,'rgba(255,214,140,0)');x.beginPath();path10(x,v,o.poly);x.fillStyle=gr;x.fill()});x.restore();
     }
   }else{
@@ -7439,15 +7479,54 @@ function paintOver10(x,v,g,isM){
       if(MAP7.tool==='edit'||g.cell*v.s>22){const c=r.pts.reduce((s,p)=>[s[0]+p[0]/r.pts.length,s[1]+p[1]/r.pts.length],[0,0]),[sx,sy]=w2s7(v,c[0],c[1]);x.font='600 11px "IBM Plex Sans",system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillStyle=r.open?'rgba(190,255,215,.85)':'rgba(225,225,255,.85)';x.fillText((r.open?'':'🌫 ')+r.name,sx,sy)}
       x.restore();
     });
-    if(geo.dark){const fx=fogCanvas10();fx.fillStyle='rgba(0,0,0,.5)';fx.fillRect(0,0,v.cw,v.ch);vs.gm.forEach(o=>o.views.forEach(w=>lightCut10(fx,v,w)));x.drawImage(TAC10.fogCv,0,0,v.cw,v.ch)}
+    if(geo.dark){const fx=fogCanvas10();fx.fillStyle='rgba(0,0,0,.5)';fx.fillRect(0,0,v.cw,v.ch);vs.gm.forEach(o=>o.views.forEach(w=>lightCut10(fx,v,w)));cutLit10(fx,v,vs);x.drawImage(TAC10.fogCv,0,0,v.cw,v.ch);tintLit10(x,v,vs)}
     vs.gm.forEach(o=>{if(!o.player&&!geo.dark)return;const col=pcol10(o.t.charId);o.views.forEach(w=>{if(!geo.dark&&!w.cone)return;x.save();x.beginPath();path10(x,v,w.poly);x.fillStyle=col+' / .12)';x.fill();x.lineWidth=1.4;x.strokeStyle=col+' / .7)';x.stroke();x.restore()})});
     /* cadeados das portas (só o Mestre vê) */
     geo.walls.forEach(w=>{if(!w.door)return;const [sx,sy]=w2s7(v,(w.a[0]+w.b[0])/2,(w.a[1]+w.b[1])/2);x.save();x.beginPath();x.arc(sx,sy,11,0,TAU10);x.fillStyle=w.door.locked?'rgba(120,30,25,.92)':'rgba(30,70,40,.92)';x.fill();x.lineWidth=1.5;x.strokeStyle='#f4ead6';x.stroke();x.font='12px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(w.door.locked?'🔒':'🔓',sx,sy+1);x.restore()});
   }
+  paintFixtures10(x,v,g,isM,vs);
   paintEditor10(x,v,g,isM);
   paintLaser10(x,v);
   if(TAC10.placing&&TAC10.hover){const ch=charById(TAC10.placing),[sx,sy]=[TAC10.hover.sx,TAC10.hover.sy],r=g.cell*v.s*.46;x.save();x.globalAlpha=.75;x.beginPath();x.arc(sx,sy,r,0,TAU10);x.fillStyle='rgba(240,200,90,.25)';x.fill();x.setLineDash([5,4]);x.lineWidth=2;x.strokeStyle='#f0c85a';x.stroke();x.setLineDash([]);x.font='600 12px "IBM Plex Sans",system-ui,sans-serif';x.textAlign='center';x.textBaseline='top';x.fillStyle='#fff';x.fillText(nm(ch),sx,sy+r+4);x.restore()}
 }
+
+/* áreas acesas por lâmpadas: recortam a escuridão (só onde o jogador enxerga) e ganham um tom quente */
+function litEach10(vs,fn){vs.lit.forEach(L=>{if(L.inside)fn(L.poly,null);else L.clips.forEach(c=>fn(L.poly,c))})}
+function cutLit10(fx,v,vs){
+  fx.save();fx.globalCompositeOperation='destination-out';fx.fillStyle='#000';
+  litEach10(vs,(poly,clip)=>{fx.save();if(clip){fx.beginPath();path10(fx,v,clip);fx.clip()}fx.beginPath();path10(fx,v,poly);fx.fill();fx.restore()});
+  fx.restore();
+}
+function tintLit10(x,v,vs){
+  x.save();x.fillStyle='rgba(255,208,130,.11)';
+  litEach10(vs,(poly,clip)=>{x.save();if(clip){x.beginPath();path10(x,v,clip);x.clip()}x.beginPath();path10(x,v,poly);x.fill();x.restore()});
+  x.restore();
+}
+/* lâmpadas e interruptores: o Mestre vê tudo; o jogador só o que a luz dele alcança */
+function paintFixtures10(x,v,g,isM,vs){
+  const geo=vs.geo;if(!geo.lamps.length&&!geo.sws.length)return;
+  const r=Math.max(9,Math.min(16,g.cell*v.s*.3));
+  x.save();x.textAlign='center';x.textBaseline='middle';x.font=`${Math.round(r*1.15)}px system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif`;
+  geo.lamps.forEach(l=>{
+    const on=lampOn10(l),base=lampBase10(l);
+    if(!isM&&!(geo.dark&&on&&litAt10(vs,l.x,l.y)))return;
+    const [sx,sy]=w2s7(v,l.x,l.y);
+    if(on){const gr=x.createRadialGradient(sx,sy,0,sx,sy,r*2.4);gr.addColorStop(0,'rgba(255,228,150,.8)');gr.addColorStop(1,'rgba(255,228,150,0)');x.fillStyle=gr;x.beginPath();x.arc(sx,sy,r*2.4,0,TAU10);x.fill()}
+    if(isM){x.beginPath();x.arc(sx,sy,r,0,TAU10);x.fillStyle=base?'rgba(120,90,10,.92)':'rgba(40,40,50,.92)';x.fill();x.lineWidth=1.6;x.strokeStyle=base?'#ffd86b':'#8a8a98';x.stroke();x.fillStyle='#fff';x.fillText('🔆',sx,sy+1)}
+    else{x.beginPath();x.arc(sx,sy,Math.max(3,r*.32),0,TAU10);x.fillStyle='#fff6d2';x.fill()}
+  });
+  geo.sws.forEach(q=>{
+    if(!swVisible10(q))return;
+    const [sx,sy]=w2s7(v,q.x,q.y),on=swLamps10(geo,q).some(lampBase10),h=r*.95;
+    x.beginPath();x.rect(sx-h,sy-h,h*2,h*2);x.fillStyle=on?'rgba(120,88,12,.95)':'rgba(30,30,40,.95)';x.fill();x.lineWidth=1.6;x.strokeStyle=on?'#ffd86b':'#a2a2b2';x.stroke();
+    x.fillStyle='#fff';x.fillText('💡',sx,sy+1);
+  });
+  x.restore();
+}
+function lampHit10(wx,wy,v){const tol=14/v.s;return geo10().lamps.find(l=>hyp10(l.x-wx,l.y-wy)<=tol)||null}
+function swHit10(wx,wy,v){const tol=14/v.s;return geo10().sws.find(q=>hyp10(q.x-wx,q.y-wy)<=tol)||null}
+function distPoly10(x,y,pts){let d=Infinity;for(let i=0,j=pts.length-1;i<pts.length;j=i++)d=Math.min(d,distSeg10(x,y,{ax:pts[j][0],ay:pts[j][1],bx:pts[i][0],by:pts[i][1]}));return d}
+const smallestRoom10=rs=>rs.slice().sort((a,b)=>polyArea10(a.pts)-polyArea10(b.pts))[0]||null;
 
 /* ---------- editor do Mestre ---------- */
 function snap10(wx,wy,v){
@@ -7460,8 +7539,8 @@ function snap10(wx,wy,v){
   if(TAC10.snap){const g=mapCfg7(),h=g.cell/2;return[g.ox+Math.round((wx-g.ox)/h)*h,g.oy+Math.round((wy-g.oy)/h)*h]}
   return[wx,wy];
 }
-function nearWall10(wx,wy,v,onlyDoors){
-  const tol=10/v.s;let best=null,bd=tol;
+function nearWall10(wx,wy,v,onlyDoors,tolW){
+  const tol=tolW||10/v.s;let best=null,bd=tol;
   geo10().walls.forEach(w=>{if(onlyDoors&&!w.door)return;const d=distSeg10(wx,wy,{ax:w.a[0],ay:w.a[1],bx:w.b[0],by:w.b[1]});if(d<bd){bd=d;best=w}});
   return best;
 }
@@ -7505,7 +7584,24 @@ function editDown10(e,p){
     geo.rooms=geo.rooms.map(q=>q.id===r.id?{...q,open:!q.open,reset:q.open?q.reset+1:q.reset}:q);geoSet10(geo);
     toast(r.open?`Névoa recolocada em “${r.name}”.`:`“${r.name}” revelado para todos.`);return true;
   }
+  if(m==='lamp'){
+    const h=lampHit10(p.wx,p.wy,v);if(h){lampSet10([h.id],!lampBase10(h),'gm');return true}
+    const [sx,sy]=snap10(p.wx,p.wy,v),room=smallestRoom10(roomAt10(geo.rooms,sx,sy));
+    geo.lamps.push({id:'l'+rid(),x:sx,y:sy,room:room?room.id:null,on:false});geoSet10(geo);
+    toast(room?`Lâmpada colocada em “${room.name}” (apagada). Clique nela para ligar.`:`Lâmpada sem cômodo: ilumina um raio de ${LAMP_R10} quadrados.`);return true;
+  }
+  if(m==='sw'){
+    const w=nearWall10(p.wx,p.wy,v,false,mapCfg7().cell*.8);
+    if(!w){toast('Clique perto de uma parede para colocar o interruptor.');return true}
+    const [qx,qy]=closestOnSeg10(p.wx,p.wy,w.a[0],w.a[1],w.b[0],w.b[1]);
+    let rs=roomAt10(geo.rooms,p.wx,p.wy);if(!rs.length)rs=geo.rooms.filter(r=>distPoly10(qx,qy,r.pts)<5);
+    const room=smallestRoom10(rs);
+    geo.sws.push({id:'s'+rid(),x:qx,y:qy,room:room?room.id:null});geoSet10(geo);
+    toast(room?`Interruptor ligado às lâmpadas de “${room.name}”.`:'Interruptor sem cômodo: liga as lâmpadas sem cômodo num raio de 8 quadrados.');return true;
+  }
   if(m==='erase'){
+    const lh=lampHit10(p.wx,p.wy,v);if(lh){geo.lamps=geo.lamps.filter(q=>q.id!==lh.id);geoSet10(geo);return true}
+    const sh=swHit10(p.wx,p.wy,v);if(sh){geo.sws=geo.sws.filter(q=>q.id!==sh.id);geoSet10(geo);return true}
     const w=nearWall10(p.wx,p.wy,v,false);
     if(w){geo.walls=geo.walls.filter(q=>q.id!==w.id);geoSet10(geo);return true}
     const rs=roomAt10(geo.rooms,p.wx,p.wy).sort((a,b)=>polyArea10(a.pts)-polyArea10(b.pts));
@@ -7523,6 +7619,8 @@ function paintEditor10(x,v,g,isM){
   if(m==='door'&&TAC10.doorA&&sp){const [ax,ay]=w2s7(v,...TAC10.doorA),[bx,by]=w2s7(v,...sp);x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.setLineDash([6,5]);x.lineWidth=4;x.strokeStyle='#d9a066';x.stroke();x.setLineDash([])}
   if(m==='room'&&TAC10.poly&&TAC10.poly.length){x.beginPath();path10(x,v,sp?[...TAC10.poly,sp]:TAC10.poly);x.fillStyle='rgba(160,160,255,.12)';x.fill();x.setLineDash([6,5]);x.lineWidth=2;x.strokeStyle='rgba(200,200,255,.95)';x.stroke();x.setLineDash([]);
     TAC10.poly.forEach((p,i)=>{const [px,py]=w2s7(v,p[0],p[1]);x.beginPath();x.arc(px,py,i?3.5:6,0,TAU10);x.fillStyle=i?'#dcdcff':'#fff';x.fill()})}
+  if(m==='lamp'&&sp){const [px,py]=w2s7(v,...sp);x.beginPath();x.arc(px,py,10,0,TAU10);x.setLineDash([4,3]);x.lineWidth=2;x.strokeStyle='#ffd86b';x.stroke();x.setLineDash([])}
+  if(m==='sw'&&h){const w=nearWall10(h.wx,h.wy,v,false,mapCfg7().cell*.8);if(w){const [qx,qy]=closestOnSeg10(h.wx,h.wy,w.a[0],w.a[1],w.b[0],w.b[1]),[px,py]=w2s7(v,qx,qy);x.beginPath();x.rect(px-9,py-9,18,18);x.setLineDash([4,3]);x.lineWidth=2;x.strokeStyle='#ffd86b';x.stroke();x.setLineDash([])}}
   if(sp&&(m==='wall'||m==='door'||m==='room')){const [px,py]=w2s7(v,...sp);x.beginPath();x.arc(px,py,6,0,TAU10);x.lineWidth=2;x.strokeStyle='#fff';x.stroke()}
   if((m==='erase'||m==='door')&&h&&!TAC10.doorA){const w=nearWall10(h.wx,h.wy,v,false);if(w){const [ax,ay]=w2s7(v,...w.a),[bx,by]=w2s7(v,...w.b);x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.lineWidth=7;x.strokeStyle=m==='erase'?'rgba(255,70,70,.55)':'rgba(240,200,90,.55)';x.stroke()}}
   x.restore();
@@ -7570,20 +7668,37 @@ S5.doorClose=t=>{
   o.connect(f);f.connect(g);send5(g,.3);o.start(t);o.stop(t+.34);
   n5(t+.31,.14,{freq:170,type:'lowpass',gain:.38,wet:.35});o5('sine',74,t+.31,.28,{to:44,gain:.26,wet:.2});n5(t+.37,.03,{freq:2900,q:5,gain:.16,wet:.05});
 };
+S5.switchClick=t=>{
+  n5(t,.014,{freq:3800,q:6,gain:.3,wet:.04});o5('square',1650,t,.012,{gain:.035,wet:.04});
+  o5('sine',150,t+.012,.06,{to:90,gain:.16,wet:.1});n5(t+.075,.02,{freq:2500,q:5,gain:.18,wet:.05});
+};
+S5.torchClick=t=>{
+  n5(t,.01,{freq:4900,q:12,gain:.3,wet:.05});o5('triangle',2150,t,.03,{to:1500,gain:.06,wet:.08});
+  n5(t+.055,.012,{freq:3500,q:10,gain:.2,wet:.05});o5('sine',320,t+.01,.05,{to:210,gain:.1,wet:.1});
+};
+S5.power=t=>{
+  o5('sawtooth',210,t,.8,{to:38,gain:.1,wet:.35});n5(t+.04,.6,{freq:1000,to:110,type:'lowpass',gain:.14,wet:.45});
+  for(let i=0;i<5;i++){n5(t+.1+i*.19+Math.random()*.05,.02,{freq:2800+Math.random()*1200,q:6,gain:.14,wet:.05})}
+  o5('sine',60,t+.9,.4,{to:34,gain:.22,wet:.3});
+};
 S5.doorLocked=t=>{
   n5(t,.06,{freq:520,type:'lowpass',gain:.2,wet:.1});
   for(let i=0;i<5;i++){const tt=t+.02+i*.072+Math.random()*.014;n5(tt,.028,{freq:2400+Math.random()*1800,q:6,gain:.2-.02*i,wet:.08});o5('triangle',380+Math.random()*120,tt,.03,{gain:.035,wet:.05})}
 };
-function doorReach10(t){
-  if(!t)return null;const [fx,fy,a]=front10(t),g=mapCfg7(),reach=g.cell*.95;let best=null,bd=Infinity;
-  geo10().walls.forEach(w=>{if(!w.door)return;const s={ax:w.a[0],ay:w.a[1],bx:w.b[0],by:w.b[1]},[qx,qy]=closestOnSeg10(fx,fy,s.ax,s.ay,s.bx,s.by),d=hyp10(qx-fx,qy-fy);
-    if(d>reach)return;const ang=Math.atan2(qy-fy,qx-fx);if(d>g.cell*.2&&Math.abs(angDiff10(ang,a))>Math.PI*.42)return;if(d<bd){bd=d;best=w}});
+/* o que está ao alcance e à frente do token: porta ou interruptor (o mais perto) */
+function reach10(t){
+  if(!t)return null;const [fx,fy,a]=front10(t),g=mapCfg7(),reach=g.cell*.95,geo=geo10();let best=null,bd=Infinity;
+  const test=(kind,obj,qx,qy)=>{const d=hyp10(qx-fx,qy-fy);if(d>reach)return;const ang=Math.atan2(qy-fy,qx-fx);if(d>g.cell*.2&&Math.abs(angDiff10(ang,a))>Math.PI*.42)return;if(d<bd){bd=d;best={kind,obj}}};
+  geo.walls.forEach(w=>{if(!w.door)return;const [qx,qy]=closestOnSeg10(fx,fy,w.a[0],w.a[1],w.b[0],w.b[1]);test('door',w,qx,qy)});
+  geo.sws.forEach(q=>test('sw',q,q.x,q.y));
   return best;
 }
+const doorReach10=t=>{const r=reach10(t);return r&&r.kind==='door'?r.obj:null};
+T3.reach=reach10;
 function interact10(){
   const t=ctlTok10();if(!t){toast(isGM6()?'Selecione um token para interagir.':'Você não tem um token neste mapa.');return}
-  const w=doorReach10(t);if(!w){toast('Nada para interagir à frente do personagem.');return}
-  doorUse10(w,t);
+  const r=reach10(t);if(!r){toast('Nada para interagir à frente do personagem.');return}
+  if(r.kind==='sw')swUse10(r.obj,t);else doorUse10(r.obj,t);
 }
 function doorUse10(w,t){
   const key=geoKey10(),isM=isGM6();
@@ -7604,6 +7719,56 @@ async function doorSave10(key,id){
 }
 const noFn10=e=>/PGRST202|42883|404|could not find the function|function .* does not exist/i.test(String(e?.code||'')+' '+String(e?.message||'')+' '+String(e?.status||''));
 T3.interact=interact10;T3.doorUse=w=>doorUse10(w,ctlTok10());
+
+/* ---------- luz: interruptores, lâmpadas, queda de energia e lanterna ---------- */
+function lampSet10(ids,on,via,ref){
+  const key=geoKey10();
+  ids.forEach(id=>{TAC10.lampLive[id]={on,until:Date.now()+600000}});
+  fx5('switchClick');cast6({t:'lamp',k:key,ids,on});TAC10.vs=null;mapDraw7();
+  if(isGM6()){const g=geo10();g.lamps=g.lamps.map(l=>ids.includes(l.id)?{...l,on}:l);geoSet10(g,{undo:false});return}
+  if(via==='sw')lightSave10({kind:'switch',key,ref,on,req:{kind:'sw',k:key,id:ref,on}});
+}
+function swUse10(q,t){
+  const ls=swLamps10(geo10(),q);
+  if(!ls.length){fx5('switchClick');toast('Este interruptor não está ligado a nenhuma lâmpada.');return}
+  const on=!ls.some(lampBase10);lampSet10(ls.map(l=>l.id),on,'sw',q.id);
+  toast(on?'💡 Luz acesa.':'💡 Luz apagada.');
+}
+/* grava: função do banco (se existir) ou o aparelho do Mestre */
+async function lightSave10({kind,key,ref,on,req}){
+  if(M6.backend==='store'&&!TAC10.noLightFn&&typeof sb()?.rpc==='function'){
+    try{const {data,error}=await sb().rpc('set_campaign_light',{p_campaign_id:camp3().id,p_kind:kind,p_map_key:key||'',p_ref:ref,p_on:on});
+      if(!error&&(data==='on'||data==='off'))return;
+      if(error){if(noFn10(error))TAC10.noLightFn=true;else console.warn('[T10] luz',error)}}catch(e){console.warn('[T10] luz',e)}
+  }
+  cast6({t:'req',...req});
+}
+function torchToggle10(t){
+  t=t||ctlTok10();
+  if(!t){toast(isGM6()?'Selecione um token para ligar a lanterna.':'Você não tem um token neste mapa.');return}
+  const ch=charById(t.charId);
+  if(!hasLight10(ch)){toast('Sem lanterna no inventário. Coloque uma Lanterna (ou Tocha, Lampião, Vela…) na mochila.');return}
+  const on=!torchOn10(t);
+  TAC10.ltLive[t.id]={on,until:Date.now()+600000};TAC10.vs=null;
+  fx5('torchClick');cast6({t:'lt',id:t.id,on});
+  if(isGM6())setState6({tokens:(M6.state.tokens||[]).map(q=>q.id===t.id?{...q,lt:on}:q)});
+  else lightSave10({kind:'torch',key:geoKey10(),ref:t.id,on,req:{kind:'lt',id:t.id,on}});
+  toast(on?'🔦 Lanterna ligada.':'🔦 Lanterna desligada.');mapTools7();actButton10();mapDraw7();
+}
+T3.torch=torchToggle10;T3.sw=swUse10;
+/* queda de energia: as luzes piscam por ~1,4 s e depois ficam apagadas para todos */
+function powerFx10(){
+  TAC10.flick={until:Date.now()+FLICK_MS10};fx5('power');mapDraw7();
+  setTimeout(()=>{geo10().lamps.forEach(l=>{TAC10.lampLive[l.id]={on:false,until:Date.now()+600000}});TAC10.vs=null;mapDraw7()},FLICK_MS10+10);
+}
+function blackout10(){
+  if(!isGM6())return;const g=geo10();
+  if(!g.lamps.some(lampBase10)){toast('Nenhuma lâmpada acesa neste mapa.');return}
+  cast6({t:'power',k:geoKey10()});powerFx10();
+  setTimeout(()=>{const g2=geo10();g2.lamps=g2.lamps.map(l=>({...l,on:false}));geoSet10(g2,{undo:false})},FLICK_MS10+60);
+  toast('⚡ Queda de energia: as luzes piscam e apagam.');
+}
+T3.blackout=blackout10;
 
 /* ---------- movimento direto (WASD, setas, analógico) ---------- */
 const MOV10={id:null,st:null,keys:new Set(),joy:null,raf:0,last:0,lastCast:0,dirtyAt:0,dirty:false,eDown:0,aim:null,commitT:null,lastCommit:null};
@@ -7675,6 +7840,7 @@ document.addEventListener('keydown',e=>{
   if(c==='Escape'){if(TAC10.placing){TAC10.placing=null;MAP7.tool='move';mapTools7()}TAC10.chain=null;TAC10.poly=null;TAC10.doorA=null;mapDraw7();return}
   if(c==='Enter'&&isGM6()&&MAP7.tool==='edit'){e.preventDefault();if(TAC10.edit==='room')polyClose10();else chainEnd10();return}
   if(c==='KeyL'&&isGM6()){MOV10.laserKey=true;return}
+  if(c==='KeyF'){e.preventDefault();if(!e.repeat)torchToggle10();return}
   if(c==='Space'){e.preventDefault();if(!e.repeat)interact10();return}
   if(DIRK10[c]||c==='KeyQ'||c==='KeyE'||c==='ShiftLeft'||c==='ShiftRight'){
     if(!ctlTok10()){if(DIRK10[c]&&!e.repeat)toast(isGM6()?'Selecione um token para movê-lo pelo teclado.':'Você não tem um token neste mapa.');return}
@@ -7706,13 +7872,13 @@ const touchUi10=()=>document.body.classList.contains('t3-mobile')||!!window.matc
 function actButton10(){
   const b=$('tacAct'),j=$('tacJoy'),h=$('tacHint');if(!b)return;
   if(MAP7.cv)MAP7.cv.style.cursor=TAC10.placing||MAP7.tool==='edit'||MAP7.tool==='laser'?'crosshair':MAP7.tool==='ruler'?'cell':'';
-  const t=ctlTok10(),touch=touchUi10(),near=t&&canMove7(t)?doorReach10(t):null;
+  const t=ctlTok10(),touch=touchUi10(),near=t&&canMove7(t)?reach10(t):null;
   if(j)j.hidden=!(touch&&t&&canMove7(t));if(MAP7.stage)MAP7.stage.classList.toggle('has-joy',!!(j&&!j.hidden));
   b.hidden=!(t&&(touch||near));b.classList.toggle('ready',!!near);b.disabled=!near;
-  b.textContent=near?(near.door.locked&&!isGM6()?'🔒 Tentar abrir':doorOpen10(near)?'✋ Fechar porta':'✋ Abrir porta'):'✋ Interagir';
-  if(h){const msg=TAC10.placing?'Clique no local do mapa onde o token deve aparecer (Esc cancela).':(isGM6()&&MAP7.tool==='edit')?editHint10():(!touch&&t&&canMove7(t)&&!TAC10.hintSeen?'WASD ou setas: andar · mouse ou Q/E: virar · Espaço ou toque em E: interagir · Shift: correr':'');h.hidden=!msg;h.textContent=msg}
+  b.textContent=near?(near.kind==='sw'?(swLamps10(geo10(),near.obj).some(lampBase10)?'💡 Apagar a luz':'💡 Acender a luz'):(near.obj.door.locked&&!isGM6()?'🔒 Tentar abrir':doorOpen10(near.obj)?'✋ Fechar porta':'✋ Abrir porta')):'✋ Interagir';
+  if(h){const msg=TAC10.placing?'Clique no local do mapa onde o token deve aparecer (Esc cancela).':(isGM6()&&MAP7.tool==='edit')?editHint10():(!touch&&t&&canMove7(t)&&!TAC10.hintSeen?'WASD ou setas: andar · mouse ou Q/E: virar · Espaço ou toque em E: interagir · F: lanterna · Shift: correr':(t&&canMove7(t)&&geo10().dark&&hasLight10(charById(t.charId))&&!torchOn10(t)?'Está escuro: aperte F (ou o botão 🔦) para ligar a lanterna.':''));h.hidden=!msg;h.textContent=msg}
 }
-function editHint10(){return{wall:'Parede: clique para marcar pontos; clique duplo, Enter ou botão direito termina a linha.',door:'Porta: clique numa parede para torná-la porta, ou clique dois pontos para criar uma porta nova.',room:'Cômodo: clique os cantos; feche clicando no primeiro ponto (ou Enter).',roomfog:'Névoa do cômodo: clique dentro de um cômodo para revelar ou recolocar a névoa.',erase:'Apagar: clique numa parede, porta ou dentro de um cômodo.'}[TAC10.edit]||''}
+function editHint10(){return{wall:'Parede: clique para marcar pontos; clique duplo, Enter ou botão direito termina a linha.',door:'Porta: clique numa parede para torná-la porta, ou clique dois pontos para criar uma porta nova.',room:'Cômodo: clique os cantos; feche clicando no primeiro ponto (ou Enter).',roomfog:'Névoa do cômodo: clique dentro de um cômodo para revelar ou recolocar a névoa.',lamp:'Lâmpada: clique dentro de um cômodo para colocar; clique numa lâmpada para ligar ou apagar.',sw:'Interruptor: clique perto de uma parede do cômodo. Ele liga e apaga as lâmpadas daquele cômodo.',erase:'Apagar: clique numa parede, porta, lâmpada, interruptor ou dentro de um cômodo.'}[TAC10.edit]||''}
 
 /* ---------- ponteiro: editor, laser, posicionar token, mirar ---------- */
 function tacDown10(e,p){
@@ -7727,6 +7893,8 @@ function tacDown10(e,p){
   if(isM&&MAP7.tool==='move'&&e.button===0){
     const lk=lockHit10(p.wx,p.wy,p.v);
     if(lk){const g=geo10();g.walls=g.walls.map(q=>q.id===lk.id?{...q,door:{...q.door,locked:!q.door.locked}}:q);geoSet10(g);fx5(lk.door.locked?'click':'doorLocked');toast(lk.door.locked?'🔓 Porta destrancada.':'🔒 Porta trancada.');return true}
+    const lh=lampHit10(p.wx,p.wy,p.v);if(lh){const on=!lampBase10(lh);lampSet10([lh.id],on,'gm');toast(on?'🔆 Lâmpada ligada.':'🔆 Lâmpada apagada.');return true}
+    const sh=swHit10(p.wx,p.wy,p.v);if(sh){swUse10(sh,null);return true}
     if(!mapHit7(p.wx,p.wy)){const w=nearWall10(p.wx,p.wy,p.v,true);if(w){doorUse10(w,null);return true}}
   }
   return false;
@@ -7748,30 +7916,34 @@ T3.tacDown=tacDown10;
 
 /* ---------- barra de ferramentas ---------- */
 function tacTools10(isM,b){
-  const geo=geo10();
-  return{main:isM?`${b('laser','🔴','Ponto de destaque para todos (ou segure L)',MAP7.tool==='laser')}${b('edit','✏️','Editar paredes, portas e cômodos',MAP7.tool==='edit')}${b('dark','🌑',geo.dark?'Ambiente escuro: ligado (clique para desligar)':'Ambiente escuro: desligado (clique para ligar)',geo.dark)}`:'',
-    view:`${b('follow','🎯',TAC10.follow?'Seguir meu token: ligado':'Seguir meu token: desligado',TAC10.follow)}`,
-    row:isM&&MAP7.tool==='edit'?editRow10():'',sig:[geo.dark,TAC10.edit,TAC10.snap,TAC10.follow,!!TAC10.placing].join()};
+  const geo=geo10(),ct=ctlTok10(),hasT=!!(ct&&hasLight10(charById(ct.charId))),tOn=hasT&&torchOn10(ct);
+  const torch=hasT?b('torch','🔦',tOn?'Lanterna ligada (tecla F desliga)':'Lanterna desligada (tecla F liga)',tOn):'';
+  return{main:isM?`${b('laser','🔴','Ponto de destaque para todos (ou segure L)',MAP7.tool==='laser')}${b('edit','✏️','Editar paredes, portas e cômodos',MAP7.tool==='edit')}${b('dark','🌑',geo.dark?'Ambiente escuro: ligado (clique para desligar)':'Ambiente escuro: desligado (clique para ligar)',geo.dark)}${b('power','⚡','Queda de energia: as luzes piscam e apagam',false)}`:'',
+    view:`${torch}${b('follow','🎯',TAC10.follow?'Seguir meu token: ligado':'Seguir meu token: desligado',TAC10.follow)}`,
+    row:isM&&MAP7.tool==='edit'?editRow10():'',sig:[geo.dark,TAC10.edit,TAC10.snap,TAC10.follow,!!TAC10.placing,hasT,tOn,geo.lamps.length].join()};
 }
 function editRow10(){
   const m=TAC10.edit,c=(id,l,on,cls='')=>`<button type="button" class="mt-chip ${on?'on':''} ${cls}" data-mt="e:${id}" aria-pressed="${on?'true':'false'}">${l}</button>`;
-  return`<div class="mt-row mt-edit">${c('wall','🧱 Parede',m==='wall')}${c('door','🚪 Porta',m==='door')}${c('room','▢ Cômodo',m==='room')}${c('roomfog','🌫 Névoa do cômodo',m==='roomfog')}${c('erase','✂ Apagar',m==='erase')}<span class="mt-sep"></span>${c('snap','🧲 Ímã '+(TAC10.snap?'ligado':'desligado'),TAC10.snap)}${c('undo','⤺ Desfazer',false)}${c('revealall','Revelar cômodos',false)}${c('hideall','Cobrir cômodos',false)}${c('clear','Apagar tudo',false,'danger')}${c('done','✓ Concluir',false)}</div>`;
+  return`<div class="mt-row mt-edit">${c('wall','🧱 Parede',m==='wall')}${c('door','🚪 Porta',m==='door')}${c('room','▢ Cômodo',m==='room')}${c('roomfog','🌫 Névoa do cômodo',m==='roomfog')}${c('lamp','🔆 Lâmpada',m==='lamp')}${c('sw','💡 Interruptor',m==='sw')}${c('erase','✂ Apagar',m==='erase')}<span class="mt-sep"></span>${c('snap','🧲 Ímã '+(TAC10.snap?'ligado':'desligado'),TAC10.snap)}${c('undo','⤺ Desfazer',false)}${c('allon','Ligar todas as luzes',false)}${c('alloff','Apagar todas as luzes',false)}${c('revealall','Revelar cômodos',false)}${c('hideall','Cobrir cômodos',false)}${c('clear','Apagar tudo',false,'danger')}${c('done','✓ Concluir',false)}</div>`;
 }
 function tacTool10(id){
   const isM=isGM6();
   if(id==='follow'){TAC10.follow=!TAC10.follow;lsSet6('tulpa_follow',TAC10.follow);return true}
+  if(id==='torch'){torchToggle10();return true}
   if(!isM)return false;
+  if(id==='power'){blackout10();return true}
   if(id==='laser'){MAP7.tool=MAP7.tool==='laser'?'move':'laser';return true}
   if(id==='edit'){MAP7.tool=MAP7.tool==='edit'?'move':'edit';TAC10.chain=null;TAC10.poly=null;TAC10.doorA=null;actButton10();return true}
   if(id==='dark'){const g=geo10();g.dark=!g.dark;geoSet10(g,{undo:false});toast(g.dark?'🌑 Ambiente escuro ligado: só a lanterna (ou o tato) revela o mapa.':'Ambiente claro: os cômodos revelados ficam visíveis.');return true}
   if(id.startsWith('e:')){
     const k=id.slice(2),g=geo10();
-    if(['wall','door','room','roomfog','erase'].includes(k)){if(TAC10.edit==='room'&&k!=='room'&&TAC10.poly)polyClose10();TAC10.edit=k;TAC10.chain=null;TAC10.doorA=null;if(k!=='room')TAC10.poly=null}
+    if(['wall','door','room','roomfog','lamp','sw','erase'].includes(k)){if(TAC10.edit==='room'&&k!=='room'&&TAC10.poly)polyClose10();TAC10.edit=k;TAC10.chain=null;TAC10.doorA=null;if(k!=='room')TAC10.poly=null}
     else if(k==='snap')TAC10.snap=!TAC10.snap;
     else if(k==='undo')geoUndo10();
+    else if(k==='allon'||k==='alloff'){const on=k==='allon',ids=g.lamps.map(l=>l.id);if(!ids.length)toast('Nenhuma lâmpada neste mapa.');else lampSet10(ids,on,'gm')}
     else if(k==='revealall'){g.rooms=g.rooms.map(r=>({...r,open:true}));geoSet10(g)}
     else if(k==='hideall'){g.rooms=g.rooms.map(r=>({...r,open:false,reset:r.reset+1}));geoSet10(g)}
-    else if(k==='clear'){if(confirm('Apagar todas as paredes, portas e cômodos deste mapa?')){geoSet10({walls:[],rooms:[],dark:g.dark})}}
+    else if(k==='clear'){if(confirm('Apagar todas as paredes, portas, cômodos, lâmpadas e interruptores deste mapa?')){geoSet10({walls:[],rooms:[],dark:g.dark})}}
     else if(k==='done'){if(TAC10.poly)polyClose10();MAP7.tool='move';TAC10.chain=null}
     actButton10();return true;
   }
@@ -7781,12 +7953,26 @@ function moveCancel10(id){if(!id||MOV10.id===id){MOV10.id=null;MOV10.st=null;MOV
 function placeStart10(charId){if(!isGM6())return;TAC10.placing=charId;MAP7.tool='place';closeModal();mapTools7();actButton10();mapDraw7();toast('Clique no local do mapa onde o token deve aparecer.')}
 T3.placeToken=placeStart10;
 
-/* ---------- quadro: atualiza animações (lerp, laser) ---------- */
+/* névoa dos cômodos: sobe para 1 quando o jogador sai, desce para 0 quando entra (≈200 ms) */
+function stepFog10(vs,dt){
+  if(vs.mode!=='rooms')return false;
+  const FA=TAC10.fogA,fogged=new Set(vs.fog.map(r=>r.id));let anim=false;
+  vs.geo.rooms.forEach(r=>{
+    if(r.open){delete FA[r.id];return}
+    const tgt=fogged.has(r.id)?1:0;if(FA[r.id]==null){FA[r.id]=tgt;return}
+    const d=tgt-FA[r.id];if(Math.abs(d)<.001){FA[r.id]=tgt;return}
+    FA[r.id]+=Math.sign(d)*Math.min(Math.abs(d),dt/FADE_S10);anim=true;
+  });
+  return anim;
+}
+/* ---------- quadro: atualiza animações (lerp, laser, névoa) ---------- */
 function tacFrame10(){
   const now=performance.now(),dt=TAC10.frameAt?Math.min(.1,(now-TAC10.frameAt)/1000):0;TAC10.frameAt=now;
   let again=stepDisp10(dt);
   if(TAC10.laser.pts.length||TAC10.laser.rip.length)again=true;
   TAC10.vs=null;
+  if(TAC10.flick){if(Date.now()<TAC10.flick.until)again=true;else TAC10.flick=null}
+  if(!isGM6()&&stepFog10(view10(),dt))again=true;
   return again;
 }
 
@@ -7794,6 +7980,18 @@ function tacFrame10(){
 onCast6(p=>{
   if(p.t==='ping'&&p.from===gmUid7()&&isFinite(p.x)&&isFinite(p.y)){if(p.from!==uid3())laserGot10(Number(p.x),Number(p.y),p.k)}
   if(p.t==='door'&&p.k===geoKey10()&&p.id){const w=geo10().walls.find(q=>q.id===p.id&&q.door);if(!w)return;TAC10.doorLive[p.id]={open:!!p.open,until:Date.now()+8000};TAC10.blkSig='';if(p.from!==uid3())fx5(p.open?'doorOpen':'doorClose');mapDraw7()}
+  if(p.t==='lamp'&&p.k===geoKey10()&&Array.isArray(p.ids)){p.ids.slice(0,80).forEach(id=>{TAC10.lampLive[String(id)]={on:!!p.on,until:Date.now()+600000}});if(p.from!==uid3())fx5('switchClick');TAC10.vs=null;mapDraw7()}
+  if(p.t==='lt'&&p.id){TAC10.ltLive[String(p.id)]={on:!!p.on,until:Date.now()+600000};TAC10.vs=null;const t=(M6.state.tokens||[]).find(q=>q.id===p.id);if(p.from!==uid3()&&t&&tokVisible10(t))fx5('torchClick');mapTools7();mapDraw7()}
+  if(p.t==='power'&&p.from===gmUid7()&&p.k===geoKey10()&&p.from!==uid3())powerFx10();
+  if(p.t==='req'&&p.kind==='sw'&&isGM6()&&p.k===geoKey10()){
+    const g=geo10(),q=g.sws.find(x=>x.id===p.id);if(!q)return;
+    const ids=swLamps10(g,q).map(l=>l.id);g.lamps=g.lamps.map(l=>ids.includes(l.id)?{...l,on:!!p.on}:l);geoSet10(g,{undo:false});
+  }
+  if(p.t==='req'&&p.kind==='lt'&&isGM6()){
+    const t=(M6.state.tokens||[]).find(q=>q.id===p.id),ch=t&&charById(t.charId);
+    if(!t||!ch||ch.ownerId!==p.from)return; /* só o dono liga a própria lanterna */
+    setState6({tokens:(M6.state.tokens||[]).map(q=>q.id===t.id?{...q,lt:!!p.on}:q)});
+  }
   if(p.t==='doorlk'&&p.k===geoKey10()&&p.from!==uid3()){fx5('doorLocked');if(isGM6())toast('🔒 '+(String(p.who||'Alguém').slice(0,40))+' tentou abrir uma porta trancada.')}
   if(p.t==='req'&&p.kind==='door'&&isGM6()&&p.k===geoKey10()){
     const g=geo10(),w=g.walls.find(q=>q.id===p.id&&q.door);if(!w||w.door.locked)return;
@@ -7811,10 +8009,15 @@ onState6(()=>{
   TAC10.lastToks=next;TAC10.vs=null;
   /* o banco confirmou: tira o aviso ao vivo das portas que já batem com o estado gravado */
   const g=geo10();for(const id in TAC10.doorLive){const w=g.walls.find(q=>q.id===id);if(!w||!!w.door?.open===TAC10.doorLive[id].open)delete TAC10.doorLive[id]}
-  TAC10.blkSig='';actButton10();
+  const lampIds=new Set(g.lamps.map(l=>l.id));
+  for(const id in TAC10.lampLive){const l=g.lamps.find(q=>q.id===id);if(!l||!!l.on===TAC10.lampLive[id].on)delete TAC10.lampLive[id]}
+  for(const id in TAC10.ltLive){const t=(M6.state.tokens||[]).find(q=>q.id===id);if(!t||!!t.lt===TAC10.ltLive[id].on)delete TAC10.ltLive[id]}
+  TAC10.blkSig='';actButton10();mapTools7();
 });
-M6.hooks.leave.push(()=>{TAC10.disp={};TAC10.doorLive={};TAC10.undo=[];TAC10.chain=null;TAC10.poly=null;TAC10.placing=null;MOV10.id=null;MOV10.st=null;MOV10.keys.clear();TAC10.exp=null});
+M6.hooks.leave.push(()=>{TAC10.disp={};TAC10.doorLive={};TAC10.undo=[];TAC10.chain=null;TAC10.poly=null;TAC10.placing=null;TAC10.lampLive={};TAC10.ltLive={};TAC10.fogA={};TAC10.flick=null;MOV10.id=null;MOV10.st=null;MOV10.keys.clear()});
 try{const f=lsGet6('tulpa_follow',null);if(f===false)TAC10.follow=false;TAC10.hintSeen=!!lsGet6('tulpa_tac_hint',0)}catch(e){}
+/* o inventário pode mudar fora do mapa (ganhou ou perdeu a lanterna): confere a barra e o botão de vez em quando */
+setInterval(()=>{try{if(MAP7.cv&&MAP7.cv.isConnected&&!document.hidden){mapTools7();actButton10()}}catch(e){}},1200);
 /* o tema mudou: redesenha o mapa com as cores novas */
 try{new MutationObserver(()=>mapDraw7()).observe(document.body,{attributes:true,attributeFilter:['class','data-pal','style']})}catch(e){}
 
