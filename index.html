@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="15/11 03:50">
+<meta name="tulpa-build" content="15/11 03:55">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -7057,7 +7057,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='15/11 03:50';
+const BUILD8='15/11 03:55';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -10613,13 +10613,15 @@ function rhythm(C){
   /* gráfico: notas por compasso conforme a dificuldade */
   const den=gdPick(C.gd,[{sub:2,p:.55,dbl:0},{sub:2,p:.62,dbl:.04,s16:0},{sub:4,p:.42,dbl:.1},{sub:4,p:.6,dbl:.18}]);
   const notes=[];
+  /* chamada e resposta (como no FNF): o primeiro canta uma frase e o outro repete o mesmo padrão.
+     Os dois lados têm sempre as mesmas notas: quem toca perfeito nunca perde. */
   for(let bar=0;bar<BARS;bar++){
-    const phrase=Math.floor(bar/PH),owner=phrase%2;
+    const phrase=Math.floor(bar/PH);if(phrase%2)continue;
     for(let s=0;s<4*den.sub;s++){
       const onBeat=s%den.sub===0;if(!(rng()<(onBeat?Math.min(.95,den.p+.25):den.p)))continue;
-      const t=(bar*4+s/den.sub)*spb,lane=Math.floor(rng()*4);
-      notes.push({t,lane,owner,deg:Math.floor(rng()*song.scale.length),j:null});
-      if(rng()<den.dbl){let l2=(lane+1+Math.floor(rng()*3))%4;notes.push({t,lane:l2,owner,deg:Math.floor(rng()*song.scale.length),j:null,dbl:true})}
+      const t=(bar*4+s/den.sub)*spb,lane=Math.floor(rng()*4),deg=Math.floor(rng()*song.scale.length),off=PH*4*spb;
+      notes.push({t,lane,owner:0,deg,j:null},{t:t+off,lane,owner:1,deg,j:null});
+      if(rng()<den.dbl){const l2=(lane+1+Math.floor(rng()*3))%4;notes.push({t,lane:l2,owner:0,deg,j:null,dbl:true},{t:t+off,lane:l2,owner:1,deg,j:null,dbl:true})}
     }
   }
   notes.sort((a,b)=>a.t-b.t||a.lane-b.lane);notes.forEach((n,i)=>n.i=i);
@@ -10680,6 +10682,7 @@ function rhythm(C){
     let winSi=me.ess>=op.ess?ME:OP;if(S.collapsed===ME)winSi=OP;else if(S.collapsed===OP)winSi=ME;
     const rows=[{u:C.me,n:meInfo.n,c:meInfo.c,s:me.ess,w:winSi===ME},{u:oppU,n:oppInfo.n,c:oppInfo.c,s:op.ess,w:winSi===OP}];
     const why=S.collapsed>=0?` · ${S.collapsed===ME?meInfo.n:oppInfo.n} colapsou`:'';
+    if(S.collapsed<0&&me.ess===op.ess){rows.forEach(r=>r.w=false);C.finish({title:'Empate na batalha de rituais · '+me.ess+' ⚗ cada',rows});return}
     C.finish({title:(winSi===ME?(pvp?'Vitória de '+meInfo.n:'Você venceu o Perseus!'):(pvp?'Vitória de '+oppInfo.n:'O Perseus venceu a batalha'))+why,rows});
     if(!pvp)C.say(winSi===ME?sayFmt(SAY12['humanWin_'+C.diff]||SAY12.humanWin):sayFmt(SAY12['aiWin_'+C.diff]||SAY12.aiWin),false);
   }
