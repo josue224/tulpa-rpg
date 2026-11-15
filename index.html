@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="15/11 00:20">
+<meta name="tulpa-build" content="15/11 01:23">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2309,6 +2309,54 @@ button.hand-badge:hover .hand-ok,button.hand-badge:focus-visible .hand-ok{displa
 .vc-fix{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .vc-fix .btn{min-height:36px}
 
+/* ---------- combate no mapa ---------- */
+.cb-bar{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:6px 8px;border-radius:12px;background:#1b1410;color:#f4ead6;border:1px solid #a9844766;min-width:0}
+.cb-bar[hidden]{display:none}
+.cb-round{flex:none;font-weight:800;font-size:13px;color:#ffd36b;white-space:nowrap}
+.cb-ord{flex:1;min-width:0;display:flex;gap:6px;margin:0;padding:2px 0;list-style:none;overflow-x:auto;scrollbar-width:thin}
+.cb-ord li{flex:none;padding:5px 10px;border-radius:999px;background:#ffffff12;border:1px solid #ffffff22;font-size:13px;font-weight:600;white-space:nowrap}
+.cb-ord li.npc{border-color:#c2493d88}
+.cb-ord li.past{opacity:.55}
+.cb-ord li.down{opacity:.45;text-decoration:line-through}
+.cb-ord li.on{background:#ffd36b;color:#2a1a00;border-color:#ffd36b;font-weight:800;opacity:1;text-decoration:none;box-shadow:0 0 14px -2px #ffd36b}
+.cb-next,.cb-start{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #ffd36b;background:#3a2a10;color:#ffd36b;font:inherit;font-weight:800;font-size:13px;cursor:pointer}
+.cb-start{background:linear-gradient(135deg,#8e2a22,#c2493d);color:#fff;border-color:#e0817a}
+.cb-next:focus-visible,.cb-start:focus-visible{outline:3px solid #ffd36b;outline-offset:2px}
+.cb-hud{margin:8px 0 0;padding:10px 12px;border-radius:14px;background:#1b1410;color:#f4ead6;border:1px solid #a9844766;display:flex;flex-direction:column;gap:8px}
+.cb-hud[hidden]{display:none}
+.cb-hud.aim{border-color:#ff8a6b;box-shadow:0 0 0 2px #ff8a6b33}
+.cbh-pills{display:flex;flex-wrap:wrap;gap:6px}
+.cbp{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#ffffff10;border:1px solid #ffffff24;font-size:12.5px}
+.cbp b{font-weight:700}
+.cbp em{font-style:normal;font-weight:800;color:#ffd36b}
+.cbp.free em{color:#7fe3ff}
+.cbp.off{opacity:.5}
+.cbp.off em{color:#c9b995}
+.cbp.mv i{display:inline-block;width:64px;height:7px;border-radius:4px;background:#ffffff1c;overflow:hidden}
+.cbp.mv i s{display:block;height:100%;background:linear-gradient(90deg,#3fb27f,#7dffa8);text-decoration:none}
+.cbh-acts{display:flex;flex-wrap:wrap;gap:6px}
+.cbh-acts .btn{min-height:38px}
+.cbh-acts .btn:not(.primary):not(.danger){background:#3a2c22;border-color:#6b5a44;color:#f4ead6}
+.cbh-acts .btn[disabled]{opacity:.45}
+.cbh-aim{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:14px;line-height:1.45}
+.cbh-btns{display:flex;flex-wrap:wrap;gap:6px}
+.cbh-btns .btn{min-height:38px}
+.cbh-btns .btn:not(.primary){background:#3a2c22;border-color:#6b5a44;color:#f4ead6}
+.cbh-note{margin:0;font-size:13px;color:#ffb3a8}
+.cb-init{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+.cb-init li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#00000010;border:1px solid #00000018}
+body.t3-dark .cb-init li{background:#ffffff0a;border-color:#ffffff18}
+.cb-init li.on{border-color:#d4a017;background:#f2b31022}
+.cb-init .cb-i{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#2a1c14;color:#ffd36b;font-weight:800;font-size:13px;flex:none}
+.cb-init b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cb-dice{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.cb-dice i{font-style:normal;display:grid;place-items:center;min-width:24px;height:24px;padding:0 3px;border-radius:6px;border:1px solid #9d846188;font-size:12px;opacity:.6}
+.cb-dice i.hi{opacity:1;background:#2a1c14;color:#ffd36b;border-color:#2a1c14;font-weight:800}
+.cb-dice em{font-style:normal;font-size:12px}
+.cb-init strong{font-size:20px;min-width:34px;text-align:right}
+@media (max-width:560px){.cb-hud{padding:8px 10px}.cbp{font-size:12px;padding:4px 8px}.cbp.mv i{width:44px}.cbh-acts .btn{flex:1 1 calc(50% - 6px)}.cb-round{font-size:12px}}
+body.cb-aiming #t3Roll{pointer-events:none;opacity:.35}
+
 /* Gerado por gen_palette.py: camada de paletas (não edite à mão). */
 html body.t3-pal{color:var(--text);background:radial-gradient(ellipse at 50% -18%,color-mix(in oklab,var(--text) 3%,var(--panel)) 0%,color-mix(in oklab,var(--panel) 24%,var(--bg)) 55%,var(--bg) 100%)!important}
 html body.t3-pal #portal{background:radial-gradient(ellipse at 50% 0%,color-mix(in oklab,var(--text) 3%,var(--panel)) 0%,color-mix(in oklab,var(--panel) 40%,var(--bg)) 56%,var(--bg) 100%)!important;color:var(--text)}
@@ -4022,7 +4070,9 @@ async function resolveFor(aid,tid,defRow){
   const crit=(a.best>=a.weapon.critMin);
   const sumN=a.dmg.normal.reduce((x,y)=>x+y,0),dmgInfo={dado:a.weapon.dado,normal:a.dmg.normal,crit:a.dmg.crit,usedCrit:false,flat:a.dmg.total-sumN,total:a.dmg.total};
   const dT=ch.id===activeCharacterId?data:ch.data,targetDown=E.isDying(dT)||E.isDead(dT),nat20=a.best===20;
-  let res=E.resolveAttack({ATA:p.row.total,RF:canDefend?defRow.total:0,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:crit||nat20,nat20,targetDown,proficient:dd.prof!==false});
+  /* cobertura parcial (mapa tático): +N na defesa de quem está atrás de uma quina */
+  const cov=Math.max(0,Number(a.cover)||0),RFc=canDefend?defRow.total+cov:0;
+  let res=E.resolveAttack({ATA:p.row.total,RF:RFc,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:crit||nat20,nat20,targetDown,proficient:dd.prof!==false});
   const out={final:0,absorbed:0,resisted:0,notes:[]},stAdd=[];
   /* reações instantâneas do defensor */
   const atkView={skill:a.weapon.skill,dice:p.row.dice||[],bonus:p.row.bonus||0,total:p.row.total};let critNow=crit;
@@ -4032,7 +4082,7 @@ async function resolveFor(aid,tid,defRow){
     const n=Math.max(1,(p.row.dice||[]).length),dice2=Array.from({length:n},()=>E.die(20)),best2=Math.max(...dice2),ATA2=best2+(p.row.bonus||0);
     announceRoll(ch,'Desvio Improvável · ataque repetido',{dice:dice2,sides:20,bonus:p.row.bonus||0,total:ATA2,eyebrow:'REAÇÃO'});
     critNow=best2>=a.weapon.critMin;
-    res=E.resolveAttack({ATA:ATA2,RF:canDefend?defRow.total:0,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:critNow||best2===20,nat20:best2===20,targetDown,proficient:dd.prof!==false});
+    res=E.resolveAttack({ATA:ATA2,RF:RFc,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:critNow||best2===20,nat20:best2===20,targetDown,proficient:dd.prof!==false});
     Object.assign(atkView,{dice:dice2,total:ATA2});out.notes.push(`Reação: Desvio Improvável — o atacante repetiu o ataque (${p.row.total} → ${ATA2}).`);
   }
   if(res.forced)out.notes.push('20 natural: o ataque sempre acerta, independentemente de bônus ou defesa.');
@@ -4063,7 +4113,8 @@ async function resolveFor(aid,tid,defRow){
     });
   }
   if(res.extraDef)mutateChar(ch,d=>{d.retalExtra=(Number(d.retalExtra)||0)+1;d.retalTarget=a.attackerId});
-  const detail={cmb:'res',aid,targetId:tid,targetName:nm(ch),attackerId:a.attackerId,attackerName:a.attackerName,weapon:a.weapon.name,mode:dd.mode,outcome:res.outcome,label:res.label,text:res.text,hit:res.hit,crit:res.crit,ATA:res.ATA,RF:res.RF,DB:10,DF:dd.df,dmg:{final:out.final,absorbed:out.absorbed,resisted:out.resisted},statuses:stAdd,notes:out.notes,forced:!!res.forced,extraAtk:res.extraAtk,extraDef:res.extraDef,atk:atkView,react:dd.react||'',def:{skill:dd.mode==='reflexo'?'Reflexo':dd.mode==='none'?'Sem defesa':'Esquiva',dice:defRow.dice||[],bonus:defRow.bonus||0,total:defRow.total},dmgInfo};
+  if(cov&&canDefend)out.notes.push(`Cobertura parcial: +${cov} na defesa.`);
+  const detail={cmb:'res',cover:cov,aid,targetId:tid,targetName:nm(ch),attackerId:a.attackerId,attackerName:a.attackerName,weapon:a.weapon.name,mode:dd.mode,outcome:res.outcome,label:res.label,text:res.text,hit:res.hit,crit:res.crit,ATA:res.ATA,RF:res.RF,DB:10,DF:dd.df,dmg:{final:out.final,absorbed:out.absorbed,resisted:out.resisted},statuses:stAdd,notes:out.notes,forced:!!res.forced,extraAtk:res.extraAtk,extraDef:res.extraDef,atk:atkView,react:dd.react||'',def:{skill:dd.mode==='reflexo'?'Reflexo':dd.mode==='none'?'Sem defesa':'Esquiva',dice:defRow.dice||[],bonus:defRow.bonus||0,total:defRow.total},dmgInfo};
   try{await insertRow(ch,'Resultado do confronto',{dice:[],bonus:0,total:out.final,detail})}catch(e){fail3('registrar resultado',e)}
 }
 
@@ -4163,7 +4214,7 @@ async function startAttack(ch,{retal=false}={}){
     closeModal();spend(ch);mutateChar(ch,x=>{const t=E.ensureInv(x).items.find(i=>i.id===it.id);if(t)t.loc='maos'});toast(it.name+' sacada. A ação foi gasta.');renderCombatUI();
   });
 }
-async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=false}={}){
+async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=false,extra=null}={}){
   const d=ch.id===activeCharacterId?data:ch.data;
   /* munição opcional: armas de Distância marcadas gastam 1 "Munição solta" por ataque */
   if(w._ammo){const am=E.ensureInv(d).items.find(i=>/muni[çc][ãa]o/i.test(i.name)&&i.loc!=='chao'&&(Number(i.qty)||0)>0);if(!am){toast('Sem munição! Adicione "Munição solta" no inventário (Equipamentos) para recarregar.');return}}
@@ -4184,7 +4235,7 @@ async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=
   const dmg=E.rollDamage(w,{extraDice:cal.mods.dmgDice+(favOn?1:0),flat});
   const aid=rid(),cm=camp3()?.combat;
   const des=d.extase?.on&&d.extase.bonus==='desarme';
-  const detail={cmb:'atk',aid,round:cm?.round||0,attackerId:ch.id,attackerName:nm(ch),targets:ids.map(i=>({id:i,name:nm(charById(i))})),weapon:{name:w.name,dado:w.dado,critMin:w.critMin,skill:w.skill,cat:w.cat,area:!!w.area,effects:w.effects||[]},best:r.best,dmg:{total:dmg.total,critTotal:dmg.critTotal,normal:dmg.normal,crit:dmg.crit},surprise,ignoreResist:ignore,desarme:!!des,noDefense:!!retal};
+  const detail={cmb:'atk',aid,round:cm?.round||0,attackerId:ch.id,attackerName:nm(ch),targets:ids.map(i=>({id:i,name:nm(charById(i))})),weapon:{name:w.name,dado:w.dado,critMin:w.critMin,skill:w.skill,cat:w.cat,area:!!w.area,effects:w.effects||[]},best:r.best,dmg:{total:dmg.total,critTotal:dmg.critTotal,normal:dmg.normal,crit:dmg.crit},surprise,ignoreResist:ignore,desarme:!!des,noDefense:!!retal,...(extra||{})};
   mutateChar(ch,x=>{consumeOnce(x,cal,{attack:true});(x.activeEffects||[]).forEach(e=>{if(e.ignoreResist&&e.type==='once')e._used=1});if(w._ammo){const am=E.ensureInv(x).items.find(i=>/muni[çc][ãa]o/i.test(i.name)&&i.loc!=='chao'&&(Number(i.qty)||0)>0);if(am){am.qty=(Number(am.qty)||1)-1;if(am.qty<=0)x.inventory.items=x.inventory.items.filter(i=>i!==am)}}});
   showRollPopup({eyebrow:retal?'RETALIAÇÃO':'ATAQUE',title:`${nm(ch)} · ${w.name}`,sub:`${w.skill} → ${detail.targets.map(t=>t.name).join(', ')}`,
     sets:[{label:`${w.skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max',note:r.mode!=='normal'?r.mode:''},
@@ -6638,6 +6689,7 @@ function mapDown7(e){
   try{MAP7.cv.setPointerCapture(e.pointerId)}catch(x){}
   mapMenu7(null);
   if(MAP7.ptrs.size===2){const [a,b]=[...MAP7.ptrs.values()];MAP7.drag={kind:'pinch',d0:Math.hypot(a.sx-b.sx,a.sy-b.sy),z0:MAP7.cam.z};return}
+  if(T3.cbDown&&T3.cbDown(e,p))return;
   if(tacDown10(e,p))return;
   if(MAP7.tool==='ruler'){const g=mapCfg7(),[cx,cy]=mapCellAt7(p.wx,p.wy);const a={x:g.ox+(cx+.5)*g.cell,y:g.oy+(cy+.5)*g.cell};MAP7.ruler={a,b:{...a}};MAP7.drag={kind:'ruler'};mapDraw7();return}
   if(isM&&(MAP7.tool==='reveal'||MAP7.tool==='hide')){MAP7.drag={kind:'fog',set:new Set(M6.state.fog?.open||[])};mapFogPaint7(p);return}
@@ -6650,7 +6702,7 @@ function mapDown7(e){
 }
 function mapMove7(e){
   const d=MAP7.drag;if(MAP7.ptrs.has(e.pointerId)){const r=MAP7.cv.getBoundingClientRect();MAP7.ptrs.set(e.pointerId,{sx:e.clientX-r.left,sy:e.clientY-r.top})}
-  const p=mapPt7(e);if(tacMove10(e,p))return;
+  const p=mapPt7(e);if(T3.cbHover)T3.cbHover(e,p);if(tacMove10(e,p))return;
   if(!d)return;
   if(d.kind==='pinch'){if(MAP7.ptrs.size<2)return;const [a,b]=[...MAP7.ptrs.values()];mapCam7({...MAP7.cam,z:d.z0*Math.hypot(a.sx-b.sx,a.sy-b.sy)/Math.max(10,d.d0)});return}
   if(d.kind==='pan'){const v=p.v;mapCam7({z:d.cam.z,x:d.cam.x-(p.sx-d.sx)/(v.s*v.W),y:d.cam.y-(p.sy-d.sy)/(v.s*v.H)});return}
@@ -6662,7 +6714,7 @@ function mapMove7(e){
     const prev=MAP7.live[d.id]||tokPos7(t||{x,y}),a=prev.a!=null?prev.a:t?.a;
     if(t&&!isGM6()){/* o jogador arrasta com colisão: não atravessa paredes nem portas fechadas */
       const s=t.s||1,c0=[g.ox+(prev.x+s/2)*g.cell,g.oy+(prev.y+s/2)*g.cell],c1=[g.ox+(x+s/2)*g.cell,g.oy+(y+s/2)*g.cell];
-      const [nx,ny]=collide10(c0[0],c0[1],c1[0],c1[1],tokR10(t),blockers10());x=(nx-g.ox)/g.cell-s/2;y=(ny-g.oy)/g.cell-s/2}
+      let [nx,ny]=collide10(c0[0],c0[1],c1[0],c1[1],tokR10(t),blockers10());if(T3.cbMove)[nx,ny]=T3.cbMove(t,c0[0],c0[1],nx,ny,'drag');x=(nx-g.ox)/g.cell-s/2;y=(ny-g.oy)/g.cell-s/2}
     MAP7.live[d.id]={x,y,a,until:Date.now()+60000};
     const now=Date.now();if(now-(d.cast||0)>80){d.cast=now;cast6({t:'tok',id:d.id,x:+x.toFixed(3),y:+y.toFixed(3),a})}
     mapDraw7();
@@ -6678,7 +6730,8 @@ function mapUp7(e){
     if(!d.moved){delete MAP7.live[d.id];mapMenu7(t,e);return}
     const g=mapCfg7(),l=MAP7.live[d.id]||t,sz=t.s||1;
     let x=Math.max(0,Math.min(g.cols-sz,Math.round(l.x))),y=Math.max(0,Math.min(g.rows-sz,Math.round(l.y)));
-    if(!isGM6()){/* encaixa na grade só se o encaixe não entrar numa parede */
+    if(!isGM6()&&T3.cbNoSnap&&T3.cbNoSnap(t)){x=l.x;y=l.y}
+    else if(!isGM6()){/* encaixa na grade só se o encaixe não entrar numa parede */
       const c0=[g.ox+(l.x+sz/2)*g.cell,g.oy+(l.y+sz/2)*g.cell],[nx,ny]=collide10(c0[0],c0[1],g.ox+(x+sz/2)*g.cell,g.oy+(y+sz/2)*g.cell,tokR10(t),blockers10());
       const sx=(nx-g.ox)/g.cell-sz/2,sy=(ny-g.oy)/g.cell-sz/2;if(Math.abs(sx-x)+Math.abs(sy-y)>.05){x=sx;y=sy}}
     mapCommitMove7(d.id,x,y,l.a!=null?l.a:t.a);
@@ -6805,6 +6858,7 @@ function mapPaint7(){
     if(!isM&&(g.ox>0||g.oy>0)){const [ax,ay]=w2s7(v,0,0);x.fillRect(ax,ay,mw,g.oy*v.s);x.fillRect(ax,ay,g.ox*v.s,mh)}
   }
   paintOver10(x,v,g,isM);
+  if(T3.cbPaint){try{if(T3.cbPaint(x,v,g))again=true}catch(e){console.warn('[T14] desenho',e)}}
   if(MAP7.ruler)mapRuler7(v,g,MAP7.ruler.a,MAP7.ruler.b);
   const info=$('mapInfo');if(info){const m=M6.state.map,gg=geo10(),txt=(m?m.name:'Sem mapa')+' · '+g.mpc.toLocaleString('pt-BR')+' m por quadrado'+(gg.dark?' · 🌑 ambiente escuro':'')+(fog?.on?' · névoa ligada':'');if(info.textContent!==txt)info.textContent=txt}
   if(again)mapDraw7();
@@ -6909,7 +6963,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='15/11 00:20';
+const BUILD8='15/11 01:23';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -7486,7 +7540,7 @@ function normGeo10(g){
     const o={id:String(w.id||('w'+rid())).slice(0,24),a:[rnd10(w.a[0]),rnd10(w.a[1])],b:[rnd10(w.b[0]),rnd10(w.b[1])]};
     if(w.door)o.door={open:!!w.door.open,locked:!!w.door.locked};return o});
   const rooms=(Array.isArray(g.rooms)?g.rooms:[]).filter(r=>r&&Array.isArray(r.pts)&&r.pts.length>=3).slice(0,120).map(r=>({
-    id:String(r.id||('r'+rid())).slice(0,24),name:String(r.name||'Cômodo').slice(0,40),pts:r.pts.slice(0,64).map(p=>[rnd10(p[0]),rnd10(p[1])]),open:!!r.open,reset:Number(r.reset)||0}));
+    id:String(r.id||('r'+rid())).slice(0,24),name:String(r.name||'Cômodo').slice(0,40),pts:r.pts.slice(0,64).map(p=>[rnd10(p[0]),rnd10(p[1])]),open:!!r.open,reset:Number(r.reset)||0,...(r.rough?{rough:true}:{})}));
   const lamps=(Array.isArray(g.lamps)?g.lamps:[]).filter(l=>l&&isFinite(l.x)&&isFinite(l.y)).slice(0,120).map(l=>({id:String(l.id||('l'+rid())).slice(0,24),x:rnd10(l.x),y:rnd10(l.y),room:l.room?String(l.room).slice(0,24):null,on:!!l.on}));
   const sws=(Array.isArray(g.sws)?g.sws:[]).filter(q=>q&&isFinite(q.x)&&isFinite(q.y)).slice(0,120).map(q=>({id:String(q.id||('s'+rid())).slice(0,24),x:rnd10(q.x),y:rnd10(q.y),room:q.room?String(q.room).slice(0,24):null}));
   return{walls,rooms,lamps,sws,dark:!!g.dark};
@@ -7860,6 +7914,12 @@ function editDown10(e,p){
     const l=TAC10.poly[TAC10.poly.length-1];if(l&&hyp10(sx-l[0],sy-l[1])*v.s<4)return true;
     TAC10.poly.push([sx,sy]);mapDraw7();return true;
   }
+  if(m==='rough'){
+    const rs=roomAt10(geo.rooms,p.wx,p.wy).sort((a,b)=>polyArea10(a.pts)-polyArea10(b.pts));const r=rs[0];
+    if(!r){toast('Clique dentro de um cômodo.');return true}
+    geo.rooms=geo.rooms.map(q=>q.id===r.id?(q.rough?(({rough,...z})=>z)(q):{...q,rough:true}):q);geoSet10(geo);
+    toast(r.rough?`“${r.name}” voltou a ser terreno normal.`:`“${r.name}” agora é terreno difícil: andar ali custa o dobro.`);return true;
+  }
   if(m==='roomfog'){
     const rs=roomAt10(geo.rooms,p.wx,p.wy).sort((a,b)=>polyArea10(a.pts)-polyArea10(b.pts));const r=rs[0];
     if(!r){toast('Clique dentro de um cômodo.');return true}
@@ -8077,7 +8137,8 @@ function moveTick10(now){
   if(mag>.08){
     const run=MOV10.keys.has('ShiftLeft')||MOV10.keys.has('ShiftRight'),sp=SPEED10*(run?1.8:1)*g.cell*Math.min(1,mag);
     const s=t.s||1,cx=g.ox+(st.x+s/2)*g.cell,cy=g.oy+(st.y+s/2)*g.cell;
-    const [nx,ny]=collide10(cx,cy,cx+vx*sp*dt,cy+vy*sp*dt,tokR10(t),blockers10());
+    let [nx,ny]=collide10(cx,cy,cx+vx*sp*dt,cy+vy*sp*dt,tokR10(t),blockers10());
+    if(T3.cbMove)[nx,ny]=T3.cbMove(t,cx,cy,nx,ny,'key');
     if(Math.abs(nx-cx)+Math.abs(ny-cy)>1e-4){st.x=(nx-g.ox)/g.cell-s/2;st.y=(ny-g.oy)/g.cell-s/2;changed=true}
     if(!rot&&MOV10.aim==null){const want=Math.atan2(vy,vx),d=angDiff10(want,st.a);st.a=normAng10(st.a+d*Math.min(1,dt*14));changed=true}
   }
@@ -8160,7 +8221,7 @@ function actButton10(){
   b.textContent=near?(near.kind==='sw'?(swLamps10(geo10(),near.obj).some(lampBase10)?'💡 Apagar a luz':'💡 Acender a luz'):(near.obj.door.locked&&!isGM6()?'🔒 Tentar abrir':doorOpen10(near.obj)?'✋ Fechar porta':'✋ Abrir porta')):'✋ Interagir';
   if(h){const msg=TAC10.placing?'Clique no local do mapa onde o token deve aparecer (Esc cancela).':(isGM6()&&MAP7.tool==='edit')?editHint10():(!touch&&t&&canMove7(t)&&!TAC10.hintSeen?'WASD ou setas: andar · mouse ou Q/E: virar · Espaço ou toque em E: interagir · F: lanterna · Shift: correr':(t&&canMove7(t)&&geo10().dark&&hasLight10(charById(t.charId))&&!torchOn10(t)?'Está escuro: aperte F (ou o botão 🔦) para ligar a lanterna.':''));h.hidden=!msg;h.textContent=msg}
 }
-function editHint10(){return{wall:'Parede: clique para marcar pontos; clique duplo, Enter ou botão direito termina a linha.',door:'Porta: clique numa parede para torná-la porta, ou clique dois pontos para criar uma porta nova.',room:'Cômodo: clique os cantos; feche clicando no primeiro ponto (ou Enter).',roomfog:'Névoa do cômodo: clique dentro de um cômodo para revelar ou recolocar a névoa.',lamp:'Lâmpada: clique dentro de um cômodo para colocar; clique numa lâmpada para ligar ou apagar.',sw:'Interruptor: clique perto de uma parede do cômodo. Ele liga e apaga as lâmpadas daquele cômodo.',erase:'Apagar: clique numa parede, porta, lâmpada, interruptor ou dentro de um cômodo.'}[TAC10.edit]||''}
+function editHint10(){return{wall:'Parede: clique para marcar pontos; clique duplo, Enter ou botão direito termina a linha.',door:'Porta: clique numa parede para torná-la porta, ou clique dois pontos para criar uma porta nova.',room:'Cômodo: clique os cantos; feche clicando no primeiro ponto (ou Enter).',roomfog:'Névoa do cômodo: clique dentro de um cômodo para revelar ou recolocar a névoa.',rough:'Terreno difícil: clique dentro de um cômodo. Em combate, andar ali custa o dobro (9 m viram 4,5 m).',lamp:'Lâmpada: clique dentro de um cômodo para colocar; clique numa lâmpada para ligar ou apagar.',sw:'Interruptor: clique perto de uma parede do cômodo. Ele liga e apaga as lâmpadas daquele cômodo.',erase:'Apagar: clique numa parede, porta, lâmpada, interruptor ou dentro de um cômodo.'}[TAC10.edit]||''}
 
 /* ---------- ponteiro: editor, laser, posicionar token, mirar ---------- */
 function tacDown10(e,p){
@@ -8206,7 +8267,7 @@ function tacTools10(isM,b){
 }
 function editRow10(){
   const m=TAC10.edit,c=(id,l,on,cls='')=>`<button type="button" class="mt-chip ${on?'on':''} ${cls}" data-mt="e:${id}" aria-pressed="${on?'true':'false'}">${l}</button>`;
-  return`<div class="mt-row mt-edit">${c('wall','🧱 Parede',m==='wall')}${c('door','🚪 Porta',m==='door')}${c('room','▢ Cômodo',m==='room')}${c('roomfog','🌫 Névoa do cômodo',m==='roomfog')}${c('lamp','🔆 Lâmpada',m==='lamp')}${c('sw','💡 Interruptor',m==='sw')}${c('erase','✂ Apagar',m==='erase')}<span class="mt-sep"></span>${c('snap','🧲 Ímã '+(TAC10.snap?'ligado':'desligado'),TAC10.snap)}${c('undo','⤺ Desfazer',false)}${c('allon','Ligar todas as luzes',false)}${c('alloff','Apagar todas as luzes',false)}${c('revealall','Revelar cômodos',false)}${c('hideall','Cobrir cômodos',false)}${c('clear','Apagar tudo',false,'danger')}${c('done','✓ Concluir',false)}</div>`;
+  return`<div class="mt-row mt-edit">${c('wall','🧱 Parede',m==='wall')}${c('door','🚪 Porta',m==='door')}${c('room','▢ Cômodo',m==='room')}${c('roomfog','🌫 Névoa do cômodo',m==='roomfog')}${c('rough','🪨 Terreno difícil',m==='rough')}${c('lamp','🔆 Lâmpada',m==='lamp')}${c('sw','💡 Interruptor',m==='sw')}${c('erase','✂ Apagar',m==='erase')}<span class="mt-sep"></span>${c('snap','🧲 Ímã '+(TAC10.snap?'ligado':'desligado'),TAC10.snap)}${c('undo','⤺ Desfazer',false)}${c('allon','Ligar todas as luzes',false)}${c('alloff','Apagar todas as luzes',false)}${c('revealall','Revelar cômodos',false)}${c('hideall','Cobrir cômodos',false)}${c('clear','Apagar tudo',false,'danger')}${c('done','✓ Concluir',false)}</div>`;
 }
 function tacTool10(id){
   const isM=isGM6();
@@ -8219,7 +8280,7 @@ function tacTool10(id){
   if(id==='dark'){const g=geo10();g.dark=!g.dark;geoSet10(g,{undo:false});toast(g.dark?'🌑 Ambiente escuro ligado: só a lanterna (ou o tato) revela o mapa.':'Ambiente claro: os cômodos revelados ficam visíveis.');return true}
   if(id.startsWith('e:')){
     const k=id.slice(2),g=geo10();
-    if(['wall','door','room','roomfog','lamp','sw','erase'].includes(k)){if(TAC10.edit==='room'&&k!=='room'&&TAC10.poly)polyClose10();TAC10.edit=k;TAC10.chain=null;TAC10.doorA=null;if(k!=='room')TAC10.poly=null}
+    if(['wall','door','room','roomfog','rough','lamp','sw','erase'].includes(k)){if(TAC10.edit==='room'&&k!=='room'&&TAC10.poly)polyClose10();TAC10.edit=k;TAC10.chain=null;TAC10.doorA=null;if(k!=='room')TAC10.poly=null}
     else if(k==='snap')TAC10.snap=!TAC10.snap;
     else if(k==='undo')geoUndo10();
     else if(k==='allon'||k==='alloff'){const on=k==='allon',ids=g.lamps.map(l=>l.id);if(!ids.length)toast('Nenhuma lâmpada neste mapa.');else lampSet10(ids,on,'gm')}
@@ -8325,7 +8386,13 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'✋ Levantar a mão, dificuldade do Perseus e tela cheia',w:'a',open:1,b:`<ul>
+  {t:'⚔ Combate dentro do mapa tático',w:'a',open:1,b:`<ul>
+   <li><b>⚔ Iniciar Combate</b> ${TM} (botão em cima do mapa): rola na hora o Reflexo de todos com o olho ligado, mostra os dados e monta a ordem. Ninguém precisa clicar para rolar.</li>
+   <li>A vez de cada um aparece no mapa: <b>anel dourado</b> e a etiqueta <b>⚡ SEU TURNO</b> em cima do token. A barra acima do mapa mostra a ordem da rodada.</li>
+   <li>Embaixo do mapa fica o painel do turno: <b>👣 Movimento</b> (9 m), <b>⚔ Ação Padrão</b> (1, +1 no Acerto Violento), <b>⚡ Talento</b> e <b>🔁 Saque rápido</b> (livres, 1 por turno) e <b>🛡 Reação</b>.</li>
+   <li><b>Atacar</b>: escolha a arma e <b>clique no token</b> do alvo. Corpo a corpo só em quem está ao lado; à distância, a parede bloqueia e a quina dá <b>cobertura</b> (+2 na defesa).</li>
+   <li><b>💣 Arremessar</b>: mire o explosivo no mapa. A DT do Arremesso sobe com a distância; se falhar, desvia. Todos no raio levam o dano (Resistência DT 12 reduz à metade).</li></ul>`},
+  {t:'✋ Levantar a mão, dificuldade do Perseus e tela cheia',w:'a',b:`<ul>
    <li><b>✋ Levantar a Mão</b> ${TP}: botão na barra da mesa, ao lado da call. O card ganha um ✋ dourado que todos veem e o Mestre ouve um aviso discreto.</li>
    <li><b>✓ Baixar Mão</b> ${TM}: clique no nome na barra (ou no ✋ do card) quando der a palavra. Com várias mãos, use <b>Baixar Todas as Mãos</b>. A lista segue a ordem em que levantaram.</li>
    <li><b>Dificuldade do Perseus</b> no Tulpa Volley e no Jogo da Velha: 🌱 Fácil, ⚖️ Médio, 🔥 Difícil e 💀 Pesadelo. No Pesadelo do Jogo da Velha, o melhor resultado possível é empatar.</li>
@@ -8384,6 +8451,9 @@ const GUIDE11=[
   {t:'Rolagens: atributo puro e perícia',w:'a',b:'Cada atributo tem um botão <b>🎲</b> para rolar o atributo puro (sem perícia; vale o maior dado). Em cada perícia há um seletor para escolher <b>com qual atributo</b> rolar o teste; o padrão já vem marcado. Na Visão de Mesa, o botão <b>🎲 Rolar</b> oferece as duas coisas.'},
   {t:'Privacidade das rolagens',w:'p',b:'Em ⚙ Aparência, "Rolagens feitas dentro da ficha": <b>🔒 Privadas</b> (só você vê) ou <b>🎲 Mostrar na mesa</b> (aparecem na tela de todos e no histórico, como as da Visão de Mesa).'},
   {t:'Combate',w:'a',b:`${TM} inicia e conduz o combate: ordem de turnos, rodadas e participantes. Todos acompanham pela aba <b>⚔ Combate</b> do dock da mesa, que pisca quando há combate ativo. Os sons de turno seguem a configuração de Sons.`},
+  {t:'⚔ Combate no mapa: iniciativa e turno',w:'a',b:`${TM} clica em <b>⚔ Iniciar Combate</b> em cima do mapa. O Reflexo de todos com o olho ligado é rolado na hora e a janela mostra os dados e a ordem (todos veem na mesa e no histórico). O token da vez ganha um <b>anel dourado</b> e a etiqueta <b>⚡ SEU TURNO</b> (para os outros, o nome). A barra acima do mapa mostra a rodada e a ordem; ${TM} tem <b>Próximo ⏭</b> nela.`},
+  {t:'⚔ Economia de ações no seu turno',w:'p',b:`<ul><li><b>👣 Movimento: 9 m por turno.</b> Ande com ${KB11('W')}${KB11('A')}${KB11('S')}${KB11('D')}, setas, arrastando ou com o analógico. O círculo verde mostra o que resta e o token para no 0. Fora da sua vez você não anda.</li><li><b>0 m</b> se estiver Agarrado, Paralisado, Congelado, Amarrado, Morrendo ou Imobilizado pela carga. <b>Terreno difícil</b> (marcado pelo Mestre) e Névoa da Alma custam o dobro. Gigante Invulnerável dobra.</li><li><b>🏃 Disparada</b>: gasta a Ação Padrão e dobra o movimento (não vale Exausto ou Sobrecarregado).</li><li><b>⚔ Ação Padrão (1)</b>: atacar, curar/Sutura, conjurar, usar perícia, Alerta, levantar-se ou sacar da mochila. O <b>Acerto Violento</b> dá +1.</li><li><b>⚡ Livres</b>: 1 talento por turno, 1 <b>🔁 Saque rápido</b> (cintura/coldre ou bandoleira → mãos), Combustão Vital ao pagar Essência, <b>🎒 Soltar mochila</b>, lanterna ${KB11('F')}, porta e interruptor.</li><li><b>🛡 Reação</b> (fora do turno): a Retaliação aparece com o botão <b>Contra-atacar</b>; rituais de reação aparecem na janela de defesa.</li></ul>`},
+  {t:'⚔ Mirar, arremessar e efeitos no mapa',w:'a',b:`<ul><li><b>Atacar</b>: depois da arma, o cursor vira mira e aparece o alcance. Clique no token. Corpo a corpo: só ao lado (até ~2 m). Armas de fogo, arcos e arremesso: alcance da arma e <b>linha de visão</b> (parede bloqueia; Disparo Etéreo atravessa). Quina no caminho: <b>cobertura parcial, +2 na defesa</b>. Se o alvo não estiver no mapa, use <b>Escolher pela lista</b>.</li><li><b>💣 Arremessar</b> (granada, molotov, bomba, mina, lança-granadas, bazuca): o círculo da área segue o cursor e mostra quem será atingido. DT do teste: até 6 m <b>12</b>, até 12 m <b>15</b>, até 18 m <b>18</b>, mais longe <b>20+</b>. Falhou: a explosão desvia alguns metros. Todos na área levam o dano; quem passar na Resistência (DT 12) leva metade. O Molotov deixa Queimando.</li><li><b>Talentos e rituais com alvo</b>: em combate, você clica nos tokens (em área, clique num ponto para pegar todos no raio de 6 m) e confirma.</li><li>Efeitos: rastro do golpe, números flutuantes (−14 VT, CRÍTICO!, ESQUIVOU!, RETALIAÇÃO!). <b>Golpe Repulsor</b> empurra 3 m e para na parede; <b>Brecha Rápida</b> deixa você clicar onde reaparecer (até 5 m); <b>Plano Superior</b> reposiciona até 4 tokens em 6 m.</li><li>${TM}: no editor de paredes, <b>🪨 Terreno difícil</b> marca um cômodo onde andar custa o dobro.</li></ul>`},
   {t:'Bloco de notas (BN)',w:'a',b:'Cada pessoa tem o seu, guardado na ficha (o Mestre tem o dele). Escreva na aba 📝 Notas ou peça ao Perseus: “adiciona no BN: a senha da porta é 1904”.'},
  ]},
  {id:'perseus',ico:'🐱',name:'Perseus & comandos',items:[
@@ -9499,6 +9569,608 @@ setInterval(()=>{
   cast6({t:'hand?'});handPaint13();
 },700);
 M6.hooks.leave.push(()=>{handBoot13=''});
+
+
+/* ===================================================================
+   TULPA · ETAPA 15 — combate dentro do mapa tático
+   - Iniciar combate rola o Reflexo de todos com o olho ligado e monta a
+     ordem na hora (o aparelho do Mestre rola; todos veem os dados).
+   - Token da vez com anel luminoso e etiqueta flutuante; barra da ordem.
+   - Economia de ações: 9 m de movimento, Ação Padrão (+1 no Acerto
+     Violento), ações livres (talento, saque rápido, combustão, descarte,
+     lanterna/porta) e reação (retaliação e rituais de reação).
+   - Mira clicando no token: alcance, linha de visão pelas paredes e
+     cobertura parcial (+2 na defesa).
+   - Arremesso e área: modelo no cursor, DT pela distância, desvio na
+     falha, dano em todos na área (Resistência reduz à metade).
+   - Rastro do golpe, números flutuantes, empurrão e teleporte.
+   As regras (Tabela de Defesa, críticos, estados, proficiência...) são
+   as mesmas de antes: este módulo só escolhe alvos e chama o motor.
+   =================================================================== */
+const CB14={mv:{key:'',cid:'',used:0,run:false},quick:'',aim:null,fx:[],hover:null,remote:{},denyAt:0,lastPick:[],hudSig:'',barSig:'',mvCast:0};
+T3.cb14=CB14;
+const MOVE14=9;                       /* metros por turno */
+const STOP14=['agarrado','paralisado','congelado','amarrado','agonia','morto'];
+const COVER14=2;                      /* cobertura parcial: +2 na defesa */
+const AREA_TALENT_M14=6;              /* raio padrão de habilidades em área */
+
+const d14=ch=>ch?(ch.id===activeCharacterId?data:(ch.data||{})):{};
+const inCb14=()=>{const cm=camp3()?.combat;return!!(cm?.active&&cm.phase==='active')};
+const cur14=()=>{const e=curEntry();return e?charById(e.characterId):null};
+const tok14=id=>(M6.state.tokens||[]).find(t=>t.charId===id)||null;
+const mpc14=()=>mapCfg7().mpc;
+const m2px14=m=>m/mpc14()*mapCfg7().cell;
+const px2m14=px=>px/mapCfg7().cell*mpc14();
+const fmtM14=m=>(Math.round(Math.max(0,m)*10)/10).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const clamp14=(v,a,b)=>Math.max(a,Math.min(b,v));
+function mapOn14(){if(!MAP7.cv||!MAP7.cv.isConnected||!MAP7.stage)return false;const r=MAP7.stage.getBoundingClientRect();return r.height>60&&r.width>60}
+const mapReady14=ch=>!!(ch&&mapOn14()&&tok14(ch.id));
+function deny14(msg){const n=Date.now();if(n-CB14.denyAt>2500){CB14.denyAt=n;toast(msg)}}
+const myTurn14=()=>{const c=cur14();return!!(c&&controls(c)&&(c._sheetAvailable||c.id===activeCharacterId))};
+
+/* ===================== 1. iniciativa automática ===================== */
+function reflex14(ch){
+  const d=d14(ch);
+  if(d&&d.attributes&&Object.keys(d.attributes).length){
+    const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},'Reflexo');
+    const r=E.rollTest(d,'Reflexo',SKILL_ATTR,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis});
+    return{dice:r.dice,bonus:r.bonus,total:r.total,best:r.best};
+  }
+  /* ficha não carregada neste aparelho: usa o Reflexo que a própria ficha deixou calculado */
+  const cc=d?.combatCache||{},n=clamp14(Number(cc.reflexDice)||1,1,8),b=Number(cc.reflexBonus)||0,dice=Array.from({length:n},()=>E.die(20)),best=Math.max(...dice);
+  return{dice,bonus:b,total:best+b,best};
+}
+async function beginCombat14(){
+  if(role3()!=='master'){toast('Somente o Mestre pode iniciar o combate.');return}
+  const c=camp3();if(!c)return;
+  const list=(c.characters||[]).filter(ch=>ch.inScene!==false&&!isDeadCh(ch));
+  if(!list.length){toast('Ligue o olho (na cena) de pelo menos um personagem.');return}
+  const rolls=list.map(ch=>({id:ch.id,name:nm(ch),...reflex14(ch)})).sort((a,b)=>b.total-a.total||b.best-a.best||a.name.localeCompare(b.name,'pt-BR'));
+  try{
+    try{await sb()?.from('campaign_reflex_rolls').delete().eq('campaign_id',c.id)}catch(e){}
+    await window.tulpaSaveCombatState({active:true,phase:'active',round:1,turnIndex:0,participants:rolls.map(r=>({characterId:r.id,name:r.name,rolled:true})),order:rolls.map(r=>({characterId:r.id,name:r.name,done:false}))});
+  }catch(e){fail3('iniciar combate',e);return}
+  try{fx5('start')}catch(e){}
+  CB.pending={};CB.log=[];
+  const first=charById(rolls[0].id);
+  /* a linha "Iniciativa" mostra o resumo para todos; as outras guardam os dados de cada um no histórico */
+  insertRow(first,'Iniciativa',{dice:[],bonus:0,total:rolls[0].total,detail:{cmb:'init',rolls:rolls.map(r=>({id:r.id,name:r.name,dice:r.dice,total:r.total}))}}).catch(e=>fail3('iniciativa',e));
+  rolls.forEach(r=>{const ch=charById(r.id);if(ch)insertRow(ch,'Iniciativa · Reflexo',{dice:r.dice,bonus:r.bonus,total:r.total,attribute:'Destreza',detail:{cmb:'rollx',sides:20,eyebrow:'INICIATIVA',quiet:true}}).catch(()=>{})});
+  initPanel14(rolls);
+  setTimeout(()=>{try{renderTable()}catch(e){}hud14(true)},200);
+}
+function initPanel14(rolls){
+  openModal('INICIATIVA','Ordem de combate',`<p class="sub">O Reflexo de todos que estão na cena foi rolado agora. A ordem já vale: a vez é de <b>${esc(rolls[0].name)}</b>.</p><ol class="cb-init">${rolls.map((r,i)=>`<li class="${i===0?'on':''}"><span class="cb-i">${i+1}</span><b>${esc(r.name)}</b><span class="cb-dice">${r.dice.map(x=>`<i class="${x===r.best?'hi':''}">${x}</i>`).join('')}${r.bonus?` <em>${r.bonus>0?'+':''}${r.bonus}</em>`:''}</span><strong>${r.total}</strong></li>`).join('')}</ol>`,'Fechar',()=>closeModal());
+}
+window.tulpaBeginCombat=beginCombat14;
+T3.beginCombat=beginCombat14;
+
+/* ===================== 2. movimento por turno ===================== */
+function mvInfo14(ch){
+  const d=d14(ch),st=stIds(d),m=E.computeMods(d);
+  const stop=STOP14.find(s=>st.includes(s));
+  if(stop)return{max:0,base:0,why:(STATUS_BY_ID[stop]?.name||stop),canRun:false};
+  if(m.flags.has('semMover'))return{max:0,base:0,why:'um estado impede você de se mover',canRun:false};
+  const ci=E.cargaInfo(d,E.hasEffect(d,'Força do Cotidiano'));
+  if(ci.level>=3)return{max:0,base:0,why:'Imobilizado pela carga',canRun:false};
+  let base=MOVE14;const why=[];
+  const fx=d.activeEffects||[];
+  if(E.hasEffect(d,'Gigante Invulnerável')||fx.some(e=>/desloc\w*\s+dobrad|velocidade\s+dobrad|acelera[çc][ãa]o/i.test(e.desc||''))){base*=2;why.push('deslocamento dobrado')}
+  if(fx.some(e=>/n[ée]voa da alma/i.test(e.name||'')&&String(e.source||'').startsWith('ext:'))){base/=2;why.push('Névoa da Alma')}
+  const canRun=!st.includes('exausto')&&!st.includes('exaurido')&&ci.level<2&&!m.flags.has('semCorrer');
+  const mv=mvState14(ch);
+  return{max:base*(mv.run?2:1),base,why:why.join(', '),canRun,over:ci.level};
+}
+function mvState14(ch){
+  const k=TURN.key||'';
+  if(CB14.mv.key!==k||CB14.mv.cid!==ch.id){
+    let s=null;try{s=JSON.parse(sessionStorage.getItem('tulpa_mv_'+k)||'null')}catch(e){}
+    CB14.mv={key:k,cid:ch.id,used:s&&s.cid===ch.id?Number(s.used)||0:0,run:!!(s&&s.cid===ch.id&&s.run)};
+  }
+  return CB14.mv;
+}
+function mvSave14(force){
+  const mv=CB14.mv;try{sessionStorage.setItem('tulpa_mv_'+mv.key,JSON.stringify(mv))}catch(e){}
+  const send=()=>{CB14.mvCast=Date.now();const ch=charById(mv.cid);cast6({t:'cbmv',key:mv.key,cid:mv.cid,used:+mv.used.toFixed(2),max:ch?mvInfo14(ch).max:MOVE14})};
+  clearTimeout(CB14.mvT);if(force||Date.now()-CB14.mvCast>250)send();else CB14.mvT=setTimeout(send,300);
+  hud14();
+}
+function rough14(wx,wy){return geo10().rooms.some(r=>r.rough&&inPoly10(wx,wy,r.pts))}
+/* chamado pelo mapa a cada passo (teclado/analógico/arrasto): corta o passo no que resta */
+T3.cbMove=(t,cx,cy,nx,ny,how)=>{
+  if(!inCb14())return[nx,ny];
+  const ch=charById(t.charId),cur=cur14();if(!ch)return[nx,ny];
+  if(!cur||cur.id!==ch.id){if(isGM6())return[nx,ny];deny14('Não é a sua vez: espere o seu turno para andar.');return[cx,cy]}
+  if(!controls(ch))return[nx,ny];                 /* o Mestre reposicionando o token de um jogador */
+  const info=mvInfo14(ch),mv=mvState14(ch),left=info.max-mv.used;
+  if(left<=1e-3){deny14(info.max?`Sem movimento: os ${fmtM14(info.max)} m deste turno acabaram.`:`Você não pode se mover agora: ${info.why}.`);return[cx,cy]}
+  const k=rough14(nx,ny)||rough14(cx,cy)?2:1,cost=px2m14(hyp10(nx-cx,ny-cy))*k;
+  if(cost<=left)mv.used+=cost;
+  else{const f=left/cost;nx=cx+(nx-cx)*f;ny=cy+(ny-cy)*f;mv.used=info.max}
+  mvSave14();return[nx,ny];
+};
+/* na sua vez o token não "pula" para a grade ao soltar (o encaixe gastaria metros a mais) */
+T3.cbNoSnap=t=>inCb14()&&cur14()?.id===t.charId;
+
+/* ===================== 3. alcance, linha de visão e cobertura ===================== */
+const RANGE14=[[/rifle|fuzil|sniper|carabina|precis/i,90],[/escopeta|espingarda/i,15],[/pistola|rev[óo]lver/i,24],[/submetralh|uzi|smg/i,30],[/metralhadora/i,60],[/arco longo/i,45],[/arco|besta/i,30],[/estilingue|zarabatana/i,15],[/taser|choque/i,6],[/lan[çc]a-granadas/i,60],[/bazuca/i,90],[/arp[ãa]o/i,12]];
+function weaponRange14(w){
+  if(w.cat==='Corpo a corpo'||w.skill==='Briga')return{melee:true,m:2.2};
+  for(const [re,m] of RANGE14)if(re.test(w.name||''))return{melee:false,m};
+  if(w.skill==='Arremesso')return{melee:false,m:/granada|molotov|bomba|mina/i.test(w.name||'')?24:12};
+  return{melee:false,m:30};
+}
+const aoe14=w=>!!(w&&(w.area||/molotov|granada|bomba|mina terrestre/i.test(w.name||'')));
+const aoeR14=w=>/bazuca/i.test(w.name||'')?4.5:/mina/i.test(w.name||'')?3:3;
+function los14(ax,ay,bx,by){const d=hyp10(bx-ax,by-ay);if(d<1)return true;return castRay10(ax,ay,(bx-ax)/d,(by-ay)/d,blockers10(),d)>=d-2}
+/* três raios (centro e as bordas do alvo): todos livres = limpo; alguns = cobertura parcial; nenhum = sem linha de visão */
+function shot14(a,t){
+  const [ax,ay]=tokCenter10(a),[bx,by]=tokCenter10(t),d=hyp10(bx-ax,by-ay)||1,ux=(bx-ax)/d,uy=(by-ay)/d,off=tokR10(t)*.85;
+  const rays=[los14(ax,ay,bx,by),los14(ax,ay,bx-uy*off,by+ux*off),los14(ax,ay,bx+uy*off,by-ux*off)],n=rays.filter(Boolean).length;
+  return{dist:px2m14(d),vis:n>0,cover:n>0&&n<3,ax,ay,bx,by};
+}
+const ethereal14=ch=>E.hasEffect(d14(ch),'Disparo Etéreo');
+function evalAtk14(a,t){
+  const at=tok14(a.ch.id);if(!at)return{ok:false,why:'Seu token não está no mapa.'};
+  const tc=charById(t.charId);if(!tc)return{ok:false,why:'Token sem personagem.'};
+  if(tc.id===a.ch.id)return{ok:false,why:'Escolha outro token.'};
+  if(isDeadCh(tc))return{ok:false,why:nm(tc)+' já está morto.'};
+  const s=shot14(at,t),reach=a.range+(((at.s||1)+(t.s||1))/2-1)*mpc14();
+  if(a.melee&&s.dist>reach+.01)return{ok:false,why:`Fora de alcance: corpo a corpo só em quem está ao lado (${fmtM14(s.dist)} m).`,s};
+  if(!a.melee&&s.dist>reach+.01)return{ok:false,why:`Fora de alcance: ${fmtM14(s.dist)} m (alcance ${fmtM14(a.range)} m).`,s};
+  const eth=!a.melee&&ethereal14(a.ch);
+  if(!s.vis&&!eth)return{ok:false,why:'Sem linha de visão: tem uma parede no caminho.',s};
+  const cover=s.cover&&!eth&&!a.melee;
+  return{ok:true,cover,s,why:cover?'Cobertura parcial: +'+COVER14+' na defesa do alvo':eth&&!s.vis?'Disparo Etéreo: atravessa a cobertura':''};
+}
+
+/* ===================== 4. ataque escolhendo o alvo no mapa ===================== */
+const _startAttack14=startAttack;
+startAttack=async function(ch,{retal=false,areaOnly=false}={}){
+  if(!mapReady14(ch))return _startAttack14(ch,{retal});
+  const d=d14(ch),m=E.computeMods(d);
+  if(m.flags.has('semAgir')||m.flags.has('semAtacar')){toast('Neste estado você não pode atacar.');return}
+  if(retal){if(retalOf(ch)<=0){toast('Você não tem ação de retaliação.');return}}
+  else if(actionsLeft(ch)<=0){toast('Você já usou sua Ação Padrão neste turno.');return}
+  let quick=E.quickWeapons(d);const pack=areaOnly||retal?[]:E.packWeapons(d);
+  if(areaOnly)quick=quick.filter(i=>aoe14(i.w));
+  const card=(w,id,tag)=>{const rg=weaponRange14(w);return`<button class="t3-weapon" data-w="${id}"><b>${esc(w.name)}${d.favWeaponId&&d.favWeaponId===id?' ★':''}</b><span>${esc(w.skill)} · dano <b>${esc(w.dado)}</b> · crítico ${w.critMin>=20?'20':w.critMin+'-20'} · ${aoe14(w)?`💣 área ${fmtM14(aoeR14(w))} m, até ${rg.m} m`:rg.melee?'corpo a corpo':'alcance '+rg.m+' m'}</span><span class="sub">${(w.effects||[]).map(e=>(STATUS_BY_ID[e.status]?.name||e.status)+' ('+(e.when==='crit'?'no crítico':'no acerto')+')').join(' · ')||'sem estado'}${tag?' · '+tag:''}</span></button>`};
+  if(areaOnly&&!quick.length){toast('Nenhuma granada, bomba ou arma em área nas mãos, cintura ou bandoleira.');return}
+  openModal(areaOnly?'ARREMESSAR':'ATACAR',nm(ch),`<p class="sub">${areaOnly?'Escolha o explosivo. Depois mire no mapa: a DT do Arremesso sobe com a distância.':'Escolha a arma. Depois clique no alvo direto no mapa.'}</p><div class="t3-weapons">${quick.map(i=>card(i.w,i.id,LOCS[i.loc])).join('')}${areaOnly?'':card(UNARMED,'__soco','1d2 · Briga')}</div>${pack.length?`<h4 style="margin-top:12px">Sacar da mochila (gasta a Ação Padrão)</h4><div class="t3-weapons">${pack.map(i=>`<button class="t3-weapon" data-draw="${i.id}"><b>${esc(i.name)}</b><span>${esc(i.w.skill)} · ${esc(i.w.dado)} · crít. ${i.w.critMin>=20?'20':i.w.critMin+'-20'}</span><span class="sub">${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>`:''}${retal?'<div class="notice t3-alert">Contra-ataque de Retaliação: <b>não pode ser esquivado</b>.</div>':''}<label class="t3-check" style="margin-top:10px;${retal||areaOnly?'display:none':''}"><input type="checkbox" id="atkSurprise"> Ataque de surpresa (o alvo está desprevenido e só pode rolar Reflexo)</label>`,'Fechar',closeModal);
+  $$('[data-w]').forEach(b=>b.onclick=()=>{
+    const surprise=!!$('atkSurprise')?.checked,id=b.dataset.w,it0=quick.find(i=>i.id===id);
+    const w=id==='__soco'?UNARMED:(it0?{...it0.w,_itemId:it0.id,_ammo:!!it0.useAmmo}:null);closeModal();_modalResolve=null;if(!w)return;
+    const rg=weaponRange14(w);
+    if(aoe14(w))startAim14({kind:'aoe',ch,w,max:rg.m,r:aoeR14(w)});
+    else startAim14({kind:'atk',ch,w,range:rg.m,melee:rg.melee,surprise,retal,prefer:retal?d.retalTarget:null});
+  });
+  $$('[data-draw]').forEach(b=>b.onclick=()=>{
+    const inv=E.ensureInv(d),it=inv.items.find(i=>i.id===b.dataset.draw);const v=E.validPlacement(d,it,'maos');
+    if(!v.ok){toast('Libere as mãos antes: '+v.msg);return}
+    closeModal();spend(ch);mutateChar(ch,x=>{const t=E.ensureInv(x).items.find(i=>i.id===it.id);if(t)t.loc='maos'});toast(it.name+' sacada. A Ação Padrão foi gasta.');renderCombatUI();
+  });
+};
+
+/* ===================== 5. mira: atacar, área, escolher, teleporte, empurrão ===================== */
+function startAim14(a){
+  if(CB14.aim&&CB14.aim.done)try{CB14.aim.done(null)}catch(e){}
+  CB14.aim=a;CB14.hover=null;MAP7.tool='move';document.body.classList.add('cb-aiming');
+  try{MAP7.stage.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(e){}
+  if(MAP7.cv)MAP7.cv.style.cursor='crosshair';
+  const at=tok14(a.ch.id);if(at){const [x,y]=tokCenter10(at),v=mapView7();const [sx,sy]=w2s7(v,x,y);if(sx<0||sy<0||sx>v.cw||sy>v.ch)mapCam7({...MAP7.cam,x:x/v.W,y:y/v.H})}
+  if(a.kind==='atk'&&a.prefer){const t=tok14(a.prefer);if(t){const ev=evalAtk14(a,t);if(ev.ok){toast('Alvo da retaliação marcado. Clique nele para contra-atacar.')}}}
+  hud14(true);mapDraw7();
+}
+function endAim14(){document.body.classList.remove('cb-aiming');CB14.aim=null;CB14.hover=null;if(MAP7.cv)MAP7.cv.style.cursor='';hud14(true);mapDraw7()}
+function aimCancel14(){const a=CB14.aim;endAim14();if(a&&a.done)try{a.done(null)}catch(e){}if(a&&a.kind==='pick'&&a.refund)a.refund()}
+function aimList14(){
+  const a=CB14.aim;if(!a)return;endAim14();
+  if(a.kind==='atk'){const d=d14(a.ch);pickTargets.orig({title:'Alvo do ataque · '+a.w.name,hint:'Escolha o alvo (jogador ou NPC).',multi:false,exclude:[a.ch.id],skipDead:true,preset:a.retal&&d.retalTarget?[d.retalTarget]:[]}).then(p=>{if(p&&p.ids.length)performAttack(a.ch,a.w,p.ids,{surprise:a.surprise,retal:a.retal})})}
+  else if(a.kind==='aoe')pickTargets.orig({title:'Atingidos · '+a.w.name,hint:'Marque quem está na área.',multi:true,exclude:[],skipDead:true}).then(p=>{if(p&&p.ids.length)performAttack(a.ch,a.w,p.ids,{})});
+  else if(a.kind==='pick'&&a.done)a.done('list');
+}
+function dtFor14(m){if(m<=6)return 12;if(m<=12)return 15;if(m<=18)return 18;return 20+2*Math.ceil(Math.max(0,m-24)/6)}
+function aimPoint14(a){
+  const h=CB14.hover,at=tok14(a.ch.id);if(!h||!at)return null;
+  const [ax,ay]=tokCenter10(at);let px=h.wx,py=h.wy;const d=hyp10(px-ax,py-ay),mx=m2px14(a.max||a.m||0);
+  if(mx&&d>mx){px=ax+(px-ax)*mx/d;py=ay+(py-ay)*mx/d}
+  return[px,py,ax,ay];
+}
+const tokAtPt14=(wx,wy)=>mapHit7(wx,wy);
+function pickAllowed14(a,ch){const o=a.opts||{};if(!ch)return false;if((o.exclude||[]).includes(ch.id))return false;if(o.onlyScene!==false&&!inScene(ch))return false;if(o.only&&!o.only.includes(ch.id))return false;if(o.skipDead&&isDeadCh(ch))return false;return true}
+T3.cbDown=(e,p)=>{
+  const a=CB14.aim;if(!a)return false;
+  CB14.hover={wx:p.wx,wy:p.wy};
+  if(e.button===2){aimCancel14();return true}
+  if(a.kind==='atk'){
+    const t=tokAtPt14(p.wx,p.wy);if(!t){toast('Clique em cima de um token para atacar.');return true}
+    const ev=evalAtk14(a,t);if(!ev.ok){toast('⛔ '+ev.why);fx5('error');return true}
+    endAim14();
+    traceFx14(a.ch.id,t.charId,a.melee?'melee':'shot',true);
+    performAttack(a.ch,a.w,[t.charId],{surprise:a.surprise,retal:a.retal,extra:ev.cover?{cover:COVER14}:null});
+    if(ev.cover)toast('🧱 '+nm(charById(t.charId))+' tem cobertura parcial: +'+COVER14+' na defesa.');
+    return true;
+  }
+  if(a.kind==='aoe'){const pt=aimPoint14(a);if(!pt)return true;endAim14();throw14(a.ch,a.w,[pt[0],pt[1]]);return true}
+  if(a.kind==='pick'){
+    const t=tokAtPt14(p.wx,p.wy),ch=t&&charById(t.charId);
+    if(a.area&&!t){/* área: marca quem está no círculo em volta do ponto clicado */
+      const R=m2px14(a.r||AREA_TALENT_M14);(M6.state.tokens||[]).forEach(q=>{const c=charById(q.charId);if(!pickAllowed14(a,c))return;const [x,y]=tokCenter10(q);if(hyp10(x-p.wx,y-p.wy)<=R+tokR10(q)*.6&&los14(p.wx,p.wy,x,y))a.sel.add(c.id)});
+      addFx14({kind:'boom',x:p.wx,y:p.wy,r:R,col:'120,200,255',dur:500});hud14(true);mapDraw7();return true}
+    if(!t||!pickAllowed14(a,ch)){toast(t?'Esse personagem não pode ser escolhido aqui.':'Clique em um token.');return true}
+    if(!a.multi){endAim14();a.done([ch.id]);return true}
+    a.sel.has(ch.id)?a.sel.delete(ch.id):a.sel.add(ch.id);hud14(true);mapDraw7();return true;
+  }
+  if(a.kind==='tp'||a.kind==='plano'&&a.step==='dest'){
+    const who=a.kind==='tp'?tok14(a.ch.id):a.tok;if(!who){endAim14();return true}
+    const [ox,oy]=a.kind==='tp'?tokCenter10(who):a.from,d=hyp10(p.wx-ox,p.wy-oy);
+    if(d>m2px14(a.m)+1){toast(`Longe demais: até ${fmtM14(a.m)} m.`);return true}
+    if(!los14(ox,oy,p.wx,p.wy)){toast('Precisa ser um lugar visível, sem parede no meio.');return true}
+    const hit=tokAtPt14(p.wx,p.wy);if(hit&&hit.id!==who.id){toast('Esse lugar está ocupado.');return true}
+    placeTok14(who,p.wx,p.wy,a.kind==='tp'?'tp':'plano');
+    if(a.kind==='tp'){endAim14();toast('✨ Teleporte feito.');return true}
+    a.left--;a.step='tok';a.tok=null;if(a.left<=0){endAim14();toast('Plano Superior concluído.')}else{hud14(true);mapDraw7()}
+    return true;
+  }
+  if(a.kind==='plano'){
+    const t=tokAtPt14(p.wx,p.wy);if(!t){toast('Clique no token que vai ser reposicionado.');return true}
+    a.tok=t;a.from=tokCenter10(t);a.step='dest';hud14(true);mapDraw7();return true;
+  }
+  if(a.kind==='push'){
+    const t=tokAtPt14(p.wx,p.wy);if(!t||t.charId===a.ch.id){toast('Clique no alvo que vai ser empurrado.');return true}
+    endAim14();push14(a.ch,t,a.m);return true;
+  }
+  return true;
+};
+T3.cbHover=(e,p)=>{if(!CB14.aim)return;CB14.hover={wx:p.wx,wy:p.wy};mapDraw7()};
+document.addEventListener('keydown',e=>{if(e.code==='Escape'&&CB14.aim){e.preventDefault();e.stopPropagation();aimCancel14()}},true);
+document.addEventListener('contextmenu',e=>{if(CB14.aim&&MAP7.cv&&e.target===MAP7.cv){e.preventDefault()}},true);
+
+/* mover token alheio: o Mestre grava; o jogador pede ao aparelho do Mestre */
+function placeTok14(t,wx,wy,why){
+  const g=mapCfg7(),s=t.s||1,x=+((wx-g.ox)/g.cell-s/2).toFixed(3),y=+((wy-g.oy)/g.cell-s/2).toFixed(3);
+  const [ox,oy]=tokCenter10(t);addFx14({kind:why==='push'?'push':'tp',x:ox,y:oy,x2:wx,y2:wy,dur:600});cast6({t:'cbfx',f:{kind:why==='push'?'push':'tp',x:ox,y:oy,x2:wx,y2:wy,dur:600}});
+  moveCancel10(t.id);TAC10.disp[t.id]={x,y,a:t.a,tx:x,ty:y,ta:t.a};
+  MAP7.live[t.id]={x,y,a:t.a,until:Date.now()+5000};
+  if(isGM6())setState6({tokens:(M6.state.tokens||[]).map(q=>q.id===t.id?{...q,x,y}:q)});
+  else if(canMove7(t))mapCommitMove7(t.id,x,y,t.a);
+  else{cast6({t:'tok',id:t.id,x,y,a:t.a});cast6({t:'cbreq',id:t.id,x,y,why})}
+  mapDraw7();
+}
+function push14(ch,t,m){
+  const at=tok14(ch.id);if(!at)return;
+  const [ax,ay]=tokCenter10(at),[bx,by]=tokCenter10(t),d=hyp10(bx-ax,by-ay)||1,ux=(bx-ax)/d,uy=(by-ay)/d;
+  const [nx,ny]=collide10(bx,by,bx+ux*m2px14(m),by+uy*m2px14(m),tokR10(t),blockers10());
+  const moved=px2m14(hyp10(nx-bx,ny-by));
+  placeTok14(t,nx,ny,'push');
+  const tc=charById(t.charId),txt=moved<m-.2?`EMPURRADO ${fmtM14(moved)} m (parede)`:`EMPURRADO ${fmtM14(m)} m`;
+  floatTxt14(t.charId,txt,'#ffd36b');cast6({t:'cbf',id:t.charId,txt,col:'#ffd36b'});
+  insertRow(ch,'Golpe Repulsor',{detail:{cmb:'log',text:`${nm(ch)} empurrou ${nm(tc)} ${fmtM14(moved)} m${moved<m-.2?' até bater na parede':''}.`}}).catch(()=>{});
+}
+onCast6(p=>{
+  if(p.t==='cbreq'&&isGM6()&&p.id&&isFinite(p.x)&&isFinite(p.y)){
+    const t=(M6.state.tokens||[]).find(q=>q.id===p.id);if(!t)return;
+    setState6({tokens:(M6.state.tokens||[]).map(q=>q.id===t.id?{...q,x:+Number(p.x).toFixed(3),y:+Number(p.y).toFixed(3)}:q)});
+  }
+  if(p.t==='cbmv'&&p.key){CB14.remote[p.key]={cid:p.cid,used:Number(p.used)||0,max:Number(p.max)||0};hud14();mapDraw7()}
+  if(p.t==='cbf'&&p.id&&p.from!==uid3())floatTxt14(String(p.id),String(p.txt||'').slice(0,40),String(p.col||'#fff').slice(0,20));
+  if(p.t==='cbfx'&&p.f&&p.from!==uid3())addFx14({...p.f,dur:Math.min(2000,Number(p.f.dur)||600)});
+});
+
+/* ===================== 6. arremesso e dano em área ===================== */
+async function throw14(ch,w,pt){
+  const at=tok14(ch.id);if(!at)return;
+  if(actionsLeft(ch)<=0){toast('Você já usou sua Ação Padrão neste turno.');return}
+  const [ax,ay]=tokCenter10(at),dist=px2m14(hyp10(pt[0]-ax,pt[1]-ay)),DT=dtFor14(dist),d=d14(ch);
+  const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},w.skill);
+  const r=E.rollTest(d,w.skill,SKILL_ATTR,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis,consumeDelta:true});fx3('dice');
+  mutateChar(ch,x=>consumeOnce(x,cal,{attack:true}));
+  const ok=r.total>=DT;let ip=[pt[0],pt[1]],sc=0;
+  if(!ok){sc=clamp14(1.5+(DT-r.total)*.5,1.5,9);const ang=E.rng()*TAU10,ux=Math.cos(ang),uy=Math.sin(ang),tt=castRay10(pt[0],pt[1],ux,uy,blockers10(),m2px14(sc));ip=[pt[0]+ux*Math.max(0,tt-4),pt[1]+uy*Math.max(0,tt-4)];sc=px2m14(Math.max(0,tt-4))}
+  const R=m2px14(aoeR14(w));
+  const hits=(M6.state.tokens||[]).filter(t=>{const c=charById(t.charId);if(!c||!inScene(c)||isDeadCh(c))return false;const [x,y]=tokCenter10(t);return hyp10(x-ip[0],y-ip[1])<=R+tokR10(t)*.6&&los14(ip[0],ip[1],x,y)});
+  const crit=r.best>=w.critMin,dm=E.rollDamage(w,{extraDice:cal.mods.dmgDice,flat:cal.mods.dmg}),n=crit?dm.critTotal:dm.total;
+  const molotov=/molotov/i.test(w.name||''),st=(w.effects||[]).filter(e=>e.when==='hit'||(e.when==='crit'&&crit)).map(e=>e.status);
+  showRollPopup({eyebrow:'ARREMESSO',title:`${nm(ch)} · ${w.name}`,sub:`${fmtM14(dist)} m → DT ${DT}`,sets:[{label:`${w.skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max'},{label:`Dano ${w.dado}`,dice:crit?[...dm.normal,...dm.crit]:dm.normal,bonus:dm.mod+(dm.flat||0),total:n,note:crit?'CRÍTICO!':''}],big:r.total,tone:ok?'hit':'',detail:ok?`Caiu no ponto certo. ${hits.length?'Atingidos: '+hits.map(t=>nm(charById(t.charId))).join(', '):'Ninguém na área.'}`:`Errou a DT: desviou ${fmtM14(sc)} m. ${hits.length?'Atingidos: '+hits.map(t=>nm(charById(t.charId))).join(', '):'Ninguém na área.'}`});
+  spend(ch);
+  /* explosivos de arremesso são gastos ao lançar */
+  if(w._itemId&&w.skill==='Arremesso'&&w.cat==='Especial')mutateChar(ch,x=>{const it=E.ensureInv(x).items.find(i=>i.id===w._itemId);if(!it)return;it.qty=(Number(it.qty)||1)-1;if(it.qty<=0)x.inventory.items=x.inventory.items.filter(i=>i!==it)});
+  const f={kind:'boom',x:ip[0],y:ip[1],r:R,col:molotov?'255,120,40':'255,200,80',dur:900,ax,ay,px:pt[0],py:pt[1]};addFx14(f);cast6({t:'cbfx',f});
+  try{fx5(molotov?'burn':'hit')}catch(e){}
+  const label=`${nm(ch)} arremessou ${w.name} (${fmtM14(dist)} m, DT ${DT}, ${r.total}: ${ok?'acertou o ponto':'desviou '+fmtM14(sc)+' m'})`;
+  if(hits.length)await sendFx(hits.map(t=>t.charId),[{t:'aoe',n,save:molotov?'':'Resistência',dt:12,st,w:w.name,by:nm(ch),crit}],label,ch);
+  else insertRow(ch,'Arremesso · '+w.name,{dice:r.dice,bonus:r.bonus,total:r.total,detail:{cmb:'log',text:label+': ninguém atingido.'}}).catch(()=>{});
+  renderCombatUI();
+}
+T3.throwAt=throw14;
+/* o efeito de área chega no aparelho de quem controla cada alvo: ele rola a própria Resistência */
+const _afl14=applyFxLocal;
+applyFxLocal=function(ch,fx){
+  const out=[];
+  (Array.isArray(fx)?fx:[fx]).forEach(f=>{
+    if(!f||f.t!=='aoe'){out.push(f);return}
+    const d=d14(ch);let n=Math.max(0,Number(f.n)||0),saved=false;
+    if(f.save){
+      const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},f.save);
+      const r=E.rollTest(d,f.save,SKILL_ATTR,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis});saved=r.total>=(Number(f.dt)||12);
+      if(saved)n=Math.floor(n/2);
+      announceRoll(ch,`${f.save} contra ${f.w||'a explosão'} (DT ${f.dt||12})`,{dice:r.dice,sides:20,bonus:r.bonus,total:r.total,eyebrow:'ÁREA',note:saved?'Resistiu: metade do dano':'Dano total'}).catch?.(()=>{});
+    }
+    out.push({t:'dmg',n});
+    (f.st||[]).forEach(s=>{if(STATUS_BY_ID[s]&&!saved)out.push({t:'status',id:s,on:true})});
+    const txt=`−${n} VT${f.crit?' · CRÍTICO!':''}${saved?' · ½':''}`;
+    setTimeout(()=>{floatTxt14(ch.id,txt,'#ff6b5b');cast6({t:'cbf',id:ch.id,txt,col:'#ff6b5b'})},350);
+  });
+  return _afl14(ch,out);
+};
+
+/* ===================== 7. escolher alvos de habilidades no mapa ===================== */
+const _pick14=pickTargets;
+pickTargets=function(o={}){
+  const me=charById(activeCharacterId);
+  if(CB14.noMap||!inCb14()||!o||!mapReady14(me))return _pick14(o);
+  return new Promise(res=>{
+    const area=/área/i.test(o.hint||'');
+    startAim14({kind:'pick',ch:me,multi:o.multi!==false,area,r:AREA_TALENT_M14,opts:o,title:o.title||'Escolher alvos',sel:new Set(o.preset||[]),done:ids=>{
+      if(ids===null){res(null);return}
+      if(ids==='list'){res(_pick14(o));return}
+      CB14.lastPick=ids.slice();
+      if(o.statusSelect||o.dmgInfo)res(_pick14({...o,preset:ids}));else res({ids,status:'',dmgMode:'none'});
+    }});
+  });
+};
+pickTargets.orig=_pick14;
+/* talentos que mexem no mapa: Golpe Repulsor (empurra 3 m) e Plano Superior (reposiciona até 4 em 6 m) */
+const _act14=activateTalent;
+activateTalent=async function(id){
+  const item=findAbility(id),es0=Number(data.essence)||0,t0=TURN.talentUsed,os=data.lastOneShot?.at;CB14.lastPick=[];
+  const out=await _act14.apply(this,arguments);
+  const used=(Number(data.essence)||0)<es0||(!t0&&TURN.talentUsed)||data.lastOneShot?.at!==os;
+  const me=charById(activeCharacterId);
+  if(!used||!item||!mapReady14(me))return out;
+  if(item.name==='Golpe Repulsor'){const tid=CB14.lastPick[0],t=tid&&tok14(tid);if(t)push14(me,t,3);else startAim14({kind:'push',ch:me,m:3})}
+  if(item.name==='Plano Superior')startAim14({kind:'plano',ch:me,m:6,left:4,step:'tok'});
+  return out;
+};
+
+/* ===================== 8. efeitos visuais ===================== */
+function addFx14(f){CB14.fx.push({...f,t0:performance.now()});if(CB14.fx.length>60)CB14.fx.splice(0,20);mapDraw7()}
+function floatTxt14(cid,txt,col='#fff'){addFx14({kind:'txt',cid,txt,col,dur:1600})}
+function traceFx14(aId,tId,kind,net){
+  const a=tok14(aId),t=tok14(tId);if(!a||!t)return;const [ax,ay]=tokCenter10(a),[bx,by]=tokCenter10(t);
+  const f={kind:'trace',style:kind,ax,ay,bx,by,dur:kind==='melee'?380:520};addFx14(f);if(net)cast6({t:'cbfx',f});
+}
+const _pr14=processRow;
+processRow=function(row,live=true){
+  const dt=row&&row.detail,seen=!!(row&&CB.seen.has(row.id));
+  const out=_pr14.apply(this,arguments);
+  if(live&&dt&&!seen&&Date.now()-(Date.parse(row.created_at)||Date.now())<30000){try{rowFx14(dt)}catch(e){console.warn('[T14] efeito',e)}}
+  return out;
+};
+function rowFx14(dt){
+  if(dt.cmb==='atk'&&dt.attackerId){const melee=dt.weapon&&(dt.weapon.cat==='Corpo a corpo'||dt.weapon.skill==='Briga');(dt.targets||[]).forEach(t=>{if(!CB14.fx.some(f=>f.kind==='trace'&&performance.now()-f.t0<700))traceFx14(dt.attackerId,t.id,melee?'melee':'shot',false)})}
+  if(dt.cmb==='res'&&dt.targetId){
+    const o=dt.outcome,id=dt.targetId;
+    if(dt.hit){const n=dt.dmg?.final||0;floatTxt14(id,n?`−${n} VT`:'ABSORVIDO','#ff6b5b');if(dt.crit)setTimeout(()=>floatTxt14(id,'CRÍTICO!','#ffb020'),220);if(o==='violento')setTimeout(()=>floatTxt14(id,'ACERTO VIOLENTO!','#ff8a3d'),440)}
+    else floatTxt14(id,o==='retaliacao'?'RETALIAÇÃO!':o==='defesa'?'BLOQUEOU!':dt.label==='Brecha Rápida'?'BRECHA!':'ESQUIVOU!',o==='retaliacao'?'#ffd36b':'#7fe3ff');
+    /* Brecha Rápida: quem defendeu escolhe para onde se teleporta (até 5 m) */
+    const tc=charById(id);if(dt.label==='Brecha Rápida'&&tc&&controls(tc)&&mapReady14(tc))setTimeout(()=>startAim14({kind:'tp',ch:tc,m:5}),600);
+  }
+}
+/* desenho por cima do mapa */
+function pill14(x,txt,cx,cy,bg,fg,size=13){
+  x.font=`800 ${size}px "IBM Plex Sans",system-ui,sans-serif`;const tw=x.measureText(txt).width+18,h=size+12;
+  x.fillStyle=bg;x.beginPath();x.roundRect?x.roundRect(cx-tw/2,cy-h,tw,h,h/2):x.rect(cx-tw/2,cy-h,tw,h);x.fill();
+  x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';x.fillText(txt,cx,cy-h/2+1);
+}
+T3.cbPaint=(x,v,g)=>{
+  let again=false;const now=performance.now(),cs=g.cell*v.s,sc=(wx,wy)=>w2s7(v,wx,wy),isM=isGM6();
+  /* terreno difícil: hachura (Mestre sempre; jogador só onde o próprio token está) */
+  const rough=geo10().rooms.filter(r=>r.rough);
+  if(rough.length){const mine=myToks10().map(t=>tokCenter10(t));rough.forEach(r=>{if(!isM&&!mine.some(([px,py])=>inPoly10(px,py,r.pts)))return;x.save();x.beginPath();path10(x,v,r.pts);x.clip();x.strokeStyle='rgba(160,110,60,.35)';x.lineWidth=2;const [x0,y0]=sc(Math.min(...r.pts.map(p=>p[0])),Math.min(...r.pts.map(p=>p[1]))),[x1,y1]=sc(Math.max(...r.pts.map(p=>p[0])),Math.max(...r.pts.map(p=>p[1])));x.beginPath();for(let k=x0-(y1-y0);k<x1;k+=12){x.moveTo(k,y1);x.lineTo(k+(y1-y0),y0)}x.stroke();x.restore()})}
+  if(inCb14()){
+    const cur=cur14(),t=cur&&tok14(cur.id);
+    if(t&&mapTokVisible7(t)){
+      const [wx,wy]=tokCenter10(t),[sx,sy]=sc(wx,wy),r=(t.s||1)*cs/2;
+      /* área que ainda dá para andar */
+      const mine=controls(cur),rem=mine?(()=>{const i=mvInfo14(cur);return{used:mvState14(cur).used,max:i.max}})():CB14.remote[TURN.key];
+      if(rem&&rem.max>0&&(mine||isM)){const left=Math.max(0,rem.max-rem.used),rr=m2px14(left)*v.s+r;
+        x.save();x.beginPath();x.arc(sx,sy,rr,0,TAU10);x.fillStyle='rgba(120,220,160,.08)';x.fill();x.setLineDash([6,6]);x.lineWidth=2;x.strokeStyle=left>0?'rgba(120,220,160,.85)':'rgba(220,90,90,.8)';x.stroke();x.setLineDash([]);x.restore();
+        pill14(x,`👣 ${fmtM14(left)} m / ${fmtM14(rem.max)} m`,sx,sy+rr+24,'rgba(16,30,22,.85)',left>0?'#bff5d2':'#ffb3a8',12)}
+      /* anel luminoso e etiqueta da vez */
+      const pul=(Math.sin(now/240)+1)/2;
+      x.save();const gr=x.createRadialGradient(sx,sy,r*.9,sx,sy,r*1.9);gr.addColorStop(0,`rgba(255,211,107,${.45+pul*.25})`);gr.addColorStop(1,'rgba(255,211,107,0)');x.fillStyle=gr;x.beginPath();x.arc(sx,sy,r*1.9,0,TAU10);x.fill();
+      x.beginPath();x.arc(sx,sy,r+6+pul*3,0,TAU10);x.lineWidth=3;x.strokeStyle='#ffd36b';x.shadowColor='#ffd36b';x.shadowBlur=14;x.stroke();x.restore();
+      const label=!isM&&mine?'⚡ SEU TURNO':'⚡ '+nm(cur),bob=Math.sin(now/300)*3;
+      pill14(x,label,sx,sy-r-14+bob,!isM&&mine?'#ffd36b':'rgba(30,20,8,.88)',!isM&&mine?'#2a1a00':'#ffd36b',13);
+      again=true;
+    }
+  }
+  const a=CB14.aim;
+  if(a){
+    const at=tok14(a.ch.id);
+    if(at){
+      const [ax,ay]=tokCenter10(at),[sx,sy]=sc(ax,ay),r0=(at.s||1)*cs/2;
+      const ringM=a.kind==='atk'?a.range+(a.melee?0:0):a.kind==='aoe'?a.max:a.kind==='tp'?a.m:a.kind==='push'?2.2:a.kind==='plano'&&a.step==='dest'?a.m:0;
+      if(ringM&&a.kind!=='plano'){const rr=m2px14(ringM)*v.s+(a.melee?r0:0);x.save();x.beginPath();x.arc(sx,sy,rr,0,TAU10);x.fillStyle=a.kind==='aoe'?'rgba(255,150,60,.06)':'rgba(255,90,90,.06)';x.fill();x.setLineDash([8,6]);x.lineWidth=2;x.strokeStyle=a.kind==='tp'?'rgba(170,140,255,.9)':'rgba(255,110,90,.85)';x.stroke();x.setLineDash([]);x.restore();
+        pill14(x,(a.kind==='atk'?(a.melee?'Corpo a corpo':'Alcance '+fmtM14(ringM)+' m'):a.kind==='aoe'?'Arremesso até '+fmtM14(ringM)+' m':'Até '+fmtM14(ringM)+' m'),sx,sy-rr-6,'rgba(30,10,8,.85)','#ffd2c8',11)}
+      const h=CB14.hover;
+      if(a.kind==='atk'&&h){
+        const t=tokAtPt14(h.wx,h.wy);
+        if(t&&t.charId!==a.ch.id){const ev=evalAtk14(a,t),[bx,by]=tokCenter10(t),[tx,ty]=sc(bx,by),tr=(t.s||1)*cs/2;
+          x.save();x.beginPath();x.moveTo(sx,sy);x.lineTo(tx,ty);x.lineWidth=2.5;x.setLineDash(ev.ok?[]:[6,5]);x.strokeStyle=ev.ok?(ev.cover?'#ffd36b':'#7dffa8'):'#ff6b5b';x.stroke();x.setLineDash([]);
+          x.beginPath();x.arc(tx,ty,tr+5,0,TAU10);x.lineWidth=2.5;x.stroke();x.beginPath();x.moveTo(tx-tr-10,ty);x.lineTo(tx-tr+2,ty);x.moveTo(tx+tr-2,ty);x.lineTo(tx+tr+10,ty);x.moveTo(tx,ty-tr-10);x.lineTo(tx,ty-tr+2);x.moveTo(tx,ty+tr-2);x.lineTo(tx,ty+tr+10);x.stroke();x.restore();
+          pill14(x,ev.ok?(ev.cover?'🧱 Cobertura · ':'🎯 ')+fmtM14(ev.s.dist)+' m':'⛔ '+(ev.s&&!ev.s.vis?'sem visão':'fora de alcance'),tx,ty-tr-12,ev.ok?'rgba(10,30,18,.88)':'rgba(40,8,8,.9)',ev.ok?(ev.cover?'#ffd36b':'#7dffa8'):'#ffb3a8',12)}
+      }
+      if(a.kind==='aoe'&&h){
+        const pt=aimPoint14(a);if(pt){const [px,py]=pt,[qx,qy]=sc(px,py),R=m2px14(a.r),d=px2m14(hyp10(px-ax,py-ay)),DT=dtFor14(d);
+          (M6.state.tokens||[]).forEach(t=>{const c=charById(t.charId);if(!c||!inScene(c)||!mapTokVisible7(t))return;const [x2,y2]=tokCenter10(t);if(hyp10(x2-px,y2-py)<=R+tokR10(t)*.6&&los14(px,py,x2,y2)){const [s2,t2]=sc(x2,y2);x.beginPath();x.arc(s2,t2,(t.s||1)*cs/2+4,0,TAU10);x.lineWidth=3;x.strokeStyle='#ff8a3d';x.stroke()}});
+          x.save();x.beginPath();x.moveTo(sx,sy);x.quadraticCurveTo((sx+qx)/2,Math.min(sy,qy)-60,qx,qy);x.setLineDash([4,6]);x.lineWidth=2;x.strokeStyle='rgba(255,200,120,.9)';x.stroke();x.setLineDash([]);
+          x.beginPath();x.arc(qx,qy,R*v.s,0,TAU10);x.fillStyle='rgba(255,120,40,.18)';x.fill();x.lineWidth=2;x.strokeStyle='rgba(255,150,60,.95)';x.stroke();x.restore();
+          pill14(x,`💣 ${fmtM14(d)} m · DT ${DT} · raio ${fmtM14(a.r)} m`,qx,qy-R*v.s-6,'rgba(40,16,4,.9)','#ffd2a8',12)}
+      }
+      if(a.kind==='pick'){
+        (M6.state.tokens||[]).forEach(t=>{if(!a.sel.has(t.charId))return;const [x2,y2]=tokCenter10(t),[s2,t2]=sc(x2,y2);x.beginPath();x.arc(s2,t2,(t.s||1)*cs/2+5,0,TAU10);x.lineWidth=3;x.strokeStyle='#7fe3ff';x.stroke()});
+        if(a.area&&h){x.save();x.beginPath();x.arc(...sc(h.wx,h.wy),m2px14(a.r)*v.s,0,TAU10);x.fillStyle='rgba(127,227,255,.1)';x.fill();x.setLineDash([6,5]);x.strokeStyle='rgba(127,227,255,.9)';x.lineWidth=2;x.stroke();x.restore()}
+      }
+      if((a.kind==='tp'||a.kind==='plano'&&a.step==='dest')&&h){const o=a.kind==='tp'?[ax,ay]:a.from,okd=hyp10(h.wx-o[0],h.wy-o[1])<=m2px14(a.m)&&los14(o[0],o[1],h.wx,h.wy),[qx,qy]=sc(h.wx,h.wy);
+        if(a.kind==='plano'){const [ox,oy]=sc(o[0],o[1]);x.save();x.beginPath();x.arc(ox,oy,m2px14(a.m)*v.s,0,TAU10);x.setLineDash([8,6]);x.lineWidth=2;x.strokeStyle='rgba(170,140,255,.9)';x.stroke();x.restore()}
+        x.beginPath();x.arc(qx,qy,r0,0,TAU10);x.fillStyle=okd?'rgba(170,140,255,.35)':'rgba(255,90,90,.3)';x.fill()}
+    }
+  }
+  /* efeitos (rastros, explosões, números) */
+  CB14.fx=CB14.fx.filter(f=>now-f.t0<f.dur);
+  CB14.fx.forEach(f=>{
+    const k=(now-f.t0)/f.dur;again=true;
+    if(f.kind==='trace'){const [ax,ay]=sc(f.ax,f.ay),[bx,by]=sc(f.bx,f.by);x.save();x.globalAlpha=1-k;
+      if(f.style==='melee'){const an=Math.atan2(by-ay,bx-ax),r=Math.max(18,cs*.7);x.beginPath();x.arc(bx,by,r,an-Math.PI*.9+k*1.2,an-Math.PI*.2+k*1.2);x.lineWidth=5;x.strokeStyle='#fff';x.shadowColor='#ff6b5b';x.shadowBlur=12;x.stroke()}
+      else{const p=Math.min(1,k*1.6),cx=ax+(bx-ax)*p,cy=ay+(by-ay)*p;x.beginPath();x.moveTo(ax+(bx-ax)*Math.max(0,p-.35),ay+(by-ay)*Math.max(0,p-.35));x.lineTo(cx,cy);x.lineWidth=3;x.strokeStyle='#ffe6a8';x.shadowColor='#ffb020';x.shadowBlur=10;x.stroke();x.beginPath();x.arc(cx,cy,3.5,0,TAU10);x.fillStyle='#fff';x.fill()}
+      x.restore()}
+    else if(f.kind==='boom'){const [bx,by]=sc(f.x,f.y),R=(f.r||m2px14(3))*v.s;x.save();
+      if(f.ax!=null&&k<.3){const [ax,ay]=sc(f.ax,f.ay),p=k/.3;x.beginPath();x.arc(ax+(bx-ax)*p,ay+(by-ay)*p-Math.sin(p*Math.PI)*60,5,0,TAU10);x.fillStyle='#ffd36b';x.fill()}
+      else{const p=Math.min(1,(k-.3)/.7);x.globalAlpha=1-p;const gr=x.createRadialGradient(bx,by,0,bx,by,R*(.4+p*.7));gr.addColorStop(0,`rgba(255,255,220,.95)`);gr.addColorStop(.45,`rgba(${f.col||'255,200,80'},.75)`);gr.addColorStop(1,`rgba(${f.col||'255,200,80'},0)`);x.fillStyle=gr;x.beginPath();x.arc(bx,by,R*(.4+p*.7),0,TAU10);x.fill();x.beginPath();x.arc(bx,by,R,0,TAU10);x.lineWidth=2;x.strokeStyle=`rgba(${f.col||'255,200,80'},.8)`;x.stroke()}
+      x.restore()}
+    else if(f.kind==='push'||f.kind==='tp'){const [ax,ay]=sc(f.x,f.y),[bx,by]=sc(f.x2,f.y2);x.save();x.globalAlpha=1-k;x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.lineWidth=f.kind==='push'?6:3;x.setLineDash(f.kind==='tp'?[3,6]:[]);x.strokeStyle=f.kind==='push'?'rgba(255,211,107,.8)':'rgba(170,140,255,.9)';x.stroke();if(f.kind==='tp'){x.beginPath();x.arc(ax,ay,cs*.5*(1-k)+2,0,TAU10);x.arc(bx,by,cs*.5*k+2,0,TAU10);x.fillStyle='rgba(170,140,255,.35)';x.fill()}x.restore()}
+    else if(f.kind==='txt'){const t=tok14(f.cid);if(!t||!mapTokVisible7(t))return;const [wx,wy]=tokCenter10(t),[tx,ty]=sc(wx,wy),r=(t.s||1)*cs/2;
+      const same=CB14.fx.filter(q=>q.kind==='txt'&&q.cid===f.cid),idx=same.indexOf(f);
+      x.save();x.globalAlpha=k<.15?k/.15:1-Math.max(0,(k-.6)/.4);x.font=`900 ${Math.round(16+Math.min(6,cs*.08))}px "IBM Plex Sans",system-ui,sans-serif`;x.textAlign='center';x.textBaseline='bottom';x.lineWidth=4;x.strokeStyle='rgba(0,0,0,.8)';
+      const yy=ty-r-6-k*34-idx*20;x.strokeText(f.txt,tx,yy);x.fillStyle=f.col||'#fff';x.fillText(f.txt,tx,yy);x.restore()}
+  });
+  return again;
+};
+
+/* ===================== 9. barra da ordem e HUD do turno ===================== */
+function mount14(){
+  const st=MAP7.stage;if(!st||!st.isConnected)return false;
+  let b=$('cbBar'),h=$('cbHud');
+  if(!b){b=document.createElement('div');b.id='cbBar';b.className='cb-bar';b.hidden=true}
+  if(!h){h=document.createElement('div');h.id='cbHud';h.className='cb-hud';h.hidden=true;h.setAttribute('role','region');h.setAttribute('aria-label','Ações do turno')}
+  if(b.nextElementSibling!==st)st.before(b);if(st.nextElementSibling!==h)st.after(h);
+  return true;
+}
+function bar14(){
+  const b=$('cbBar');if(!b)return;const c=camp3(),cm=c?.combat,isM=isGM6();
+  if(!inCb14()){
+    const sig=isM&&c?'start':'';if(CB14.barSig===sig)return;CB14.barSig=sig;
+    if(!sig){b.hidden=true;b.innerHTML='';return}
+    b.hidden=false;b.innerHTML='<button type="button" class="cb-start" id="cbStart">⚔ Iniciar Combate</button>';$('cbStart').onclick=beginCombat14;return;
+  }
+  const order=cm.order||[],ti=Math.min(cm.turnIndex||0,order.length-1);
+  const sig=JSON.stringify([cm.round,ti,order.map(o=>[o.characterId,isDeadCh(charById(o.characterId)),isDyingCh(charById(o.characterId))]),isM]);
+  if(CB14.barSig===sig)return;CB14.barSig=sig;b.hidden=false;
+  b.innerHTML=`<span class="cb-round">⚔ Rodada ${cm.round}</span><ol class="cb-ord">${order.map((o,i)=>{const ch=charById(o.characterId),dead=isDeadCh(ch),dy=isDyingCh(ch);return`<li class="${i===ti?'on':''} ${i<ti?'past':''} ${dead||dy?'down':''} ${ch&&gmChar6(ch)?'npc':''}" title="${esc(nm(ch)||o.name)}">${i===ti?'⚡ ':''}${esc(nm(ch)||o.name)}${dead?' ☠':dy?' ✚':''}</li>`}).join('')}</ol>${isM?'<button type="button" class="cb-next" id="cbNext" title="Passar para o próximo da ordem">Próximo ⏭</button>':''}`;
+  const n=$('cbNext');if(n)n.onclick=()=>window.tulpaAdvanceTurn?.(true,true);
+  b.querySelector('li.on')?.scrollIntoView?.({block:'nearest',inline:'center'});
+}
+function hud14(force){
+  if(!mount14())return;bar14();
+  const h=$('cbHud');if(!h)return;
+  const a=CB14.aim,cur=cur14(),isM=isGM6(),mineAll=chars3().filter(controls);
+  let sig,html='';
+  if(a){
+    const n=a.kind==='pick'?a.sel.size:0;
+    sig='aim|'+a.kind+'|'+n+'|'+(a.step||'')+'|'+(a.left||'');
+    const msg=a.kind==='atk'?`🎯 <b>${esc(a.w.name)}</b>: clique no alvo no mapa. ${a.melee?'Corpo a corpo: só quem está ao lado.':'Alcance '+fmtM14(a.range)+' m, precisa de linha de visão.'}`
+      :a.kind==='aoe'?`💣 <b>${esc(a.w.name)}</b>: mire no mapa e clique. Até 6 m DT 12 · 12 m DT 15 · 18 m DT 18 · mais longe DT 20+. Se falhar, desvia.`
+      :a.kind==='pick'?`✦ <b>${esc(a.title)}</b>: ${a.multi?(a.area?'clique num ponto para pegar todos no raio de '+fmtM14(a.r)+' m, ou clique nos tokens':'clique nos tokens para marcar'):'clique no token'}.${a.multi?` <b>${n}</b> marcado(s).`:''}`
+      :a.kind==='tp'?`✨ <b>Teleporte</b>: clique num lugar vazio e visível a até ${fmtM14(a.m)} m.`
+      :a.kind==='push'?'💥 <b>Golpe Repulsor</b>: clique no alvo para empurrá-lo 3 m.'
+      :`🜂 <b>Plano Superior</b>: ${a.step==='dest'?'clique no novo lugar (até 6 m).':'clique no token a reposicionar.'} Restam ${a.left}.`;
+    html=`<div class="cbh-aim"><span>${msg}</span><span class="cbh-btns">${a.kind==='pick'&&a.multi?`<button type="button" class="btn small primary" data-cba="ok" ${n?'':'disabled'}>✓ Confirmar</button>`:''}${['atk','aoe','pick'].includes(a.kind)?'<button type="button" class="btn small" data-cba="list">Escolher pela lista</button>':''}<button type="button" class="btn small" data-cba="x">${a.kind==='plano'?'Concluir':'Cancelar'} (Esc)</button></span></div>`;
+  }else if(inCb14()&&cur){
+    const myT=myTurn14()&&!(isM&&cur.ownerId&&cur.ownerId!==uid3());
+    if(myT&&!isDown(cur)){
+      const d=d14(cur),m=E.computeMods(d),blocked=m.flags.has('semAgir'),left=actionsLeft(cur),extra=Number(d.combatExtra)||0,info=mvInfo14(cur),mv=mvState14(cur),mleft=Math.max(0,info.max-mv.used);
+      const quickUsed=CB14.quick===TURN.key,st=stIds(d),inv=E.ensureInv(d),quickItems=inv.items.filter(i=>['cintura','bandoleira'].includes(i.loc)),hasAoe=E.quickWeapons(d).some(i=>aoe14(i.w)),re=retalOf(cur);
+      sig=JSON.stringify(['me',cur.id,TURN.key,left,extra,fmtM14(mleft),info.max,mv.run,TURN.talentUsed,quickUsed,re,blocked,st.join(),inv.mochila,quickItems.length,hasAoe,info.canRun]);
+      const pct=info.max?mleft/info.max*100:0;
+      html=`<div class="cbh-pills">
+        <span class="cbp mv ${mleft<=0?'off':''}" title="${info.why?esc(info.why):'9 m por turno'}"><b>👣 Movimento</b><i><s style="width:${pct.toFixed(1)}%"></s></i><em>${fmtM14(mleft)} / ${fmtM14(info.max)} m${mv.run?' · disparada':''}</em></span>
+        <span class="cbp ${left>0?'':'off'}" title="Atacar, curar, conjurar, perícia, alerta, levantar, sacar da mochila"><b>⚔ Ação Padrão</b><em>${left} / ${1+extra}${extra?' (+1 violento)':''}</em></span>
+        <span class="cbp free ${TURN.talentUsed?'off':''}" title="1 talento por turno sem gastar a Ação Padrão"><b>⚡ Talento</b><em>${TURN.talentUsed?'usado':'livre'}</em></span>
+        <span class="cbp free ${quickUsed?'off':''}" title="1 vez por turno: cintura/coldre ou bandoleira → mãos"><b>🔁 Saque rápido</b><em>${quickUsed?'usado':'livre'}</em></span>
+        <span class="cbp ${re?'':'off'}" title="Retaliação e rituais de reação acontecem fora do seu turno"><b>🛡 Reação</b><em>${re?re+' disponível':'fora do turno'}</em></span>
+      </div><div class="cbh-acts">
+        <button type="button" class="btn small primary" data-cb="atk" ${blocked||left<=0?'disabled':''}>⚔ Atacar</button>
+        ${hasAoe?`<button type="button" class="btn small" data-cb="throw" ${blocked||left<=0?'disabled':''}>💣 Arremessar</button>`:''}
+        <button type="button" class="btn small" data-cb="run" ${blocked||left<=0||mv.run||!info.canRun||!info.base?'disabled':''} title="Gasta a Ação Padrão e dobra o movimento deste turno">🏃 Disparada</button>
+        <button type="button" class="btn small" data-cb="abil" ${blocked?'disabled':''}>✦ Talentos / Rituais</button>
+        <button type="button" class="btn small" data-cb="quick" ${blocked||quickUsed||!quickItems.length?'disabled':''}>🔁 Saque rápido</button>
+        <button type="button" class="btn small" data-cb="alert" ${blocked||left<=0?'disabled':''}>👁 Alerta</button>
+        ${st.includes('caido')?`<button type="button" class="btn small" data-cb="up" ${blocked||left<=0?'disabled':''}>⬆ Levantar</button>`:''}
+        <button type="button" class="btn small" data-cb="sut" ${blocked||left<=0?'disabled':''}>🩹 Sutura</button>
+        <button type="button" class="btn small" data-cb="other" ${blocked||left<=0?'disabled':''}>⌖ Perícia</button>
+        ${inv.mochila?'<button type="button" class="btn small" data-cb="drop" title="Ação livre: solta a mochila no chão">🎒 Soltar mochila</button>':''}
+        <button type="button" class="btn small danger" data-cb="end">✔ Concluir turno</button>
+      </div>${info.max===0?`<p class="cbh-note">🚫 Sem movimento: ${esc(info.why)}.</p>`:''}${blocked?'<p class="cbh-note">🚫 Você não pode agir neste estado.</p>':''}`;
+    }else{
+      const reCh=mineAll.find(x=>inScene(x)&&retalOf(x)>0);
+      if(reCh&&!isM){sig='re|'+reCh.id+'|'+retalOf(reCh);html=`<div class="cbh-aim"><span>🛡 <b>${esc(nm(reCh))}</b> desviou com folga: <b>Reação</b> de Retaliação disponível (não pode ser esquivada).</span><span class="cbh-btns"><button type="button" class="btn small primary" data-cbre="${reCh.id}">⚔ Contra-atacar</button></span></div>`}
+      else if(isM){const r=CB14.remote[TURN.key],mi=controls(cur)?null:r;
+        sig='gm|'+TURN.key+'|'+(mi?fmtM14(mi.max-mi.used):'')+'|'+isDown(cur);
+        html=`<div class="cbh-aim"><span>⏳ Vez de <b>${esc(nm(cur))}</b>${mi?` · 👣 ${fmtM14(Math.max(0,mi.max-mi.used))} / ${fmtM14(mi.max)} m`:''}${isDown(cur)?' · turno pulado':''}</span><span class="cbh-btns"><button type="button" class="btn small" data-cb="force">Forçar fim do turno</button></span></div>`}
+      else{sig='wait|'+TURN.key;html=''}
+    }
+  }else{sig='';html=''}
+  if(!force&&CB14.hudSig===sig)return;CB14.hudSig=sig;
+  h.hidden=!html;h.innerHTML=html;h.classList.toggle('aim',!!a);
+  const on=(sel,fn)=>$$(sel,h).forEach(b=>b.onclick=fn);
+  on('[data-cba]',e=>{const k=e.currentTarget.dataset.cba,a2=CB14.aim;if(k==='x'){aimCancel14()}else if(k==='list')aimList14();else if(k==='ok'&&a2&&a2.kind==='pick'){const ids=[...a2.sel];endAim14();a2.done(ids)}});
+  on('[data-cbre]',e=>startAttack(charById(e.currentTarget.dataset.cbre),{retal:true}));
+  on('[data-cb]',e=>act14(e.currentTarget.dataset.cb));
+}
+T3.cbHud=hud14;
+function act14(k){
+  const cur=cur14();if(!cur)return;
+  if(k==='force'){window.tulpaAdvanceTurn?.(true,true);return}
+  if(!myTurn14()){toast('Não é a sua vez.');return}
+  if(k==='atk')return startAttack(cur);
+  if(k==='throw')return startAttack(cur,{areaOnly:true});
+  if(k==='abil')return abilitiesMenu(cur);
+  if(k==='alert')return alertAction(cur);
+  if(k==='other')return otherAction(cur);
+  if(k==='sut')return rescueAction(cur,'sutura',{spendAction:true});
+  if(k==='end'){endAim14();return endTurn(cur)}
+  if(k==='up'){if(actionsLeft(cur)<=0){toast('Você já usou sua Ação Padrão neste turno.');return}spend(cur);mutateChar(cur,x=>{x.statuses=(x.statuses||[]).filter(s=>s.id!=='caido')});insertRow(cur,'Levantar',{detail:{cmb:'log',text:`${nm(cur)} se levantou (Ação Padrão).`}}).catch(()=>{});toast('Você se levantou.');renderCombatUI();return}
+  if(k==='run'){
+    const info=mvInfo14(cur);if(!info.canRun){toast('Exausto ou sobrecarregado: não dá para disparar.');return}
+    if(actionsLeft(cur)<=0){toast('Disparada gasta a Ação Padrão, e ela já foi usada.');return}
+    spend(cur);const mv=mvState14(cur);mv.run=true;mvSave14(true);fx5('activate');
+    insertRow(cur,'Disparada',{detail:{cmb:'log',text:`${nm(cur)} disparou: ${fmtM14(info.base*2)} m de movimento neste turno (Ação Padrão).`}}).catch(()=>{});
+    toast(`🏃 Disparada: ${fmtM14(info.base*2)} m neste turno.`);renderCombatUI();mapDraw7();return;
+  }
+  if(k==='quick')return quickDraw14(cur);
+  if(k==='drop'){
+    askModal('AÇÃO LIVRE','Soltar a mochila',`<p>A mochila e tudo o que está nela ficam no chão, aqui. A carga cai na hora. Não gasta a Ação Padrão nem movimento.</p>`,'Soltar').then(ok=>{if(!ok)return;
+      mutateChar(cur,x=>{const inv=E.ensureInv(x);inv.items.forEach(i=>{if(i.loc==='mochila')i.loc='chao'});inv.mochila=false});
+      insertRow(cur,'Descarte de emergência',{detail:{cmb:'log',text:`${nm(cur)} soltou a mochila no chão (ação livre).`}}).catch(()=>{});toast('🎒 Mochila no chão.');renderCombatUI()});
+  }
+}
+/* Saque Rápido: 1 por turno, cintura/coldre ou bandoleira → mãos, sem gastar a Ação Padrão */
+function quickDraw14(ch){
+  if(CB14.quick===TURN.key){toast('O Saque Rápido deste turno já foi usado.');return}
+  const d=d14(ch),inv=E.ensureInv(d),list=inv.items.filter(i=>['cintura','bandoleira'].includes(i.loc));
+  if(!list.length){toast('Nada na cintura/coldre ou na bandoleira.');return}
+  const hands=inv.items.filter(i=>i.loc==='maos');
+  openModal('AÇÃO LIVRE','Saque Rápido',`<p class="sub">Puxe um item da cintura/coldre ou da bandoleira para as mãos. Uma vez por turno, sem gastar a Ação Padrão.</p><div class="t3-weapons">${list.map(i=>`<button class="t3-weapon" data-qd="${i.id}"><b>${esc(i.name)}</b><span>${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>${hands.length?`<p class="sub" style="margin-top:8px">Nas mãos agora: ${hands.map(i=>esc(i.name)).join(', ')}. Se não couber, o que está na mão vai para onde o novo estava.</p>`:''}`,'Fechar',closeModal);
+  $$('[data-qd]').forEach(b=>b.onclick=()=>{
+    const it=inv.items.find(i=>i.id===b.dataset.qd);if(!it)return;let v=E.validPlacement(d,it,'maos'),swap=null;
+    if(!v.ok&&hands.length){swap=hands[hands.length-1]}
+    closeModal();
+    mutateChar(ch,x=>{const items=E.ensureInv(x).items,t=items.find(i=>i.id===it.id);if(!t)return;const from=t.loc;if(swap){const s=items.find(i=>i.id===swap.id);if(s)s.loc=from}t.loc='maos'});
+    const d2=d14(ch);if(E.handsUsed(d2)>2){mutateChar(ch,x=>{const items=E.ensureInv(x).items,t=items.find(i=>i.id===it.id);if(t)t.loc=it.loc;if(swap){const s=items.find(i=>i.id===swap.id);if(s)s.loc='maos'}});toast('Não cabe nas mãos: '+(v.msg||'mãos ocupadas'));return}
+    CB14.quick=TURN.key;fx5('click');toast(`🔁 ${it.name} na mão${swap?` (${swap.name} foi para ${LOCS[it.loc]})`:''}.`);
+    insertRow(ch,'Saque rápido',{detail:{cmb:'log',text:`${nm(ch)} sacou ${it.name} (ação livre).`}}).catch(()=>{});renderCombatUI();
+  });
+}
+
+/* ---------- ciclo ---------- */
+const _rc14=renderCombatUI;
+renderCombatUI=function(){const r=_rc14.apply(this,arguments);try{if(!inCb14()&&CB14.aim&&CB14.aim.kind!=='tp')endAim14();hud14()}catch(e){console.warn('[T14] hud',e)}return r};
+T3.renderCombatUI=renderCombatUI;
+setInterval(()=>{try{if(MAP7.cv&&MAP7.cv.isConnected&&!document.hidden){hud14();if(inCb14())mapDraw7()}}catch(e){console.warn('[T14] hud',e)}},500);
+M6.hooks.leave.push(()=>{CB14.aim=null;CB14.fx=[];CB14.remote={};CB14.hudSig='';CB14.barSig=''});
+T3.cbDbg={evalAtk14,shot14,mvInfo14,mvState14,dtFor14,weaponRange14,startAim14,endAim14};
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
