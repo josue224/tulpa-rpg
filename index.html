@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="2026-11-07-etapa2-combate-encerrar-excluir-tulpa-2">
+<meta name="tulpa-build" content="14/11 22:00">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2123,6 +2123,45 @@ body.t3-dark .chat-msg.priv{background:#3f2a5c;color:#f1e6ff}
 .dock-tabs button .dock-badge{display:inline-block;min-width:18px;height:18px;line-height:18px;margin-left:6px;padding:0 5px;border-radius:9px;background:#c0392b;color:#fff;font-size:11px;font-weight:700;text-align:center;vertical-align:middle}
 @media (max-width:860px){.chat-form{grid-template-columns:1fr auto}.chat-to{grid-column:1/-1}.chat-to select{max-width:none;width:100%}.chat-msg{max-width:94%}}
 
+/* ===== Guia: notas de atualização (Etapa 11) ===== */
+.guide-btn{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;width:100%;min-height:50px;margin:0 0 16px;padding:12px 14px;font-weight:700;font-size:15px;line-height:1.25;text-align:center;border:2px solid var(--accent,#c0773a)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent,#c0773a) 24%,transparent)}
+.gd-pill,.gd-new{display:inline-block;padding:2px 9px;border-radius:999px;background:#ffcc33;color:#2a1c00;font-size:12px;font-weight:800}
+.modal.gd{width:min(860px,100%)!important;overflow-x:hidden}
+.modal.gd #modalCancel{display:none}
+.modal.gd #modalBody{min-width:0;overflow-wrap:anywhere}
+.gd-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:10px}
+.gd-ver{padding:3px 10px;border-radius:999px;border:1px solid color-mix(in srgb,currentColor 30%,transparent);font-size:13px}
+.gd-ok{font-size:13px;opacity:.8}
+.gd-search{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-bottom:8px}
+.gd-search input{flex:1 1 220px;min-width:0;min-height:44px;padding:9px 12px;font:inherit;font-size:16px;border-radius:10px;border:1px solid color-mix(in srgb,currentColor 28%,transparent);background:color-mix(in srgb,currentColor 6%,transparent);color:inherit}
+.gd-search input:focus-visible,.gd-tab:focus-visible,.gd-who button:focus-visible,.gd-item summary:focus-visible{outline:3px solid var(--accent,#c0773a);outline-offset:2px}
+.gd-who,.gd-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.gd-who button,.gd-tab{min-height:40px;padding:7px 12px;border-radius:999px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);background:transparent;color:inherit;font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.gd-who button{min-height:34px;font-size:13px}
+.gd-who button.on,.gd-tab.on{background:var(--accent,#c0773a);border-color:var(--accent,#c0773a);color:#fff;font-weight:700}
+.gd-cat{margin:14px 0 4px;font-weight:800;font-size:14px;opacity:.85}
+.gd-item{margin:8px 0;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:10px;background:color-mix(in srgb,currentColor 5%,transparent)}
+.gd-item summary{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:11px 12px 11px 30px;font-weight:700;cursor:pointer;list-style:none;position:relative;min-height:44px}
+.gd-item summary::-webkit-details-marker{display:none}
+.gd-item summary::before{content:'▸';position:absolute;left:11px;top:11px;transition:transform .15s}
+.gd-item[open] summary::before{transform:rotate(90deg)}
+.gd-t{flex:1 1 220px;min-width:0}
+.gd-body{padding:0 13px 13px 13px;line-height:1.55;font-size:14.5px}
+.gd-body ul{margin:6px 0 0;padding-left:20px}.gd-body li{margin:5px 0}
+.gd-body ul.gd-list{list-style:none;padding-left:0}
+.gd-tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:700;color:#fff;white-space:nowrap;vertical-align:baseline}
+.gd-tag.m{background:#8e3e34}.gd-tag.p{background:#2f6b63}
+.gd-tag.a{background:transparent;color:inherit;border:1px solid color-mix(in srgb,currentColor 45%,transparent)}
+.gd-keys{white-space:nowrap}
+.gd-keys kbd,.gd-body kbd{display:inline-block;min-width:22px;padding:1px 6px;margin:0 1px;border-radius:5px;border:1px solid color-mix(in srgb,currentColor 35%,transparent);border-bottom-width:2px;background:color-mix(in srgb,currentColor 8%,transparent);font:600 12px/1.5 ui-monospace,Menlo,Consolas,monospace;text-align:center}
+.gd-empty{margin:14px 0;opacity:.85}
+body[data-news="1"] .t3-setbtn{position:relative}
+body[data-news="1"] .t3-setbtn::after{content:'';position:absolute;top:-4px;right:-4px;width:11px;height:11px;border-radius:50%;background:#ffcc33;box-shadow:0 0 0 2px var(--bg,#161616),0 0 10px 3px #ffcc33aa;animation:gdPulse 1.6s ease-in-out infinite}
+@keyframes gdPulse{50%{box-shadow:0 0 0 2px var(--bg,#161616),0 0 16px 6px #ffcc3377;transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){body[data-news="1"] .t3-setbtn::after{animation:none}.gd-item summary::before{transition:none}}
+body.t3-mobile .gd-body{font-size:15px}
+body.t3-mobile .gd-tab{flex:1 1 calc(50% - 6px)}
+
 /* Gerado por gen_palette.py: camada de paletas (não edite à mão). */
 html body.t3-pal{color:var(--text);background:radial-gradient(ellipse at 50% -18%,color-mix(in oklab,var(--text) 3%,var(--panel)) 0%,color-mix(in oklab,var(--panel) 24%,var(--bg)) 55%,var(--bg) 100%)!important}
 html body.t3-pal #portal{background:radial-gradient(ellipse at 50% 0%,color-mix(in oklab,var(--text) 3%,var(--panel)) 0%,color-mix(in oklab,var(--panel) 40%,var(--bg)) 56%,var(--bg) 100%)!important;color:var(--text)}
@@ -3049,13 +3088,14 @@ T3.applyPrefs=applyPrefs;
 function seg(key,opts){return `<div class="t3-seg" data-pref="${key}">${opts.map(([v,l])=>`<button type="button" class="${String(prefs[key])===String(v)?'on':''}" data-v="${v}">${l}</button>`).join('')}</div>`}
 function openSettings(){
   const now=detectMobile()?'celular':'computador';
-  openModal('APARÊNCIA','Tema e visualização',`<div class="field"><label>Paleta de cores</label><div class="pal-grid" role="radiogroup" aria-label="Paleta de cores">${PALETTES.map(p=>{const sw=p.id==='custom'?Object.values(customPal()):p.sw;return `<button type="button" class="pal-card ${prefs.theme===p.id?'on':''}" data-pal="${p.id}" role="radio" aria-checked="${prefs.theme===p.id}"><span class="pal-sw" aria-hidden="true">${sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><span class="pal-name">${p.name}</span></button>`}).join('')}</div>
+  openModal('APARÊNCIA','Tema e visualização',`<button type="button" class="btn guide-btn" id="guideBtn"><span>📜 Notas de Atualização & Guia Completo</span>${T3.guideNews?.()?'<span class="gd-pill">Novo</span>':''}</button><div class="field"><label>Paleta de cores</label><div class="pal-grid" role="radiogroup" aria-label="Paleta de cores">${PALETTES.map(p=>{const sw=p.id==='custom'?Object.values(customPal()):p.sw;return `<button type="button" class="pal-card ${prefs.theme===p.id?'on':''}" data-pal="${p.id}" role="radio" aria-checked="${prefs.theme===p.id}"><span class="pal-sw" aria-hidden="true">${sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span><span class="pal-name">${p.name}</span></button>`}).join('')}</div>
     <div class="pal-custom ${prefs.theme==='custom'?'':'hide'}" id="palCustom"><p class="sub">Escolha as cores. A mudança aparece na hora e fica guardada neste navegador.</p><div class="pal-pickers">${[['bg','Cor de fundo'],['panel','Cor dos painéis'],['text','Cor do texto principal'],['accent','Cor de destaque'],['second','Cor secundária e bordas']].map(([k,l])=>`<label class="pal-pick"><input type="color" data-cp="${k}" value="${customPal()[k]}"><span>${l}</span></label>`).join('')}</div><div class="inline"><button type="button" class="btn small" id="palReset">Voltar às cores iniciais</button><span class="sub" id="palWarn" aria-live="polite"></span></div></div></div><div class="field" style="margin-top:12px"><label>Visualização</label>${seg('view',[['auto','Automática'],['mobile','📱 Celular'],['desktop','🖥 Computador']])}<span class="sub">Detectado agora: <b>${now}</b> (${window.innerWidth}×${window.innerHeight}). “Automática” se ajusta sozinha ao girar a tela.</span></div><div class="field" style="margin-top:12px"><label>Tamanho do texto</label>${seg('text',[['normal','Normal'],['large','Grande'],['xl','Extra grande']])}</div><div class="field" style="margin-top:12px"><label>Rolagens feitas dentro da ficha</label>${seg('shareSheet',[[false,'🔒 Privadas'],[true,'🎲 Mostrar na mesa']])}<span class="sub">Em “Mostrar na mesa” elas aparecem na tela de todos e no histórico, como as da Visão de Mesa.</span></div><div class="field" style="margin-top:12px"><label>Perseus (gato assistente)</label>${seg('perseus',[[true,'🐱 Mostrar'],[false,'Esconder']])}<span class="sub">Dicas, explicações das regras e guias passo a passo.</span></div><div class="field" style="margin-top:12px"><label>Sons</label>${seg('sound',[['on','🔊 Ligados'],['low','🔉 Baixos'],['off','🔇 Desligados']])}<span class="sub">Dados, acertos, críticos, turnos e rituais.</span></div>`,'Pronto',closeModal);
   const contrast=()=>{const c=customPal(),a=hexLum(c.text),b2=hexLum(c.bg),r=(Math.max(a,b2)+.05)/(Math.min(a,b2)+.05),w=$('palWarn');if(w)w.textContent=r<4.5?'⚠ Pouco contraste entre texto e fundo: a leitura pode ficar difícil.':''};
   $$('.pal-card',$('modalBody')).forEach(b=>b.onclick=()=>{prefs.theme=b.dataset.pal;savePrefs();applyPrefs();$$('.pal-card',$('modalBody')).forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-checked',x===b)});$('palCustom').classList.toggle('hide',prefs.theme!=='custom');contrast();T3.fx?.('click')});
   $$('[data-cp]',$('modalBody')).forEach(inp=>inp.oninput=()=>{prefs.customPalette={...customPal(),[inp.dataset.cp]:inp.value};prefs.theme='custom';savePrefs();applyPrefs();contrast();const card=$q('.pal-card[data-pal="custom"] .pal-sw',$('modalBody'));if(card)card.innerHTML=Object.values(customPal()).map(c=>`<i style="background:${c}"></i>`).join('')});
   const pr=$('palReset');if(pr)pr.onclick=()=>{prefs.customPalette={...CUSTOM_DEF};savePrefs();applyPrefs();$$('[data-cp]',$('modalBody')).forEach(i=>i.value=CUSTOM_DEF[i.dataset.cp]);contrast()};
   contrast();
+  const gb=$('guideBtn');if(gb)gb.onclick=()=>T3.openGuide?.();
   $$('.t3-seg button',$('modalBody')).forEach(b=>b.onclick=()=>{
     const key=b.parentElement.dataset.pref;let v=b.dataset.v;if(v==='true')v=true;if(v==='false')v=false;
     prefs[key]=v;savePrefs();applyPrefs();T3.perseusApply?.();if(key==='sound')T3.fx?.('confirm');
@@ -6720,7 +6760,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='14/11 21:21';
+const BUILD8='14/11 22:00';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -8020,6 +8060,150 @@ try{const f=lsGet6('tulpa_follow',null);if(f===false)TAC10.follow=false;TAC10.hi
 setInterval(()=>{try{if(MAP7.cv&&MAP7.cv.isConnected&&!document.hidden){mapTools7();actButton10()}}catch(e){}},1200);
 /* o tema mudou: redesenha o mapa com as cores novas */
 try{new MutationObserver(()=>mapDraw7()).observe(document.body,{attributes:true,attributeFilter:['class','data-pal','style']})}catch(e){}
+
+
+/* ===================================================================
+   TULPA · ETAPA 11 — Notas de atualização & guia completo
+   Abre pelo botão em destaque do menu ⚙ Aparência. Mostra a versão do
+   site (meta tulpa-build), avisa quando há novidade (ponto no ⚙ e aviso
+   rápido) e reúne, em abas com busca, tudo o que o sistema faz.
+   Cada tópico leva uma etiqueta: Exclusivo do Mestre, Jogadores ou Todos.
+   =================================================================== */
+const G11={tab:'new',q:'',who:'all'};
+const SEEN11='tulpa_seen_version';
+const build11=()=>{const m=document.querySelector('meta[name="tulpa-build"]');return(m&&m.content&&m.content.trim())||T3.build||'desconhecida'};
+const seen11=()=>{try{return localStorage.getItem(SEEN11)||''}catch(e){return''}};
+const isNew11=()=>seen11()!==build11();
+function news11(){document.body.dataset.news=isNew11()?'1':'0'}
+T3.guideNews=isNew11;
+const TM='<span class="gd-tag m">👑 Mestre</span>',TP='<span class="gd-tag p">🎲 Jogador</span>',TA='<span class="gd-tag a">👥 Todos</span>';
+const KB11=(...k)=>`<span class="gd-keys">${k.map(x=>`<kbd>${x}</kbd>`).join('')}</span>`;
+const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogadores'],a:['gd-tag a','👥 Todos']};
+
+/* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
+const GUIDE11=[
+ {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
+  {t:'Etapa 11 · Neblina só no cômodo atual, portas, luzes e lanterna',w:'a',open:1,b:`<ul>
+   <li><b>Neblina sem memória:</b> um cômodo só fica limpo enquanto o seu token está dentro. Ao sair, a névoa volta em cerca de 0,2 s. Pela porta aberta você vê só o feixe do vão; porta fechada bloqueia tudo.</li>
+   <li><b>Fechar portas:</b> qualquer um abre e fecha uma porta destrancada. O cadeado é só do Mestre.</li>
+   <li><b>Lâmpadas e interruptores</b> para o ambiente escuro. O ícone 💡 do interruptor só aparece quando a sua luz passa por cima dele.</li>
+   <li><b>⚡ Queda de energia</b> ${TM}: as luzes piscam e apagam para todos.</li>
+   <li><b>🔦 Lanterna liga/desliga</b> ${TP} pelo botão ou pela tecla ${KB11('F')}.</li>
+   <li><b>Este guia</b>, com busca, abas e a versão do site.</li></ul>`},
+  {t:'Etapa 10 · Paletas, câmera particular e mapa tático',w:'a',b:`<ul>
+   <li>5 paletas de cores, mais <b>Personalizado</b> (5 seletores de cor) e <b>Automático</b>.</li>
+   <li><b>Câmera particular:</b> cada pessoa move e aproxima só a própria tela.</li>
+   <li><b>Ponto de destaque</b> ${TM}: o laser 🔴 aparece pulsando para todos.</li>
+   <li><b>Andar com ${KB11('W')}${KB11('A')}${KB11('S')}${KB11('D')} ou analógico</b>, com o triângulo dourado marcando a frente do token.</li>
+   <li><b>Editor do Mestre:</b> paredes com colisão, portas com cadeado e som, cômodos com névoa individual.</li>
+   <li><b>Ambiente escuro</b> ${TM} com visão por raycasting: paredes bloqueiam a luz.</li></ul>`},
+  {t:'Chat da mesa',w:'a',b:'Mensagens para <b>Todos</b>, só para o <b>Mestre</b> ou em <b>particular</b> com outro jogador. O histórico fica neste aparelho e a aba mostra um selo de mensagens não lidas.'},
+  {t:'Call de voz mais estável',w:'a',b:'A conexão passou a usar servidor TURN (funciona atrás de redes difíceis), reconecta ao sair e entrar e avisa quando o navegador bloqueou o som. O botão <b>🔎</b> mostra a versão do site de cada pessoa e o tipo de rota, para descobrir quem está com a versão antiga.'},
+  {t:'Música do YouTube',w:'a',b:`${TM} adiciona links à playlist; o site confere o vídeo antes. ⚠ só aparece quando o YouTube recusa o vídeo de verdade. O volume da música é individual.`},
+ ]},
+ {id:'map',ico:'🗺',name:'Mapa tático & iluminação',items:[
+  {t:'Câmera, zoom e ferramentas da barra',w:'a',b:'A câmera é <b>só sua</b>: arraste o mapa vazio, use a roda do mouse ou a pinça no celular, ou os botões − ＋ e ⤢ (enquadrar tudo). O botão <b>🎯</b> mantém o seu token na tela enquanto você anda. Clique duplo no mapa centraliza naquele ponto. O botão ⛶ abre em tela cheia. A barra também tem a <b>📏 régua</b>, que mede em metros.'},
+  {t:'Andar, correr e virar o token',w:'p',b:`<ul><li>${KB11('W')}${KB11('A')}${KB11('S')}${KB11('D')} ou setas andam. ${KB11('Shift')} corre.</li><li>O <b>mouse</b> aponta a direção; ${KB11('Q')} e ${KB11('E')} giram.</li><li>No celular aparece o <b>analógico</b> no canto da tela.</li><li>Arrastar o token também funciona, mas ele não atravessa paredes nem portas fechadas.</li><li>O <b>triângulo dourado</b> na borda do token é a frente do personagem.</li></ul>O Mestre move qualquer token livremente. O teclado só vale depois de você clicar no mapa e fora dos campos de texto.`},
+  {t:'Interagir: portas e interruptores',w:'a',b:`Fique perto e <b>de frente</b> para uma porta ou um interruptor e use ${KB11('Espaço')}, um toque rápido em ${KB11('E')} ou o botão <b>✋</b> (no celular ele fica sempre na tela). O texto do botão diz o que vai acontecer: Abrir porta, Fechar porta, Tentar abrir, Acender a luz ou Apagar a luz.`},
+  {t:'Portas e cadeado',w:'a',b:`<ul><li><b>Destrancada 🔓:</b> qualquer um abre ou fecha, com som de rangido ou batida. Aberta, deixa passar corpo, visão e luz. Fechada, bloqueia os três.</li><li><b>Trancada 🔒:</b> ninguém abre nem fecha. Quem tenta ouve a maçaneta sendo forçada, e o Mestre recebe um aviso.</li><li>${TM} Só o Mestre vê os cadeados. Clique no cadeado para trancar ou destrancar; clique na porta para abrir ou fechar.</li></ul>`},
+  {t:'Neblina por cômodo',w:'a',b:`Quando o Mestre desenha cômodos, cada jogador vê <b>só o cômodo onde o seu token está</b>. Saiu? A névoa volta (sem memória do que já viu). Com a porta aberta você enxerga do outro cômodo apenas o recorte permitido pelo vão e pelo ângulo para onde o personagem olha (cone de 120°). ${TM} Cômodos marcados como <b>revelados</b> (🌫) ficam visíveis para todos.`},
+  {t:'Ambiente escuro',w:'a',b:`${TM} liga e desliga no botão <b>🌑</b>. No escuro, o jogador sem luz só enxerga um círculo curto em volta do token. Para ver além: lanterna ligada, ou uma lâmpada acesa no cômodo. As paredes e as portas fechadas bloqueiam a luz.`},
+  {t:'Lanterna',w:'p',b:`Vale para quem tem no inventário Lanterna, Tocha, Lampião, Vela, Isqueiro, Sinalizador e similares (itens "no chão" não contam). O botão <b>🔦</b> da barra e a tecla ${KB11('F')} ligam e desligam, com clique metálico. Ela começa <b>desligada</b>. Ligada, projeta um facho de 60° e 8 quadrados pela frente do token e revela interruptores no escuro. Aliados com linha de visão para a área também enxergam o feixe.`},
+  {t:'Lâmpadas e interruptores',w:'a',b:`<ul><li>${TM} No editor, <b>🔆 Lâmpada</b>: clique dentro de um cômodo. <b>💡 Interruptor</b>: clique perto de uma parede. Ele liga e apaga as lâmpadas do mesmo cômodo. Sem cômodo, a lâmpada ilumina um raio de 6 quadrados.</li><li>Lâmpada acesa ilumina o cômodo todo para quem está dentro. Por uma porta aberta, só a parte que o seu cone alcança.</li><li>${TP} No escuro, o ícone 💡 só aparece quando o facho, o círculo de tato ou uma área acesa passa por cima dele.</li><li>${TM} Clique numa lâmpada para ligar ou apagar à distância. O editor tem "Ligar todas" e "Apagar todas as luzes".</li></ul>`},
+  {t:'⚡ Queda de energia',w:'m',b:'O botão <b>⚡</b> da barra faz as luzes piscarem por cerca de 1,4 s para todos e deixa todas as lâmpadas do mapa apagadas. Para religar, clique nas lâmpadas ou use "Ligar todas as luzes" no editor.'},
+  {t:'Editor de mapa',w:'m',b:`Botão <b>✏️</b>:<ul><li><b>🧱 Parede:</b> clique pontos; clique duplo, ${KB11('Enter')} ou botão direito termina.</li><li><b>🚪 Porta:</b> clique numa parede para virar porta, ou dois pontos para criar uma.</li><li><b>▢ Cômodo:</b> clique os cantos e feche no primeiro ponto (ou ${KB11('Enter')}).</li><li><b>🌫 Névoa do cômodo:</b> revela ou recobre para todos.</li><li><b>🔆 Lâmpada</b> e <b>💡 Interruptor</b> (veja acima).</li><li><b>✂ Apagar</b> paredes, portas, lâmpadas, interruptores ou cômodos.</li><li><b>🧲 Ímã</b> encaixa nos meios-quadrados e nas pontas existentes. ${KB11('Ctrl')}${KB11('Z')} ou ⤺ desfaz.</li><li>Em mapa com desenho próprio, trace as paredes por cima: o site não detecta paredes na imagem.</li></ul>`},
+  {t:'Ponto de destaque (laser)',w:'m',b:`O botão <b>🔴</b> (ou segurar ${KB11('L')}) mostra um ponto pulsando para todos, com uma onda a cada clique. Bom para apontar um detalhe do mapa durante a narração.`},
+  {t:'Mapas, grade e tokens',w:'m',b:'<b>🗺 Mapas</b> envia e escolhe imagens; <b>#</b> ajusta a grade (colunas e metros por quadrado). <b>♟ Tokens</b> coloca e tira personagens: "＋ Adicionar token" fecha a janela e o token nasce onde você clicar; "Mudar de lugar" funciona igual. Clicar num token abre o menu: alcance (3, 6, 9 ou 15 m), tamanho (1×, 2× ou 3×), centralizar na sua tela e tirar do mapa.'},
+  {t:'Névoa por quadrado (pincel)',w:'m',b:'O botão <b>▦</b> abre o pincel de 1×1, 3×3 ou 5×5 para revelar ou cobrir quadrados da grade, com "Cobrir tudo" e "Desligar névoa". É independente da névoa por cômodo.'},
+  {t:'A visão do Mestre',w:'m',b:'Você vê tudo nítido, com névoa e escuro translúcidos, mais o cone (ou a luz) de cada jogador em uma cor diferente, os cadeados e todas as lâmpadas e interruptores.'},
+  {t:'Limites que valem a pena saber',w:'a',b:'A visão escondida vale na tela de cada jogador, não no banco de dados. Quem abrir as ferramentas do navegador consegue ler o estado do mapa. A memória de câmera fica no aparelho.'},
+ ]},
+ {id:'mesa',ico:'🎙',name:'Mesa, voz & música',items:[
+  {t:'Visão de Mesa',w:'a',b:'O Mestre fica na caixa do topo e os jogadores ocupam os lados, na ordem de chegada, sempre equilibrados. Embaixo de cada foto ficam Vital, Essência, Lucidez, a DF e os estados. O botão <b>⋯</b> abre os controles. O mapa fica no centro.'},
+  {t:'Falando como…',w:'m',b:'Escolha com um clique se você está <b>narrando</b> (a máscara) ou falando como um NPC ou chefe. A caixa do topo muda junto.'},
+  {t:'Chamada de voz',w:'a',b:`${TM} clica em <b>📞 Iniciar call</b> e todos na Visão de Mesa entram. Quem fala ganha o <b>contorno verde</b> na foto. 🎙 muta o seu microfone. ${TM} O <b>🤫 Sussurro</b> marca jogadores que se ouvem em particular. Se você não escuta ninguém, toque na tela: o navegador bloqueia o som até o primeiro toque. O botão <b>🔎</b> mostra a versão e a rota de cada pessoa; versões diferentes pedem Ctrl+F5.`},
+  {t:'Chat',w:'a',b:'Aba <b>💬 Chat</b> do dock da mesa. Escolha para quem enviar: <b>Todos</b>, o <b>Mestre</b> ou um jogador (particular). O histórico fica neste aparelho; o selo vermelho mostra mensagens novas.'},
+  {t:'Música e Intervalo',w:'m',b:`Aba <b>🎵 Música</b>: cole links do YouTube e dê um <b>momento</b> a cada um (ex.: Revelação da Sala). Uma música com o momento <b>Intervalo</b> vira a música de espera do botão <b>⏸ Intervalo</b>, que pausa a sessão. Também dá para pedir ao Perseus: “toca a música para revelação da sala”.`},
+  {t:'Volume da música',w:'p',b:'O volume é de cada um e fica no topo da mesa. Mudar o seu não muda o que os outros ouvem. Se aparecer um aviso de áudio bloqueado, toque na tela uma vez.'},
+  {t:'Imagens, pistas e documentos',w:'m',b:'<b>🖼 Enviar imagem</b>: para <b>todos</b> (fica na aba 📂 Documentos da mesa e só você apaga) ou para <b>jogadores marcados</b> (aparece só para eles e fica na ficha, em Documentos / Pistas).'},
+ ]},
+ {id:'sheet',ico:'📜',name:'Ficha & combate',items:[
+  {t:'Abas da ficha',w:'p',b:'A ficha tem abas para <b>Inventário & Carga</b>, <b>Estados</b>, <b>Lucidez & Trauma</b>, <b>Combate & Defesa</b>, <b>Descanso & Cura</b>, além dos registros, das notas (BN) e dos documentos e pistas recebidos.'},
+  {t:'Inventário e lanterna',w:'p',b:'Os itens ficam no inventário e contam para a carga. Para ter o botão 🔦 no mapa, o personagem precisa ter um item de luz (Lanterna, Tocha, Lampião, Vela, Isqueiro…) fora do chão.'},
+  {t:'Rolagens: atributo puro e perícia',w:'a',b:'Cada atributo tem um botão <b>🎲</b> para rolar o atributo puro (sem perícia; vale o maior dado). Em cada perícia há um seletor para escolher <b>com qual atributo</b> rolar o teste; o padrão já vem marcado. Na Visão de Mesa, o botão <b>🎲 Rolar</b> oferece as duas coisas.'},
+  {t:'Privacidade das rolagens',w:'p',b:'Em ⚙ Aparência, "Rolagens feitas dentro da ficha": <b>🔒 Privadas</b> (só você vê) ou <b>🎲 Mostrar na mesa</b> (aparecem na tela de todos e no histórico, como as da Visão de Mesa).'},
+  {t:'Combate',w:'a',b:`${TM} inicia e conduz o combate: ordem de turnos, rodadas e participantes. Todos acompanham pela aba <b>⚔ Combate</b> do dock da mesa, que pisca quando há combate ativo. Os sons de turno seguem a configuração de Sons.`},
+  {t:'Bloco de notas (BN)',w:'a',b:'Cada pessoa tem o seu, guardado na ficha (o Mestre tem o dele). Escreva na aba 📝 Notas ou peça ao Perseus: “adiciona no BN: a senha da porta é 1904”.'},
+ ]},
+ {id:'perseus',ico:'🐱',name:'Perseus & comandos',items:[
+  {t:'Quem é o Perseus',w:'a',b:'O gato assistente. Explica regras, dá dicas e guias passo a passo e responde em linguagem natural. Dá para esconder em ⚙ Aparência → Perseus.'},
+  {t:'Comandos úteis',w:'a',b:`<ul><li><b>“adiciona no BN: …”</b> guarda uma nota.</li><li><b>“o que tem no meu BN?”</b> ou <b>“busca no BN sobre a porta”</b> lê as notas.</li><li>${TM} <b>“toca a música para revelação da sala”</b> escolhe pelo momento da playlist.</li><li>Pergunte coisas como <b>“como funciona a névoa?”</b>, <b>“como rolar atributo puro?”</b> ou <b>“como funciona a call?”</b>.</li></ul>`},
+  {t:'Quando ele não sabe',w:'a',b:'Reformule com outras palavras. Ele reconhece muitos termos (mapa, token, call, sussurro, intervalo, imagem, BN). Este guia tem a busca rápida no topo para o resto.'},
+ ]},
+ {id:'cfg',ico:'⚙',name:'Configurações & atalhos',items:[
+  {t:'Paleta de cores',w:'a',b:'Em ⚙ Aparência: <b>Pergaminho Clássico</b> (claro), <b>Abismo / Noturno</b>, <b>Sombra & Obsidiana</b>, <b>Sangue & Cinzas</b>, <b>Terminal Operacional</b>, <b>Personalizado</b> e <b>Automático</b> (segue o claro/escuro do sistema). A escolha vale na hora e fica neste navegador. O botão ☾/☀ no topo alterna claro e escuro.'},
+  {t:'Tema personalizado',w:'a',b:'Escolha <b>🎨 Personalizado</b> e ajuste 5 cores: fundo, painéis, texto, destaque e secundária/bordas. A janela avisa quando o contraste entre texto e fundo é baixo. "Voltar às cores iniciais" desfaz.'},
+  {t:'Visualização: celular ou computador',w:'a',b:'<b>Automática</b> se ajusta sozinha ao girar a tela; <b>📱 Celular</b> e <b>🖥 Computador</b> forçam um layout. A janela mostra o que foi detectado e o tamanho da tela.'},
+  {t:'Tamanho do texto',w:'a',b:'<b>Normal</b>, <b>Grande</b> ou <b>Extra grande</b>, para a ficha, a mesa e as janelas.'},
+  {t:'Privacidade das rolagens',w:'p',b:'<b>🔒 Privadas</b> ou <b>🎲 Mostrar na mesa</b> para rolagens feitas dentro da ficha.'},
+  {t:'Perseus',w:'a',b:'<b>🐱 Mostrar</b> ou <b>Esconder</b> o gato assistente.'},
+  {t:'Sons e volume',w:'a',b:'<b>Sons</b>: 🔊 Ligados, 🔉 Baixos ou 🔇 Desligados (dados, acertos, críticos, turnos, rituais, portas, interruptores). O <b>volume da música</b> é um controle à parte, no topo da mesa. O microfone se muta no 🎙 da call.'},
+  {t:'Atalhos de teclado (mapa)',w:'a',b:`<ul class="gd-list"><li>${KB11('W')}${KB11('A')}${KB11('S')}${KB11('D')} / setas — andar</li><li>${KB11('Shift')} — correr</li><li>${KB11('Q')} ${KB11('E')} — girar o token (mouse também aponta)</li><li>${KB11('Espaço')} ou toque rápido em ${KB11('E')} — interagir com porta ou interruptor</li><li>${KB11('F')} — ligar ou desligar a lanterna</li><li>${KB11('L')} segurado — laser do Mestre ${TM}</li><li>${KB11('Enter')} — terminar linha ou cômodo no editor ${TM}</li><li>${KB11('Esc')} — cancelar o que está sendo desenhado ou posicionado</li><li>${KB11('Ctrl')}${KB11('Z')} — desfazer no editor ${TM}</li><li>${KB11('Ctrl')}${KB11('F5')} — recarregar o site com a versão nova</li></ul>`},
+  {t:'Gestos e toque (celular)',w:'a',b:'Arraste o mapa vazio para mover a câmera, use a <b>pinça</b> para aproximar, o <b>analógico</b> para andar e o botão <b>✋</b> para interagir. Toque num token para abrir o menu dele. Os botões do mapa têm o tamanho certo para o dedo.'},
+  {t:'Atualizações do site e a versão',w:'a',b:'O site se atualiza no GitHub Pages. Quando há versão nova, aparece um aviso e um <b>ponto brilhante no ⚙</b>. Recarregue com Ctrl+F5 (ou puxe a página no celular). Na call, o 🔎 mostra a versão de cada pessoa: todos precisam estar na mesma.'},
+ ]},
+];
+
+const norm11=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const plain11=h=>String(h).replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ');
+GUIDE11.forEach(c=>c.items.forEach(i=>{i.s=norm11(i.t+' '+plain11(i.b)+' '+(GW11[i.w][1]))}));
+
+function item11(c,i,forceOpen){
+  const [cls,label]=GW11[i.w];
+  return`<details class="gd-item" ${forceOpen||i.open?'open':''}><summary><span class="gd-t">${i.t}</span><span class="${cls}">${label}</span></summary><div class="gd-body">${i.b}</div></details>`;
+}
+function guideList11(){
+  const q=norm11(G11.q.trim()),who=G11.who,out=[];
+  const okWho=i=>who==='all'||i.w===who||i.w==='a';
+  if(q){
+    const terms=q.split(/\s+/).filter(Boolean);let n=0;
+    GUIDE11.forEach(c=>{const hits=c.items.filter(i=>okWho(i)&&terms.every(t=>i.s.includes(t)));if(!hits.length)return;n+=hits.length;
+      out.push(`<div class="gd-cat">${c.ico} ${c.name}</div>`+hits.map(i=>item11(c,i,true)).join(''))});
+    if(!n)return{html:`<p class="gd-empty">Nada encontrado para “${esc(G11.q)}”. Tente outra palavra, como <b>lâmpada</b>, <b>volume</b>, <b>lanterna</b>, <b>porta</b> ou <b>sussurro</b>.</p>`,n:0};
+    return{html:out.join(''),n};
+  }
+  const c=GUIDE11.find(x=>x.id===G11.tab)||GUIDE11[0],items=c.items.filter(okWho);
+  return{html:items.map(i=>item11(c,i)).join('')||'<p class="gd-empty">Nada nesta aba para esse filtro.</p>',n:items.length};
+}
+function guideRender11(){
+  const box=$('gdList');if(!box)return;const r=guideList11();box.innerHTML=r.html;
+  const st=$('gdCount');if(st)st.textContent=G11.q.trim()?`${r.n} resultado${r.n===1?'':'s'} em todas as abas`:'';
+  $$('.gd-tab',$('modalBody')).forEach(b=>{const on=!G11.q.trim()&&b.dataset.tab===G11.tab;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+  $$('.gd-who button',$('modalBody')).forEach(b=>b.classList.toggle('on',b.dataset.who===G11.who));
+}
+function openGuide11(tab){
+  const cur=build11(),fresh=isNew11(),was=seen11();
+  if(tab)G11.tab=tab;else G11.tab=fresh?'new':G11.tab;G11.q='';
+  const head=`<div class="gd-head"><span class="gd-ver" title="Versão do site carregada neste aparelho">Versão <b>${esc(cur)}</b></span>${fresh?`<span class="gd-new">🆕 ${was?'Novidades desde a sua última visita':'Bem-vindo! Comece pelas novidades'}</span>`:'<span class="gd-ok">✓ Você já viu esta versão</span>'}</div>`;
+  const search=`<div class="gd-search"><input type="search" id="gdQ" placeholder="Buscar: lâmpada, volume, sussurro, atalhos…" aria-label="Buscar no guia" autocomplete="off" enterkeyhint="search"><span class="sub" id="gdCount" aria-live="polite"></span></div>`;
+  const who=`<div class="gd-who" role="group" aria-label="Filtrar por quem usa">${[['all','Tudo'],['m','👑 Só Mestre'],['p','🎲 Só jogadores']].map(([v,l])=>`<button type="button" data-who="${v}">${l}</button>`).join('')}</div>`;
+  const tabs=`<div class="gd-tabs" role="tablist" aria-label="Categorias">${GUIDE11.map(c=>`<button type="button" class="gd-tab" role="tab" data-tab="${c.id}">${c.ico} ${c.name}</button>`).join('')}</div>`;
+  openModal('NOTAS DE ATUALIZAÇÃO','Guia completo do Tulpa',`${head}${search}${who}${tabs}<div id="gdList" role="tabpanel"></div>`,'Fechar',closeModal);
+  const md=document.querySelector('#modalWrap .modal');if(md)md.classList.add('gd');
+  guideRender11();
+  try{localStorage.setItem(SEEN11,cur)}catch(e){}
+  news11();
+  const q=$('gdQ');
+  q.oninput=()=>{G11.q=q.value;guideRender11()};
+  $$('.gd-tab',$('modalBody')).forEach(b=>b.onclick=()=>{G11.tab=b.dataset.tab;G11.q='';q.value='';guideRender11();T3.fx?.('click');$('gdList').scrollIntoView?.({block:'nearest'})});
+  $$('.gd-who button',$('modalBody')).forEach(b=>b.onclick=()=>{G11.who=b.dataset.who;guideRender11()});
+}
+T3.openGuide=openGuide11;
+/* tira a largura extra do guia quando qualquer janela fecha */
+try{const w=$('modalWrap');if(w)new MutationObserver(()=>{if(!w.classList.contains('open'))document.querySelector('#modalWrap .modal')?.classList.remove('gd')}).observe(w,{attributes:true,attributeFilter:['class']})}catch(e){}
+/* ponto de novidade no ⚙ e aviso rápido (só para quem já tinha visitado antes) */
+news11();
+setTimeout(()=>{try{if(seen11()&&isNew11()&&!sessionStorage.getItem('tulpa_news_toast')){sessionStorage.setItem('tulpa_news_toast','1');toast('✨ O site foi atualizado. Veja as novidades em ⚙ → 📜 Notas de Atualização.')}}catch(e){}},2600);
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
