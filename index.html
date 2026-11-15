@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="15/11 01:23">
+<meta name="tulpa-build" content="15/11 01:55">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2356,6 +2356,16 @@ body.t3-dark .cb-init li{background:#ffffff0a;border-color:#ffffff18}
 .cb-init strong{font-size:20px;min-width:34px;text-align:right}
 @media (max-width:560px){.cb-hud{padding:8px 10px}.cbp{font-size:12px;padding:4px 8px}.cbp.mv i{width:44px}.cbh-acts .btn{flex:1 1 calc(50% - 6px)}.cb-round{font-size:12px}}
 body.cb-aiming #t3Roll{pointer-events:none;opacity:.35}
+/* durante a mira as janelas de rolagem saem da frente do mapa */
+body.cb-aiming #t3Roll{display:none!important}
+.cbh-auto{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13.5px;color:#ffd36b}
+.cbh-auto .btn{min-height:34px;background:#3a2c22;border-color:#6b5a44;color:#f4ead6}
+/* mapa em tela cheia: barra da rodada e barra de ações por cima do mapa */
+.map-stage.cb-full .cb-bar.in-full{position:absolute;top:10px;right:10px;left:auto;max-width:min(60%,720px);margin:0;z-index:6;background:#1b1410e6;backdrop-filter:blur(6px)}
+.map-stage.cb-full .cb-hud.in-full{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:min(calc(100% - 28px),980px);margin:0;z-index:6;background:#1b1410e8;backdrop-filter:blur(6px);box-shadow:0 14px 40px -12px #000}
+.map-stage.cb-full .map-info{display:none}
+.map-stage.cb-full.has-joy .cb-hud.in-full{bottom:auto;top:64px}
+@media (max-width:700px){.map-stage.cb-full .cb-bar.in-full{left:10px;right:10px;top:auto;bottom:10px;max-width:none}.map-stage.cb-full .cb-hud.in-full{top:60px;bottom:auto}}
 
 /* Gerado por gen_palette.py: camada de paletas (não edite à mão). */
 html body.t3-pal{color:var(--text);background:radial-gradient(ellipse at 50% -18%,color-mix(in oklab,var(--text) 3%,var(--panel)) 0%,color-mix(in oklab,var(--panel) 24%,var(--bg)) 55%,var(--bg) 100%)!important}
@@ -3884,7 +3894,7 @@ function processRow(row,live=true){
     if(live)T3.narrateRes?.(dt);
     if(live&&(dt.statuses||[]).includes('agonia'))toast('☠ '+dt.targetName+' está Morrendo! Sutura Bruta ou Síntese Cirúrgica podem salvá-lo.');
     if(live&&(dt.statuses||[]).includes('morto'))toast('☠ '+dt.targetName+' morreu.');
-    if(live){queuePopup(dt);const att=charById(dt.attackerId);if(att&&controls(att)){if(dt.extraAtk)mutateChar(att,d=>{d.combatExtra=(Number(d.combatExtra)||0)+dt.extraAtk})}}
+    if(live){queuePopup(dt);const att=charById(dt.attackerId);if(att&&controls(att)){if(dt.extraAtk&&TURN.actor===att.id){const dd=att.id===activeCharacterId?data:att.data;if(dd.violentKey!==TURN.key){mutateChar(att,d=>{d.violentKey=TURN.key;d.combatExtra=Math.min(1,(Number(d.combatExtra)||0)+1)});toast('⚔ Acerto Violento: +1 Ação Padrão neste turno (só uma vez por turno).')}}}}
   }else if(dt.cmb==='mark'){CB.pending={};CB.log=[];CB.promptQueue=[]
   }else if(dt.cmb==='fx')onFx(row,live);
   else if(dt.cmb==='init'){if(live&&Date.now()-Date.parse(row.created_at)<60000){const top=(dt.rolls||[]).slice().sort((a,b)=>(b.total||0)-(a.total||0))[0];if(top)setTimeout(()=>T3.narrate?.('init',{n:top.name}),900)}if(live&&Date.now()-Date.parse(row.created_at)<60000)showRollPopup({eyebrow:'INICIATIVA',title:'Ordem de ação',sub:'Reflexo de cada participante',sets:(dt.rolls||[]).slice(0,14).map(x=>({label:x.name,dice:x.dice||[],bonus:(x.total||0)-Math.max(0,...(x.dice||[0])),total:x.total,hi:'max'}))})}
@@ -4112,7 +4122,8 @@ async function resolveFor(aid,tid,defRow){
       }
     });
   }
-  if(res.extraDef)mutateChar(ch,d=>{d.retalExtra=(Number(d.retalExtra)||0)+1;d.retalTarget=a.attackerId});
+  if(a.noDefense)res={...res,extraAtk:0};
+  if(res.extraDef){const dk=TURN.key||('r'+(camp3()?.combat?.round||0));if(dT.retalKey!==dk&&!(Number(dT.retalExtra)>0))mutateChar(ch,d=>{d.retalKey=dk;d.retalExtra=1;d.retalTarget=a.attackerId});else{res={...res,extraDef:0};out.notes.push('Retaliação já usada neste turno: sem nova ação extra.')}}
   if(cov&&canDefend)out.notes.push(`Cobertura parcial: +${cov} na defesa.`);
   const detail={cmb:'res',cover:cov,aid,targetId:tid,targetName:nm(ch),attackerId:a.attackerId,attackerName:a.attackerName,weapon:a.weapon.name,mode:dd.mode,outcome:res.outcome,label:res.label,text:res.text,hit:res.hit,crit:res.crit,ATA:res.ATA,RF:res.RF,DB:10,DF:dd.df,dmg:{final:out.final,absorbed:out.absorbed,resisted:out.resisted},statuses:stAdd,notes:out.notes,forced:!!res.forced,extraAtk:res.extraAtk,extraDef:res.extraDef,atk:atkView,react:dd.react||'',def:{skill:dd.mode==='reflexo'?'Reflexo':dd.mode==='none'?'Sem defesa':'Esquiva',dice:defRow.dice||[],bonus:defRow.bonus||0,total:defRow.total},dmgInfo};
   try{await insertRow(ch,'Resultado do confronto',{dice:[],bonus:0,total:out.final,detail})}catch(e){fail3('registrar resultado',e)}
@@ -6963,7 +6974,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='15/11 01:23';
+const BUILD8='15/11 01:55';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -8391,7 +8402,7 @@ const GUIDE11=[
    <li>A vez de cada um aparece no mapa: <b>anel dourado</b> e a etiqueta <b>⚡ SEU TURNO</b> em cima do token. A barra acima do mapa mostra a ordem da rodada.</li>
    <li>Embaixo do mapa fica o painel do turno: <b>👣 Movimento</b> (9 m), <b>⚔ Ação Padrão</b> (1, +1 no Acerto Violento), <b>⚡ Talento</b> e <b>🔁 Saque rápido</b> (livres, 1 por turno) e <b>🛡 Reação</b>.</li>
    <li><b>Atacar</b>: escolha a arma e <b>clique no token</b> do alvo. Corpo a corpo só em quem está ao lado; à distância, a parede bloqueia e a quina dá <b>cobertura</b> (+2 na defesa).</li>
-   <li><b>💣 Arremessar</b>: mire o explosivo no mapa. A DT do Arremesso sobe com a distância; se falhar, desvia. Todos no raio levam o dano (Resistência DT 12 reduz à metade).</li></ul>`},
+   <li><b>💣 Arremessar</b>: mire o explosivo no mapa. A DT do Arremesso sobe com a distância; se falhar, desvia. Todos no raio levam o dano (Resistência DT 12 reduz à metade).</li><li>Quando a Ação Padrão acaba, a vez <b>passa sozinha</b> (1,5 s, ou 6 s se ainda dá para andar). <b>Segurar a vez</b> cancela.</li><li>O <b>Acerto Violento</b> dá +1 ação só uma vez por turno, e a <b>Retaliação</b> acontece uma vez por turno (contra-ataque não gera outro).</li><li>Com o mapa em <b>⛶ tela cheia</b>, a barra de ações aparece por cima dele na sua vez, junto com as janelas de arma, defesa e rolagem.</li></ul>`},
   {t:'✋ Levantar a mão, dificuldade do Perseus e tela cheia',w:'a',b:`<ul>
    <li><b>✋ Levantar a Mão</b> ${TP}: botão na barra da mesa, ao lado da call. O card ganha um ✋ dourado que todos veem e o Mestre ouve um aviso discreto.</li>
    <li><b>✓ Baixar Mão</b> ${TM}: clique no nome na barra (ou no ✋ do card) quando der a palavra. Com várias mãos, use <b>Baixar Todas as Mãos</b>. A lista segue a ordem em que levantaram.</li>
@@ -9982,7 +9993,7 @@ T3.cbPaint=(x,v,g)=>{
       x.save();const gr=x.createRadialGradient(sx,sy,r*.9,sx,sy,r*1.9);gr.addColorStop(0,`rgba(255,211,107,${.45+pul*.25})`);gr.addColorStop(1,'rgba(255,211,107,0)');x.fillStyle=gr;x.beginPath();x.arc(sx,sy,r*1.9,0,TAU10);x.fill();
       x.beginPath();x.arc(sx,sy,r+6+pul*3,0,TAU10);x.lineWidth=3;x.strokeStyle='#ffd36b';x.shadowColor='#ffd36b';x.shadowBlur=14;x.stroke();x.restore();
       const label=!isM&&mine?'⚡ SEU TURNO':'⚡ '+nm(cur),bob=Math.sin(now/300)*3;
-      pill14(x,label,sx,sy-r-14+bob,!isM&&mine?'#ffd36b':'rgba(30,20,8,.88)',!isM&&mine?'#2a1a00':'#ffd36b',13);
+      if(!(CB14.aim&&CB14.aim.ch.id===cur.id))pill14(x,label,sx,sy-r-14+bob,!isM&&mine?'#ffd36b':'rgba(30,20,8,.88)',!isM&&mine?'#2a1a00':'#ffd36b',13);
       again=true;
     }
   }
@@ -9993,7 +10004,7 @@ T3.cbPaint=(x,v,g)=>{
       const [ax,ay]=tokCenter10(at),[sx,sy]=sc(ax,ay),r0=(at.s||1)*cs/2;
       const ringM=a.kind==='atk'?a.range+(a.melee?0:0):a.kind==='aoe'?a.max:a.kind==='tp'?a.m:a.kind==='push'?2.2:a.kind==='plano'&&a.step==='dest'?a.m:0;
       if(ringM&&a.kind!=='plano'){const rr=m2px14(ringM)*v.s+(a.melee?r0:0);x.save();x.beginPath();x.arc(sx,sy,rr,0,TAU10);x.fillStyle=a.kind==='aoe'?'rgba(255,150,60,.06)':'rgba(255,90,90,.06)';x.fill();x.setLineDash([8,6]);x.lineWidth=2;x.strokeStyle=a.kind==='tp'?'rgba(170,140,255,.9)':'rgba(255,110,90,.85)';x.stroke();x.setLineDash([]);x.restore();
-        pill14(x,(a.kind==='atk'?(a.melee?'Corpo a corpo':'Alcance '+fmtM14(ringM)+' m'):a.kind==='aoe'?'Arremesso até '+fmtM14(ringM)+' m':'Até '+fmtM14(ringM)+' m'),sx,sy-rr-6,'rgba(30,10,8,.85)','#ffd2c8',11)}
+        if(!a.melee)pill14(x,(a.kind==='atk'?('Alcance '+fmtM14(ringM)+' m'):a.kind==='aoe'?'Arremesso até '+fmtM14(ringM)+' m':'Até '+fmtM14(ringM)+' m'),sx,sy-rr-6,'rgba(30,10,8,.85)','#ffd2c8',11)}
       const h=CB14.hover;
       if(a.kind==='atk'&&h){
         const t=tokAtPt14(h.wx,h.wy);
@@ -10045,7 +10056,10 @@ function mount14(){
   let b=$('cbBar'),h=$('cbHud');
   if(!b){b=document.createElement('div');b.id='cbBar';b.className='cb-bar';b.hidden=true}
   if(!h){h=document.createElement('div');h.id='cbHud';h.className='cb-hud';h.hidden=true;h.setAttribute('role','region');h.setAttribute('aria-label','Ações do turno')}
-  if(b.nextElementSibling!==st)st.before(b);if(st.nextElementSibling!==h)st.after(h);
+  const full=document.fullscreenElement===st;
+  if(full){if(b.parentNode!==st)st.append(b);if(h.parentNode!==st)st.append(h)}
+  else{if(b.nextElementSibling!==st)st.before(b);if(st.nextElementSibling!==h)st.after(h)}
+  b.classList.toggle('in-full',full);h.classList.toggle('in-full',full);st.classList.toggle('cb-full',full);
   return true;
 }
 function bar14(){
@@ -10112,6 +10126,7 @@ function hud14(force){
       else{sig='wait|'+TURN.key;html=''}
     }
   }else{sig='';html=''}
+  if(document.fullscreenElement===MAP7.stage&&!a&&!(sig||'').startsWith('["me"')&&!(sig||'').startsWith('re|')){sig='full-hide';html=''}
   if(!force&&CB14.hudSig===sig)return;CB14.hudSig=sig;
   h.hidden=!html;h.innerHTML=html;h.classList.toggle('aim',!!a);
   const on=(sel,fn)=>$$(sel,h).forEach(b=>b.onclick=fn);
@@ -10120,6 +10135,15 @@ function hud14(force){
   on('[data-cb]',e=>act14(e.currentTarget.dataset.cb));
 }
 T3.cbHud=hud14;
+/* na tela cheia só aparece o que está dentro do mapa: janelas, rolagens e avisos vão junto e voltam depois */
+const FLOAT14=['modalWrap','t3Roll','toast','mgInv'];
+function floatHome14(){
+  const st=MAP7.stage,full=!!st&&document.fullscreenElement===st;
+  FLOAT14.forEach(id=>{const e=$(id);if(!e)return;if(full){if(e.parentNode!==st){e.dataset.cbHome='1';st.append(e)}}else if(e.dataset.cbHome){delete e.dataset.cbHome;document.body.append(e)}});
+}
+document.addEventListener('fullscreenchange',()=>{CB14.hudSig='';CB14.barSig='';floatHome14();setTimeout(()=>{hud14(true);mapDraw7()},60)});
+/* o #t3Roll é criado na primeira rolagem: confere de vez em quando */
+setInterval(()=>{if(document.fullscreenElement&&document.fullscreenElement===MAP7.stage)floatHome14()},700);
 function act14(k){
   const cur=cur14();if(!cur)return;
   if(k==='force'){window.tulpaAdvanceTurn?.(true,true);return}
@@ -10163,6 +10187,30 @@ function quickDraw14(ch){
     insertRow(ch,'Saque rápido',{detail:{cmb:'log',text:`${nm(ch)} sacou ${it.name} (ação livre).`}}).catch(()=>{});renderCombatUI();
   });
 }
+
+/* ---------- passa a vez sozinho quando as ações acabam ----------
+   Ação Padrão em 0, nenhum ataque seu esperando resultado (o Acerto Violento pode dar +1),
+   nenhuma retaliação pendente: 1,5 s se o movimento também acabou; 6 s se ainda dá para andar
+   (andar reinicia a contagem). "Segurar a vez" cancela neste turno. */
+const AUTO14={key:'',at:0,used:-1,hold:''};
+function pendingMine14(ch){return Object.values(CB.pending||{}).some(v=>v&&v.dt&&v.dt.attackerId===ch.id&&Date.now()-v.t<120000&&Object.values(v.targets||{}).some(t=>!t.res))}
+function auto14(){
+  const cur=cur14();
+  if(!inCb14()||!cur||!myTurn14()||isDown(cur)||(isGM6()&&cur.ownerId&&cur.ownerId!==uid3())){AUTO14.at=0;return}
+  if(AUTO14.hold===TURN.key||window.__cbNoAuto){AUTO14.at=0;return}
+  const left=actionsLeft(cur),info=mvInfo14(cur),mv=mvState14(cur),mleft=Math.max(0,info.max-mv.used);
+  const busy=!!CB14.aim||pendingMine14(cur)||$('modalWrap')?.classList.contains('open')||CB.prompting||(CB.promptQueue||[]).length;
+  if(left>0||busy){AUTO14.at=0;AUTO14.key='';return}
+  const now=Date.now();
+  if(AUTO14.key!==TURN.key||!AUTO14.at||Math.abs(mv.used-AUTO14.used)>.01){AUTO14.key=TURN.key;AUTO14.used=mv.used;AUTO14.at=now+(mleft>.05?6000:1500)}
+  if(now>=AUTO14.at){AUTO14.at=0;AUTO14.hold=TURN.key;toast('⏭ Ações usadas: a vez passa para o próximo.');endAim14();endTurn(cur);return}
+  const n=Math.ceil((AUTO14.at-now)/1000),h=$('cbHud');
+  if(h){let e=h.querySelector('.cbh-auto');if(!e){e=document.createElement('p');e.className='cbh-auto';h.append(e)}
+    const txt=`⏭ Ações usadas. A vez passa em ${n} s${mleft>.05?` (ainda dá para andar ${fmtM14(mleft)} m)`:''}.`;
+    if(e.dataset.t!==txt){e.dataset.t=txt;e.innerHTML=`${txt} <button type="button" class="btn small" id="cbHold">Segurar a vez</button>`;$('cbHold').onclick=()=>{AUTO14.hold=TURN.key;AUTO14.at=0;e.remove();toast('Ok, a vez fica com você. Use ✔ Concluir turno quando terminar.')}}}
+}
+setInterval(()=>{try{auto14()}catch(e){console.warn('[T14] vez',e)}},400);
+T3.cbAuto=AUTO14;
 
 /* ---------- ciclo ---------- */
 const _rc14=renderCombatUI;
