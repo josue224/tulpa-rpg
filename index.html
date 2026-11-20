@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="20/11 19:49">
+<meta name="tulpa-build" content="20/11 20:20">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -7239,7 +7239,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='20/11 19:49';
+const BUILD8='20/11 20:20';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -13641,7 +13641,10 @@ function aiCfg22(c){c=c||{};return{h:c.h?1:0,mode:['fixed','patrol','route'].inc
 const route22=c=>{const k=M6.state.map?.key||'~blank';return(c.r&&Array.isArray(c.r[k])?c.r[k]:[]).filter(p=>Array.isArray(p)&&isFinite(p[0])&&isFinite(p[1]))};
 const alive22=ch=>{if(!ch)return false;const st=stIds(dOf6(ch));return!st.includes('morto')&&!st.includes('agonia')&&!isDeadCh(ch)};
 const hostTok22=()=>(M6.state.tokens||[]).filter(t=>{const c=aiOf22(t.charId);return c&&c.st!=='surr'&&alive22(charById(t.charId))});
-const playerTok22=()=>(M6.state.tokens||[]).filter(t=>{const ch=charById(t.charId);return ch&&ch.ownerId&&!gmChar6(ch)&&inScene(ch)&&alive22(ch)});
+/* alvos dos hostis: jogadores e também NPCs neutros/aliados do Mestre (não hostis) */
+const isFoe22=ch=>!!ch&&(!ch.ownerId||gmChar6(ch))&&!!aiOf22(ch.id);
+const isTarget22=ch=>!!ch&&inScene(ch)&&alive22(ch)&&!isFoe22(ch);
+const playerTok22=()=>(M6.state.tokens||[]).filter(t=>isTarget22(charById(t.charId)));
 const cbOrder22=()=>{const cm=camp3()?.combat;return cm?.active&&cm.phase==='active'?(cm.order||[]).map(o=>o.characterId):[]};
 
 /* ===================== 1. visões do Mestre ===================== */
@@ -13964,7 +13967,7 @@ function disengage22(){
   if(!M6.state.aiCb)return;
   const order=cbOrder22(),toks=M6.state.tokens||[],tk=id=>toks.find(t=>t.charId===id);
   const en=order.filter(id=>{const c=aiOf22(id);return c&&c.st!=='surr'&&alive22(charById(id))}).map(tk).filter(Boolean);
-  const pl=order.filter(id=>{const ch=charById(id);return ch&&ch.ownerId&&!gmChar6(ch)&&alive22(ch)}).map(tk).filter(Boolean);
+  const pl=order.filter(id=>{const ch=charById(id);return ch&&!aiOf22(id)&&alive22(ch)}).map(tk).filter(Boolean);
   if(!en.length){cbEnd22();return}
   if(!pl.length){cbEnd22();return}
   const now=Date.now(),contact=(e,p)=>{const c=aiCfg22(aiOf22(e.charId)),[ex,ey]=tokCenter10(e),[px,py]=tokCenter10(p),d=hyp10(px-ex,py-ey),rng=c.rng/mapCfg7().mpc*mapCfg7().cell;return sameRoom22(e,p)||(d<=rng*1.4&&los14(ex,ey,px,py))};
@@ -14040,7 +14043,7 @@ onCast6(p=>{
   if(p.t==='ai'&&p.kind==='left'&&!isGM6())toast(`🏃 ${String(p.names||'').slice(0,80)} ${String(p.why||'').slice(0,80)}`);
 });
 M6.hooks.leave.push(()=>{AI22.run={};AI22.live={};AI22.noise=[];AI22.dirty.clear();AI22.lastEng={};if(AI22.routeFor)routeEnd22(false)});
-T3.aiModal=aiModal22;T3.aiDbg={sees22,aiState22,engage22,cbRemove22,disengage22,hear22,noise22,aiTick22,aiPoly22,aiCfg22};
+T3.aiModal=aiModal22;T3.aiDbg={playerTok22,sees22,aiState22,engage22,cbRemove22,disengage22,hear22,noise22,aiTick22,aiPoly22,aiCfg22};
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
