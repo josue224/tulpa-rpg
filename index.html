@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="21/11 12:12">
+<meta name="tulpa-build" content="21/11 12:54">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -128,7 +128,7 @@ body.app-locked .topbar,body.app-locked .shell{display:none!important}
     <div class="panel"><div class="panel-head"><h2>Talentos e habilidades</h2><span class="pill" id="essenceNow">ES 10 / 10</span></div><p class="sub">Ativar um talento exige confirmação. Ao confirmar, o custo é descontado da Essência e o efeito fica registrado como ativo. O sistema não reembolsa o custo ao desativar.</p><h3>Talentos da vocação</h3><div id="vocationTalents" class="card-list"></div><h3 style="margin-top:18px">Habilidades da trilha</h3><div id="trackTalents" class="card-list"></div><h3 style="margin-top:18px">Talentos especiais / personalizados</h3><div class="field"><label>Adicionar anotação de talento</label><textarea id="customTalent" placeholder="Nome, efeito, custo ou observações..."></textarea></div><button class="btn" style="margin-top:8px" id="saveCustomTalent">Adicionar anotação</button><div id="customTalents" class="card-list" style="margin-top:12px"></div></div>
    </section>
    <section class="tab" id="tab-records">
-    <div class="panel"><div class="panel-head"><h2>Repertório ritualístico</h2><span class="pill" id="ritualCount">0 rituais conhecidos</span></div><p class="sub">Consulte os cinco elementos, aprenda rituais e conjure usando Essência. O custo e os efeitos seguem as descrições do manual.</p><div class="grid two"><div class="field"><label>Buscar ritual</label><input class="search" id="ritualSearch" placeholder="Nome, elemento ou efeito"></div><div class="field"><label>Filtrar elemento</label><select id="ritualElement"><option value="">Todos os elementos</option><option>Natureza</option><option>Inexistência</option><option>Ilusão</option><option>Verdade</option><option>Fé</option><optgroup label="Sub-Elementos"><option value="Sol">Sol (Fé + Natureza)</option><option value="Desrealização">Desrealização (Natureza + Inexistência)</option><option value="Apofenia">Apofenia (Inexistência + Ilusão)</option><option value="Confabulação">Confabulação (Ilusão + Verdade)</option><option value="Metáfora">Metáfora (Verdade + Fé)</option></optgroup></select></div></div><div id="ritualCatalog" class="ritual-list" style="margin-top:12px"></div><div class="inline" style="margin-top:14px"><button class="btn primary" id="addRitualCustom">＋ Adicionar ritual personalizado</button><button class="btn" id="showKnownRituals">Ver apenas conhecidos</button></div><div class="field" style="margin-top:14px"><label>Anotações ritualísticas</label><textarea id="rituals" placeholder="Componentes, descobertas, observações e rituais que não estejam no catálogo..."></textarea></div></div>
+    <div class="panel"><div class="panel-head"><h2>Repertório ritualístico</h2><span class="pill" id="ritualCount">0 rituais conhecidos</span></div><p class="sub">Consulte os cinco elementos, aprenda rituais e conjure usando Essência. O custo e os efeitos seguem as descrições do manual.</p><div class="grid two"><div class="field"><label>Buscar ritual</label><input class="search" id="ritualSearch" placeholder="Nome, elemento ou efeito"></div><div class="field"><label>Filtrar elemento</label><select id="ritualElement"><option value="">Todos os elementos</option><option>Natureza</option><option>Inexistência</option><option>Ilusão</option><option>Verdade</option><option>Fé</option><optgroup label="Sub-Elementos"><option value="Sol">Sol (Fé + Natureza)</option><option value="Desrealização">Desrealização (Natureza + Inexistência)</option><option value="Pofenia">Pofenia (Inexistência + Ilusão)</option><option value="Confabulação">Confabulação (Ilusão + Verdade)</option><option value="Metáfora">Metáfora (Verdade + Fé)</option></optgroup></select></div></div><div id="ritualCatalog" class="ritual-list" style="margin-top:12px"></div><div class="inline" style="margin-top:14px"><button class="btn primary" id="addRitualCustom">＋ Adicionar ritual personalizado</button><button class="btn" id="showKnownRituals">Ver apenas conhecidos</button></div><div class="field" style="margin-top:14px"><label>Anotações ritualísticas</label><textarea id="rituals" placeholder="Componentes, descobertas, observações e rituais que não estejam no catálogo..."></textarea></div></div>
     <div class="grid two"><div class="panel"><h2 style="margin-bottom:12px">Crônica pessoal</h2><div class="field"><textarea id="chronicle" placeholder="História, acontecimentos e memórias..."></textarea></div></div><div class="panel"><h2 style="margin-bottom:12px">Recursos & pertences</h2><div class="field"><textarea id="items" placeholder="Equipamentos, recursos e pertences..."></textarea></div></div></div>
     <div class="panel"><h2 style="margin-bottom:12px">Conexões & vínculos</h2><div class="field"><textarea id="connections" placeholder="Aliados, contatos, vínculos..."></textarea></div></div>
     <div class="panel"><h2 style="margin-bottom:12px">Anotações diversas</h2><div class="field"><textarea id="notes" placeholder="Anotações adicionais..."></textarea></div></div>
@@ -250,7 +250,7 @@ const RITUALS=[
 ].map(([name,element,cost,desc])=>({id:name.toLowerCase().replace(/[^a-z0-9]+/g,'-'),name,element,cost,desc}));
 function renderRituals(){(data.customRituals||[]).forEach(r=>{if(!RITUALS.some(x=>x.id===r.id))RITUALS.push(r)});const q=($('ritualSearch')?.value||'').toLowerCase(),el=$('ritualElement')?.value||'',known=data.knownRituals||[];const list=RITUALS.filter(r=>(!knownOnly||known.includes(r.id))&&(!el||r.element===el)&&(!q||(r.name+' '+r.element+' '+r.desc).toLowerCase().includes(q)));$('ritualCount').textContent=known.length+' rituais conhecidos';$('ritualCatalog').innerHTML=list.length?list.map(r=>`<article class="ritual-card"><div class="inline" style="justify-content:space-between"><h4>${escapeHtml(r.name)}</h4><span class="pill">${r.element}</span></div><p>${escapeHtml(r.desc)}</p><div class="ritual-meta"><span class="tag">Base: ${r.cost}</span><span class="sub">Avançada: 10 ES · Próspera: 20 ES</span></div><div class="inline"><button class="btn small ${known.includes(r.id)?'':'primary'}" data-learn="${r.id}">${known.includes(r.id)?'Conhecido ✓':'Aprender'}</button>${known.includes(r.id)?'<button class="btn small" data-cast="'+r.id+'">Conjurar</button>':''}</div></article>`).join(''):'<div class="empty" style="grid-column:1/-1">Nenhum ritual encontrado.</div>'; $('ritualCatalog').querySelectorAll('[data-learn]').forEach(b=>b.onclick=()=>{const id=b.dataset.learn;data.knownRituals=data.knownRituals||[];if(!data.knownRituals.includes(id))data.knownRituals.push(id);save();renderRituals()});$('ritualCatalog').querySelectorAll('[data-cast]').forEach(b=>b.onclick=()=>castRitual(b.dataset.cast))}
 function castRitual(id){const r=RITUALS.find(x=>x.id===id);if(!r)return;openModal('CONJURAÇÃO RITUALÍSTICA',r.name,`<p>${escapeHtml(r.desc)}</p><div class="field"><label>Potência do ritual</label><select id="ritualPower"><option value="5">Base — 5 ES</option><option value="10">Avançada — 10 ES</option><option value="20">Próspera — 20 ES</option></select></div><p class="notice">Essência disponível: <b>${data.essence} ES</b>. A descrição específica de cada nível deve ser aplicada conforme o manual e a decisão do Mestre.</p>`,'Confirmar conjuração',()=>{const cost=Number($('ritualPower').value);if(data.essence<cost){toast('Essência insuficiente.');return}data.essence-=cost;data.ritualHistory=data.ritualHistory||[];data.ritualHistory.unshift({name:r.name,element:r.element,cost,date:new Date().toLocaleString('pt-BR')});closeModal();save();renderRituals();toast(r.name+' conjurado. −'+cost+' ES')})}
-$('ritualSearch').oninput=renderRituals;$('ritualElement').onchange=renderRituals;$('showKnownRituals').onclick=()=>{knownOnly=!knownOnly;$('showKnownRituals').textContent=knownOnly?'Ver catálogo completo':'Ver apenas conhecidos';renderRituals()};$('addRitualCustom').onclick=()=>openModal('NOVO RITUAL','Adicionar ritual personalizado','<div class="field"><label>Nome</label><input id="customRitualName"></div><div class="field"><label>Elemento</label><select id="customRitualElement"><option>Natureza</option><option>Inexistência</option><option>Ilusão</option><option>Verdade</option><option>Fé</option><optgroup label="Sub-Elementos"><option value="Sol">Sol (Fé + Natureza)</option><option value="Desrealização">Desrealização (Natureza + Inexistência)</option><option value="Apofenia">Apofenia (Inexistência + Ilusão)</option><option value="Confabulação">Confabulação (Ilusão + Verdade)</option><option value="Metáfora">Metáfora (Verdade + Fé)</option></optgroup></select></div><div class="field"><label>Descrição / efeitos</label><textarea id="customRitualDesc"></textarea></div>','Adicionar',()=>{const name=$('customRitualName').value.trim();if(!name)return;const r={id:'custom-'+uid(),name,element:$('customRitualElement').value,cost:'Variável',desc:$('customRitualDesc').value};data.customRituals=data.customRituals||[];data.customRituals.push(r);data.knownRituals=data.knownRituals||[];data.knownRituals.push(r.id);RITUALS.push(r);closeModal();save();renderRituals()});
+$('ritualSearch').oninput=renderRituals;$('ritualElement').onchange=renderRituals;$('showKnownRituals').onclick=()=>{knownOnly=!knownOnly;$('showKnownRituals').textContent=knownOnly?'Ver catálogo completo':'Ver apenas conhecidos';renderRituals()};$('addRitualCustom').onclick=()=>openModal('NOVO RITUAL','Adicionar ritual personalizado','<div class="field"><label>Nome</label><input id="customRitualName"></div><div class="field"><label>Elemento</label><select id="customRitualElement"><option>Natureza</option><option>Inexistência</option><option>Ilusão</option><option>Verdade</option><option>Fé</option><optgroup label="Sub-Elementos"><option value="Sol">Sol (Fé + Natureza)</option><option value="Desrealização">Desrealização (Natureza + Inexistência)</option><option value="Pofenia">Pofenia (Inexistência + Ilusão)</option><option value="Confabulação">Confabulação (Ilusão + Verdade)</option><option value="Metáfora">Metáfora (Verdade + Fé)</option></optgroup></select></div><div class="field"><label>Descrição / efeitos</label><textarea id="customRitualDesc"></textarea></div>','Adicionar',()=>{const name=$('customRitualName').value.trim();if(!name)return;const r={id:'custom-'+uid(),name,element:$('customRitualElement').value,cost:'Variável',desc:$('customRitualDesc').value};data.customRituals=data.customRituals||[];data.customRituals.push(r);data.knownRituals=data.knownRituals||[];data.knownRituals.push(r.id);RITUALS.push(r);closeModal();save();renderRituals()});
 // Renderização e atalhos
 const previousRender=render;render=function(){previousRender();if($('ritualCatalog'))renderRituals()};
 // Abrir menu inicial ao carregar; acesso a ficha continua disponível pelo botão Voltar ao portal.
@@ -321,7 +321,7 @@ function fx(kind='click',element=''){
  if(window.tulpaFx5){window.tulpaFx5(kind,element);return}
  try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ctx=new AC(),t=ctx.currentTime;
  const patterns={click:[[740,0,.055,'sine']],confirm:[[520,0,.09,'sine'],[780,.08,.13,'sine']],error:[[220,0,.16,'sawtooth'],[165,.12,.18,'sawtooth']],turn:[[392,0,.13,'triangle'],[523,.12,.13,'triangle'],[659,.24,.24,'triangle']],round:[[261,0,.18,'sine'],[392,.15,.18,'sine'],[523,.3,.2,'sine'],[784,.48,.35,'sine']],activate:[[440,0,.1,'triangle'],[660,.08,.1,'triangle'],[880,.16,.24,'triangle']],learn:[[523,0,.12,'sine'],[659,.1,.12,'sine'],[784,.2,.12,'sine'],[1046,.3,.3,'sine']],cast:[[180,0,.2,'sawtooth'],[330,.12,.2,'triangle'],[520,.25,.3,'sine']]};
- let p=patterns[kind]||patterns.click;if(kind==='cast'){const sets={Natureza:[150,220,330,440],Inexistência:[90,140,210,300],Ilusão:[660,520,780,1040],Verdade:[440,660,880,990],Fé:[330,495,660,990],Sol:[330,440,495,660,990],Desrealização:[150,140,220,210,300],Apofenia:[90,520,210,780,1040],Confabulação:[660,440,780,880,1040],Metáfora:[440,330,660,495,990]};p=(sets[element]||sets.Fé).map((f,i)=>[f,i*.12,.28,i%2?'triangle':'sine'])}
+ let p=patterns[kind]||patterns.click;if(kind==='cast'){const sets={Natureza:[150,220,330,440],Inexistência:[90,140,210,300],Ilusão:[660,520,780,1040],Verdade:[440,660,880,990],Fé:[330,495,660,990],Sol:[330,440,495,660,990],Desrealização:[150,140,220,210,300],Pofenia:[90,520,210,780,1040],Confabulação:[660,440,780,880,1040],Metáfora:[440,330,660,495,990]};p=(sets[element]||sets.Fé).map((f,i)=>[f,i*.12,.28,i%2?'triangle':'sine'])}
  p.forEach(([f,off,dur,type])=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t+off);g.gain.setValueAtTime(.0001,t+off);g.gain.exponentialRampToValueAtTime(.075,t+off+.015);g.gain.exponentialRampToValueAtTime(.0001,t+off+dur);o.connect(g);g.connect(ctx.destination);o.start(t+off);o.stop(t+off+dur+.02)});setTimeout(()=>ctx.close(),1800)
  }catch(e){}
 }
@@ -3287,7 +3287,7 @@ body.m31-print .rsym{filter:none!important}
 
 /* Etapa 33 · Ciclo Elemental */
 .cy33w{margin:14px 0 18px;padding:0}
-.cy33{display:block;width:100%;max-width:880px;height:auto;margin:0 auto;overflow:visible;color:var(--text,currentColor);font-family:var(--f-ui,inherit)}
+.cy33{display:block;width:100%;max-width:980px;height:auto;margin:0 auto;overflow:visible;color:var(--text,currentColor);font-family:var(--f-ui,inherit)}
 .cy33 .cy-star{fill:none;stroke:currentColor;stroke-width:1.6;opacity:.16}
 .cy33 .cy-arc{fill:none;stroke:currentColor;stroke-width:3.4;opacity:.75;transition:opacity .25s,stroke-width .25s}
 .cy33 .cy-head{fill:currentColor}
@@ -3321,6 +3321,41 @@ body.m31-print .rsym{filter:none!important}
 @media (max-width:640px){.cy33 .cy-sub{display:none}.cy-leg{display:block}.cy33 .cy-name{font-size:44px}.cy33 .cy-arc{stroke-width:4.4}}
 @media (prefers-reduced-motion:reduce){.cy33 .cy-ic,.cy33 .cy-arc,.cy33 .cy-sub,.cy33 .cy-disc{transition:none}.cy33 .cy-el:is(:hover,:focus-visible) .cy-ic{transform:none}}
 body.m31-print .cy-sub{display:inline}body.m31-print .cy-hint{display:none}
+
+/* Etapa 34 · Sub-Elementos */
+body{--h-fe:#d39a26;--h-nat:#3f9a5c;--h-inx:#8270cc;--h-ilu:#c4579c;--h-ver:#3b90c6}
+.rs-stop-fe{stop-color:color-mix(in srgb,var(--h-fe) 60%,var(--text,#222))}
+.rs-stop-nat{stop-color:color-mix(in srgb,var(--h-nat) 60%,var(--text,#222))}
+.rs-stop-inx{stop-color:color-mix(in srgb,var(--h-inx) 60%,var(--text,#222))}
+.rs-stop-ilu{stop-color:color-mix(in srgb,var(--h-ilu) 60%,var(--text,#222))}
+.rs-stop-ver{stop-color:color-mix(in srgb,var(--h-ver) 60%,var(--text,#222))}
+.rs-sol{--rs-hue:color-mix(in srgb,var(--h-fe),var(--h-nat))}.rs-dsr{--rs-hue:color-mix(in srgb,var(--h-nat),var(--h-inx))}.rs-pof{--rs-hue:color-mix(in srgb,var(--h-inx),var(--h-ilu))}.rs-cnf{--rs-hue:color-mix(in srgb,var(--h-ilu),var(--h-ver))}.rs-met{--rs-hue:color-mix(in srgb,var(--h-ver),var(--h-fe))}
+.rsym .rs-orbit{fill:none;stroke-width:1.3;stroke-dasharray:2 3.4;opacity:.75}
+:is(.rs-art,.cy-sic) .l{fill:none;stroke-width:var(--rs-lw,2.6);stroke-linecap:round;stroke-linejoin:round}
+:is(.rs-art,.cy-sic) .t{fill:none;stroke-width:calc(var(--rs-lw,2.6)*.6);stroke-linecap:round;stroke-linejoin:round}
+:is(.rs-art,.cy-sic) .d{fill:none;stroke-width:calc(var(--rs-lw,2.6)*.78);stroke-dasharray:3 3;stroke-linecap:round}
+:is(.rs-art,.cy-sic) .p{stroke:none}
+.rs-sm{--rs-lw:4.2}.rs-sm .rs-orbit{display:none}.rs-md{--rs-lw:3.2}.rs-lg{--rs-lw:2.7}.rs-xl{--rs-lw:2.3}.rs-fx{--rs-lw:2}
+.cy33 .cy-hair{fill:none;stroke:currentColor;stroke-width:1;opacity:.3}
+.cy33 .cy-sub{cursor:pointer;outline:none;transition:opacity .25s}
+.cy33 .cy-sdisc{opacity:.1;transition:opacity .25s}
+.cy33 .cy-sring{fill:none;stroke-width:4}
+.cy33 .cy-sorbit{fill:none;stroke-width:1.8;stroke-dasharray:3 5;opacity:.8}
+.cy33 .cy-sic{--rs-lw:2.8;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.cy33 .cy-teth{fill:none;stroke-width:2.2;stroke-dasharray:4 6;opacity:.75}
+.cy33 .cy-sn{font-size:31px;font-weight:800;fill:var(--text,currentColor);font-family:var(--f-display,inherit)}
+.cy33 .cy-sc{font-size:24px;fill:var(--text,currentColor);opacity:.85;paint-order:stroke;stroke:var(--panel,#fff);stroke-width:8px;stroke-linejoin:round}
+.cy33 .cy-sub:is(:hover,:focus-visible,.on,.sel) .cy-sdisc{opacity:.22}
+.cy33 .cy-sub:is(:hover,:focus-visible) .cy-sic{transform:scale(1.2)}
+.cy33 .cy-sub:is(:focus-visible,.sel) .cy-sring{stroke-width:7}
+.cy-leg li{display:flex;gap:10px;align-items:center}.cy-leg li>div{min-width:0}
+@media (max-width:640px){.cy33 .cy-sub{display:inline}.cy33 :is(.cy-sn,.cy-sc,.cy-teth){display:none}}
+@media (prefers-reduced-motion:reduce){.cy33 .cy-sic{transition:none}.cy33 .cy-sub:is(:hover,:focus-visible) .cy-sic{transform:scale(1.12)}}
+.sub34-head{display:flex;gap:18px;align-items:center;margin:4px 0 14px;padding:12px 14px;border:1px solid var(--line,rgba(128,128,128,.3));border-radius:14px;background:color-mix(in srgb,var(--rs-hue,#888) 6%,transparent)}
+.sub34-head p{margin:2px 0}.sub34-eq{font-weight:700}.sub34-desc{font-size:1.05rem}
+.sub34-chip{color:color-mix(in srgb,var(--rs-hue) 60%,var(--text,currentColor));font-weight:800}
+.sub34-pill small{opacity:.75;font-weight:500;margin-left:2px}
+@media (max-width:640px){.sub34-head{flex-direction:column;align-items:flex-start}}
 
 </style>
 <script id="tulpa-etapa3">
@@ -3481,6 +3516,13 @@ const NEW_VOCATIONS=[
 ];
 const NEW_SKILLS=[];
 
+/* Sub-Elementos oficiais (Etapa 34): nascem entre dois elementos vizinhos do Ciclo Elemental */
+const SUBEL_BASE=[
+{id:'sub-sol',k:'sol',name:'Sol',a:'Fé',b:'Natureza',desc:'Energia vital e purificação.'},
+{id:'sub-desrealizacao',k:'dsr',name:'Desrealização',a:'Natureza',b:'Inexistência',desc:'Dissolução da realidade física.'},
+{id:'sub-pofenia',k:'pof',name:'Pofenia',a:'Inexistência',b:'Ilusão',desc:'Padrões falsos e realidades alternativas.'},
+{id:'sub-confabulacao',k:'cnf',name:'Confabulação',a:'Ilusão',b:'Verdade',desc:'Memórias falsas que parecem reais.'},
+{id:'sub-metafora',k:'met',name:'Metáfora',a:'Verdade',b:'Fé',desc:'Revelações expressas simbolicamente.'}];
 /* Rituais completos: [nome, elemento, execução, alcance, alvo, duração, base, avançada, próspera, auto] */
 const RITUAL_FULL=[
 ['Conversa Silvestre','Natureza','simples','pessoal ou toque em objeto natural','pessoal ou único','cena','Sintoniza a mente com a flora e a fauna: comunica-se de forma rudimentar com plantas (sinais, terreno, água, presença de criaturas) e animais simples até porte médio, recebendo sugestões e avisos de perigo.','Entende emoções básicas de criaturas vegetais ou animais; uma vez por cena pede ajuda a um animal ou convence uma planta consciente a ceder passagem ou criar pequena barreira. Requer punhado de terra ou folha fresca.','Afeta até 2 aliados com a conexão; sintonia grupal com a rede viva em até 15 m, obtendo mapas naturais (caminhos, água) e influenciando pequenos animais ou plantas (guiar raízes rasas, suporte temporário). Requer oferenda vegetal e breve meditação.',null],
@@ -3522,7 +3564,23 @@ const RITUAL_FULL=[
 ['Abrigo Sagrado (Serenidade)','Fé','simples','médio','área (diversos)','cena','Proteção espiritual em até 10 m: presença confortante como mãos invisíveis que protegem de maldições, medos ou energias negativas; aumenta a resistência a efeitos prejudiciais.','Reage a ameaças imediatas: cura ferimentos leves e remove desespero de aliados expostos a energia sombria.','Até 30 m com concentração: vantagem em Resistência mental contra qualquer aflição e cura automática ao fim de cada cena; inimigos têm dificuldade em atacar os protegidos.',null],
 ['Guardiã Divina','Fé','simples','médio','único ou grupo pequeno','cena','Invoca a presença de uma guardiã espiritual: calor e proteção contra ataques físicos e espirituais; confiança inabalável.','Barreiras simbólicas reduzem o dano de ataques e efeitos; bônus em resistência física e mental contra influências negativas.','Até 5 aliados em 15 m: aura de luz; vantagem em resistência mental e física; inimigos na área têm dificuldade em atacar ou manipular.',null],
 ['Coração Iluminado','Fé','simples','curto','único','cena','Energia de fé sobre um aliado (ou si): coragem inabalável, medos e dúvidas desaparecem, percepção de perigos aguçada.','Amplifica a resistência contra medo, confusão e dúvida, permitindo agir sem hesitação.','Estende-se a um grupo pequeno, todos com vantagem em resistência mental; aura de fé protetora.',null],
-['Luz Purificadora','Fé','simples','médio','área (até 15 m)','cena','Luz suave e intensa varre a área: inimigos sofrem desespero e fraqueza; aliados sentem alívio de estados negativos, dores ou fardos mágicos.','Purifica maldições leves, medos intensos e efeitos ilusórios; inimigos afetados têm penalidade em ataques ou manipulação mental.','Até 5 aliados e inimigos: aliados ganham cura automática e proteção contra efeitos mentais ou mágicos; inimigos têm desvantagem contínua em ataque ou controle.',null]
+['Luz Purificadora','Fé','simples','médio','área (até 15 m)','cena','Luz suave e intensa varre a área: inimigos sofrem desespero e fraqueza; aliados sentem alívio de estados negativos, dores ou fardos mágicos.','Purifica maldições leves, medos intensos e efeitos ilusórios; inimigos afetados têm penalidade em ataques ou manipulação mental.','Até 5 aliados e inimigos: aliados ganham cura automática e proteção contra efeitos mentais ou mágicos; inimigos têm desvantagem contínua em ataque ou controle.',null],
+/* ---- Sub-Elementos (Etapa 34): rituais inéditos ---- */
+['Coroa do Meio-Dia','Sol','simples','toque','único','cena','Uma coroa de luz quente pousa sobre o aliado: cura 1d8+2 VT e remove Envenenado ou Sangrando (à escolha). Até o fim da cena, ele tem +1 dado em Resistência contra doenças, venenos e influências sombrias.','Cura 2d8+4 VT em até 3 aliados tocados em sequência e remove um estado físico de cada um (Envenenado, Sangrando, Queimando ou Enjoado).','Explosão de aurora em 6 m: aliados curam 3d8+6 VT e ficam imunes a Envenenado e Sangrando até o fim da cena. Requer oferenda de mel, flor ou pão.',{heal:['1d8+2','2d8+4','3d8+6'],targets:[1,3,6]}],
+['Lança de Aurora','Sol','simples','médio','único','instantânea','Um feixe de sol concentrado: teste de Teosofia contra a Defesa do alvo. No acerto causa 2d6 de dano radiante e o alvo faz Resistência (DT 12) ou fica Ofuscado por 1 rodada. Criaturas de Inexistência sofrem +1d6.','O feixe atravessa em linha reta (até 12 m): até 3 alvos sofrem 3d6 cada e fazem Resistência (DT 14) contra Ofuscado.','A lança explode no impacto: 4d6 no alvo e 2d6 em quem estiver a até 3 m dele. Os atingidos ficam Queimando (Resistência DT 15 no fim do turno apaga).',{status:'ofuscado',targets:[1,3,4]}],
+['Jardim Solar','Sol','complexa','curto','área (6 m)','cena sustentada','Raios dourados e brotos cobrem uma área de 6 m: a luz dissipa escuridão sobrenatural e revela criaturas invisíveis e ilusões de estágio igual ou menor que o seu. Aliados dentro recuperam 1 VT no início de cada turno.','Área de 10 m. Inimigos de Inexistência ou Ilusão que entrarem ficam Ofuscados; aliados dentro têm +1 dado em Resistência contra Amedrontado e Apavorado.','Santuário vivo de 15 m até o fim da cena, sem precisar de concentração: aliados recuperam 1d4 VT por turno e 1 Lucidez por rodada; inimigos dentro ficam Marcados e não conseguem se esconder.',null],
+['Passo Através da Matéria','Desrealização','simples','toque','pessoal','1 rodada','Seu corpo perde a solidez por um instante: atravesse uma barreira natural ou leve (madeira, terra, vegetação, porta comum) de até 30 cm. Não funciona em metal.','Até 1 m de espessura, incluindo pedra e alvenaria, e você pode levar 1 aliado de mãos dadas. Durante a travessia, ataques contra vocês erram automaticamente.','Por uma cena, você e até 2 aliados atravessam paredes à vontade (o movimento custa o dobro). Quem terminar o turno dentro da matéria sofre 4d6 e é expulso para o espaço livre mais próximo.',null],
+['Erosão do Real','Desrealização','simples','curto','único','cena','A matéria ao redor do alvo esfarela: a proteção dele perde 2 de Defesa até o fim da cena (mínimo 0) e ele fica Vulnerável até o início do próximo turno dele.','Defesa −4. A arma do alvo racha: na primeira vez que ele errar um ataque, ela quebra e perde 1 dado de dano.','Até 3 alvos em 6 m: Defesa −4 e Vulnerável por 3 rodadas. Objetos inanimados de até 1 m³ à sua escolha simplesmente deixam de existir.',{status:'vulneravel',targets:[1,1,3]}],
+['Chão que Não Existe','Desrealização','complexa','médio','área (3 m)','instantânea','O solo numa área de 3 m se desfaz em vazio por um instante: quem estiver dentro faz Reflexo (DT 13) ou fica Caído e perde o restante do movimento.','Área de 6 m. Quem falhar afunda até a cintura e fica Agarrado (Atletismo DT 14 para sair).','Área de 9 m vira um poço de não-existência por 2 rodadas: quem falhar em Reflexo (DT 16) cai 3 m, sofre 2d6 e fica Agarrado. Aliados escolhidos flutuam sobre a borda.',{status:'caido',statusAdv:'agarrado',targets:[3,5,8]}],
+['Constelação Falsa','Pofenia','simples','pessoal','pessoal','cena','Você enxerga ligações escondidas entre pistas soltas: +1 dado em Investigação e Pesquisa até o fim da cena. Se um desses testes tirar 1 em todos os d20, o Mestre entrega uma conexão falsa e convincente.','Faça 1 pergunta ao Mestre sobre como duas pistas se relacionam. A resposta é verdadeira, mas vem como padrão ou imagem, sem nomes.','Você monta um mural de padrões: o grupo inteiro tem +1 dado em Investigação, Pesquisa e Intuição até o fim da sessão, e você descobre o próximo local importante da trama, ainda que de forma enigmática.',null],
+['Rosto na Parede','Pofenia','simples','médio','único','cena','O alvo passa a ver rostos e olhos em manchas, sombras e texturas: Resistência (DT 13) ou fica Amedrontado até o fim da cena.','Até 2 alvos. Quem falhar por 5 ou mais fica Apavorado (não pode atacar você).','Toda superfície num raio de 9 m ganha rostos que sussurram: inimigos que falharem em Resistência (DT 15) ficam Apavorados; quem já estava Apavorado fica Confuso.',{status:'amedrontado',statusAdv:'apavorado',targets:[1,2,5]}],
+['Coincidência Fatal','Pofenia','reação','pessoal','pessoal','instantânea','Reação a um ataque contra você: o mundo encaixa um acaso. Role 1d6; em 4–6 o golpe acerta outro alvo adjacente a você (à escolha do Mestre) ou não acerta nada.','Role 1d6; em 3–6 o golpe é desviado. Em 6, o atacante fica Confuso por 1 rodada.','Até o fim da cena, o primeiro ataque de cada rodada contra você ou um aliado a até 3 m é sorteado: em 4–6 no 1d6, erra completamente.',null],
+['Lembrança Emprestada','Confabulação','complexa','toque','único','permanente','Você insere uma memória pequena e plausível no alvo (um nome, um rosto, um detalhe de conversa). Resistência (DT 13): na falha, ele acredita nela como se sempre tivesse sabido.','A memória pode ser uma cena inteira de até 1 minuto ou substituir uma lembrança recente (DT 15). Você tem +1 dado em Persuasão com o alvo enquanto ela durar.','Reescreva uma noite inteira da vida do alvo ou implante a mesma lembrança em até 3 pessoas (DT 16). Só um trauma ou um ritual de Verdade revela a falsificação.',null],
+['Déjà Vu','Confabulação','reação','curto','único','instantânea','Reação quando um inimigo a até 9 m acerta um ataque: você o faz lembrar que já errou esse golpe. Ele repete a rolagem com −1 dado e fica com o pior resultado.','Também vale contra testes de perícia e rituais inimigos, e o alvo fica Vulnerável até o início do próximo turno dele.','Uma vez na cena, desfaça a última ação de um inimigo (dano e efeitos não acontecem); ele fica Atordoado pela própria memória e perde a próxima ação.',{status:'vulneravel',targets:[1,1,1]}],
+['Testemunha Fabricada','Confabulação','complexa','toque em objeto ou local','área (local)','cena','Ao tocar um objeto ou local, você reconstrói como lembrança o que provavelmente aconteceu ali nas últimas 24 h. Teste de Intuição (DT 12): no sucesso a cena é fiel; na falha, mistura verdade e invenção, e o Mestre não diz quais partes.','Alcança até 1 semana e permite interrogar a lembrança: faça 2 perguntas sobre detalhes (rostos, roupas, palavras ditas).','Projeta a reconstrução para o grupo como visão compartilhada: todos têm +1 dado em Investigação naquela cena, e você sabe se alguém presente mentiu sobre o ocorrido.',null],
+['Parábola Viva','Metáfora','simples','curto','diversos (aliados que ouvirem)','cena','Você conta uma pequena parábola que dá sentido ao momento: até 2 aliados ganham +1 dado no próximo teste ligado à lição da história e recuperam 1d4 de Lucidez.','Até 4 aliados. O bônus vale para todos os testes ligados à lição durante a cena e remove Amedrontado ou Ansioso.','A parábola vira verdade por uma cena: os aliados que a ouviram ficam Eufóricos e recuperam 2d6 de Lucidez, e um deles pode repetir uma rolagem que falhou.',null],
+['Selo do Significado','Metáfora','simples','médio','único','cena','Você grava um símbolo de luz sobre o alvo: ele fica Marcado e ataques de aliados contra ele ganham +1 dado até o fim da cena.','O selo revela intenções: você sabe a próxima ação que o alvo pretende fazer (o Mestre diz em uma frase), e ele não consegue ficar invisível nem se disfarçar.','Até 3 alvos. Quem mentir enquanto estiver Marcado sente o selo queimar: 1d6 de dano e Silenciado por 1 rodada.',{status:'marcado',targets:[1,1,3]}],
+['Oráculo das Imagens','Metáfora','complexa','pessoal','pessoal','instantânea','Faça uma pergunta sobre algo oculto: o Mestre responde com uma imagem simbólica verdadeira (um animal, um objeto, uma cor). Requer 10 minutos de meditação.','Duas perguntas, ou uma pergunta respondida com uma cena curta e simbólica. +1 dado em Intuição para interpretá-la.','Você recebe uma visão completa sobre uma pessoa, lugar ou evento: o Mestre revela um segredo importante em forma de alegoria e uma frase literal. Custa 1d4 de Lucidez.',null]
 ].map(([name,element,exec,alcance,alvo,dur,base,adv,pro,auto])=>({id:name.toLowerCase().replace(/[^a-z0-9]+/g,'-'),name,element,cost:'5 ES',exec,alcance,alvo,dur,levels:[base,adv,pro],desc:base,auto}));
 
 /* Descanso: tabela de recuperação por Patamar final */
@@ -6238,7 +6296,7 @@ const S5={
   collapse:t=>{n5(t,.9,{freq:300,to:5000,q:.6,gain:.1,wet:.6});o5('sawtooth',220,t,.9,{to:233,gain:.04});o5('sawtooth',311,t,.9,{to:294,gain:.04})},
   meow:t=>o5('sine',620,t,.16,{to:980,gain:.03,wet:.2}),
 };
-const CAST5={Natureza:[150,220,330,440],Inexistência:[90,140,210,300],Ilusão:[660,520,780,1040],Verdade:[440,660,880,990],Fé:[330,495,660,990],Sol:[330,440,495,660,990],Desrealização:[150,140,220,210,300],Apofenia:[90,520,210,780,1040],Confabulação:[660,440,780,880,1040],Metáfora:[440,330,660,495,990]};
+const CAST5={Natureza:[150,220,330,440],Inexistência:[90,140,210,300],Ilusão:[660,520,780,1040],Verdade:[440,660,880,990],Fé:[330,495,660,990],Sol:[330,440,495,660,990],Desrealização:[150,140,220,210,300],Pofenia:[90,520,210,780,1040],Confabulação:[660,440,780,880,1040],Metáfora:[440,330,660,495,990]};
 function fx5(kind='click',element=''){
   try{
     if(!vol5())return;const c=actx();if(!c)return;
@@ -7853,7 +7911,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='21/11 12:12';
+const BUILD8='21/11 12:54';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -9329,7 +9387,13 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'⟡ Diagrama do Ciclo Elemental',w:'a',open:1,b:`<ul>
+  {t:'✧ Sub-Elementos e 15 rituais novos',w:'a',open:1,b:`<ul>
+    <li><b>Sol</b> (Fé + Natureza), <b>Desrealização</b> (Natureza + Inexistência), <b>Pofenia</b> (Inexistência + Ilusão), <b>Confabulação</b> (Ilusão + Verdade) e <b>Metáfora</b> (Verdade + Fé) agora são elementos oficiais, com <b>3 rituais inéditos cada</b>: Coroa do Meio-Dia, Lança de Aurora, Jardim Solar, Passo Através da Matéria, Erosão do Real, Chão que Não Existe, Constelação Falsa, Rosto na Parede, Coincidência Fatal, Lembrança Emprestada, Déjà Vu, Testemunha Fabricada, Parábola Viva, Selo do Significado e Oráculo das Imagens.</li>
+    <li>Cada ritual e cada sub-elemento tem um <b>sigilo próprio</b>, com as cores dos dois elementos de origem misturadas.</li>
+    <li>O <b>Ciclo Elemental</b> agora mostra o fluxo Fé → Natureza → Inexistência → Ilusão → Verdade → Fé, com os sub-elementos entre eles. Tocar num sub-elemento leva aos rituais dele.</li>
+    <li>No <b>📖 Manual</b>, capítulo 8, cada sub-elemento tem a sua seção. <b>Mestre:</b> o conceito de cada um é editável (✏️ no Manual ou ⚙️ → Sub-Elementos), e os rituais novos são editáveis como os outros.</li>
+  </ul>`},
+  {t:'⟡ Diagrama do Ciclo Elemental',w:'a',b:`<ul>
     <li>Os cinco elementos e os sub-elementos que nascem entre eles (Sol, Desrealização, Pofenia, Confabulação e Metáfora) num diagrama só.</li>
     <li>No <b>📖 Manual</b>, capítulo 8: toque num elemento para ir direto aos rituais dele.</li>
     <li>Na ficha, em <b>Registros → Repertório ritualístico</b>, abra "Ciclo Elemental": tocar num elemento filtra os rituais daquele elemento.</li>
@@ -15947,7 +16011,9 @@ function list29(sec){
     return rows;
   }
   if(sec==='beast')return(R.beast||[]).map(b=>({key:b.id,name:b.name,sub:`${b.tier||'Inimigo'} · VT ${b.vital||'—'} · Defesa ${b.def||'—'} · ${b.dano||'—'}`,st:'new'}));
-  if(sec==='subel')return(R.subel||[]).map(b=>({key:b.id,name:b.name,sub:(b.element||'')+' · '+String(b.desc||'').slice(0,80),st:'new'}));
+  if(sec==='subel'){const L=R.subel||[];
+    const off=(typeof SUBEL_BASE!=='undefined'?SUBEL_BASE:[]).map(b=>{const o=L.find(x=>x.id===b.id);return{key:b.id,name:b.name,sub:`${b.a} + ${b.b} · `+String(o?.desc??b.desc).slice(0,80),st:o?'edit':'orig'}});
+    return off.concat(L.filter(x=>!String(x.id).startsWith('sub-')).map(b=>({key:b.id,name:b.name,sub:(b.element||'')+' · '+String(b.desc||'').slice(0,80),st:'new'})))}
   return[];
 }
 /* valores atuais de um registro (para o formulário e para o "antes") */
@@ -15960,7 +16026,9 @@ function cur29(sec,key){
   if(sec==='status'){const b=B.status.find(x=>x.id===key),o=R.status[key]||{};const t=cl29(b||{id:key,name:'',group:'manual',narr:'',text:''});statusSet29(t,o);return t}
   if(sec==='trauma'){const b=B.trauma.find(x=>x.id===key),o=R.trauma[key]||{};const t=cl29(b||{id:key,name:'',grp:'Mente',text:''});['name','text','grp'].forEach(k=>{if(o[k]!=null)t[k]=o[k]});return t}
   if(sec==='beast')return cl29((R.beast||[]).find(x=>x.id===key)||{id:key,name:'',tier:'Inimigo',vital:20,def:12,atk:'+3',dano:'1d6',skills:'',notes:''});
-  if(sec==='subel')return cl29((R.subel||[]).find(x=>x.id===key)||{id:key,name:'',element:'Natureza',desc:''});
+  if(sec==='subel'){const b=String(key).startsWith('sub-')&&typeof SUBEL_BASE!=='undefined'?SUBEL_BASE.find(x=>x.id===key):null,o=(R.subel||[]).find(x=>x.id===key);
+    if(b)return cl29({...b,element:`${b.a} + ${b.b}`,off:1,...(o?{desc:o.desc}:{})});
+    return cl29(o||{id:key,name:'',element:'Natureza',desc:''})}
   return{};
 }
 const isNative29=(sec,key)=>{const B=base29();return sec==='voc'?B.voc.some(x=>x.name===key):sec==='track'?B.track.some(x=>tkey29(x)===key):sec==='ritual'?B.ritual.some(x=>x.id===key):sec==='item'?(()=>{const [k,n]=String(key).split('|');return(k==='weapon'?B.weapon:k==='prot'?B.prot:B.gear).some(x=>x.name===n)})():sec==='status'?B.status.some(x=>x.id===key):sec==='trauma'?B.trauma.some(x=>x.id===key):false};
@@ -16039,7 +16107,9 @@ function edit29(sec,key){
      +fC29('e29mv','Não pode se mover',(s.flags||[]).includes('semMover'))+fC29('e29atk','Desvantagem em ataques',(s.disadv||[]).includes('ataque'))+fC29('e29act','Perde a próxima ação',(s.flags||[]).includes('perdeAcao'))}
   if(sec==='trauma'){const t=c||{name:'',grp:'Mente',text:''};f=fI29('e29n','Nome',t.name)+fI29('e29g','Grupo',t.grp)+fT29('e29d','Efeito',t.text)}
   if(sec==='beast'){const b=c||cur29('beast',null);f=fI29('e29n','Nome',b.name)+fS29('e29tier','Tipo',b.tier||'Inimigo',['Inimigo','Elite','Chefe','Entidade'])+`<div class="sys29-3">${fI29('e29vt','Vitalidade',b.vital,'number','min="1" max="999"')}${fI29('e29def','Defesa',b.def,'number','min="0" max="40"')}${fI29('e29atk','Ataque (bônus)',b.atk)}</div>`+fI29('e29dano','Dano',b.dano)+fT29('e29sk','Perícias e poderes',b.skills,2)+fT29('e29nt','Notas e comportamento',b.notes,3)}
-  if(sec==='subel'){const s=c||cur29('subel',null);f=fI29('e29n','Nome do sub-elemento',s.name)+fS29('e29el','Elemento de origem',s.element,elems29())+fT29('e29d','Descrição e efeitos',s.desc)}
+  if(sec==='subel'){const s=c||cur29('subel',null);
+    if(s.off)f=`<p class="sub">Sub-elemento oficial do Ciclo Elemental: <b>${esc(s.name)}</b> nasce de <b>${esc(s.a)} + ${esc(s.b)}</b>. O nome fica fixo porque os rituais dependem dele; o conceito aparece no diagrama, no Manual e na ficha.</p><input type="hidden" id="e29n" value="${esc(s.name)}">`+fT29('e29d','Conceito',s.desc,2);
+    else f=fI29('e29n','Nome do sub-elemento',s.name)+fS29('e29el','Elemento de origem',s.element,elems29())+fT29('e29d','Descrição e efeitos',s.desc)}
   m.innerHTML=`<div class="sys29-head"><button type="button" class="btn small" id="e29back">← Voltar</button><h3>${isNew?'Novo':'Editar'} ${esc((lbl||'').toLowerCase())}</h3>${!isNew&&isNative29(sec,key)?'<span class="sub">Conteúdo do manual. Dá para voltar ao original depois.</span>':''}</div><form class="sys29-form" id="e29f">${f}<div class="sys29-save"><button type="submit" class="btn primary">Salvar e aplicar na mesa</button><button type="button" class="btn" id="e29cancel">Cancelar</button></div></form>`;
   const kSync=()=>{const k=isNew&&sec==='item'?gv29('e29k'):c?.kind;$$('[data-k29]',m).forEach(d=>d.classList.toggle('hide',d.dataset.k29!==k))};
   if(sec==='item'){kSync();$('e29k')&&($('e29k').onchange=kSync)}
@@ -16104,8 +16174,8 @@ async function submit29(sec,key,c){
     if(dn&&!/^\d+d\d+([+-]\d+)?$/i.test(dn)){toast('Dano inválido. Use algo como 1d6 ou 2d8+2.');return false}
     if(at&&!/^[+-]?\d+$/.test(at)){toast('Ataque inválido. Use um número, como +3.');return false}}
   if(sec==='beast'||sec==='subel'){
-    const arr=R[sec];k=isNew?'gm-'+rid().slice(0,8):key;
-    o=sec==='beast'?{id:k,name,tier:gv29('e29tier'),vital:Number(gv29('e29vt'))||1,def:Number(gv29('e29def'))||0,atk:gv29('e29atk'),dano:gv29('e29dano'),skills:gv29('e29sk'),notes:gv29('e29nt')}:{id:k,name,element:gv29('e29el'),desc:gv29('e29d')};
+    const arr=R[sec];k=isNew?'gm-'+rid().slice(0,8):key;const off29=sec==='subel'&&c&&c.off;
+    o=sec==='beast'?{id:k,name,tier:gv29('e29tier'),vital:Number(gv29('e29vt'))||1,def:Number(gv29('e29def'))||0,atk:gv29('e29atk'),dano:gv29('e29dano'),skills:gv29('e29sk'),notes:gv29('e29nt')}:off29?{id:k,name:c.name,element:c.element,desc:gv29('e29d').trim()||c.desc,off:1}:{id:k,name,element:gv29('e29el'),desc:gv29('e29d')};
     const i=arr.findIndex(x=>x.id===k);changes=diff29(c,o,sec==='beast'?[['name','Nome'],['vital','Vitalidade'],['def','Defesa'],['atk','Ataque'],['dano','Dano']]:[['name','Nome'],['element','Elemento'],['desc','Descrição']]);
     if(i>=0)arr[i]=o;else arr.push(o);
   }
@@ -16116,6 +16186,7 @@ async function submit29(sec,key,c){
 }
 async function del29(sec,key){
   const R=rules29(),row=list29(sec).find(r=>r.key===key);if(!row)return;
+  if(sec==='subel'&&String(key).startsWith('sub-')){if(!(R.subel||[]).some(x=>x.id===key)){toast('Sub-elemento oficial: dá para editar o conceito, mas não excluir.');return}if(!confirm(`Voltar o conceito de “${row.name}” ao texto oficial?`))return;R.subel=R.subel.filter(x=>x.id!==key);await saveRules29({kind:sec,key,label:row.name,changes:[['Conceito','editado','oficial']]});paint29();return}
   if(!confirm(`Excluir “${row.name}” de ${KIND29[sec]}? ${isNative29(sec,key)?'É conteúdo do manual: dá para restaurar depois.':'Não dá para desfazer.'}`))return;
   if(sec==='beast'||sec==='subel')R[sec]=R[sec].filter(x=>x.id!==key);
   else if(isNative29(sec,key))R[sec][key]={...(R[sec][key]||{}),del:1};
@@ -16186,7 +16257,7 @@ function gmInline29(){
 /* sub-elementos aparecem para todos junto do repertório de rituais */
 function subelPanel29(){
   const rc=$('ritualCatalog');if(!rc)return;const panel=rc.closest('.panel');if(!panel)return;
-  const L=rules29().subel||[];let p=$('subel29');
+  const L=(rules29().subel||[]).filter(x=>!String(x.id).startsWith('sub-'));let p=$('subel29');
   if(!L.length){p&&p.remove();return}
   if(!p){p=document.createElement('div');p.id='subel29';p.className='panel subel29';panel.after(p)}
   const sig=JSON.stringify(L);if(p.dataset.sig===sig)return;p.dataset.sig=sig;
@@ -16829,11 +16900,11 @@ const LIVE31={
   dt(){const d=[6,12,18,24,30,36];let f=x=>12;try{f=dtFor14}catch(e){}
     return`<p><b>DT do teste de Arremesso pela distância até o ponto mirado:</b></p>`+tb31(['Distância',...d.map(m=>'até '+m+' m'),'cada 6 m a mais'],[`<tr class="m31-row"><td><b>DT</b></td>${d.map(m=>`<td>${f(m)}</td>`).join('')}<td>+2</td></tr>`])+(gm31()?`<div class="m31-addrow"><button type="button" class="gm29-b gm29-add" data-m31tab="1">⚖ Ajustar DT base (Regras da Mesa)</button></div>`:'')},
   doors(){let dt=12;try{dt=dtDoor22()}catch(e){}return tb31(['Modo','Teste exigido','Onda sonora gerada'],[tr31(['<b>Normal</b>','Nenhum','5 quadrados (7,5 m).']),tr31(['<b>Furtiva</b>',`Destreza + Furtividade (DT ${dt})`,'Sucesso: 1,2 quadrado (~1,8 m). Falha: rangido de 6 + (0,9 × margem da falha) quadrados (máx. 22 quadrados / 33 m).'])])},
-  ritual(b){const base=['Natureza','Inexistência','Ilusão','Verdade','Fé'];
+  ritual(b){const base=['Natureza','Inexistência','Ilusão','Verdade','Fé',...(typeof SUBEL_BASE!=='undefined'?SUBEL_BASE.map(x=>x.name):[])];
     const L=live31('ritual').filter(x=>b.el==='*'?!base.includes(x.v.element):x.v.element===b.el);
     if(!L.length&&b.el==='*')return'';
     return(b.el==='*'?'':gmA31('ritual','Ritual'))+L.map(({row,v})=>{const lv=v.levels||[v.desc,'',''];return`<article class="m31-rit m31-row rs-host" data-key="${esc(row.key)}"><header>${typeof ritSym32==='function'?ritSym32(v,'lg'):''}<h4>Ritual: ${esc(v.name)}</h4>${tag31(row.st)}${gmB31('ritual',row.key,v.name)}</header><p class="m31-meta">${[['Elemento',v.element],['Execução',v.exec],['Alcance',v.alcance],['Alvo',v.alvo],['Duração',v.dur]].filter(x=>x[1]).map(([k,x])=>`<span><i>${k}:</i> ${esc(x)}</span>`).join('')}</p><dl class="m31-pot">${['Base · 5 ES','Avançada · 10 ES','Próspera · 20 ES'].map((n,i)=>lv[i]?`<dt>${n}</dt><dd>${link31(esc(lv[i]))}</dd>`:'').join('')}</dl></article>`}).join('')},
-  subel(){let L=[];try{L=(rules29().subel||[])}catch(e){}
+  subel(){let L=[];try{L=(rules29().subel||[]).filter(x=>!String(x.id).startsWith('sub-'))}catch(e){}
     if(!L.length&&!gm31())return'';
     return`<div class="m31-subel"><h4>Sub-Elementos da campanha</h4>${gmA31('subel','Sub-Elemento')}${L.map(s=>`<p class="m31-row" data-key="${esc(s.id)}"><b>${esc(s.name)}</b> <span class="m31-chip">${esc(s.element||'')}</span>${gmB31('subel',s.id,s.name)} — ${esc(s.desc||'')}</p>`).join('')||'<p class="sub">Nenhum sub-elemento próprio ainda.</p>'}</div>`},
   weapons(){const L=live31('item').filter(x=>String(x.row.key).startsWith('weapon|'));
@@ -17448,6 +17519,9 @@ function symCtl32(){
 {const _rs=ritSet29;ritSet29=function(x,o){_rs.apply(this,arguments);if(o&&o.sym!==undefined){if(o.sym)x.sym=o.sym;else delete x.sym}}}
 console.info('[Tulpa] Etapa 32 carregada (símbolos dos rituais)');
 
+/* Etapa 34 · sigilos dos 5 Sub-Elementos e dos 15 rituais novos (desenho autoral em SVG, centrado em 0,0) */
+const RART34={"sub:sol":"<circle class=\"p\" cx=\"0\" cy=\"0\" r=\"9\"/><circle class=\"l\" cx=\"0\" cy=\"0\" r=\"13\"/><g transform=\"rotate(-90)\"><path class=\"l\" d=\"M15 0L27 0\"/><path class=\"p\" d=\"M29.5 -2.6L32.1 0L29.5 2.6L26.9 0Z\"/></g><g transform=\"rotate(0)\"><path class=\"l\" d=\"M15 0L27 0\"/><path class=\"p\" d=\"M29.5 -2.6L32.1 0L29.5 2.6L26.9 0Z\"/></g><g transform=\"rotate(90)\"><path class=\"l\" d=\"M15 0L27 0\"/><path class=\"p\" d=\"M29.5 -2.6L32.1 0L29.5 2.6L26.9 0Z\"/></g><g transform=\"rotate(180)\"><path class=\"l\" d=\"M15 0L27 0\"/><path class=\"p\" d=\"M29.5 -2.6L32.1 0L29.5 2.6L26.9 0Z\"/></g><g transform=\"rotate(-45)\"><path class=\"l\" d=\"M15 0C20 -5.2 25 -3.64 29 0C25 3.64 20 5.2 15 0Z\"/><path class=\"t\" d=\"M16 0L26 0\"/></g><g transform=\"rotate(45)\"><path class=\"l\" d=\"M15 0C20 -5.2 25 -3.64 29 0C25 3.64 20 5.2 15 0Z\"/><path class=\"t\" d=\"M16 0L26 0\"/></g><g transform=\"rotate(135)\"><path class=\"l\" d=\"M15 0C20 -5.2 25 -3.64 29 0C25 3.64 20 5.2 15 0Z\"/><path class=\"t\" d=\"M16 0L26 0\"/></g><g transform=\"rotate(225)\"><path class=\"l\" d=\"M15 0C20 -5.2 25 -3.64 29 0C25 3.64 20 5.2 15 0Z\"/><path class=\"t\" d=\"M16 0L26 0\"/></g>","coroa-do-meio-dia":"<path class=\"l\" d=\"M-17.85 -6.5A19 19 0 0 1 17.85 -6.5\"/><path class=\"l\" d=\"M-19.05 -11L-25.98 -15\"/><path class=\"l\" d=\"M-11 -19.05L-15 -25.98\"/><path class=\"l\" d=\"M-0 -22L-0 -30\"/><path class=\"l\" d=\"M11 -19.05L15 -25.98\"/><path class=\"l\" d=\"M19.05 -11L25.98 -15\"/><path class=\"p\" d=\"M0 -11L2.12 -4.12L9 -2L2.12 0.12L0 7L-2.12 0.12L-9 -2L-2.12 -4.12Z\"/><path class=\"l\" d=\"M0 9C-4 14 -12 18 -20 17C-16 11 -8 8 0 9Z\"/><path class=\"l\" d=\"M0 9C4 14 12 18 20 17C16 11 8 8 0 9Z\"/><path class=\"l\" d=\"M0 9V27\"/><path class=\"t\" d=\"M-8 23C-4 21 4 21 8 23\"/>","lan-a-de-aurora":"<path class=\"l\" d=\"M0 30V-14\"/><path class=\"p\" d=\"M0 -30L5 -21L0 -12L-5 -21Z\"/><path class=\"t\" d=\"M-10.39 -27L-16.45 -30.5\"/><path class=\"t\" d=\"M0 -33L0 -40\"/><path class=\"t\" d=\"M10.39 -27L16.45 -30.5\"/><circle class=\"l\" cx=\"0\" cy=\"4\" r=\"6.5\"/><circle class=\"p\" cx=\"0\" cy=\"4\" r=\"2.2\"/><path class=\"l\" d=\"M0 24C-6 20 -12 22 -15 28C-9 29 -4 28 0 24Z\"/><path class=\"l\" d=\"M0 24C6 20 12 22 15 28C9 29 4 28 0 24Z\"/>","jardim-solar":"<path class=\"l\" d=\"M-30 6H30\"/><path class=\"l\" d=\"M-13 6A13 13 0 0 1 13 6\"/><path class=\"l\" d=\"M-15.45 1.86L-23.18 -0.21\"/><path class=\"l\" d=\"M-11.31 -5.31L-16.97 -10.97\"/><path class=\"l\" d=\"M-4.14 -9.45L-6.21 -17.18\"/><path class=\"l\" d=\"M4.14 -9.45L6.21 -17.18\"/><path class=\"l\" d=\"M11.31 -5.31L16.97 -10.97\"/><path class=\"l\" d=\"M15.45 1.86L23.18 -0.21\"/><path class=\"p\" d=\"M0 -5.5L1.13 -2.13L4.5 -1L1.13 0.13L0 3.5L-1.13 0.13L-4.5 -1L-1.13 -2.13Z\"/><path class=\"l\" d=\"M-18 6C-19 0 -24 -2 -27 -1C-26 3 -22 6 -18 6Z\"/><path class=\"l\" d=\"M18 6C19 0 24 -2 27 -1C26 3 22 6 18 6Z\"/><path class=\"t\" d=\"M0 6V24M0 12C-5 16 -10 17 -13 23M0 12C5 16 10 17 13 23M-7 17C-9 20 -9 23 -8 26M7 17C9 20 9 23 8 26\"/>","sub:dsr":"<path class=\"l\" d=\"M0 25L-21.65 12.5L-21.65 -12.5L0 -25\"/><path class=\"l\" d=\"M0.9 -26.56L22.55 -14.06\"/><path class=\"l\" d=\"M25.26 -12.5L25.26 12.5\"/><path class=\"l\" d=\"M24.36 17.19L2.71 29.69\"/><path class=\"l\" d=\"M-3 14C-13 4 -12 -10 -3 -17C-1 -8 -1 2 -3 14Z\"/><path class=\"t\" d=\"M-3 14V-10\"/><circle class=\"p\" cx=\"5\" cy=\"-9\" r=\"1.9\"/><circle class=\"p\" cx=\"10\" cy=\"-3\" r=\"1.6\"/><circle class=\"p\" cx=\"14\" cy=\"4\" r=\"1.3\"/><circle class=\"p\" cx=\"18\" cy=\"11\" r=\"1\"/><g transform=\"translate(15 -17) rotate(200)\"><path class=\"p\" d=\"M0 -5.5A5.5 5.5 0 0 0 0 5.5A6.88 6.88 0 0 1 0 -5.5Z\"/></g>","passo-atrav-s-da-mat-ria":"<path class=\"l\" d=\"M-7 -26H7V26H-7Z\"/><path class=\"t\" d=\"M-7 -13H7\"/><path class=\"t\" d=\"M-7 0H7\"/><path class=\"t\" d=\"M-7 13H7\"/><path class=\"t\" d=\"M0 -26.0V-13.0\"/><path class=\"t\" d=\"M-3.5 -13.0V0.0\"/><path class=\"t\" d=\"M0 0.0V13.0\"/><path class=\"t\" d=\"M-3.5 13.0V26.0\"/><path class=\"l\" d=\"M-30 0H-11\"/><path class=\"d\" d=\"M-7 0H7\"/><path class=\"l\" d=\"M11 0H27\"/><path class=\"l\" d=\"M21 -6L28 0L21 6\"/><circle class=\"l\" cx=\"-24\" cy=\"-10\" r=\"4\"/><path class=\"t\" d=\"M-24 -6V4\"/>","eros-o-do-real":"<path class=\"l\" d=\"M0 -26C8 -21 16 -21 22 -21C22 0 15 16 0 26C-15 16 -22 0 -22 -21C-16 -21 -8 -21 0 -26Z\"/><path class=\"l\" d=\"M2 -24L-3 -10L4 -2L-2 9L3 22\"/><path class=\"p\" d=\"M17 -8L21 -1.6L13.8 -2Z\"/><path class=\"p\" d=\"M23 3L26 7.8L20.6 7.5Z\"/><path class=\"p\" d=\"M27 -14.4L29.4 -10.56L25.08 -10.8Z\"/><path class=\"t\" d=\"M-12 -12C-10 -6 -12 0 -9 6\"/>","ch-o-que-n-o-existe":"<path class=\"l\" d=\"M-30 -2H-13\"/><path class=\"l\" d=\"M13 -2H30\"/><path class=\"l\" d=\"M-13 -2L-10 2L-14 6\"/><path class=\"l\" d=\"M13 -2L10 3L14 6\"/><path class=\"p\" d=\"M-13 6C-8 4 8 4 13 6C11 16 -11 16 -13 6Z\"/><path class=\"d\" d=\"M-18 12C-10 24 10 24 18 12\"/><path class=\"d\" d=\"M-22 19C-12 31 12 31 22 19\"/><path class=\"t\" d=\"M-21 -2C-21 3 -23 6 -22 10M21 -2C22 3 20 6 21 10\"/><path class=\"t\" d=\"M-7 -18L-6 -11\"/><path class=\"t\" d=\"M3 -18L4 -11\"/>","sub:pof":"<circle class=\"p\" cx=\"-20\" cy=\"-12\" r=\"2.6\"/><circle class=\"p\" cx=\"-8\" cy=\"-21\" r=\"2.6\"/><circle class=\"p\" cx=\"9\" cy=\"-17\" r=\"2.6\"/><circle class=\"p\" cx=\"20\" cy=\"-6\" r=\"2.6\"/><circle class=\"p\" cx=\"12\" cy=\"9\" r=\"2.6\"/><circle class=\"p\" cx=\"-4\" cy=\"17\" r=\"2.6\"/><circle class=\"p\" cx=\"-19\" cy=\"7\" r=\"2.6\"/><path class=\"t\" d=\"M-20 -12L-8 -21L9 -17L20 -6\"/><path class=\"d\" d=\"M20 -6L12 9L-4 17L-19 7L-20 -12\"/><path class=\"l\" d=\"M0 -12L9.53 4.5L-9.53 4.5Z\"/><g transform=\"translate(0 -1) rotate(-30)\"><path class=\"p\" d=\"M0 -6A6 6 0 0 0 0 6A7.5 7.5 0 0 1 0 -6Z\"/></g>","constela-o-falsa":"<circle class=\"p\" cx=\"-22\" cy=\"8\" r=\"2.4\"/><circle class=\"p\" cx=\"-12\" cy=\"-6\" r=\"2.4\"/><circle class=\"p\" cx=\"-2\" cy=\"-20\" r=\"2.4\"/><circle class=\"p\" cx=\"10\" cy=\"-8\" r=\"2.4\"/><circle class=\"p\" cx=\"22\" cy=\"-18\" r=\"2.4\"/><circle class=\"p\" cx=\"16\" cy=\"10\" r=\"2.4\"/><circle class=\"p\" cx=\"2\" cy=\"20\" r=\"2.4\"/><path class=\"t\" d=\"M-22 8L-12 -6L-2 -20L10 -8L22 -18\"/><path class=\"t\" d=\"M10 -8L16 10L2 20\"/><path class=\"d\" d=\"M2 20L-12 -6\"/><circle class=\"l\" cx=\"10\" cy=\"-8\" r=\"6\"/><path class=\"t\" d=\"M1 -8H3M17 -8H19\"/>","rosto-na-parede":"<path class=\"t\" d=\"M-20 -21H20\"/><path class=\"t\" d=\"M-27.87 -8H27.87\"/><path class=\"t\" d=\"M-27.87 8H27.87\"/><path class=\"t\" d=\"M-20 21H20\"/><path class=\"t\" d=\"M-10 -21V-8M12 -8V8M-4 8V21\"/><path class=\"p\" d=\"M-17 -2C-16 -7 -8 -8 -6 -3C-7 1 -15 2 -17 -2Z\"/><path class=\"p\" d=\"M6 -4C8 -8 16 -7 17 -2C15 1 7 1 6 -4Z\"/><path class=\"l\" d=\"M-10 13C-6 17 -1 12 3 16C6 19 10 14 12 15\"/><path class=\"t\" d=\"M-12 -4L-11 -3M11 -3L12 -2\"/>","coincid-ncia-fatal":"<path class=\"l\" d=\"M-25 13C-16 11 -9 8 -4 2\"/><path class=\"l\" d=\"M4 -2C9 -9 13 -14 20 -18\"/><path class=\"l\" d=\"M13 -20L21 -18L18 -11\"/><path class=\"l\" d=\"M0 -9L9 0L0 9L-9 0Z\"/><circle class=\"p\" cx=\"0\" cy=\"-4\" r=\"1.8\"/><circle class=\"p\" cx=\"-4\" cy=\"0\" r=\"1.8\"/><circle class=\"p\" cx=\"4\" cy=\"0\" r=\"1.8\"/><circle class=\"p\" cx=\"0\" cy=\"4\" r=\"1.8\"/><path class=\"t\" d=\"M10 16C14 12 20 14 19 19C18 23 12 23 12 19C12 17 15 16 16 18\"/>","sub:cnf":"<path class=\"l\" d=\"M0 -22L20.78 14L-20.78 14Z\"/><path class=\"d\" d=\"M5 -26L25.78 10L-15.78 10Z\"/><path class=\"t\" d=\"M0 -22V22\"/><circle class=\"l\" cx=\"0\" cy=\"-27\" r=\"4\"/><path class=\"t\" d=\"M1 6C1 2 6 2 6 6C6 11 -3 12 -3 6C-3 0 9 -1 9 6\"/>","lembran-a-emprestada":"<path class=\"l\" d=\"M0 -22L21.65 15.5L-21.65 15.5Z\"/><path class=\"t\" d=\"M0 9C0 5 5 5 5 9C5 14 -4 15 -4 9C-4 2 9 1 9 9C9 18 -8 19 -8 9\"/><path class=\"l\" d=\"M-21 -19L-6 -2\"/><path class=\"t\" d=\"M-21.4 -17Q-19 -19.4 -16.6 -17Q-19 -14.6 -21.4 -17Z\"/><path class=\"d\" d=\"M-6 -2C-2 2 -6 6 -2 10\"/>","d-j-vu":"<circle class=\"l\" cx=\"-3\" cy=\"2\" r=\"15\"/><circle class=\"d\" cx=\"4\" cy=\"-3\" r=\"15\"/><path class=\"l\" d=\"M-3 2V-8M-3 2L5 6\"/><circle class=\"p\" cx=\"-3\" cy=\"2\" r=\"1.8\"/><path class=\"l\" d=\"M-23.49 -8.55A25 25 0 0 1 21.65 -12.5\"/><path class=\"l\" d=\"M-24 -15L-24 -7L-16 -10\"/>","testemunha-fabricada":"<path class=\"l\" d=\"M-20 -6Q0 -22 20 -6Q0 10 -20 -6Z\"/><circle class=\"l\" cx=\"0\" cy=\"-6\" r=\"5\"/><circle class=\"p\" cx=\"0\" cy=\"-6\" r=\"2\"/><path class=\"d\" d=\"M-16 -10Q4 -26 24 -10Q4 6 -16 -10Z\"/><path class=\"t\" d=\"M-4.7 22.29A5 5 0 0 1 4.7 22.29\"/><path class=\"t\" d=\"M-8.46 20.92A9 9 0 0 1 8.46 20.92\"/><path class=\"t\" d=\"M-12.22 19.55A13 13 0 0 1 12.22 19.55\"/>","sub:met":"<path class=\"l\" d=\"M0 -30L24 0L0 30L-24 0Z\"/><path class=\"l\" d=\"M0 -11L12.12 10L-12.12 10Z\"/><circle class=\"l\" cx=\"0\" cy=\"-6\" r=\"4\"/><path class=\"t\" d=\"M0 -2V14\"/><path class=\"p\" d=\"M0 -26L0.99 -22.99L4 -22L0.99 -21.01L0 -18L-0.99 -21.01L-4 -22L-0.99 -22.99Z\"/>","par-bola-viva":"<path class=\"l\" d=\"M0 -2C-8 -8 -18 -8 -26 -4V20C-18 16 -8 16 0 22C8 16 18 16 26 20V-4C18 -8 8 -8 0 -2Z\"/><path class=\"l\" d=\"M0 -2V22\"/><path class=\"t\" d=\"M-20 4C-14 2 -8 2 -4 4M4 4C8 2 14 2 20 4\"/><path class=\"t\" d=\"M-20 9C-14 7 -8 7 -4 9M4 9C8 7 14 7 20 9\"/><path class=\"t\" d=\"M-20 14C-14 12 -8 12 -4 14M4 14C8 12 14 12 20 14\"/><path class=\"p\" d=\"M0 -24L1.7 -18.7L7 -17L1.7 -15.3L0 -10L-1.7 -15.3L-7 -17L-1.7 -18.7Z\"/><path class=\"t\" d=\"M-10 -22L-13 -26M10 -22L13 -26\"/>","selo-do-significado":"<circle class=\"t\" cx=\"0\" cy=\"0\" r=\"26\"/><path class=\"l\" d=\"M0 -20L20 0L0 20L-20 0Z\"/><path class=\"l\" d=\"M8.42 -20.33L11.1 -26.79\"/><path class=\"l\" d=\"M20.33 -8.42L26.79 -11.1\"/><path class=\"l\" d=\"M20.33 8.42L26.79 11.1\"/><path class=\"l\" d=\"M8.42 20.33L11.1 26.79\"/><path class=\"l\" d=\"M-8.42 20.33L-11.1 26.79\"/><path class=\"l\" d=\"M-20.33 8.42L-26.79 11.1\"/><path class=\"l\" d=\"M-20.33 -8.42L-26.79 -11.1\"/><path class=\"l\" d=\"M-8.42 -20.33L-11.1 -26.79\"/><path class=\"l\" d=\"M-10 0Q0 -9 10 0Q0 9 -10 0Z\"/><circle class=\"p\" cx=\"0\" cy=\"0\" r=\"3\"/>","or-culo-das-imagens":"<path class=\"l\" d=\"M0 -16L13 0L0 16L-13 0Z\"/><path class=\"l\" d=\"M-9 0Q0 -8 9 0Q0 8 -9 0Z\"/><circle class=\"p\" cx=\"0\" cy=\"0\" r=\"2.6\"/><path class=\"d\" d=\"M26 0A26 26 0 1 1 26 -0.05\"/><circle class=\"p\" cx=\"0\" cy=\"-26\" r=\"3.6\"/><path class=\"p\" d=\"M22.52 8.4L26.5 15.3L18.53 15.3Z\"/><path class=\"p\" transform=\"translate(-22.52 13) rotate(-40)\" d=\"M-5 0C-2 -3.2 1 -2.24 5 0C1 2.24 -2 3.2 -5 0Z\"/>"};
+
 /* ===================================================================
    TULPA · ETAPA 33 — Diagrama do Ciclo Elemental
    - SVG desenhado no próprio site (nítido, segue a cor de texto e os
@@ -17483,63 +17557,89 @@ const CY33={
   }
 };
 let cyN33=0;
+/* conceito atual do sub-elemento (o Mestre pode editar na central ⚙️ → Sub-Elementos) */
+function subInfo33(i){
+  const b=(typeof SUBEL_BASE!=='undefined'?SUBEL_BASE:[])[i]||{name:CY33.subs[i].n,desc:CY33.subs[i].d.join(' '),k:''};
+  let desc=b.desc;try{const c=cur29('subel',b.id);if(c&&c.desc)desc=c.desc}catch(e){}
+  return{...b,desc};
+}
+const split33=t=>{t=String(t||'').trim();if(t.length<=24)return[t,''];const m=Math.round(t.length/2);let i=t.lastIndexOf(' ',m);const j=t.indexOf(' ',m);if(i<0||(j>=0&&j-m<m-i))i=j;return i<0?[t,'']:[t.slice(0,i),t.slice(i+1)]};
+/* emblema de sub-elemento (desenho autoral) com gradiente dos dois elementos */
+let embN33=0;
+function subEmblem33(k,size='md',{node=false}={}){
+  const art=(typeof RART34!=='undefined'&&RART34['sub:'+k])||'';
+  const b=(typeof SUBEL_BASE!=='undefined'?SUBEL_BASE:[]).find(x=>x.k===k);if(!b)return'';
+  const ka=(CY33.els.find(e=>e.n===b.a)||{}).k,kb=(CY33.els.find(e=>e.n===b.b)||{}).k,id='sg'+(++embN33);
+  return`<svg class="rsym rs-${size} rs-${k} rs-sub" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="12" y1="12" x2="88" y2="88"><stop offset="0" class="rs-stop-${ka}"/><stop offset="1" class="rs-stop-${kb}"/></linearGradient></defs><circle class="rs-disc" cx="50" cy="50" r="40"/><g class="rs-spin"><circle class="rs-ring" cx="50" cy="50" r="40" style="stroke:url(#${id})"/><circle class="rs-orbit" cx="50" cy="50" r="45.5" style="stroke:url(#${id})"/><g class="rs-art" transform="translate(50 50)" fill="url(#${id})" stroke="url(#${id})">${art}</g></g></svg>`;
+}
+T3.subEmblem=subEmblem33;
 function cycleSvg33(){
-  const mid_='cyArr'+(++cyN33);
-  const W=1400,H=960,cx=700,cy=470,Rp=290,r=70;
-  const LP=[[310,-280],[450,90],[0,360],[-450,90],[-310,-280]];
+  const u='cy'+(++cyN33);
+  const W=1560,H=1040,cx=780,cy=500,Rp=300,r=80,rs=46;
+  const LP=[[300,-310],[460,90],[0,365],[-460,90],[-300,-310]];
   const P=CY33.els.map((e,i)=>{const a=(-90+72*i)*Math.PI/180;return{...e,x:cx+Rp*Math.cos(a),y:cy+Rp*Math.sin(a),a}});
   const f=v=>v.toFixed(1);
-  /* linhas da estrela (pentagrama) */
   let star='';for(let i=0;i<5;i++){const A=P[i],B=P[(i+2)%5];star+=`M${f(A.x)} ${f(A.y)}L${f(B.x)} ${f(B.y)}`}
-  /* arcos entre vizinhos + rótulos dos sub-elementos */
-  let arcs='',pills='';
+  let defs='',arcs='',subs='';
   P.forEach((A,i)=>{const B=P[(i+1)%5],mx=(A.x+B.x)/2,my=(A.y+B.y)/2,ox=mx-cx,oy=my-cy,ol=Math.hypot(ox,oy),ux=ox/ol,uy=oy/ol;
-    const C={x:mx+ux*46,y:my+uy*46};
+    const C={x:mx+ux*50,y:my+uy*50};
     const cut=(p,q,d)=>{const dx=q.x-p.x,dy=q.y-p.y,l=Math.hypot(dx,dy);return{x:p.x+dx/l*d,y:p.y+dy/l*d}};
-    const s=cut(A,C,r+16),e=cut(B,C,r+16);
-    const sub=CY33.subs[i];
-    arcs+=`<path class="cy-arc" data-a="${A.k}" data-b="${B.k}" d="M${f(s.x)} ${f(s.y)}Q${f(C.x)} ${f(C.y)} ${f(e.x)} ${f(e.y)}" marker-start="url(#${mid_})" marker-end="url(#${mid_})"/>`;
+    const s=cut(A,C,r+14),e=cut(B,C,r+20);
+    const sb=subInfo33(i),[c1,c2]=split33(sb.desc);
+    const gid=`${u}g${i}`;
+    defs+=`<linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="-46" y1="-46" x2="46" y2="46"><stop offset="0" class="rs-stop-${A.k}"/><stop offset="1" class="rs-stop-${B.k}"/></linearGradient>`;
+    arcs+=`<path class="cy-arc" data-a="${A.k}" data-b="${B.k}" d="M${f(s.x)} ${f(s.y)}Q${f(C.x)} ${f(C.y)} ${f(e.x)} ${f(e.y)}" marker-end="url(#${u}a)"/>`;
     const mid={x:.25*s.x+.5*C.x+.25*e.x,y:.25*s.y+.5*C.y+.25*e.y};
-    const L={x:cx+LP[i][0],y:cy+LP[i][1]},w=sub.n.length*17+48;
-    pills+=`<g class="cy-sub" data-a="${A.k}" data-b="${B.k}" transform="translate(${f(L.x)} ${f(L.y)})"><title>${esc(sub.n)}: ${esc(A.n)} + ${esc(B.n)}. ${esc(sub.d.join(' '))}</title><rect x="${-w/2}" y="-24" width="${w}" height="48" rx="24"/><text class="cy-pill" y="1">${esc(sub.n.toUpperCase())}</text><text class="cy-desc" y="52">${esc(sub.d[0])}</text><text class="cy-desc" y="82">${esc(sub.d[1])}</text></g>`;
+    const L={x:cx+LP[i][0],y:cy+LP[i][1]},tl=Math.hypot(mid.x-L.x,mid.y-L.y),tx=(mid.x-L.x)/tl,ty=(mid.y-L.y)/tl;
+    const teth=`<path class="cy-teth" d="M${f(tx*(rs+10))} ${f(ty*(rs+10))}L${f(mid.x-L.x-tx*10)} ${f(mid.y-L.y-ty*10)}" style="stroke:url(#${gid})"/>`;
+    /* texto: ao lado (topo), acima (laterais) ou abaixo (base) */
+    let txt;
+    if(i!==2){const side=(i===0||i===1)?1:-1,an=side>0?'start':'end',x=side*(rs+22);
+      txt=`<text class="cy-sn" x="${x}" y="-16" text-anchor="${an}">${esc(sb.name)}</text><text class="cy-sc" x="${x}" y="16" text-anchor="${an}">${esc(c1)}</text>${c2?`<text class="cy-sc" x="${x}" y="44" text-anchor="${an}">${esc(c2)}</text>`:''}`}
+    else if(i===2)txt=`<text class="cy-sn" y="${rs+40}" text-anchor="middle">${esc(sb.name)}</text><text class="cy-sc" y="${rs+72}" text-anchor="middle">${esc(c1)}</text>${c2?`<text class="cy-sc" y="${rs+100}" text-anchor="middle">${esc(c2)}</text>`:''}`;
+    else txt=`<text class="cy-sn" y="${-rs-(c2?96:68)}" text-anchor="middle">${esc(sb.name)}</text><text class="cy-sc" y="${-rs-(c2?64:36)}" text-anchor="middle">${esc(c1)}</text>${c2?`<text class="cy-sc" y="${-rs-36}" text-anchor="middle">${esc(c2)}</text>`:''}`;
+    const art=(typeof RART34!=='undefined'&&RART34['sub:'+sb.k])||'';
+    subs+=`<g class="cy-sub rs-${sb.k}" data-a="${A.k}" data-b="${B.k}" data-subel="${esc(sb.name)}" data-sec="c8.s-${sb.k}" transform="translate(${f(L.x)} ${f(L.y)})" role="button" tabindex="0" aria-label="${esc(sb.name)}, ${esc(A.n)} mais ${esc(B.n)}: ${esc(sb.desc)}">${teth}<circle class="cy-sdisc" r="${rs}" style="fill:url(#${gid})"/><circle class="cy-sring" r="${rs}" style="stroke:url(#${gid})"/><circle class="cy-sorbit" r="${rs+7}" style="stroke:url(#${gid})"/><g class="cy-sic" transform="scale(1.12)" fill="url(#${gid})" stroke="url(#${gid})">${art}</g>${txt}</g>`;
   });
-  /* elementos */
-  const lab=(e)=>{const dx=Math.cos(e.a),dy=Math.sin(e.a);
-    if(e.k==='fe')return`<text class="cy-name" x="0" y="${-r-30}" text-anchor="middle">${esc(e.n.toUpperCase())}</text>`;
-    const right=dx>0;return`<text class="cy-name" x="${right?r+24:-r-24}" y="2" text-anchor="${right?'start':'end'}">${esc(e.n.toUpperCase())}</text>`};
-  const els=P.map(e=>`<g class="cy-el rs-${e.k}" data-el="${esc(e.n)}" data-k="${e.k}" data-sec="${e.sec}" transform="translate(${f(e.x)} ${f(e.y)})" role="button" tabindex="0" aria-label="${esc(e.n)}: ver rituais deste elemento"><circle class="cy-disc" r="${r}"/><circle class="cy-ring" r="${r}"/><g class="cy-ic">${CY33.icon[e.k]}</g>${lab(e)}</g>`).join('');
-  return`<svg class="cy33" viewBox="0 0 ${W} ${H}" role="group" aria-label="Diagrama do Ciclo Elemental: cinco elementos e os sub-elementos que nascem entre eles">
-    <defs><marker id="${mid_}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10L3 5Z" class="cy-head"/></marker></defs>
-    <path class="cy-star" d="${star}"/>${arcs}${pills}${els}</svg>`;
+  const lab=(e)=>{const dx=Math.cos(e.a);
+    if(e.k==='fe')return`<text class="cy-name" x="0" y="${-r-34}" text-anchor="middle">${esc(e.n.toUpperCase())}</text>`;
+    const right=dx>0;return`<text class="cy-name" x="${right?r+26:-r-26}" y="2" text-anchor="${right?'start':'end'}">${esc(e.n.toUpperCase())}</text>`};
+  const els=P.map(e=>`<g class="cy-el rs-${e.k}" data-el="${esc(e.n)}" data-k="${e.k}" data-sec="${e.sec}" transform="translate(${f(e.x)} ${f(e.y)})" role="button" tabindex="0" aria-label="${esc(e.n)}: ver rituais deste elemento"><circle class="cy-disc" r="${r}"/><circle class="cy-ring" r="${r}"/><circle class="cy-hair" r="${r-9}"/><g class="cy-ic" transform="scale(1.12)">${CY33.icon[e.k]}</g>${lab(e)}</g>`).join('');
+  return`<svg class="cy33" viewBox="0 0 ${W} ${H}" role="group" aria-label="Ciclo Elemental: Fé, Natureza, Inexistência, Ilusão e Verdade, em ciclo, com os cinco sub-elementos que nascem entre eles">
+    <defs>${defs}<marker id="${u}a" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10L3 5Z" class="cy-head"/></marker></defs>
+    <path class="cy-star" d="${star}"/>${arcs}${subs}${els}</svg>`;
 }
 function cycle33(where){
-  const leg=CY33.subs.map((s,i)=>{const a=CY33.els[i],b=CY33.els[(i+1)%5];return`<li data-a="${a.k}" data-b="${b.k}"><b>${esc(s.n)}</b> <span class="cy-eq">${esc(a.n)} + ${esc(b.n)}</span> <span class="cy-ld">${esc(s.d.join(' '))}</span></li>`}).join('');
-  return`<figure class="cy33w cy-${where}">${cycleSvg33()}<figcaption><ul class="cy-leg">${leg}</ul><p class="sub cy-hint">${where==='sheet'?'Toque num elemento para ver só os rituais dele.':'Toque num elemento para ir aos rituais dele.'}</p></figcaption></figure>`;
+  const leg=CY33.subs.map((s,i)=>{const a=CY33.els[i],b=CY33.els[(i+1)%5],sb=subInfo33(i);return`<li data-a="${a.k}" data-b="${b.k}">${subEmblem33(sb.k,'sm')}<div><b>${esc(sb.name)}</b> <span class="cy-eq">${esc(a.n)} + ${esc(b.n)}</span><span class="cy-ld">${esc(sb.desc)}</span></div></li>`}).join('');
+  return`<figure class="cy33w cy-${where}">${cycleSvg33()}<figcaption><ul class="cy-leg">${leg}</ul><p class="sub cy-hint">${where==='sheet'?'Toque num elemento ou sub-elemento para ver só os rituais dele.':'Toque num elemento ou sub-elemento para ir aos rituais dele.'}</p></figcaption></figure>`;
 }
 T3.cycle33=cycle33;
-/* celular: sem as etiquetas dos sub-elementos, recorta o desenho para os nomes ficarem maiores */
-const vb33=()=>{const n=matchMedia('(max-width:640px)').matches;$$('svg.cy33').forEach(s=>{const v=n?'40 40 1320 770':'0 0 1400 960';if(s.getAttribute('viewBox')!==v)s.setAttribute('viewBox',v)})};
+/* celular: sem os textos dos sub-elementos (viram lista), recorta o desenho */
+const vb33=()=>{const n=matchMedia('(max-width:640px)').matches;$$('svg.cy33').forEach(s=>{const v=n?'110 50 1340 940':'0 0 1560 1040';if(s.getAttribute('viewBox')!==v)s.setAttribute('viewBox',v)})};
 addEventListener('resize',vb33);new MutationObserver(m=>{if(m.some(x=>x.addedNodes.length))vb33()}).observe(document.body,{childList:true,subtree:true});
 
-/* destaque: elemento ativo acende os dois sub-elementos vizinhos */
-function hi33(fig,k){
-  if(!fig)return;fig.classList.toggle('cy-focus',!!k);
+/* destaque: elemento acende os sub-elementos que nascem dele; sub-elemento acende seus dois pais */
+function hi33(fig,k,sub){
+  if(!fig)return;fig.classList.toggle('cy-focus',!!(k||sub));
+  if(sub){const a=sub.dataset.a,b=sub.dataset.b;
+    fig.querySelectorAll('.cy-el').forEach(g=>g.classList.toggle('on',g.dataset.k===a||g.dataset.k===b));
+    fig.querySelectorAll('.cy-arc,.cy-sub,.cy-leg li').forEach(g=>g.classList.toggle('on',g.dataset.a===a&&g.dataset.b===b));return}
   fig.querySelectorAll('.cy-el').forEach(g=>g.classList.toggle('on',g.dataset.k===k));
   fig.querySelectorAll('.cy-arc,.cy-sub,.cy-leg li').forEach(g=>g.classList.toggle('on',!!k&&(g.dataset.a===k||g.dataset.b===k)));
 }
 const act33=g=>{
   const fig=g.closest('.cy33w');if(!fig)return;
   if(fig.classList.contains('cy-manual')){try{go31(g.dataset.sec)}catch(e){}return}
-  const sel=$('ritualElement');if(!sel)return;
-  const same=sel.value===g.dataset.el;sel.value=same?'':g.dataset.el;sel.dispatchEvent(new Event('change'));
-  fig.dataset.sel=same?'':g.dataset.k;fig.querySelectorAll('.cy-el').forEach(x=>x.classList.toggle('sel',!same&&x===g));
-  if(!same)toast(`Mostrando rituais de ${g.dataset.el}.`);
+  const sel=$('ritualElement');if(!sel)return;const el=g.dataset.el||g.dataset.subel;
+  const same=sel.value===el;sel.value=same?'':el;sel.dispatchEvent(new Event('change'));
+  fig.querySelectorAll('.cy-el,.cy-sub').forEach(x=>x.classList.toggle('sel',!same&&x===g));
+  if(!same)toast(`Mostrando rituais de ${el}.`);
 };
-document.addEventListener('click',e=>{const g=e.target.closest('.cy33 .cy-el');if(g)act33(g)});
-document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const g=e.target.closest?.('.cy33 .cy-el');if(g){e.preventDefault();act33(g)}});
-document.addEventListener('pointerover',e=>{const g=e.target.closest?.('.cy33 .cy-el');const fig=e.target.closest?.('.cy33w');if(fig)hi33(fig,g?g.dataset.k:'')});
-document.addEventListener('focusin',e=>{const g=e.target.closest?.('.cy33 .cy-el');if(g)hi33(g.closest('.cy33w'),g.dataset.k)});
-document.addEventListener('focusout',e=>{const g=e.target.closest?.('.cy33 .cy-el');if(g)hi33(g.closest('.cy33w'),'')});
+document.addEventListener('click',e=>{const g=e.target.closest('.cy33 .cy-el,.cy33 .cy-sub');if(g)act33(g)});
+document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const g=e.target.closest?.('.cy33 .cy-el,.cy33 .cy-sub');if(g){e.preventDefault();act33(g)}});
+document.addEventListener('pointerover',e=>{const fig=e.target.closest?.('.cy33w');if(!fig)return;const g=e.target.closest('.cy33 .cy-el'),sb=e.target.closest('.cy33 .cy-sub');hi33(fig,g?g.dataset.k:'',g?null:sb)});
+document.addEventListener('focusin',e=>{const g=e.target.closest?.('.cy33 .cy-el,.cy33 .cy-sub');if(g)hi33(g.closest('.cy33w'),g.classList.contains('cy-el')?g.dataset.k:'',g.classList.contains('cy-sub')?g:null)});
+document.addEventListener('focusout',e=>{const g=e.target.closest?.('.cy33 .cy-el,.cy33 .cy-sub');if(g)hi33(g.closest('.cy33w'),'')});
 document.addEventListener('pointerout',e=>{const fig=e.target.closest?.('.cy33w');if(fig&&!fig.contains(e.relatedTarget))hi33(fig,'')});
 
 /* Manual: componente vivo no capítulo 8 */
@@ -17557,10 +17657,72 @@ function sheet33(){
   d.innerHTML=`<summary><span class="cy-sumic" aria-hidden="true">⟡</span> Ciclo Elemental <span class="sub">os cinco elementos e seus sub-elementos</span></summary>${cycle33('sheet')}`;
   d.addEventListener('toggle',()=>{try{localStorage.setItem('tulpa_cy_open',d.open?'1':'0')}catch(e){}});
   grid.before(d);
-  const sel=$('ritualElement');if(sel)sel.addEventListener('change',()=>{const fig=d.querySelector('.cy33w');const k=(CY33.els.find(x=>x.n===sel.value)||{}).k||'';fig.querySelectorAll('.cy-el').forEach(x=>x.classList.toggle('sel',x.dataset.k===k))});
+  const sel=$('ritualElement');if(sel)sel.addEventListener('change',()=>{const fig=d.querySelector('.cy33w');const k=(CY33.els.find(x=>x.n===sel.value)||{}).k||'';fig.querySelectorAll('.cy-el,.cy-sub').forEach(x=>x.classList.toggle('sel',(x.dataset.el||x.dataset.subel)===sel.value&&!!sel.value))});
 }
 setTimeout(sheet33,500);setInterval(()=>{try{sheet33()}catch(e){}},2500);
 console.info('[Tulpa] Etapa 33 carregada (Ciclo Elemental)');
+
+/* ===================================================================
+   TULPA · ETAPA 34 — Sub-Elementos oficiais e rituais inéditos
+   - SUBEL_BASE (t3.js): Sol, Desrealização, Pofenia, Confabulação e
+     Metáfora, cada um nascido de dois elementos vizinhos do Ciclo.
+   - 15 rituais novos no RITUAL_FULL (3 por sub-elemento), com
+     automação de cura/estados quando faz sentido.
+   - RART34 (t34s.js): sigilos autorais em SVG; o gradiente mistura as
+     cores dos dois elementos de origem.
+   - Manual Vivo: uma seção por sub-elemento (emblema, origem, conceito
+     editável e rituais), no capítulo 8.
+   =================================================================== */
+const SUBK34={};(typeof SUBEL_BASE!=='undefined'?SUBEL_BASE:[]).forEach(b=>{SUBK34[b.name]=b;EL32[b.name]=b.k});
+const ELK34={'Fé':'fe','Natureza':'nat','Inexistência':'inx','Ilusão':'ilu','Verdade':'ver'};
+function subOf34(x){
+  const b=typeof x==='string'?(SUBK34[x]||(typeof SUBEL_BASE!=='undefined'?SUBEL_BASE.find(s=>s.k===x||s.id===x):null)):x;if(!b)return null;
+  let desc=b.desc;try{const c=cur29('subel',b.id);if(c&&c.desc)desc=c.desc}catch(e){}
+  return{...b,desc};
+}
+T3.subOf=subOf34;
+
+/* ---------- sigilo de ritual de sub-elemento ---------- */
+let rsN34=0;
+function artSym34(r,size,cls){
+  const b=SUBK34[r.element];const art=RART34[r.id]||RART34[slug32(r.name)];if(!art||!b)return null;
+  const id='ra'+(++rsN34);
+  return`<svg class="rsym rs-${size} rs-${b.k} rs-sub ${cls||''}" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="18" y1="18" x2="82" y2="82"><stop offset="0" class="rs-stop-${ELK34[b.a]}"/><stop offset="1" class="rs-stop-${ELK34[b.b]}"/></linearGradient></defs><circle class="rs-disc" cx="50" cy="50" r="40"/><g class="rs-spin"><circle class="rs-ring" cx="50" cy="50" r="40" style="stroke:url(#${id})"/><circle class="rs-hair" cx="50" cy="50" r="34.6" style="stroke:url(#${id})"/><g class="rs-art" transform="translate(50 50)" fill="url(#${id})" stroke="url(#${id})">${art}</g></g></svg>`;
+}
+{const _rs=ritSym32;ritSym32=function(x,size='md',o={}){
+  const r=ritOf32(x);
+  if(r&&!r.sym&&SUBK34[r.element]){const a=artSym34(r,size,o.cls);if(a)return a}
+  return _rs.apply(this,arguments)};
+ T3.ritSym=(...a)=>ritSym32(...a);window.tulpaRitSym=T3.ritSym}
+
+/* ---------- Manual Vivo: seção de cada sub-elemento ---------- */
+LIVE31.subhead=function(b){
+  const s=subOf34(b.k);if(!s)return'';
+  const gm=gm31()?`<button type="button" class="gm29-b" data-sub34="${esc(s.id)}" title="Editar conceito" aria-label="Editar conceito de ${esc(s.name)}">✏️</button>`:'';
+  const n=RITUALS.filter(r=>r.element===s.name).length;
+  return`<div class="sub34-head rs-host">${T3.subEmblem(s.k,'xl')}<div><p class="sub34-eq"><span class="sub34-chip rs-${ELK34[s.a]}">${esc(s.a)}</span> + <span class="sub34-chip rs-${ELK34[s.b]}">${esc(s.b)}</span></p><p class="sub34-desc">${esc(s.desc)} ${gm}</p><p class="sub">${n} ritua${n===1?'l':'is'} de ${esc(s.name)}</p></div></div>`;
+};
+{const c8=MAN31.find(c=>c.id==='c8');
+ if(c8){const at=c8.secs.findIndex(s=>s.id==='c8.7');
+   const add=(typeof SUBEL_BASE!=='undefined'?SUBEL_BASE:[]).map((s,i)=>({id:'c8.s-'+s.k,h:`8.${7+i} ${s.name} (${s.a} + ${s.b})`,b:[{live:'subhead',k:s.k},{live:'ritual',el:s.name}]}));
+   if(!c8.secs.some(s=>s.id==='c8.s-sol'))c8.secs.splice(at>=0?at:c8.secs.length,0,...add);
+   const auto=c8.secs.find(s=>s.id==='c8.7');if(auto)auto.h='8.12 Rituais de outros elementos';}}
+document.addEventListener('click',e=>{const b=e.target.closest('#m31content [data-sub34]');if(!b||!gm31())return;try{T3.open29?T3.open29('subel',b.dataset.sub34):open29('subel',b.dataset.sub34)}catch(err){}});
+/* Manual: elemento do diagrama → seção; sub-elemento → seção própria (go31 já trata data-sec) */
+
+/* ---------- ficha: origem do sub-elemento no cartão ---------- */
+function deco34(){
+  $$('#ritualCatalog .ritual-card .pill').forEach(p=>{
+    if(p.dataset.s34)return;const s=SUBK34[p.textContent.trim()];p.dataset.s34='1';if(!s)return;
+    p.classList.add('sub34-pill','rs-'+s.k);p.title=`${s.name}: ${s.a} + ${s.b}`;
+    p.insertAdjacentHTML('beforeend',` <small>${esc(s.a)} + ${esc(s.b)}</small>`);
+  });
+}
+new MutationObserver(m=>{if(m.some(x=>x.addedNodes.length))requestAnimationFrame(()=>{try{deco34()}catch(e){}})}).observe(document.body,{childList:true,subtree:true});
+
+/* compatibilidade: rituais personalizados antigos marcados como "Apofenia" */
+setTimeout(()=>{try{RITUALS.forEach(r=>{if(r.element==='Apofenia')r.element='Pofenia'});(window.data?.customRituals||[]).forEach(r=>{if(r.element==='Apofenia')r.element='Pofenia'})}catch(e){}},800);
+console.info('[Tulpa] Etapa 34 carregada (Sub-Elementos e rituais inéditos)');
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
