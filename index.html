@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="21/11 14:13">
+<meta name="tulpa-build" content="21/11 14:38">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -777,7 +777,7 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
  async function insertCloudCharacter(c,ownerId,ownerLabel,opts={}){
    const button=$id('newCharacter');if(button)button.disabled=true;
    try{
-     const initial=blank();if(opts.boss)initial.hideStats=true;
+     const initial={...blank(),...(opts.data||{})};if(opts.boss)initial.hideStats=true;
      const {data:row,error}=await sb.from('characters').insert({
        campaign_id:c.id,owner_id:ownerId,owner_label:ownerLabel,
        public_data:publicSummary(initial),in_scene:!opts.hidden
@@ -889,6 +889,7 @@ const priorRender=render;render=function(){priorRender();if($('roundPanel'))rend
  };
  openCampaign=cloudOpenCampaign;
  createCharacter=createCloudCharacter;
+ window.tulpaInsertChar=(ownerLabel,opts)=>{const c=currentCampaign();if(!c||!uid())return Promise.resolve();return insertCloudCharacter(c,uid(),ownerLabel||'Mestre',opts||{})};
  loadCharacter=function(id){
    const ch=currentCampaign()?.characters.find(x=>x.id===id);
    if(!ch){say('Personagem não encontrado nesta campanha.');return false}
@@ -3363,6 +3364,26 @@ body{--h-fe:#d39a26;--h-nat:#3f9a5c;--h-inx:#8270cc;--h-ilu:#c4579c;--h-ver:#3b9
 .wm35 input{margin-top:3px;flex:none}.wm35:has(input:checked){border-color:var(--accent,currentColor);background:color-mix(in srgb,var(--accent,#888) 10%,transparent)}
 .wm35-tag{font-weight:600}
 
+/* Etapa 36 · bestiário, IA e encontro */
+.beast36 .m31-meta{display:flex;flex-wrap:wrap;gap:4px 14px}
+.beast36.boss{border-width:2px;border-color:color-mix(in srgb,var(--red,#c0392b) 55%,var(--line,#888))}
+.beast36-el{color:color-mix(in srgb,var(--rs-hue,#888) 60%,var(--text,currentColor));border-color:currentColor}
+.beast36-ai{margin:6px 0;font-size:.92rem}
+.beast36-ab,.beast36-ph{margin:6px 0 6px 18px;padding:0}.beast36-ab li,.beast36-ph li{margin:3px 0}
+.beast36-ph{border-left:3px solid color-mix(in srgb,var(--red,#c0392b) 60%,transparent);padding-left:10px;list-style:none;margin-left:0}
+.beast36-t{margin:16px 0 6px;font-size:1rem}
+.beast36-gm{margin-top:8px}
+.enc36{border:1px dashed var(--line,rgba(128,128,128,.5));border-radius:12px;padding:10px 14px;margin:6px 0 14px}
+.enc36 h4{margin:0 0 4px}.enc36-list{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.enc36-it{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;border:1px solid var(--line,rgba(128,128,128,.4))}
+.enc36-r{margin:6px 0}.enc36-r.easy b{color:#2f7a48}.enc36-r.ok b{color:#2b6f9e}.enc36-r.hard b{color:#b8740f}.enc36-r.deadly b{color:#c0392b}
+.adv36{position:fixed;left:16px;bottom:16px;z-index:90;max-width:min(360px,calc(100vw - 32px));background:var(--panel,#fff);color:var(--text,#222);border:1px solid var(--line,rgba(128,128,128,.4));border-radius:14px;padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.adv36-h{display:flex;align-items:center;gap:8px}.adv36-h b{flex:1;min-width:0}
+.adv36-chip{font-size:.75rem;padding:2px 8px;border-radius:999px;border:1px solid currentColor;color:color-mix(in srgb,var(--rs-hue,#888) 60%,var(--text,currentColor))}
+.adv36-x{background:none;border:0;color:inherit;cursor:pointer;font-size:1rem}
+.adv36-p{margin:6px 0}.adv36-b{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (max-width:640px){.adv36{left:8px;right:8px;bottom:76px;max-width:none}}
+
 </style>
 <script id="tulpa-etapa3">
 (()=>{
@@ -3510,6 +3531,16 @@ const TRAUMA_DEFS=[
 {id:'ceticismo',name:'Ceticismo',grp:'Fora de combate',text:'−1 dado em Intuição e Investigação.',skillDice:{'Intuição':-1,'Investigação':-1}},
 {id:'sombras',name:'Sombras',grp:'Fora de combate',text:'−1 dado em testes de Percepção.',attrDice:{'Percepção':-1}}
 ];
+/* Onda 3 · traumas novos */
+TRAUMA_DEFS.push(
+{id:'despersonalizacao',name:'Despersonalização',grp:'Fora de combate',text:'Você se vê de fora, como num filme: −1 dado em Empatia e Intuição.',skillDice:{'Empatia':-1,'Intuição':-1}},
+{id:'hipervigilancia',name:'Hipervigilância',grp:'Combate',text:'+1 dado em Reflexo, mas −1 dado em Furtividade e nunca descansa totalmente.',skillDice:{'Reflexo':1,'Furtividade':-1},flags:['semDescansoTotal']},
+{id:'pareidolia',name:'Pareidolia Crônica',grp:'Fora de combate',text:'Vê rostos e sinais em tudo: −1 dado em Investigação e Observação.',skillDice:{'Investigação':-1,'Observação':-1}},
+{id:'mutismo',name:'Mutismo Seletivo',grp:'Fora de combate',text:'A voz some sob pressão: −1 em testes sociais.',socialDice:-1},
+{id:'claustrofobia',name:'Claustrofobia',grp:'Combate',text:'Lugares fechados apertam o peito: −1 dado em testes físicos (o Mestre pode suspender em espaços abertos).',physDice:-1},
+{id:'fequebrada',name:'Fé Quebrada',grp:'Fora de combate',text:'Algo que você acreditava morreu: −1 dado em Teosofia e Resistência mental contra medo.',skillDice:{'Teosofia':-1}},
+{id:'amnesialacunar',name:'Amnésia Lacunar',grp:'Fora de combate',text:'Horas inteiras somem da memória: −1 dado em Pesquisa e Intuição.',skillDice:{'Pesquisa':-1,'Intuição':-1}}
+);
 const TRAUMA_BY_ID=Object.fromEntries(TRAUMA_DEFS.map(t=>[t.id,t]));
 
 /* Êxtase */
@@ -3638,6 +3669,30 @@ const SUBEL_BASE=[
 {id:'sub-pofenia',k:'pof',name:'Pofenia',a:'Inexistência',b:'Ilusão',desc:'Padrões falsos e realidades alternativas.'},
 {id:'sub-confabulacao',k:'cnf',name:'Confabulação',a:'Ilusão',b:'Verdade',desc:'Memórias falsas que parecem reais.'},
 {id:'sub-metafora',k:'met',name:'Metáfora',a:'Verdade',b:'Fé',desc:'Revelações expressas simbolicamente.'}];
+/* Onda 3 · Bestiário oficial. ai: agressivo | cacador | covarde | protetor | conjurador | emboscador | chefe */
+const BEAST_BASE=[
+{id:'bb-capanga',name:'Capanga Urbano',tier:'Capanga',el:'',vital:12,def:11,atk:'+2',dano:'1d6',skills:'Briga +5, Intimidação +5',ai:'covarde',notes:'Trabalha por dinheiro, não por fé. Foge quando a coisa aperta.',abil:[{n:'Chamar reforço',d:'Uma vez por cena, grita e traz mais 1 Capanga em 2 rodadas.'}]},
+{id:'bb-matilha',name:'Matilha de Sombras',tier:'Capanga',el:'Inexistência',vital:8,def:12,atk:'+2',dano:'1d4',skills:'Furtividade +5',ai:'agressivo',notes:'Sempre em grupos de 3 a 6. Somem na luz forte.',abil:[{n:'Cercar',d:'+1 dado no ataque para cada outra sombra adjacente ao alvo.'}]},
+{id:'bb-cao',name:'Cão de Fumaça',tier:'Inimigo',el:'Inexistência',vital:18,def:13,atk:'+3',dano:'1d8',skills:'Furtividade +10, Rastreamento +5',ai:'emboscador',notes:'Ataca quem está distraído e desaparece antes do revide.',abil:[{n:'Mordida que some',d:'No acerto, o alvo fica Desrealizado até o fim do próximo turno dele.',st:'desrealizado'}]},
+{id:'bb-espantalho',name:'Espantalho de Raízes',tier:'Inimigo',el:'Natureza',vital:24,def:12,atk:'+3',dano:'1d6',skills:'Atletismo +5, Resistência +5',ai:'agressivo',notes:'Parado, parece só um espantalho. Até alguém passar perto.',abil:[{n:'Agarrão de raiz',d:'No crítico, o alvo fica Agarrado (Atletismo DT 14).',st:'agarrado'}]},
+{id:'bb-eco',name:'Eco Faminto',tier:'Inimigo',el:'Ilusão',vital:16,def:14,atk:'+2',dano:'1d6',skills:'Enganação +10',ai:'cacador',notes:'Imita a voz de pessoas amadas para atrair quem está sozinho.',abil:[{n:'Voz copiada',d:'Ação: imita um aliado; quem ouvir faz Intuição (DT 13) ou fica Confuso por 1 rodada.',st:'confuso'}]},
+{id:'bb-atirador',name:'Atirador Mercenário',tier:'Inimigo',el:'',vital:22,def:13,atk:'+4',dano:'1d10',skills:'Armas de Disparo +10, Tática +5',ai:'cacador',notes:'Procura o alvo mais ferido e não perde munição à toa.',abil:[{n:'Mira estável',d:'Se não se mover no turno, o crítico acontece com 18–20.'}]},
+{id:'bb-mancha',name:'Mancha Pareidólica',tier:'Inimigo',el:'Pofenia',vital:20,def:12,atk:'+3',dano:'1d6',skills:'Teosofia +5',ai:'conjurador',notes:'Uma mancha de umidade que forma rostos. Cresce quando é notada.',abil:[{n:'Rosto na parede',d:'A cada 2 rodadas: quem estiver a até 9 m faz Resistência (DT 13) ou fica Amedrontado.',st:'amedrontado'}]},
+{id:'bb-juiz',name:'Juiz de Cera',tier:'Elite',el:'Verdade',vital:34,def:14,atk:'+4',dano:'1d10',skills:'Intimidação +10, Intuição +10',ai:'conjurador',notes:'Derrete quando alguém diz uma verdade dolorosa na frente dele.',abil:[{n:'Sentença',d:'A cada 2 rodadas: até 3 alvos fazem Resistência (DT 14) ou ficam Expostos.',st:'exposto'},{n:'Lacre',d:'No crítico, o alvo fica Silenciado por 1 rodada.',st:'silenciado'}]},
+{id:'bb-freira',name:'Freira de Vidro',tier:'Elite',el:'Fé',vital:30,def:15,atk:'+4',dano:'1d8',skills:'Teosofia +10, Medicina +5',ai:'protetor',notes:'Protege os outros monstros como se fossem seus fiéis.',abil:[{n:'Bênção profana',d:'A cada 2 rodadas: cura 2d6 VT de um aliado dela e fica Abençoada.',st:'abencoado'}]},
+{id:'bb-cervo',name:'Cervo Solar',tier:'Elite',el:'Sol',vital:38,def:14,atk:'+5',dano:'2d6',skills:'Atletismo +10',ai:'agressivo',notes:'Belo demais para ser olhado por muito tempo.',abil:[{n:'Investida radiante',d:'Avança até 9 m e ataca: no acerto o alvo fica Ofuscado; no crítico, também Caído.',st:'ofuscado'}]},
+{id:'bb-colecionador',name:'Colecionador de Lembranças',tier:'Elite',el:'Confabulação',vital:32,def:13,atk:'+4',dano:'1d8',skills:'Enganação +10, Persuasão +5',ai:'cacador',notes:'Guarda memórias roubadas em potes de vidro.',abil:[{n:'Roubar memória',d:'No acerto, o alvo fica Fragmentado e o Colecionador recupera 1d6 VT.',st:'fragmentado'}]},
+{id:'bb-arquiteto',name:'Arquiteto do Avesso',tier:'Elite',el:'Desrealização',vital:36,def:15,atk:'+4',dano:'1d10',skills:'Ciências +10, Furtividade +5',ai:'emboscador',notes:'Redesenha corredores enquanto o grupo anda por eles.',abil:[{n:'Chão que some',d:'A cada 2 rodadas: área de 3 m, Reflexo (DT 14) ou Caído.',st:'caido'}]},
+{id:'bb-profeta',name:'Profeta Sem Boca',tier:'Elite',el:'Metáfora',vital:30,def:13,atk:'+3',dano:'1d8',skills:'Teosofia +10, Arte +5',ai:'conjurador',notes:'Conta histórias desenhando no ar. Todas terminam mal para quem ouve.',abil:[{n:'Fábula',d:'A cada 2 rodadas: um alvo faz Resistência (DT 14) ou fica Vaticinado.',st:'vaticinado'}]},
+{id:'bb-tulpa',name:'Tulpa Rebelde',tier:'Elite',el:'Ilusão',vital:40,def:14,atk:'+5',dano:'1d10',skills:'Intimidação +10, Briga +5',ai:'agressivo',notes:'Criada por alguém do grupo, ou de alguém que o grupo conhece.',abil:[{n:'Forma do medo',d:'No crítico, o alvo fica Apavorado.',st:'apavorado'}]},
+{id:'bb-inquilino',name:'O Inquilino',tier:'Entidade',el:'Inexistência',vital:60,def:15,atk:'+5',dano:'1d12',skills:'Furtividade +15, Intimidação +10',ai:'emboscador',notes:'Mora nos cômodos que a casa não deveria ter. Só aparece para quem está sozinho.',abil:[{n:'Mudança de cômodo',d:'A cada 2 rodadas: some e reaparece atrás do alvo mais isolado; o próximo ataque dele tem +1 dado.'},{n:'Toque do inquilino',d:'No acerto, o alvo fica Desrealizado.',st:'desrealizado'}]},
+{id:'bb-mariposas',name:'A Mãe das Mariposas',tier:'Chefe',el:'Ilusão',vital:90,def:16,atk:'+6',dano:'2d8',skills:'Teosofia +15, Enganação +10',ai:'chefe',notes:'Uma silhueta feita de milhares de asas. Odeia luz artificial.',abil:[{n:'Pó das asas',d:'A cada 2 rodadas: quem estiver a até 6 m faz Resistência (DT 15) ou fica Ofuscado.',st:'ofuscado'}],
+ phases:[{at:66,name:'Revoada',text:'As mariposas se espalham: todos a até 6 m ficam Ofuscados e ela fica Velada.',st:'velado'},{at:33,name:'Casulo',text:'Ela se fecha num casulo: fica Enraizada e recupera 3d8 VT no início do próximo turno.',st:'enraizado'}]},
+{id:'bb-relojoeiro',name:'O Relojoeiro Invertido',tier:'Chefe',el:'Confabulação',vital:110,def:17,atk:'+6',dano:'2d10',skills:'Tecnologia +15, Tática +10',ai:'chefe',notes:'Cada tique do seu peito apaga um segundo da vida de alguém.',abil:[{n:'Segundo roubado',d:'Uma vez por rodada, em reação: um inimigo dele repete a última rolagem.'}],
+ phases:[{at:66,name:'Hora Errada',text:'Os ponteiros giram ao contrário: ele fica Eufórico e age duas vezes por rodada.',st:'euforico'},{at:33,name:'Meia-noite',text:'O relógio para: ele entra em Frenesi e todos os relógios da cena quebram.',st:'frenesi'}]},
+{id:'bb-santo',name:'Santo Sem Nome',tier:'Chefe',el:'Fé',vital:120,def:16,atk:'+7',dano:'2d8',skills:'Teosofia +15, Liderança +10',ai:'chefe',notes:'Foi adorado por uma cidade inteira que esqueceu o nome dele.',abil:[{n:'Milagre invertido',d:'A cada 2 rodadas: um aliado do grupo perde o estado positivo mais forte que tiver.'}],
+ phases:[{at:66,name:'Auréola Negra',text:'Uma luz escura o envolve: ele fica Abençoado e cura 2d10 VT.',st:'abencoado'},{at:33,name:'Martírio',text:'Ele sangra luz: entra em Frenesi e cada golpe dele causa +1d6.',st:'frenesi'}]}
+];
 /* Rituais completos: [nome, elemento, execução, alcance, alvo, duração, base, avançada, próspera, auto] */
 const RITUAL_FULL=[
 ['Conversa Silvestre','Natureza','simples','pessoal ou toque em objeto natural','pessoal ou único','cena','Sintoniza a mente com a flora e a fauna: comunica-se de forma rudimentar com plantas (sinais, terreno, água, presença de criaturas) e animais simples até porte médio, recebendo sugestões e avisos de perigo.','Entende emoções básicas de criaturas vegetais ou animais; uma vez por cena pede ajuda a um animal ou convence uma planta consciente a ceder passagem ou criar pequena barreira. Requer punhado de terra ou folha fresca.','Afeta até 2 aliados com a conexão; sintonia grupal com a rede viva em até 15 m, obtendo mapas naturais (caminhos, água) e influenciando pequenos animais ou plantas (guiar raízes rasas, suporte temporário). Requer oferenda vegetal e breve meditação.',null],
@@ -8050,7 +8105,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='21/11 14:13';
+const BUILD8='21/11 14:38';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -9526,7 +9581,16 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'🌊 Expansão · Onda 2: trilhas, itens e aprimoramentos',w:'a',open:1,b:`<ul>
+  {t:'🌊 Expansão · Onda 3: bestiário, IA, chefes e sinergias',w:'a',open:1,b:`<ul>
+    <li><b>Bestiário oficial com 18 criaturas</b>, de Capangas a Chefes, com elemento, habilidades e um <b>comportamento de IA</b>: Agressivo, Caçador, Covarde, Protetor, Conjurador, Emboscador ou Chefe. Está no 📖 Manual e na ⚙️ central, e o Mestre pode editar.</li>
+    <li><b>Conselho do turno</b> (só o Mestre vê): no turno de um inimigo do bestiário, aparece o alvo sugerido e o motivo, e um toque ataca. A decisão final continua sendo do Mestre.</li>
+    <li><b>Chefes com fases</b>: A Mãe das Mariposas, O Relojoeiro Invertido e o Santo Sem Nome mudam de fase sozinhos ao cair para 66% e 33% do Vital, com aviso para a mesa.</li>
+    <li><b>Mestre</b>: botão ➕ Criar NPC em cada criatura (a ficha já vem com Vital, Defesa, ataque e efeitos) e uma <b>calculadora de encontro</b> que diz se a luta vai ser Fácil, Equilibrada, Difícil ou Mortal para o grupo.</li>
+    <li><b>10 sinergias de estados</b>: combinações como Iluminado + Exposto (Revelado) ou Ofuscado + Iluminado (Cegueira Branca) somam efeitos extras sozinhas.</li>
+    <li><b>7 traumas novos</b>, como Despersonalização, Hipervigilância, Pareidolia Crônica e Claustrofobia.</li>
+    <li>As tabelas de Aprimoramentos, Ferramentas e Artefatos e Consumíveis agora são <b>editáveis pelo Mestre</b> no Manual, e as mudanças valem no jogo.</li>
+  </ul>`},
+  {t:'🌊 Expansão · Onda 2: trilhas, itens e aprimoramentos',w:'a',b:`<ul>
     <li><b>6 trilhas novas de Despertar</b>: Corpo Votivo e Caçador do Véu (Lutador), Arquivista do Impossível e Engenheiro de Ruído (Gênio), Liturgista do Sol e Cartógrafo do Nada (Ritualista). Os poderes aplicam bônus, estados, curas e dano sozinhos.</li>
     <li><b>15 armas novas</b>, incluindo arremessáveis táticos (bomba de fumaça, flashbang, água benta, coquetel de ácido, boleadeira), e <b>5 proteções novas</b>.</li>
     <li><b>Ferramentas e artefatos</b> que valem enquanto estão nas mãos, na cintura ou no bolso. Alguns artefatos são amaldiçoados e cobram um preço.</li>
@@ -16168,7 +16232,8 @@ function list29(sec){
     Object.entries(R.trauma).forEach(([k,o])=>{if(o&&o.add)rows.push({key:k,name:o.name||k,sub:(o.grp||'')+' · '+String(o.text||'').slice(0,80),st:st(o,false)})});
     return rows;
   }
-  if(sec==='beast')return(R.beast||[]).map(b=>({key:b.id,name:b.name,sub:`${b.tier||'Inimigo'} · VT ${b.vital||'—'} · Defesa ${b.def||'—'} · ${b.dano||'—'}`,st:'new'}));
+  if(sec==='beast'){const L=R.beast||[],row=(b,st)=>({key:b.id,name:b.name,sub:`${b.tier||'Inimigo'} · VT ${b.vital||'—'} · Defesa ${b.def||'—'} · ${b.dano||'—'}`,st});
+    return(typeof BEAST_BASE!=='undefined'?BEAST_BASE:[]).map(b=>{const o=L.find(x=>x.id===b.id);return row(o||b,o?'edit':'orig')}).concat(L.filter(x=>!String(x.id).startsWith('bb-')).map(b=>row(b,'new')))}
   if(sec==='subel'){const L=R.subel||[];
     const off=(typeof SUBEL_BASE!=='undefined'?SUBEL_BASE:[]).map(b=>{const o=L.find(x=>x.id===b.id);return{key:b.id,name:b.name,sub:`${b.a} + ${b.b} · `+String(o?.desc??b.desc).slice(0,80),st:o?'edit':'orig'}});
     return off.concat(L.filter(x=>!String(x.id).startsWith('sub-')).map(b=>({key:b.id,name:b.name,sub:(b.element||'')+' · '+String(b.desc||'').slice(0,80),st:'new'})))}
@@ -16183,7 +16248,7 @@ function cur29(sec,key){
   if(sec==='item'){const [kind,n]=String(key).split('|'),arr=kind==='weapon'?B.weapon:kind==='prot'?B.prot:B.gear,b=arr.find(x=>x.name===n),o=R.item[key]||{};const x=b?cl29(b):itemNew29(kind,{name:n,...o});if(b)itemSet29(kind,x,o);x.kind=kind;return x}
   if(sec==='status'){const b=B.status.find(x=>x.id===key),o=R.status[key]||{};const t=cl29(b||{id:key,name:'',group:'manual',narr:'',text:''});statusSet29(t,o);return t}
   if(sec==='trauma'){const b=B.trauma.find(x=>x.id===key),o=R.trauma[key]||{};const t=cl29(b||{id:key,name:'',grp:'Mente',text:''});['name','text','grp'].forEach(k=>{if(o[k]!=null)t[k]=o[k]});return t}
-  if(sec==='beast')return cl29((R.beast||[]).find(x=>x.id===key)||{id:key,name:'',tier:'Inimigo',vital:20,def:12,atk:'+3',dano:'1d6',skills:'',notes:''});
+  if(sec==='beast'){const b=(typeof BEAST_BASE!=='undefined'?BEAST_BASE:[]).find(x=>x.id===key),o=(R.beast||[]).find(x=>x.id===key);return cl29(o?{...(b||{}),...o}:b||{id:key,name:'',tier:'Inimigo',el:'',vital:20,def:12,atk:'+3',dano:'1d6',skills:'',notes:'',ai:'agressivo'})}
   if(sec==='subel'){const b=String(key).startsWith('sub-')&&typeof SUBEL_BASE!=='undefined'?SUBEL_BASE.find(x=>x.id===key):null,o=(R.subel||[]).find(x=>x.id===key);
     if(b)return cl29({...b,element:`${b.a} + ${b.b}`,off:1,...(o?{desc:o.desc}:{})});
     return cl29(o||{id:key,name:'',element:'Natureza',desc:''})}
@@ -16264,7 +16329,7 @@ function edit29(sec,key){
     f=fI29('e29n','Nome',s.name)+fT29('e29d','Regra (o que aparece na ficha)',s.text,2)+fT29('e29nr','Narração',s.narr,2)+`<div class="sys29-3">${fI29('e29dot','Dano por turno (PV)',s.dot?.fixed??0,'number','min="0" max="50"')}${fI29('e29def','Defesa (− penalidade)',s.defense??0,'number','min="-20" max="20"')}${fI29('e29ph','Dados em testes físicos',s.physDice??0,'number','min="-5" max="5"')}</div>`
      +fC29('e29mv','Não pode se mover',(s.flags||[]).includes('semMover'))+fC29('e29atk','Desvantagem em ataques',(s.disadv||[]).includes('ataque'))+fC29('e29act','Perde a próxima ação',(s.flags||[]).includes('perdeAcao'))}
   if(sec==='trauma'){const t=c||{name:'',grp:'Mente',text:''};f=fI29('e29n','Nome',t.name)+fI29('e29g','Grupo',t.grp)+fT29('e29d','Efeito',t.text)}
-  if(sec==='beast'){const b=c||cur29('beast',null);f=fI29('e29n','Nome',b.name)+fS29('e29tier','Tipo',b.tier||'Inimigo',['Inimigo','Elite','Chefe','Entidade'])+`<div class="sys29-3">${fI29('e29vt','Vitalidade',b.vital,'number','min="1" max="999"')}${fI29('e29def','Defesa',b.def,'number','min="0" max="40"')}${fI29('e29atk','Ataque (bônus)',b.atk)}</div>`+fI29('e29dano','Dano',b.dano)+fT29('e29sk','Perícias e poderes',b.skills,2)+fT29('e29nt','Notas e comportamento',b.notes,3)}
+  if(sec==='beast'){const b=c||cur29('beast',null);f=fI29('e29n','Nome',b.name)+fS29('e29tier','Tipo',b.tier||'Inimigo',['Capanga','Inimigo','Elite','Chefe','Entidade'])+`<div class="sys29-3">${fS29('e29bel','Elemento',b.el||'',['','Natureza','Inexistência','Ilusão','Verdade','Fé','Sol','Desrealização','Pofenia','Confabulação','Metáfora'])}${fS29('e29ai','Comportamento (IA)',b.ai||'agressivo',['agressivo','cacador','covarde','protetor','conjurador','emboscador','chefe'])}</div>`+`<div class="sys29-3">${fI29('e29vt','Vitalidade',b.vital,'number','min="1" max="999"')}${fI29('e29def','Defesa',b.def,'number','min="0" max="40"')}${fI29('e29atk','Ataque (bônus)',b.atk)}</div>`+fI29('e29dano','Dano',b.dano)+fT29('e29sk','Perícias e poderes',b.skills,2)+fT29('e29nt','Notas e comportamento',b.notes,3)}
   if(sec==='subel'){const s=c||cur29('subel',null);
     if(s.off)f=`<p class="sub">Sub-elemento oficial do Ciclo Elemental: <b>${esc(s.name)}</b> nasce de <b>${esc(s.a)} + ${esc(s.b)}</b>. O nome fica fixo porque os rituais dependem dele; o conceito aparece no diagrama, no Manual e na ficha.</p><input type="hidden" id="e29n" value="${esc(s.name)}">`+fT29('e29d','Conceito',s.desc,2);
     else f=fI29('e29n','Nome do sub-elemento',s.name)+fS29('e29el','Elemento de origem',s.element,elems29())+fT29('e29d','Descrição e efeitos',s.desc)}
@@ -16333,7 +16398,7 @@ async function submit29(sec,key,c){
     if(at&&!/^[+-]?\d+$/.test(at)){toast('Ataque inválido. Use um número, como +3.');return false}}
   if(sec==='beast'||sec==='subel'){
     const arr=R[sec];k=isNew?'gm-'+rid().slice(0,8):key;const off29=sec==='subel'&&c&&c.off;
-    o=sec==='beast'?{id:k,name,tier:gv29('e29tier'),vital:Number(gv29('e29vt'))||1,def:Number(gv29('e29def'))||0,atk:gv29('e29atk'),dano:gv29('e29dano'),skills:gv29('e29sk'),notes:gv29('e29nt')}:off29?{id:k,name:c.name,element:c.element,desc:gv29('e29d').trim()||c.desc,off:1}:{id:k,name,element:gv29('e29el'),desc:gv29('e29d')};
+    o=sec==='beast'?{...(c&&String(k).startsWith('bb-')?cl29(c):{}),id:k,name,tier:gv29('e29tier'),el:gv29('e29bel')||'',ai:gv29('e29ai')||'agressivo',vital:Number(gv29('e29vt'))||1,def:Number(gv29('e29def'))||0,atk:gv29('e29atk'),dano:gv29('e29dano'),skills:gv29('e29sk'),notes:gv29('e29nt')}:off29?{id:k,name:c.name,element:c.element,desc:gv29('e29d').trim()||c.desc,off:1}:{id:k,name,element:gv29('e29el'),desc:gv29('e29d')};
     const i=arr.findIndex(x=>x.id===k);changes=diff29(c,o,sec==='beast'?[['name','Nome'],['vital','Vitalidade'],['def','Defesa'],['atk','Ataque'],['dano','Dano']]:[['name','Nome'],['element','Elemento'],['desc','Descrição']]);
     if(i>=0)arr[i]=o;else arr.push(o);
   }
@@ -16344,6 +16409,7 @@ async function submit29(sec,key,c){
 }
 async function del29(sec,key){
   const R=rules29(),row=list29(sec).find(r=>r.key===key);if(!row)return;
+  if(sec==='beast'&&String(key).startsWith('bb-')){if(!(R.beast||[]).some(x=>x.id===key)){toast('Criatura do bestiário oficial: dá para editar, mas não excluir.');return}if(!confirm(`Voltar “${row.name}” ao bestiário oficial?`))return;R.beast=R.beast.filter(x=>x.id!==key);await saveRules29({kind:sec,key,label:row.name,changes:[['Criatura','editada','oficial']]});paint29();return}
   if(sec==='subel'&&String(key).startsWith('sub-')){if(!(R.subel||[]).some(x=>x.id===key)){toast('Sub-elemento oficial: dá para editar o conceito, mas não excluir.');return}if(!confirm(`Voltar o conceito de “${row.name}” ao texto oficial?`))return;R.subel=R.subel.filter(x=>x.id!==key);await saveRules29({kind:sec,key,label:row.name,changes:[['Conceito','editado','oficial']]});paint29();return}
   if(!confirm(`Excluir “${row.name}” de ${KIND29[sec]}? ${isNative29(sec,key)?'É conteúdo do manual: dá para restaurar depois.':'Não dá para desfazer.'}`))return;
   if(sec==='beast'||sec==='subel')R[sec]=R[sec].filter(x=>x.id!==key);
@@ -17429,7 +17495,7 @@ function gridEd31(g){
   const body=g.rows.map((r,i)=>`<tr data-gi="${i}">${g.cols.map(c=>{const v=r[c.k]==null?'':r[c.k];
     const inp=c.t==='ro'?`<b>${esc(v)}</b>`:c.t==='sel'?`<select data-gk="${esc(c.k)}" aria-label="${esc(c.l||'')}">${c.o().map(o=>`<option${o===v?' selected':''}>${esc(o)}</option>`).join('')}</select>`:c.t==='num'?`<input type="number" step="1" data-gk="${esc(c.k)}" value="${esc(v)}" aria-label="${esc(c.l||'')}">`:`<textarea rows="${Math.max(1,Math.min(5,Math.ceil(String(v).length/(g.free?28:34))))}" data-gk="${esc(c.k)}" aria-label="${esc(c.l||'Célula')}">${esc(v)}</textarea>`;
     return`<td>${inp}</td>`}).join('')}<td class="m31-gdel">${g.canDel?`<button type="button" class="gm29-b" data-g="del:${i}" title="Remover linha" aria-label="Remover linha ${i+1}">🗑️</button>`:''}</td></tr>`).join('');
-  const hint={skills:'Edite o atributo de cada perícia, adicione novas ou remova. Perícias removidas deixam de aparecer nas fichas.',tiers:'Quantas perícias cada estágio pode ter em +5, Mestre (+10) e Maestria (+15). A coluna da direita sobe uma perícia direto para +10.',stages:'Valores máximos de Vital, Lucidez e Essência por estágio. Os máximos mudam na hora nas fichas e na mesa.',extase:'Os campos de "+dados" e "+fixo" aplicam o bônus automaticamente nos testes. Deixe vazios para bônus só narrativos.'}[g.kind]||'Edite as células, adicione ou remova linhas e colunas. Use {{move}} para o deslocamento da mesa.';
+  const hint=g.hint||{skills:'Edite o atributo de cada perícia, adicione novas ou remova. Perícias removidas deixam de aparecer nas fichas.',tiers:'Quantas perícias cada estágio pode ter em +5, Mestre (+10) e Maestria (+15). A coluna da direita sobe uma perícia direto para +10.',stages:'Valores máximos de Vital, Lucidez e Essência por estágio. Os máximos mudam na hora nas fichas e na mesa.',extase:'Os campos de "+dados" e "+fixo" aplicam o bônus automaticamente nos testes. Deixe vazios para bônus só narrativos.'}[g.kind]||'Edite as células, adicione ou remova linhas e colunas. Use {{move}} para o deslocamento da mesa.';
   return`<div class="m31-gridwrap"><p class="sub m31-ghint">${esc(hint)}</p><div class="m31-tw"><table class="m31-tb m31-grid"><thead><tr>${th}<th class="m31-gdel"></th></tr></thead><tbody>${body}</tbody></table></div>
     <div class="m31-edbar m31-gbar">${g.canAdd?'<button type="button" class="btn small" data-g="add">＋ Linha</button>':''}${g.canCols?'<button type="button" class="btn small" data-g="addc">＋ Coluna</button>':''}<button type="button" class="btn small primary" data-g="save">Salvar tabela</button><button type="button" class="btn small" data-g="cancel">Cancelar</button><button type="button" class="btn small" data-g="reset" title="Volta ao padrão do Manual Oficial">↺ Restaurar original</button></div>
     ${g.err?`<p class="m31-err" role="alert">${esc(g.err)}</p>`:''}</div>`;
@@ -18007,6 +18073,260 @@ LIVE31.consum=()=>tb31(['Consumível','Efeito ao usar'],Object.entries(USE35).ma
    {id:'c9.cs2',h:`9.${n+3} Consumíveis Médicos e Psicológicos`,b:[['c9.cs2.p','Consumíveis têm o botão **Usar** no inventário. Cada uso gasta 1 unidade, aplica o efeito na ficha e avisa a mesa.'],{live:'consum'}]}
   )}}
 console.info('[Tulpa] Etapa 35 carregada (Onda 2: itens vivos e aprimoramentos)');
+
+/* ===================================================================
+   TULPA · ETAPA 36 — Expansão Onda 3: bestiário, IA, fases, sinergias
+   - BEAST_BASE (t3.js): 18 criaturas oficiais, editáveis na central.
+   - Perfis de IA: no turno de um inimigo do bestiário, o Mestre vê o
+     "Conselho do turno" com o alvo sugerido e o motivo; um toque ataca.
+   - Chefes com fases: ao cruzar 66% e 33% do Vital, a fase dispara
+     sozinha (estado no chefe + aviso na mesa).
+   - Criar NPC a partir do modelo e calculadora de encontro (Mestre).
+   - Sinergias: pares de estados no mesmo alvo somam efeitos extras.
+   =================================================================== */
+const AIP36={
+  agressivo:{n:'Agressivo',d:'Ataca quem tem a Defesa mais baixa.'},
+  cacador:{n:'Caçador',d:'Persegue o alvo mais ferido (menor % de Vital).'},
+  covarde:{n:'Covarde',d:'Ataca o mais fácil, mas foge quando cai abaixo de 1/3 do Vital.'},
+  protetor:{n:'Protetor',d:'Mira a maior ameaça do grupo (maior Estágio) para proteger os aliados dele.'},
+  conjurador:{n:'Conjurador',d:'Usa a habilidade especial a cada 2 rodadas; nas outras, ataca quem tem mais Essência.'},
+  emboscador:{n:'Emboscador',d:'Prioriza alvos Caídos, Atordoados ou Agarrados; evita quem está Em Alerta.'},
+  chefe:{n:'Chefe',d:'Alterna entre a maior ameaça e o mais ferido; muda de fase em 66% e 33% do Vital.'}
+};
+const TIERPTS36={Capanga:1,Inimigo:2,Elite:4,Entidade:7,Chefe:10};
+const TIERSTG36={Capanga:2,Inimigo:4,Elite:6,Entidade:8,Chefe:9};
+const ELK36={'Fé':'fe','Natureza':'nat','Inexistência':'inx','Ilusão':'ilu','Verdade':'ver','Sol':'sol','Desrealização':'dsr','Pofenia':'pof','Confabulação':'cnf','Metáfora':'met'};
+function beasts36(){
+  let R=[];try{R=rules29().beast||[]}catch(e){}
+  return BEAST_BASE.map(b=>{const o=R.find(x=>x.id===b.id);return o?{...b,...o,_ed:1}:{...b}}).concat(R.filter(x=>!String(x.id).startsWith('bb-')).map(x=>({...x,_new:1})));
+}
+T3.beasts=beasts36;
+
+/* ---------- ficha de NPC a partir do modelo ---------- */
+function npcData36(b){
+  const stage=TIERSTG36[b.tier]||4,mx=(STAGES[stage]||STAGES[1]).vt,vt=Math.max(1,Number(b.vital)||mx);
+  const atk=parseInt(String(b.atk||'0').replace('+',''))||0,a=Math.max(1,Math.min(5,1+Math.ceil(atk/2)));
+  const ranged=/Armas de Disparo/.test(b.skills||'')||/Atirador/i.test(b.name||'');
+  const fx=[];(b.abil||[]).forEach(x=>{if(!x.st)return;if(/no acerto/i.test(x.d))fx.push({status:x.st,when:'hit'});else if(/no cr[ií]tico/i.test(x.d))fx.push({status:x.st,when:'crit'})});
+  const attrs=Object.fromEntries(ATTRS.map(k=>[k,1]));Object.assign(attrs,{'Força':a,'Destreza':a,'Constituição':Math.min(5,1+Math.ceil(vt/30)),'Percepção':Math.max(1,a-1),'Presença':b.tier==='Chefe'?4:2});
+  const rid36=()=>Math.random().toString(36).slice(2,10);
+  return{name:b.name,stage,vital:Math.min(mx,vt),vitalTemp:Math.max(0,vt-mx),beastId:b.id,beastMax:vt,attributes:attrs,essence:(STAGES[stage]||STAGES[1]).es,lucidity:(STAGES[stage]||STAGES[1]).luc,
+    hideStats:b.tier!=='Capanga',statuses:[],activeEffects:[],phaseDone:[],
+    notes:[`${b.tier}${b.el?' de '+b.el:''} · IA: ${(AIP36[b.ai]||AIP36.agressivo).n}`,b.skills?`Perícias: ${b.skills}`:'',...(b.abil||[]).map(x=>`${x.n}: ${x.d}`),...(b.phases||[]).map(p=>`Fase (${p.at}%) ${p.name}: ${p.text}`),b.notes||''].filter(Boolean).join('\n'),
+    inventory:{mochila:false,bandoleira:false,items:[
+      {id:'it-'+rid36(),kind:'weapon',name:'Ataque: '+b.name,peso:'Bolso',loc:'maos',w:{name:'Ataque: '+b.name,cat:ranged?'Distância':'Corpo a corpo',peso:'Bolso',dado:b.dano||'1d6',critMin:/18–20/.test(JSON.stringify(b.abil||[]))?18:20,skill:ranged?'Armas de Disparo':'Briga',area:false,effects:fx,note:'ataque da criatura'}},
+      {id:'it-'+rid36(),kind:'prot',name:'Couraça natural',peso:'Bolso',loc:'vestido',prof:true,p:{name:'Couraça natural',cat:'Natural',peso:'Bolso',def:Math.max(0,(Number(b.def)||10)-10),slot:'roupa'}}]}};
+}
+T3.npcData=npcData36;
+async function makeNpc36(id,n=1){
+  if(!isGM6()){toast('Só o Mestre cria NPCs.');return}
+  const b=beasts36().find(x=>x.id===id);if(!b)return;
+  if(typeof window.tulpaInsertChar!=='function'){toast('Entre numa campanha na nuvem para criar NPCs.');return}
+  for(let i=0;i<n;i++){const d=npcData36(b);if(n>1)d.name=`${b.name} ${i+1}`;await window.tulpaInsertChar('Mestre',{hidden:true,boss:b.tier!=='Capanga',data:d})}
+  toast(`${n>1?n+'× ':''}${b.name} criado${n>1?'s':''} (invisível até você ligar o 👁).`);
+}
+T3.makeNpc=makeNpc36;
+
+/* ---------- conselho do turno (IA) ---------- */
+const stIds36=d=>(d?.statuses||[]).map(s=>s.id);
+function foesOf36(){
+  const cm=camp3()?.combat;if(!cm?.active)return[];
+  return(cm.order||[]).map(o=>charById(o.characterId)).filter(ch=>ch&&!gmChar6(ch)&&!isDeadCh(ch)&&!isDyingCh(ch));
+}
+function advise36(ch){
+  const d=dOf6(ch);const b=beasts36().find(x=>x.id===d.beastId);if(!b)return null;
+  const ai=b.ai||'agressivo',P=AIP36[ai]||AIP36.agressivo,round=Number(camp3()?.combat?.round)||1;
+  const T=foesOf36().map(c=>{const x=dOf6(c),mx=(STAGES[x.stage]||STAGES[1]).vt;return{c,n:nm(c),def:Number(x.defense)||10,pct:(Number(x.vital)||0)/mx,stage:Number(x.stage)||1,es:Number(x.essence)||0,st:stIds36(x)}});
+  if(!T.length)return{b,P,text:'Nenhum alvo de pé.',tgt:null};
+  const by=(f,dir=1)=>T.slice().sort((p,q)=>dir*(f(p)-f(q)))[0];
+  let tgt,why,act='atacar';
+  const myMx=Number(d.beastMax)||(STAGES[d.stage]||STAGES[1]).vt,myPct=((Number(d.vital)||0)+(Number(d.vitalTemp)||0))/myMx;
+  const timed=(b.abil||[]).find(x=>/a cada 2 rodadas/i.test(x.d));
+  if(ai==='covarde'&&myPct<1/3){act='fugir';why='Vital abaixo de 1/3: tenta fugir ou se render.'}
+  else if(ai==='cacador'){tgt=by(t=>t.pct);why=`mais ferido (${Math.round(tgt.pct*100)}% do Vital)`}
+  else if(ai==='protetor'){tgt=by(t=>t.stage,-1);why=`maior ameaça (Estágio ${tgt.stage})`}
+  else if(ai==='conjurador'&&timed&&round%2===0){act='habilidade';tgt=by(t=>t.def);why=`rodada par: usa ${timed.n}`}
+  else if(ai==='conjurador'){tgt=by(t=>t.es,-1);why=`quem mais usa Essência (${tgt.es} ES)`}
+  else if(ai==='emboscador'){const down=T.filter(t=>t.st.some(s=>['caido','atordoado','agarrado','paralisado','sonolento'].includes(s)));const pool=down.length?down:T.filter(t=>!t.st.includes('alerta'));tgt=(pool.length?pool:T).slice().sort((p,q)=>p.def-q.def)[0];why=down.length?'alvo indefeso':'quem não está Em Alerta'}
+  else if(ai==='chefe'){tgt=round%2?by(t=>t.stage,-1):by(t=>t.pct);why=round%2?`maior ameaça (Estágio ${tgt.stage})`:`mais ferido (${Math.round(tgt.pct*100)}%)`;if(timed&&round%2===0)act='habilidade'}
+  else{tgt=by(t=>t.def);why=`Defesa mais baixa (${tgt.def})`}
+  const text=act==='fugir'?why:act==='habilidade'?`Usar ${timed.n} em ${tgt?.n||'todos'}: ${timed.d}`:`Atacar ${tgt.n}: ${why}.`;
+  return{b,P,text,tgt,act};
+}
+T3.advise=advise36;
+let advHide36='';
+function advTick36(){
+  let box=$('adv36');
+  const e=(()=>{try{return curEntry()}catch(err){return null}})(),ch=e&&charById(e.characterId),d=ch&&dOf6(ch);
+  const key=e?`${camp3()?.combat?.round}|${e.characterId}`:'';
+  if(!isGM6()||!d?.beastId||advHide36===key){box?.remove();return}
+  const a=advise36(ch);if(!a){box?.remove();return}
+  if(!box){box=document.createElement('aside');box.id='adv36';box.className='adv36';box.setAttribute('aria-live','polite');document.body.append(box)}
+  const sig=key+a.text;if(box.dataset.sig===sig)return;box.dataset.sig=sig;
+  const k=ELK36[a.b.el]||'';
+  box.innerHTML=`<div class="adv36-h"><span class="adv36-chip ${k?'rs-'+k:''}">${esc(a.b.tier)}${a.b.el?' · '+esc(a.b.el):''}</span><b>🧠 Turno de ${esc(nm(ch))}</b><button type="button" class="adv36-x" aria-label="Fechar conselho">✕</button></div>
+    <p class="adv36-p"><span class="sub">IA ${esc(a.P.n)}:</span> ${esc(a.text)}</p>
+    <div class="adv36-b">${a.act!=='fugir'?'<button type="button" class="btn small primary" data-adv36="atk">⚔ Atacar</button>':''}<span class="sub">${esc(a.P.d)}</span></div>`;
+  box.querySelector('.adv36-x').onclick=()=>{advHide36=key;box.remove()};
+  const at=box.querySelector('[data-adv36="atk"]');if(at)at.onclick=()=>{try{startAttack(ch)}catch(err){console.warn('[T36] atacar',err)}};
+}
+setInterval(()=>{try{advTick36()}catch(e){}},1200);
+
+/* ---------- fases de chefe ---------- */
+const phaseBusy36={};
+function phaseTick36(){
+  if(!isGM6())return;const cm=camp3()?.combat;if(!cm?.active)return;
+  (cm.order||[]).forEach(o=>{const ch=charById(o.characterId);const d=ch&&dOf6(ch);if(!d?.beastId||phaseBusy36[ch.id])return;
+    const b=beasts36().find(x=>x.id===d.beastId);if(!b?.phases?.length)return;
+    const mx=Number(d.beastMax)||1,pct=((Number(d.vital)||0)+(Number(d.vitalTemp)||0))/mx*100,done=d.phaseDone||[];
+    const i=b.phases.findIndex((p,k)=>pct<=p.at&&!done.includes(k)&&pct>0);if(i<0)return;
+    const p=b.phases[i];phaseBusy36[ch.id]=1;
+    try{mutateChar(ch,x=>{x.phaseDone=[...(x.phaseDone||[]),i];if(p.st){x.statuses=x.statuses||[];if(!x.statuses.some(s=>s.id===p.st))x.statuses.push({id:p.st,at:Date.now()})}})}catch(e){console.warn('[T36] fase',e)}
+    toast(`⚠ ${nm(ch)} · ${p.name}: ${p.text}`);
+    try{insertRow(ch,'Fase do chefe',{detail:{cmb:'log',text:`⚠ ${nm(ch)} entra na fase ${p.name}: ${p.text}`}}).catch(()=>{})}catch(e){}
+    setTimeout(()=>{delete phaseBusy36[ch.id]},2500);
+  });
+}
+setInterval(()=>{try{phaseTick36()}catch(e){}},1500);
+T3.phaseTick=phaseTick36;
+
+/* ---------- sinergias de estados ---------- */
+const SYN36=[
+  ['iluminado','exposto','Revelado','Não há onde se esconder: −2 na Defesa a mais.',{defense:-2}],
+  ['abencoado','inspirado','Graça','+1 na Defesa e +1 dado em Resistência a mais.',{defense:1,skillDice:{'Resistência':1}}],
+  ['sonolento','desrealizado','Sonho Lúcido','O corpo não responde: sem reações e −1 dado em Reflexo.',{flags:['semReacao'],skillDice:{'Reflexo':-1}}],
+  ['amedrontado','vaticinado','Profecia Cumprida','A queda parece certa: −1 dado em todos os testes.',{allDice:-1}],
+  ['enraizado','corroido','Raiz Podre','As raízes apodrecem: −3 na Defesa (anula o bônus do Enraizado).',{defense:-3}],
+  ['ofuscado','iluminado','Cegueira Branca','Desvantagem em todos os ataques.',{disadv:['ataque']}],
+  ['velado','desrealizado','Fantasma','+1 dado em Furtividade e Esquiva a mais.',{skillDice:{'Furtividade':1,'Esquiva':1}}],
+  ['fragmentado','ecoado','Colapso Narrativo','−1 em testes sociais e −1 dado em Teosofia.',{socialDice:-1,skillDice:{'Teosofia':-1}}],
+  ['queimando','envenenado','Febre Tóxica','−1 dado em testes físicos.',{physDice:-1}],
+  ['marcado','exposto','Alvo Pintado','−1 na Defesa a mais.',{defense:-1}]
+];
+{const _cm=E.computeMods;E.computeMods=function(d){
+  const m=_cm.apply(this,arguments);
+  try{const ids=new Set(stIds36(d));SYN36.forEach(([a,b,n,,fx])=>{if(ids.has(a)&&ids.has(b))E.addSrc(m,fx,'Sinergia: '+n)})}catch(e){}
+  return m}}
+T3.SYN36=SYN36;
+
+/* ---------- calculadora de encontro ---------- */
+const ENC36={};
+function party36(){try{return chars3().filter(c=>!gmChar6(c)).map(c=>Number(dOf6(c)?.stage)||1)}catch(e){return[]}}
+function encHtml36(){
+  const L=beasts36(),pick=Object.entries(ENC36).filter(([,n])=>n>0),P=party36();
+  const threat=pick.reduce((a,[id,n])=>a+(TIERPTS36[(L.find(b=>b.id===id)||{}).tier]||2)*n,0);
+  const power=P.reduce((a,s)=>a+1+s/2,0)||1,r=threat/power;
+  const lab=!pick.length?'—':r<.5?'Fácil':r<.9?'Equilibrado':r<1.4?'Difícil':'Mortal';
+  const cls=!pick.length?'':r<.5?'easy':r<.9?'ok':r<1.4?'hard':'deadly';
+  return`<div class="enc36" id="enc36"><h4>🧮 Calculadora de encontro <span class="sub">(só o Mestre vê)</span></h4>
+   <p class="sub">Grupo: ${P.length} personage${P.length===1?'m':'ns'}${P.length?` · estágios ${P.join(', ')}`:''}. Use ＋ nos cartões para montar o encontro.</p>
+   <div class="enc36-list">${pick.map(([id,n])=>{const b=L.find(x=>x.id===id);return b?`<span class="enc36-it">${n}× ${esc(b.name)} <button type="button" class="gm29-b" data-enc36="-${esc(id)}" aria-label="Remover um ${esc(b.name)}">−</button></span>`:''}).join('')||'<span class="sub">Nenhuma criatura escolhida.</span>'}</div>
+   <p class="enc36-r ${cls}">Dificuldade: <b>${lab}</b>${pick.length?` <span class="sub">(ameaça ${threat} contra força ${power.toFixed(1)})</span>`:''}</p>
+   ${pick.length?'<div class="m31-edbar"><button type="button" class="btn small primary" data-enc36="make">Criar os NPCs deste encontro</button><button type="button" class="btn small" data-enc36="clear">Limpar</button></div>':''}</div>`;
+}
+
+/* ---------- Manual: bestiário rico ---------- */
+LIVE31.beast=function(){
+  const L=beasts36(),gm=gm31();
+  const card=b=>{const k=ELK36[b.el]||'',P=AIP36[b.ai]||AIP36.agressivo;
+    return`<article class="m31-card m31-row beast36 ${b.tier==='Chefe'?'boss':''}" data-key="${esc(b.id)}"><header><h4>${esc(b.name)}</h4><span class="m31-chip">${esc(b.tier||'Inimigo')}</span>${b.el?`<span class="m31-chip beast36-el rs-${k}">${esc(b.el)}</span>`:''}${b._ed?'<span class="m31-st edit">editado</span>':b._new?'<span class="m31-st new">da campanha</span>':''}${gm?gmBtns29('beast',b.id,b.name):''}</header>
+    <p class="m31-meta"><span><i>Vital:</i> ${esc(String(b.vital??'—'))}</span><span><i>Defesa:</i> ${esc(String(b.def??'—'))}</span><span><i>Ataque:</i> ${esc(String(b.atk||'—'))}</span><span><i>Dano:</i> ${esc(b.dano||'—')}</span></p>
+    ${b.skills?`<p class="sub">${esc(b.skills)}</p>`:''}
+    <p class="beast36-ai"><b>🧠 ${esc(P.n)}</b> · ${esc(P.d)}</p>
+    ${(b.abil||[]).length?`<ul class="beast36-ab">${b.abil.map(x=>`<li><b>${esc(x.n)}:</b> ${link31(esc(x.d))}</li>`).join('')}</ul>`:''}
+    ${(b.phases||[]).length?`<ol class="beast36-ph">${b.phases.map(p=>`<li><b>${p.at}% · ${esc(p.name)}:</b> ${link31(esc(p.text))}</li>`).join('')}</ol>`:''}
+    ${b.notes?`<p class="m31-desc">${esc(b.notes)}</p>`:''}
+    ${gm?`<div class="m31-edbar beast36-gm"><button type="button" class="btn small" data-npc36="${esc(b.id)}">➕ Criar NPC</button><button type="button" class="btn small" data-enc36="+${esc(b.id)}">＋ Encontro</button></div>`:''}</article>`};
+  const tiers=['Capanga','Inimigo','Elite','Entidade','Chefe'];
+  return`${gm?encHtml36():''}<h4 class="m31-sub">Bestiário (${L.length} criaturas)</h4>${gm?gmAdd29('beast','Criatura'):''}${tiers.map(t=>{const g=L.filter(b=>(b.tier||'Inimigo')===t);return g.length?`<h5 class="beast36-t">${t==='Chefe'?'Chefes':t==='Capanga'?'Capangas':t==='Elite'?'Elites':t==='Entidade'?'Entidades':'Inimigos'}</h5><div class="m31-cards">${g.map(card).join('')}</div>`:''}).join('')}`;
+};
+LIVE31.aiprof=()=>tb31(['Comportamento','O que a IA sugere no turno'],Object.values(AIP36).map(p=>tr31([`<b>${esc(p.n)}</b>`,esc(p.d)])));
+LIVE31.syn=()=>tb31(['Estados juntos','Sinergia','Efeito extra'],SYN36.map(([a,b,n,t])=>tr31([`${link31(esc(STATUS_BY_ID[a]?.name||a))} + ${link31(esc(STATUS_BY_ID[b]?.name||b))}`,`<b>${esc(n)}</b>`,esc(t)])));
+{const all=MAN31.flatMap(c=>c.secs.map(s=>({c,s})));
+ const bs=all.find(x=>(x.s.b||[]).some(b=>b&&b.live==='beast'));
+ if(bs&&!bs.s.b.some(b=>b&&b.live==='aiprof')){const i=bs.s.b.findIndex(b=>b&&b.live==='beast');bs.s.b.splice(i,0,['beast36.p','Cada criatura tem um **comportamento de IA**. No turno dela, o Mestre vê o *Conselho do turno* com o alvo sugerido e o motivo, e ataca com um toque. A decisão final é sempre do Mestre. Chefes mudam de fase sozinhos ao cair para 66% e 33% do Vital.'],{live:'aiprof'})}
+ const c10=MAN31.find(c=>c.id==='c10');
+ if(c10&&!c10.secs.some(s=>s.id==='c10.syn')){const n=c10.secs.length;c10.secs.push({id:'c10.syn',h:`10.${n+1} Sinergias de Estados`,b:[['c10.syn.p','Quando dois estados combinam no mesmo alvo, surge uma **sinergia** com efeito extra. Ela entra sozinha no cálculo dos dados e da Defesa e aparece como "Sinergia" no detalhamento da rolagem. Basta um dos estados acabar para a sinergia sumir.'],{live:'syn'}]})}}
+
+/* ---------- cliques do Mestre ---------- */
+document.addEventListener('click',async e=>{
+  const n=e.target.closest('[data-npc36]');if(n){e.preventDefault();makeNpc36(n.dataset.npc36);return}
+  const c=e.target.closest('[data-enc36]');if(!c)return;e.preventDefault();const v=c.dataset.enc36;
+  if(v==='clear')Object.keys(ENC36).forEach(k=>delete ENC36[k]);
+  else if(v==='make'){for(const [id,q] of Object.entries(ENC36))if(q>0)await makeNpc36(id,q);Object.keys(ENC36).forEach(k=>delete ENC36[k])}
+  else{const id=v.slice(1);ENC36[id]=Math.max(0,(ENC36[id]||0)+(v[0]==='+'?1:-1));if(!ENC36[id])delete ENC36[id];if(v[0]==='+')toast('Adicionado ao encontro.')}
+  const box=$('enc36');if(box)box.outerHTML=encHtml36();
+});
+console.info('[Tulpa] Etapa 36 carregada (Onda 3: bestiário, IA, fases e sinergias)');
+
+/* ===================================================================
+   TULPA · ETAPA 37 — Catálogos da Onda 2 editáveis no Manual
+   Aprimoramentos de armas (textos), Ferramentas/Artefatos (efeitos reais)
+   e Consumíveis (efeitos reais) ganham "✏️ Editar tabela". As mudanças
+   ficam no Manual da campanha (tbl.wmods/itemfx/consum) e são aplicadas
+   nos catálogos do motor para todos, em tempo real.
+   =================================================================== */
+const DEF37={
+  itemfx:JSON.parse(JSON.stringify(ITEMFX35)),
+  consum:JSON.parse(JSON.stringify(USE35)),
+  wmods:WMOD35.map(m=>({id:m.id,name:m.name,txt:m.txt,req:m.req}))
+};
+const TIPO37=['Ferramenta','Artefato','Artefato amaldiçoado'];
+const stName37=id=>STATUS_BY_ID[id]?.name||id;
+const stId37=n=>{const k=nrm32(n);const s=STATUS_DEFS.find(x=>nrm32(x.name)===k||x.id===k);return s?s.id:null};
+const fxRow37=(n,f)=>({n,tipo:f.art?(f.curse?TIPO37[2]:TIPO37[1]):TIPO37[0],dice:fmtSk31(f.fx?.skillDice),def:String(f.fx?.defense||0),dmg:String(f.fx?.dmg||0),soc:String(f.fx?.socialDice||0),txt:f.txt});
+const useRow37=(n,u)=>({n,heal:u.heal||'',luc:u.luc||'',rem:(u.rem||[]).map(stName37).join(', '),add:(u.add||[]).map(stName37).join(', '),txt:u.txt});
+
+function applyCat37(){
+  const T=tbl31();
+  Object.keys(ITEMFX35).forEach(k=>delete ITEMFX35[k]);
+  if(T.itemfx&&T.itemfx.length)T.itemfx.forEach(r=>{const fx={};if(r.dice&&Object.keys(r.dice).length)fx.skillDice=r.dice;if(+r.def)fx.defense=+r.def;if(+r.dmg)fx.dmg=+r.dmg;if(+r.soc)fx.socialDice=+r.soc;ITEMFX35[r.n]={fx,txt:r.txt,art:r.tipo!==TIPO37[0]?1:0,curse:r.tipo===TIPO37[2]?1:0}});
+  else Object.entries(DEF37.itemfx).forEach(([k,v])=>{ITEMFX35[k]=JSON.parse(JSON.stringify(v))});
+  Object.keys(USE35).forEach(k=>delete USE35[k]);
+  if(T.consum&&T.consum.length)T.consum.forEach(r=>{const u={txt:r.txt};if(r.heal)u.heal=r.heal;if(r.luc)u.luc=r.luc;if(r.rem?.length)u.rem=r.rem;if(r.add?.length)u.add=r.add;USE35[r.n]=u});
+  else Object.entries(DEF37.consum).forEach(([k,v])=>{USE35[k]=JSON.parse(JSON.stringify(v))});
+  WMOD35.forEach(m=>{const d=DEF37.wmods.find(x=>x.id===m.id),o=(T.wmods||[]).find(x=>x.id===m.id)||d;m.name=o.name;m.txt=o.txt;m.req=o.req});
+}
+{const _a=applyTbl31;applyTbl31=function(){const r=_a.apply(this,arguments);try{applyCat37()}catch(e){console.warn('[T37] catálogos',e)}return r}}
+
+const KINDS37={
+  itemfx:{label:'Ferramentas e artefatos',hint:'Os efeitos valem enquanto o item está nas mãos, na cintura ou no bolso. "Dados" usa o formato Perícia +N (ex.: Observação +1, Empatia −1). O nome precisa ser igual ao do item no inventário.',canAdd:1,canDel:1,
+    cols:[{k:'n',l:'Item',t:'text'},{k:'tipo',l:'Tipo',t:'sel',o:()=>TIPO37},{k:'dice',l:'Dados (Perícia +N)',t:'text'},{k:'def',l:'Defesa',t:'num'},{k:'dmg',l:'Dano',t:'num'},{k:'soc',l:'Testes sociais',t:'num'},{k:'txt',l:'Descrição',t:'text'}],
+    rows:()=>Object.entries(ITEMFX35).map(([n,f])=>fxRow37(n,f))},
+  consum:{label:'Consumíveis',hint:'Cura e Lucidez aceitam dados (ex.: 2d6, 1d4+1). Em "Remove" e "Adiciona", escreva nomes de estados separados por vírgula.',canAdd:1,canDel:1,
+    cols:[{k:'n',l:'Consumível',t:'text'},{k:'heal',l:'Cura (VT)',t:'text'},{k:'luc',l:'Lucidez',t:'text'},{k:'rem',l:'Remove estados',t:'text'},{k:'add',l:'Adiciona estados',t:'text'},{k:'txt',l:'Descrição',t:'text'}],
+    rows:()=>Object.entries(USE35).map(([n,u])=>useRow37(n,u))},
+  wmods:{label:'Aprimoramentos de armas',hint:'Edite o nome, o texto e o teste/material. O efeito mecânico de cada aprimoramento é fixo.',
+    cols:[{k:'name',l:'Aprimoramento',t:'text'},{k:'txt',l:'Efeito',t:'text'},{k:'req',l:'Teste e material',t:'text'}],
+    rows:()=>WMOD35.map(m=>({id:m.id,name:m.name,txt:m.txt,req:m.req}))}
+};
+{const _o=open31g;open31g=function(kind){
+  const K=KINDS37[kind];if(!K)return _o.apply(this,arguments);
+  M31.tg={kind,cols:K.cols,rows:K.rows(),canAdd:K.canAdd,canDel:K.canDel,hint:K.hint};paint31(true);
+  setTimeout(()=>{$q('#m31content .m31-grid')?.scrollIntoView({block:'center'})},30)}}
+{const _s=save31g;save31g=async function(){
+  const g=M31.tg;if(!g||!KINDS37[g.kind])return _s.apply(this,arguments);
+  if(!isGM6())return;const T=ensTbl31(),fail=m=>{g.err=m;paint31(true)},seen=new Set();let out=[];
+  for(const r of g.rows){
+    if(g.kind==='wmods'){const nm=String(r.name||'').trim();if(!nm)return fail('Todo aprimoramento precisa de nome.');out.push({id:r.id,name:nm.slice(0,40),txt:String(r.txt||'').trim().slice(0,200),req:String(r.req||'').trim().slice(0,120)});continue}
+    const n=String(r.n||'').trim();if(!n)return fail('Toda linha precisa de nome.');if(seen.has(nrm32(n)))return fail(`Nome repetido: ${n}`);seen.add(nrm32(n));
+    const txt=String(r.txt||'').trim();if(!txt)return fail(`${n}: escreva a descrição.`);
+    if(g.kind==='itemfx'){const d=parseSk31(r.dice,BASE_SKILLS);if(d.err)return fail(`${n}: ${d.err}.`);
+      for(const k of ['def','dmg','soc'])if(!int31(r[k]===''?'0':r[k],-10,10))return fail(`${n}: Defesa, Dano e Testes sociais vão de −10 a 10.`);
+      out.push({n,tipo:TIPO37.includes(r.tipo)?r.tipo:TIPO37[0],dice:d.v,def:+r.def||0,dmg:+r.dmg||0,soc:+r.soc||0,txt:txt.slice(0,200)})}
+    else{const dice=v=>!v||/^\d+d\d+([+-]\d+)?$|^\d+$/i.test(String(v).trim());if(!dice(r.heal)||!dice(r.luc))return fail(`${n}: Cura e Lucidez usam dados como 2d6 ou 1d4+1.`);
+      const list=v=>String(v||'').split(/[,;]/).map(x=>x.trim()).filter(Boolean);const rem=[],add=[];
+      for(const x of list(r.rem)){const id=stId37(x);if(!id)return fail(`${n}: estado "${x}" não existe.`);rem.push(id)}
+      for(const x of list(r.add)){const id=stId37(x);if(!id)return fail(`${n}: estado "${x}" não existe.`);add.push(id)}
+      out.push({n,heal:String(r.heal||'').trim(),luc:String(r.luc||'').trim(),rem,add,txt:txt.slice(0,200)})}
+  }
+  if(!out.length)return fail('Mantenha pelo menos uma linha.');
+  T[g.kind]=out;M31.tg=null;
+  const ok=await saveMan31(KINDS37[g.kind].label);if(!ok)M31.tg=g;
+  try{applyCat37();T3.refresh()}catch(e){}paint31(true)}}
+['wmods','itemfx','consum'].forEach(k=>{const _l=LIVE31[k];LIVE31[k]=function(){const g=tgOn31(k);if(g)return wrapEd31(g);return _l.apply(this,arguments)+bar31(k,!!tbl31()[k])}});
+T3.applyCat37=applyCat37;
+console.info('[Tulpa] Etapa 37 carregada (catálogos da Onda 2 editáveis)');
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
