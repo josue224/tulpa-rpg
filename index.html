@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="21/11 00:25">
+<meta name="tulpa-build" content="21/11 02:12">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3080,6 +3080,159 @@ body.sys29-open{overflow:hidden}
 .table-char.out-call .tc-head .av::before{content:"";position:absolute;right:-6px;bottom:6px;width:22px;height:2px;background:#fff;transform:rotate(-45deg);z-index:2;opacity:.9}
 .table-char.out-call .tc-head .av.speaking{outline:none;box-shadow:none}
 
+/* ---- Etapa 31 · 📖 Manual Vivo ---- */
+.man31{position:fixed;inset:0;z-index:110;background:rgba(5,6,10,.6);display:flex;justify-content:center;align-items:stretch;padding:18px 16px;backdrop-filter:blur(3px)}
+.man31.hide{display:none}
+body.m31-on{overflow:hidden}
+body.m31-on #t3Cat,body.m31-on .t3-cat,body.m31-on #t3CatBubble{visibility:hidden}
+.m31-box{width:min(1240px,100%);display:flex;flex-direction:column;min-height:0;background:linear-gradient(var(--panel,#151a21),var(--panel,#151a21)),var(--m31-base,#14171d);color:var(--text,#eef2f7);border:1px solid var(--line,rgba(255,255,255,.12));border-radius:var(--ae-rad,16px);box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden}
+.m31-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px;border-bottom:1px solid var(--line,rgba(255,255,255,.12))}
+.m31-ttl{flex:1 1 220px;min-width:0}
+.m31-ttl h1{margin:0;font-family:var(--f-display,inherit);font-size:1.12rem;line-height:1.2}
+.m31-ttl .sub{margin:2px 0 0;font-size:.8rem}
+.m31-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.m31-search input{width:min(330px,100%);min-height:36px;padding:6px 12px;border-radius:999px;border:1px solid var(--line,rgba(255,255,255,.18));background:var(--bg,rgba(0,0,0,.25));color:inherit;font:inherit}
+.m31-search input:focus-visible{outline:2px solid var(--accent,#7ab);outline-offset:2px}
+.m31-hits{min-width:0;font-size:.82rem}
+.m31-pvsw{font-size:.85rem}
+.m31-tocbtn{display:none}
+.m31-body{flex:1;display:grid;grid-template-columns:280px 1fr;min-height:0}
+.m31-nav{overflow:auto;padding:14px 10px 30px 14px;border-right:1px solid var(--line,rgba(255,255,255,.1));font-size:.88rem}
+.m31-toc,.m31-toc ol{list-style:none;margin:0;padding:0}
+.m31-toc>li{margin:2px 0}
+.m31-toc summary{cursor:pointer;padding:4px 4px 4px 20px;border-radius:8px;font-weight:600;list-style:none;position:relative}
+.m31-toc summary::-webkit-details-marker{display:none}
+.m31-toc summary::before{content:'▸';position:absolute;left:5px;top:7px;font-size:.75rem;opacity:.7;transition:transform .15s}
+.m31-toc details[open]>summary::before{transform:rotate(90deg)}
+.m31-toc ol{padding-left:14px;margin:2px 0 6px;border-left:1px solid var(--line,rgba(255,255,255,.1))}
+.m31-toc a{color:inherit;text-decoration:none;display:inline-block;padding:3px 6px;border-radius:6px;line-height:1.3}
+.m31-toc a:hover,.m31-toc a.on{background:color-mix(in srgb,var(--accent,#7ab) 18%,transparent);color:var(--text,#fff)}
+.m31-toc a.on{font-weight:700}
+.m31-toc .m31-dim{opacity:.35}
+.m31-main{position:relative;overflow:auto;padding:0 16px 60px;scroll-padding-top:12px}
+.m31-main:focus{outline:none}
+.m31-paper{max-width:900px;margin:0 auto}
+.m31-cover{padding:34px 0 22px;border-bottom:2px solid var(--gold,var(--accent,#b98));margin-bottom:8px;text-align:center}
+.m31-eyebrow{margin:0 0 8px;font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold,var(--accent,#b98))}
+.m31-cover h1{margin:0;font-family:var(--f-display,inherit);font-size:clamp(1.6rem,4vw,2.5rem);line-height:1.1}
+.m31-coversub{margin:10px auto 0;max-width:60ch;opacity:.8}
+.m31-camp{margin-top:10px}
+.m31-chap{padding-top:18px}
+.m31-h2{font-family:var(--f-display,inherit);font-size:clamp(1.3rem,3vw,1.7rem);margin:26px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line,rgba(255,255,255,.15));color:var(--gold,var(--accent,inherit))}
+.m31-h3{font-family:var(--f-display,inherit);font-size:1.16rem;margin:22px 0 8px}
+.m31-sec{padding:2px 0 6px;border-radius:10px;transition:background .6s}
+.m31-blk{position:relative;line-height:1.68;font-size:1rem}
+.m31-blk p,.m31-aside p{margin:0 0 10px;max-width:74ch}
+.m31-blk ul,.m31-aside ul{margin:0 0 12px;padding-left:22px;max-width:76ch}
+.m31-blk li{margin:5px 0}
+.m31-added{border-left:3px solid color-mix(in srgb,var(--accent,#7ab) 55%,transparent);padding-left:10px}
+.m31-gone{opacity:.7;padding:6px 0}
+.m31-f{white-space:pre-wrap;font:600 .9rem/1.6 ui-monospace,Consolas,monospace;background:var(--bg,rgba(0,0,0,.25));border:1px solid var(--line,rgba(255,255,255,.12));border-left:4px solid var(--gold,var(--accent,#b98));border-radius:10px;padding:12px 14px;margin:8px 0 14px;overflow-x:auto}
+.m31-aside{border:1px solid var(--line,rgba(255,255,255,.15));background:color-mix(in srgb,var(--gold,#b98) 9%,transparent);border-radius:12px;padding:12px 14px;margin:10px 0 16px;position:relative}
+.m31-aside h5{margin:0 0 6px;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold,var(--accent,#b98))}
+.m31-glitch{margin:12px 0 18px;padding:14px 16px;border-radius:10px;background:#0c0c10;color:#c9ffd9;font:600 .82rem/1.6 ui-monospace,Consolas,monospace;letter-spacing:.04em;text-shadow:1px 0 rgba(255,0,80,.55),-1px 0 rgba(0,220,255,.45);position:relative}
+.m31-glitch p{margin:0}
+.m31-tw{overflow-x:auto;margin:8px 0 16px;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:10px;-webkit-overflow-scrolling:touch}
+.m31-tb{width:100%;border-collapse:collapse;font-size:.88rem;line-height:1.45}
+.m31-tb th{position:sticky;top:0;text-align:left;font-weight:700;padding:8px 10px;background:color-mix(in srgb,var(--gold,var(--accent,#844)) 80%,#000);color:#fff;white-space:nowrap}
+.m31-tb td{padding:7px 10px;border-top:1px solid var(--line,rgba(255,255,255,.08));vertical-align:top}
+.m31-tb tr:nth-child(even) td{background:color-mix(in srgb,var(--text,#fff) 3%,transparent)}
+.m31-tb td .gm29{margin-left:6px}
+.m31-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:8px 0 16px}
+.m31-card,.m31-track,.m31-rit{border:1px solid var(--line,rgba(255,255,255,.12));border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--text,#fff) 3%,transparent)}
+.m31-track,.m31-rit{margin:0 0 12px}
+.m31-card header,.m31-track header,.m31-rit header{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px}
+.m31-card h4,.m31-track h4,.m31-rit h4{margin:0;font-size:1rem;font-family:var(--f-display,inherit);margin-right:auto}
+.m31-desc{opacity:.82;font-size:.9rem;margin:0 0 8px;line-height:1.5}
+.m31-chips{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 8px}
+.m31-chip{display:inline-block;font-size:.74rem;font-weight:700;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--accent,#7ab) 20%,transparent);border:1px solid color-mix(in srgb,var(--accent,#7ab) 40%,transparent)}
+.m31-tal{list-style:none;margin:0;padding:0;font-size:.88rem;line-height:1.5}
+.m31-tal li{margin:6px 0;padding-top:6px;border-top:1px dashed var(--line,rgba(255,255,255,.12))}
+.m31-cost{font-size:.74rem;font-weight:700;padding:1px 7px;border-radius:999px;border:1px solid var(--line,rgba(255,255,255,.2));white-space:nowrap}
+.m31-stages{list-style:none;margin:0;padding:0}
+.m31-stages li{padding:7px 0;border-top:1px dashed var(--line,rgba(255,255,255,.12));line-height:1.5;font-size:.92rem}
+.m31-stages li:first-child{border-top:0}
+.m31-stg{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold,var(--accent,#b98))}
+.m31-meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.84rem;margin:0 0 8px;opacity:.9}
+.m31-meta i{opacity:.7;font-style:normal}
+.m31-pot{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 12px;font-size:.9rem;line-height:1.5}
+.m31-pot dt{font-weight:800;font-size:.76rem;padding-top:2px;color:var(--gold,var(--accent,#b98));white-space:nowrap}
+.m31-pot dd{margin:0}
+.m31-st{font-size:.68rem;font-weight:800;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.m31-st.edit{background:#5a4210;color:#ffe2a6}.m31-st.new{background:#164a2c;color:#b9f5cf}.m31-st.sys{background:color-mix(in srgb,var(--text,#fff) 10%,transparent)}
+.m31-count,.m31-note{font-size:.82rem;opacity:.75;margin:0 0 8px}
+.m31-sub{margin:16px 0 8px}
+.m31-rules{border:1px solid var(--line,rgba(255,255,255,.15));border-radius:12px;padding:10px 14px;margin:10px 0 14px}
+.m31-rules h4{margin:0 0 6px;display:flex;gap:6px;align-items:center}
+.m31-rules ul{margin:0;padding-left:20px}
+.m31-subel{margin:8px 0 14px}
+.m31-subel h4{margin:0 0 6px}
+.m31-ref{all:unset;cursor:help;border-bottom:1px dotted currentColor;color:inherit;font-weight:inherit}
+.m31-ref:hover,.m31-ref:focus-visible{color:var(--gold,var(--accent,#fc8));border-bottom-style:solid}
+.m31-ref:focus-visible{outline:2px solid var(--accent,#7ab);outline-offset:2px;border-radius:3px}
+.m31-pop{position:fixed;z-index:130;padding:12px 14px;border-radius:12px;background:linear-gradient(var(--panel,#1b2029),var(--panel,#1b2029)),var(--m31-base,#14171d);color:var(--text,#eef2f7);border:1px solid var(--line,rgba(255,255,255,.2));box-shadow:0 14px 40px rgba(0,0,0,.45);font-size:.88rem;line-height:1.5}
+.m31-pop.hide{display:none}
+.m31-pop p{margin:6px 0}
+.m31-pk{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-top:2px}
+.m31-narr{font-style:italic;opacity:.8}
+.m31-hl{background:#ffd54a;color:#1a1300;border-radius:3px;padding:0 1px}
+.m31-hid{display:none!important}
+.m31-flash{background:color-mix(in srgb,var(--gold,#fc8) 20%,transparent)!important}
+.m31-gm{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}
+.m31-blk>.m31-gm{position:absolute;top:-4px;right:0;opacity:.0;transition:opacity .15s}
+.m31-blk:hover>.m31-gm,.m31-blk:focus-within>.m31-gm{opacity:1}
+@media (hover:none){.m31-blk>.m31-gm{position:static;opacity:1;margin:2px 0 8px}}
+.m31-gmmode .m31-blk{padding-right:4px}
+.m31-gmmode .m31-blk:hover{background:color-mix(in srgb,var(--accent,#7ab) 6%,transparent);border-radius:8px}
+.m31-addrow{margin:6px 0 10px}
+.m31-edit{border:1px solid var(--accent,#7ab);border-radius:12px;padding:10px 12px;margin:8px 0 14px;background:var(--bg,rgba(0,0,0,.2))}
+.m31-edit textarea,.m31-edit input{width:100%;box-sizing:border-box;margin-top:6px;padding:8px 10px;border-radius:8px;border:1px solid var(--line,rgba(255,255,255,.2));background:var(--panel,#111);color:inherit;font:inherit;line-height:1.55}
+.m31-edbar{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.m31-open.m31-new{position:relative}
+.m31-open.m31-new::after{content:'';position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:#ff5a4a;box-shadow:0 0 0 2px var(--panel,#111)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:900px){
+  .man31{padding:0}.m31-box{border-radius:0}
+  .m31-tocbtn{display:inline-flex}
+  .m31-body{grid-template-columns:1fr;position:relative}
+  .m31-top{padding:10px 16px;gap:8px}
+  .m31-ttl{flex:1 1 0;order:2}
+  .m31-tocbtn{order:1}
+  .m31-tools{order:3}
+  #m31x{position:absolute;top:10px;right:16px}
+  .man31 .m31-top{position:relative;padding-right:92px}
+  .m31-pl{display:none}
+  .m31-nav{position:absolute;z-index:3;inset:0 auto 0 0;width:min(86vw,320px);background:linear-gradient(var(--panel,#151a21),var(--panel,#151a21)),var(--m31-base,#14171d);box-shadow:12px 0 40px rgba(0,0,0,.45);transform:translateX(-105%);transition:transform .22s ease;visibility:hidden}
+  .man31.m31-tocopen .m31-nav{transform:none;visibility:visible}
+  .m31-tools{width:100%;flex-wrap:nowrap}.m31-search{flex:1 1 0;min-width:0}.m31-search input{width:100%}.m31-hits{display:none}
+  .m31-main{padding:0 16px 60px}
+  .m31-ttl h1{font-size:1rem}.m31-ttl .sub{display:none}
+  .m31-pot{grid-template-columns:1fr}
+  .m31-cards{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.m31-nav,.m31-sec,.m31-blk>.m31-gm{transition:none}}
+@media print{
+  body.m31-print>*:not(#man31){display:none!important}
+  body.m31-print{overflow:visible!important;background:#fff!important}
+  body.m31-print #man31{position:static;display:block;padding:0;background:#fff;backdrop-filter:none}
+  body.m31-print .m31-box{display:block;border:0;box-shadow:none;background:#fff;color:#111;width:auto}
+  body.m31-print .m31-top,body.m31-print .m31-nav,body.m31-print .m31-gm,body.m31-print .gm29,body.m31-print .gm29-add,body.m31-print .m31-addrow,body.m31-print .m31-pop,body.m31-print .m31-camp{display:none!important}
+  body.m31-print .m31-body{display:block}
+  body.m31-print .m31-main{overflow:visible;height:auto;padding:0}
+  body.m31-print .m31-paper{max-width:none}
+  body.m31-print .m31-chap{break-before:page}
+  body.m31-print .m31-chap:first-child{break-before:auto}
+  body.m31-print .m31-tw{overflow:visible;border-color:#bbb}
+  body.m31-print .m31-tb th{background:#6b1f2e!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;position:static}
+  body.m31-print .m31-tb td{border-color:#ccc}
+  body.m31-print .m31-card,body.m31-print .m31-track,body.m31-print .m31-rit,body.m31-print .m31-aside{break-inside:avoid;background:#fff;border-color:#bbb}
+  body.m31-print .m31-ref{border:0}
+  body.m31-print .m31-h2,body.m31-print .m31-stg,body.m31-print .m31-pot dt,body.m31-print .m31-eyebrow{color:#6b1f2e}
+  body.m31-print .m31-cards{grid-template-columns:1fr 1fr}
+  body.m31-print .m31-glitch{background:#111;color:#bfffd2;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:16mm 14mm}
+}
+
 </style>
 <script id="tulpa-etapa3">
 (()=>{
@@ -3218,7 +3371,7 @@ const NEW_VOCATIONS=[
 {name:'Bombeiro',desc:'Combate incêndios e realiza salvamentos em circunstâncias extremas, unindo condicionamento físico robusto, bravura e resiliência.',skills:['Atletismo','Resistência','Medicina'],talents:[
  {name:'Avanço na Fumaça',cost:1,desc:'Avança por ambientes sufocantes e bloqueados por escombros; +5 em Resistência.'},
  {name:'Resgate de Emergência',cost:2,desc:'Retira feridos de áreas em chamas ou colapso, carregando aliados sem penalidade de peso; +10 em Atletismo.'}]},
-{name:'Detetive',desc:'Investiga crimes e segredos ocultos, combinando capacidade analítica, perspicácia e leitura minuciosa de evidências.',skills:['Investigação','Percepção','Intuição'],talents:[
+{name:'Detetive',desc:'Investiga crimes e segredos ocultos, combinando capacidade analítica, perspicácia e leitura minuciosa de evidências.',skills:['Investigação','Observação','Intuição'],talents:[
  {name:'Pista Oculta',cost:1,desc:'Examina minuciosamente uma cena de crime ou ambiente hostil; +5 em Investigação.'},
  {name:'Interrogatório Sagaz',cost:2,desc:'Conduz perguntas cortantes com precisão psicológica para arrancar confissões superficiais; +10 em Intuição.'}]},
 {name:'Seguranças',desc:'Protege locais restritos e VIPs contra ameaças iminentes, unindo vigilância constante, postura intimidadora e resposta tática rápida.',skills:['Intimidação','Observação','Briga'],talents:[
@@ -3233,7 +3386,7 @@ const NEW_VOCATIONS=[
 {name:'Alpinista',desc:'Domina a ascensão em terrenos extremos de rocha, gelo e neve, combinando técnicas avançadas de escalada, resistência física e equipamentos especializados.',skills:['Atletismo','Acrobacia','Resistência'],talents:[
  {name:'É Logo Ali',cost:2,desc:'Ao falhar em um teste de Escalada, refaz a rolagem usando Constituição em vez de Força (deve aceitar o segundo resultado).',noBonus:true},
  {name:'Duro na Queda',cost:3,desc:'Amortece o impacto de quedas vertiginosas, reduzindo todo o dano sofrido por altura à metade.',noBonus:true}]},
-{name:'Biólogo',desc:'Estuda a vida, os organismos vivos e suas interações complexas com o ecossistema, aplicando conhecimento científico rigoroso para desvendar anomalias orgânicas.',skills:['Ciências','Investigação','Percepção'],talents:[
+{name:'Biólogo',desc:'Estuda a vida, os organismos vivos e suas interações complexas com o ecossistema, aplicando conhecimento científico rigoroso para desvendar anomalias orgânicas.',skills:['Ciências','Investigação','Observação'],talents:[
  {name:'Análise Minuciosa',cost:2,desc:'Mapeia terrenos desconhecidos analisando o solo e os nichos ecológicos; +5 em Tática e +10 em Rastreamento na área, e identifica vestígios recentes de criaturas durante a cena.',effects:[{skill:'Tática',value:5},{skill:'Rastreamento',value:10}]},
  {name:'Improviso Científico',cost:1,desc:'Mistura compostos químicos para improvisar remédios ou toxinas em cenários complexos.',noBonus:true}]}
 ];
@@ -3650,6 +3803,8 @@ function mergeCatalog(){
   [tracks,ORIGINAL_TRACKS].forEach(list=>list.forEach(t=>{if(t.name!=='Arsenal Mental')return;t.stages.forEach(s=>{const k={3:0,5:1,8:2}[s.stage];if(k===undefined)return;s.cost=ac[k];s.desc=s.desc.replace(/\b(?:Gaste |gastando |ao custo de )?\d+ ES[;,]?\s*/i,'')})}));
   [vocations,ORIGINAL_VOCATIONS].forEach(list=>NEW_VOCATIONS.forEach(v=>{if(!list.some(x=>x.name===v.name))list.push(JSON.parse(JSON.stringify(v)))}));
   [tracks,ORIGINAL_TRACKS].forEach(list=>list.forEach(t=>{if(TRACK_ARCH_FIX[t.name])t.archetype=TRACK_ARCH_FIX[t.name]}));
+  /* Manual Oficial (Edição Revisada): Percepção é atributo, a perícia das vocações é Observação; História virou Pesquisa */
+  [vocations,ORIGINAL_VOCATIONS,NEW_VOCATIONS].forEach(list=>list.forEach(v=>{if(Array.isArray(v.skills))v.skills=v.skills.map(s=>s==='Percepção'?'Observação':s==='História'?'Pesquisa':s);if(v.name==='Negociador Internacional')(v.talents||[]).forEach(t=>{if(t&&typeof t.desc==='string')t.desc=t.desc.replace(/História/g,'Pesquisa')})}));
   vocations.forEach(v=>{const nv=NEW_VOCATIONS.find(x=>x.name===v.name);if(nv)v.talents.forEach((t,i)=>{if(nv.talents[i]?.effects&&!t.effects)t.effects=nv.talents[i].effects;if(nv.talents[i]?.noBonus)t.noBonus=true})});
   if(data.archetype&&data.track){const t=tracks.find(x=>x.name===data.track);if(t&&t.archetype!==data.archetype)data.archetype=t.archetype}
 }
@@ -3672,7 +3827,7 @@ E.baseSkill=()=>0; /* todas as perícias começam em 0 */
 function skillCalc3(ch,skill,attrOv){
   const d=ch.data||{},std=SKILL_ATTR[skill],attr=attrOv&&ATTRS.includes(attrOv)?attrOv:std,SA=attr===std?SKILL_ATTR:{...SKILL_ATTR,[skill]:attr},m=E.computeMods(d),n=E.diceFor(d,skill,SA,m);
   const vlist=(ch.vocations||vocations),v=vlist.find(x=>x.name===d.vocation);
-  let voc=0;if(v&&(v.skills||[]).includes(skill)){const y=Number(d.serviceYears)||0;voc=y>=40?15:y>=10?10:5}
+  let voc=0;if(v&&(v.skills||[]).map(s=>s==='Percepção'?'Observação':s).includes(skill)){const y=Number(d.serviceYears)||0;voc=y>=40?15:y>=10?10:5}
   const extra=E.skillTier(d,skill),start=E.baseSkill(skill);
   const base=start+(Number(d.skillOverrides?.[skill])||0)+extra+voc+E.flatFor(d,skill,m);
   const matches=e=>e.skill===skill||(Array.isArray(e.skills)&&e.skills.includes(skill));
@@ -5079,7 +5234,7 @@ kb('atributos','Atributos',['atributos','atributo','forca','percepcao','intelige
  'São 8: <b>Força, Percepção, Inteligência, Presença, Constituição, Aparência, Destreza e Carisma</b>. Cada ponto = <b>1 d20</b> nos testes. No Estágio 1 você distribui <b>7 pontos livres</b> (mínimo 1, máximo 3 por atributo). Do Estágio 2 em diante o máximo sobe para 4, e você ganha +1 ponto nos estágios 2, 4, 7 e 10. Dica: ninguém sobrevive com tudo em 1 e ninguém é bom em tudo.',
  {go:[G('attributes','#attributes')],rel:['rolar-teste','estagios','dica-build']});
 kb('pericias','Perícias',['pericias','pericia','aptidoes','extras','perícias extras','8 pericias','escolher pericias','bonus de pericia','mestre','maestria','+5','+10','+15'],
- 'Todas as perícias começam em <b>+1</b>. A <b>vocação</b> dá +V em 3 delas (+5, +10 ou +15 conforme os anos de serviço). Além disso você escolhe <b>8 perícias extras</b> (+5 cada) que combinem com a história do personagem; ao evoluir ganha mais escolhas. Algumas podem virar <b>Mestre (+10)</b> e, com sorte, <b>Maestria (+15)</b>: use o campo de bônus manual no fim da aba para registrar.',
+ 'Todas as perícias começam em <b>0</b>. A <b>vocação</b> dá +V em 3 delas (+5, +10 ou +15 conforme os anos de serviço). Além disso você escolhe <b>8 perícias extras</b> (+5 cada) que combinem com a história do personagem; ao evoluir ganha mais escolhas. Algumas podem virar <b>Mestre (+10)</b> e, com sorte, <b>Maestria (+15)</b>: use o campo de bônus manual no fim da aba para registrar.',
  {go:[G('skills','#skillGrid')],rel:['vocacao','estagios','rolar-teste']});
 kb('rolar-teste','Como rolar um teste',['rolar teste','como rolar','como funciona o teste','rolar dado','d20','como faco um teste','dificuldade','dt','vantagem','desvantagem','bonus','como rolo dado','rolo dado','rolar os dados','jogar dado','como jogar o dado'],
  'Você rola tantos <b>d20</b> quanto o valor do atributo da perícia, fica com o <b>maior</b> e soma o bônus da perícia. Passou da dificuldade (DT), deu certo. <b>Vantagem</b> = rola o conjunto duas vezes e fica com o melhor; <b>Desvantagem</b> = fica com o pior. Na aba <b>Perícias</b> é só clicar no 🎲 da perícia.',
@@ -5670,7 +5825,7 @@ renderSkills=function(){
     return `<span class="pill t3-tierpill">${esc(s)} <b class="t3-tier t${t}">${TIER_LBL[t]}</b>${data.free10===s?' <small>(Estágio 10)</small>':''}${t<15?`<button class="t3-x" data-tup="${esc(s)}" ${canUp?'':'disabled'} title="${t===5?'Subir para Mestre +10':'Subir para Maestria +15'}">▲</button>`:''}<button class="t3-x" data-tdown="${esc(s)}" title="Baixar um grau">▼</button></span>`}).join('')||'<span class="sub">Nenhum bônus extra aplicado.</span>';
   let box=$('t3TierBox');if(!box){box=document.createElement('div');box.id='t3TierBox';$('extraSkillList').after(box)}
   const cnt=(a,b,l,t)=>`<span class="pill"><b class="t3-tier t${t}">${l}</b> ${a} / ${free?'∞':b}</span>`;
-  box.innerHTML=`<div class="inline" style="margin-top:12px;gap:6px">${cnt(U.five,L.five,'+5',5)}${cnt(U.ten,L.ten,'Mestre +10',10)}${cnt(U.fifteen,L.fifteen,'Maestria +15',15)}</div>${(L.free10||free)?`<div class="field" style="margin-top:10px;max-width:420px"><label>Estágio 10 · perícia que sobe direto para +10 (sem gastar escolha de +5)</label><select id="t3Free10"><option value="">— escolher —</option>${BASE_SKILLS.map(s=>`<option ${data.free10===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>`:''}<p class="sub" style="margin-top:8px">Toda perícia começa em <b>+1</b> (exceto Teosofia, que começa em 0). Estágio 5 libera 1 perícia +5 → +10 (Mestre); Estágio 7, mais 2; Estágio 8, mais 1; Estágio 9, 1 perícia +10 → +15 (Maestria); Estágio 10, +1 perícia direto para +10. Use ▲ e ▼ nas perícias acima.</p>`;
+  box.innerHTML=`<div class="inline" style="margin-top:12px;gap:6px">${cnt(U.five,L.five,'+5',5)}${cnt(U.ten,L.ten,'Mestre +10',10)}${cnt(U.fifteen,L.fifteen,'Maestria +15',15)}</div>${(L.free10||free)?`<div class="field" style="margin-top:10px;max-width:420px"><label>Estágio 10 · perícia que sobe direto para +10 (sem gastar escolha de +5)</label><select id="t3Free10"><option value="">— escolher —</option>${BASE_SKILLS.map(s=>`<option ${data.free10===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>`:''}<p class="sub" style="margin-top:8px">Toda perícia começa em <b>0</b> (Manual Oficial, Edição Revisada). Estágio 5 libera 1 perícia +5 → +10 (Mestre); Estágio 7, mais 2; Estágio 8, mais 1; Estágio 9, 1 perícia +10 → +15 (Maestria); Estágio 10, +1 perícia direto para +10. Use ▲ e ▼ nas perícias acima.</p>`;
   const f10=$('t3Free10');if(f10)f10.onchange=()=>{const v=f10.value;if(v&&E.skillTier(data,v)>=10&&data.free10!==v){toast('Essa perícia já está em +10 ou mais.');f10.value=data.free10||'';return}data.free10=v;save()};
   $$('[data-tup]').forEach(b=>b.onclick=()=>tierUp(b.dataset.tup));
   $$('[data-tdown]').forEach(b=>b.onclick=()=>tierDown(b.dataset.tdown));
@@ -7609,7 +7764,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='21/11 00:25';
+const BUILD8='21/11 02:12';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -9085,7 +9240,14 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'📞 Call mais firme, Arcade por regra e tela flexível',w:'a',open:1,b:`<ul>
+  {t:'📖 Manual Vivo: o Manual Oficial dentro do site',w:'a',open:1,b:`<ul>
+    <li><b>📖 Manual</b> no topo e na Central da campanha: o Manual Oficial (Edição Revisada) inteiro, com sumário, busca instantânea e resumo de Estados e Rituais ao passar o mouse ou tocar no nome.</li>
+    <li><b>Sempre igual ao sistema:</b> vocações, trilhas, rituais, itens, estados, traumas, bestiário e regras da mesa vêm dos mesmos dados das fichas e do combate. Mudou na ⚙️ Alterações do Sistema, muda no Manual na hora (e vice-versa).</li>
+    <li><b>Mestre:</b> ✏️ ＋ 🗑️ nos textos e nos catálogos, com os mesmos campos validados da central. 👁️ Pré-visualizar como Player esconde os botões. Jogadores só leem.</li>
+    <li><b>📥 Baixar PDF Atualizado:</b> gera o PDF do manual com tudo o que vale na sua mesa agora.</li>
+    <li><b>Ajustes do Manual Oficial:</b> as vocações com "Percepção" passam a dar +V em <b>Observação</b>, e o talento do Negociador usa <b>Pesquisa</b> no lugar de História.</li>
+  </ul>`},
+  {t:'📞 Call mais firme, Arcade por regra e tela flexível',w:'a',b:`<ul>
     <li><b>Arcade e Perseus:</b> livres enquanto não há call. Com a call ativa os botões somem; voltam no ⏸ Intervalo ou quando seu personagem está fora do mapa principal. Se a call começar com você jogando, a mesa te chama de volta.</li>
     <li><b>Sair da Call / Entrar na Call:</b> o jogador sai quando quiser (o microfone desliga) e volta pelo botão verde. Sair não libera os jogos.</li>
     <li><b>Em segundo plano:</b> a call continua com a aba em segundo plano, aparece nos controles do sistema e reconecta sozinha ao voltar.</li>
@@ -15829,6 +15991,9 @@ async function submit29(sec,key,c){
     if(isNew){k='gm-'+rid().slice(0,6);o.add=1}else if(R.trauma[key]?.add)o.add=1;
     changes=diff29(c,o,[['name','Nome'],['grp','Grupo'],['text','Efeito']]);R.trauma[k]=o;
   }
+  if(sec==='beast'){const dn=gv29('e29dano'),at=gv29('e29atk');
+    if(dn&&!/^\d+d\d+([+-]\d+)?$/i.test(dn)){toast('Dano inválido. Use algo como 1d6 ou 2d8+2.');return false}
+    if(at&&!/^[+-]?\d+$/.test(at)){toast('Ataque inválido. Use um número, como +3.');return false}}
   if(sec==='beast'||sec==='subel'){
     const arr=R[sec];k=isNew?'gm-'+rid().slice(0,8):key;
     o=sec==='beast'?{id:k,name,tier:gv29('e29tier'),vital:Number(gv29('e29vt'))||1,def:Number(gv29('e29def'))||0,atk:gv29('e29atk'),dano:gv29('e29dano'),skills:gv29('e29sk'),notes:gv29('e29nt')}:{id:k,name,element:gv29('e29el'),desc:gv29('e29d')};
@@ -15861,7 +16026,7 @@ function tableForm29(m){
     ${fI29('t29mv','Deslocamento base por turno (m)',t.move||9,'number','min="1" max="60" step="0.5"')}
     ${fI29('t29dt','DT do Arremesso até 6 m',t.dtThrow||12,'number','min="5" max="30"')}
     ${fI29('t29st','DT de Furtividade dos inimigos (0 = 10 + Percepção)',t.dtStealth??0,'number','min="0" max="30"')}
-    <p class="sub full">A DT do Arremesso sobe +3 a cada 6 m a partir desse valor. Correr continua dobrando o deslocamento.</p>
+    <p class="sub full">A tabela inteira acompanha esse valor: até 6 m = base · até 12 m = base +3 · até 18 m = base +6 · depois +2 a cada 6 m. Correr continua dobrando o deslocamento.</p>
     <div class="sys29-save"><button type="submit" class="btn primary">Salvar e aplicar na mesa</button></div></form>`;
   $('t29f').onsubmit=async ev=>{ev.preventDefault();const R=rules29(),old={...R.table};
     const nv={move:Math.max(1,Number(gv29('t29mv'))||9),dtThrow:Math.max(5,Number(gv29('t29dt'))||12),dtStealth:Math.max(0,Number(gv29('t29st'))||0)};
@@ -16234,6 +16399,584 @@ setInterval(()=>{try{cosApply30(false)}catch(e){}},1600);
 }}
 console.info('[Tulpa] Etapa 30 carregada');
 T3.mg30={lobby:()=>mgLobby(),start:(r,s,t)=>mgStartLocal(r,s,t),over:res=>mgShowOver(res)};
+
+/* ===================================================================
+   TULPA · ETAPA 31 — Manual Vivo: texto base do Manual Oficial
+   (Edição Revisada & Consolidada). Cada bloco tem id fixo: as edições
+   do Mestre ficam por campanha em campaign_store, chave "manual".
+   Marcação simples: **negrito**, *itálico*, linhas "- " viram lista.
+   {live:'x'} = componente vivo lido dos mesmos dados do sistema.
+   {tb:[...]} = tabela de referência; {f:'...'} = fórmula; {box:t,t:'...'} = quadro.
+   =================================================================== */
+const MAN31_TITLE='TULPA RPG — Manual Oficial';
+const MAN31_SUB='Edição Revisada & Consolidada · Regras Base, Combate Tático, Exploração e Catálogos Completos';
+const MAN31=[
+{id:'intro',h:'Apresentação',secs:[
+ {id:'intro.0',h:'',b:[
+  ['intro.p1','A ideia deste manual é servir de apoio sólido e flexível para a sua mesa. Não é obrigatório seguir todas as mecânicas à risca: você pode simplificar regras, adaptar procedimentos ou acrescentar elementos próprios, desde que preserve a coerência e a essência da proposta.'],
+  ['intro.p2','O objetivo do **TULPA RPG** é simular, da forma mais próxima possível, a experiência de ser um ser humano em qualquer universo — medieval, contemporâneo ou futurístico. Escolhas, habilidades, vulnerabilidades e limites refletem a complexidade da vida e da consciência humana, abrindo caminho para o estudo das *tulpas* e dos mistérios fundamentados na Teosofia.']
+ ]}
+]},
+{id:'c1',h:'1. Criação de Personagem e Regras Base',secs:[
+ {id:'c1.1',h:'1.1 Atributos Primordiais',b:[
+  ['c1.1.p1','Os oito atributos primordiais representam o potencial bruto do personagem: **Força**, **Destreza**, **Constituição**, **Inteligência**, **Percepção**, **Carisma**, **Aparência** e **Presença**. Cada ponto em um atributo equivale a **1d20** rolado em testes ligados a ele.'],
+  ['c1.1.l1','- **Distribuição inicial (Estágio 1):** todos os atributos começam em **1**. O jogador distribui **7 pontos livres**, respeitando o mínimo de 1 e o máximo de **3** por atributo.\n- **Evolução:** a partir do Estágio 2, o limite sobe para **4** por atributo. Pontos extras acumulados são concedidos nos Estágios 2 (+1), 4 (+2), 7 (+3) e 10 (+4).\n- **Equivalência de termos:** sempre que uma regra ou fórmula mencionar *Agilidade (AGI)*, utiliza-se **Destreza**; sempre que mencionar *Vigor*, utiliza-se **Constituição**.\n- **Troca de atributo por teste:** o Mestre pode autorizar ou exigir a rolagem de uma perícia com outro atributo (ou um teste de atributo puro) conforme a situação narrativa — como usar Constituição em vez de Força em Escalada no talento *É Logo Ali*.']
+ ]},
+ {id:'c1.2',h:'1.2 Perícias e Aptidões',b:[
+  ['c1.2.p1','**Todas as 39 perícias começam em 0.** O bônus total de uma perícia é a soma do grau de treinamento (+5, +10 Mestre ou +15 Maestria), do bônus **+V da Vocação**, de bônus fixos (como Êxtase ou ajustes de campanha) e de talentos ou efeitos ativos em cena.'],
+  ['c1.2.l1','- **+V da Vocação (anos de serviço):** 0 a 9 anos = **+5** · 10 a 39 anos = **+10** · 40 anos ou mais = **+15**.\n- **Grupos de perícias:** *Sociais* (Empatia, Enganação, Etiqueta, Intimidação, Liderança, Persuasão, Sedução); *Agilidade e Movimento* (Acrobacia, Atletismo, Escalada, Esquiva, Furtividade, Natação, Reflexo); *Ataque* (Briga, Armas Brancas, Armas de Disparo, Arremesso); *Testes Físicos* (perícias de Força, Destreza ou Constituição); *Atributos Mentais* (Inteligência, Percepção, Presença, Carisma, Aparência).'],
+  {live:'skills'},
+  ['c1.2.p2','Cada perícia evolui na ordem **+5 → +10 (Mestre) → +15 (Maestria)** e só pode receber uma escolha de +5. A tabela abaixo resume os limites acumulados por estágio:'],
+  {live:'tiers'}
+ ]},
+ {id:'c1.3',h:'1.3 Estatísticas Vitais e Evolução por Estágios',b:[
+  ['c1.3.p1','As três reservas do personagem são **Vital (VT)** (integridade física), **Lucidez** (sanidade e clareza mental) e **Essência (ES)** (energia usada para ativar talentos e rituais). Ao subir de estágio, soma-se a diferença dos novos máximos aos valores atuais; ao descer de estágio, os valores atuais são apenas limitados ao novo máximo.'],
+  {live:'stages'}
+ ]},
+ {id:'c1.4',h:'1.4 O Despertar e a Liberação de Trilhas',b:[
+  ['c1.4.p1','O Arquétipo e a Trilha **não são concedidos automaticamente ao atingir o Estágio 3**. O personagem continua evoluindo normalmente seus atributos, perícias e estatísticas vitais, porém sem Trilha, até vivenciar o **Despertar** na narrativa.'],
+  ['c1.4.p2','Quando o Despertar ocorre (registrado pelo Mestre ou jogador com o estágio em que aconteceu), a escolha de Arquétipo e Trilha é liberada. O personagem recebe imediatamente os poderes de todos os marcos de Trilha já alcançados (Estágios 3, 5, 8 e 10) e desbloqueia os seguintes conforme progredir.']
+ ]},
+ {id:'c1.5',h:'1.5 Modo Criação Livre ("Seu Personagem Teria")',b:[
+  ['c1.5.p1','Para mesas que desejam liberdade total mantendo apenas a coerência humana, o modo "Seu Personagem Teria" remove os limites estruturais de progressão: permite pontos de atributo ilimitados (até o teto de 10 por atributo), quantas perícias +5/+10/+15 forem coerentes com a história e escolha imediata de Arquétipo e Trilha em qualquer estágio (o personagem já conta como Desperto).']
+ ]},
+ {id:'c1.6',h:'1.6 Testes de Perícia e Uso de Talentos',b:[
+  {f:'Dados rolados = Valor do Atributo da perícia + modificadores em dados (mínimo 1d20)\nResultado = Maior d20 rolado + Bônus total da perícia\nVantagem = Rola o conjunto duas vezes e fica com o maior resultado\nDesvantagem = Rola o conjunto duas vezes e fica com o pior resultado (anula Vantagem)'},
+  ['c1.6.l1','- **Modificadores em testes:** sempre que uma regra, estado ou trauma indicar −1 ou +1 em testes de um atributo ou perícia, aplica-se **−1 ou +1 dado (d20)** na rolagem.\n- **Talentos em combate:** ativar um talento de Vocação ou Trilha **não consome a Ação Padrão**, mas cada personagem só pode usar **1 talento por turno** em combate.\n- **Consumo de bônus:** bônus de perícia concedidos por talento (ex.: "+5 em Medicina") são consumidos na primeira rolagem daquela perícia.\n- **Durações roladas (1d4):** estados com duração em 1d4 turnos (como Tempero Enjoativo, Briga Tremenda e Corte Preciso do Lenhador) têm sua contagem reduzida em 1 no início de cada turno do alvo afetado.']
+ ]}
+]},
+{id:'c2',h:'2. Catálogo de Vocações',secs:[
+ {id:'c2.0',h:'',b:[
+  ['c2.p1','A vocação representa a vida pregressa do personagem antes de se envolver com a Teosofia. Ao escolher uma vocação, o jogador recebe **+V em três perícias** e acesso a **dois talentos exclusivos**. Cada conceito é intencionalmente aberto para ser adaptado ao histórico do agente.'],
+  {live:'voc'}
+ ]}
+]},
+{id:'c3',h:'3. Arquétipos e Trilhas',secs:[
+ {id:'c3.0',h:'',b:[
+  ['c3.p1','O Arquétipo define o treinamento e o papel principal do agente após o Despertar. Cada um dos três arquétipos — **Lutador** (linha de frente e combate direto), **Gênio** (estratégia, análise e versatilidade) e **Ritualista** (domínio dos elementos e forças paranormais) — possui exatamente **6 Trilhas**, com poderes nos Estágios 3, 5, 8 e 10. Talentos em área sem raio explícito utilizam **6 m** como padrão.'],
+  ['c3.p2','*Arsenal Mental:* o custo padrão é 5 / 10 / 20 ES; o Mestre pode autorizar a variante reduzida (1 / 2 / 4 ES) por ficha. A **Arma Favorita** (Estágio 10 de Arsenal Mental e de Lâmina Psíquica) ganha +1 dado de dano e reduz a margem de crítico em 2 permanentemente (ex.: 19–20 torna-se 17–20).']
+ ]},
+ {id:'c3.1',h:'3.1 Trilhas de Lutador',b:[{live:'track',arch:'Lutador'}]},
+ {id:'c3.2',h:'3.2 Trilhas de Gênio',b:[{live:'track',arch:'Gênio'}]},
+ {id:'c3.3',h:'3.3 Trilhas de Ritualista',b:[{live:'track',arch:'Ritualista'}]}
+]},
+{id:'c4',h:'4. Lucidez, Colapso, Êxtase e Traumas',secs:[
+ {id:'c4.1',h:'4.1 Protocolo de Colapso',b:[
+  ['c4.1.p1','Quando a Lucidez de um personagem chega a 0, dispara-se o **Protocolo de Colapso**:'],
+  ['c4.1.l1','- **1º Colapso:** role 1d6. Em 4–6, entra em Êxtase; em 1–3, recebe Penalidade Nível 1. A Lucidez é restaurada para ⌊Máx ÷ 2⌋.\n- **2º Colapso:** role 1d6. Em 4–6, mantém o Êxtase (ou resiste sem aumentar a Penalidade); em 1–3, encerra o Êxtase e a Penalidade sobe +1. A Lucidez é restaurada para ⌊Máx ÷ 3⌋.\n- **3º Colapso:** se estiver em Penalidade Nível 2 ou superior (sem Êxtase), adquire um Trauma Permanente imediatamente. Caso esteja em Êxtase, role 1d6: 4–6 mantém o Êxtase; 1–3 converte em Trauma Permanente. A Lucidez permanece em 0.'],
+  ['c4.1.p2','**Efeito da Penalidade de Lucidez (Nível N):** impõe −N dados (d20) em todos os testes ligados aos atributos mentais (Inteligência, Percepção, Presença, Carisma e Aparência).'],
+  ['c4.1.p3','**Manutenção do Êxtase e Desistência:** enquanto estiver em Êxtase, todo novo dano de Lucidez exige 1d6 (1–3 encerra o Êxtase). O jogador pode optar por Desistência: encerra o Êxtase, mantém Lucidez em 0 sem adquirir Trauma e entra no estado Desistente (incapacitado até o fim da cena).']
+ ]},
+ {id:'c4.2',h:'4.2 Bônus de Êxtase',b:[
+  ['c4.2.p1','O Êxtase é uma breve onda de clareza e adrenalina que dura até o fim da cena ou até o próximo Colapso.'],
+  {live:'extase'}
+ ]},
+ {id:'c4.3',h:'4.3 Traumas Permanentes',b:[
+  ['c4.3.p1','Resultado de colapsos sucessivos, cada Trauma impõe uma penalidade contínua e deve ser acompanhado de uma cena narrada registrada na ficha até que um arco narrativo permita sua superação.'],
+  {live:'trauma'}
+ ]}
+]},
+{id:'c5',h:'5. Economia de Turno e Combate Tático',secs:[
+ {id:'c5.1',h:'5.1 Mapa e Iniciativa',b:[
+  ['c5.1.p1','A unidade padrão do mapa tático é **1 quadrado = 1,5 m** (configurável pelo Mestre). Ao iniciar o combate, todos os participantes da cena rolam **Reflexo**. A ordem vai do maior total para o menor; em caso de empate, vence quem obteve o maior dado individual (persistindo o empate, segue-se a ordem alfabética).']
+ ]},
+ {id:'c5.2',h:'5.2 Economia do Turno',b:[{live:'turn'}]},
+ {id:'c5.3',h:'5.3 Movimento e Restrições',b:[
+  ['c5.3.l1','- **Trava pós-ataque:** após realizar um ataque no seu turno, o movimento restante é travado. Ganhar uma ação extra via Acerto Violento não restaura movimento.\n- **Terreno difícil:** cada 1 m percorrido custa 2 m de deslocamento.\n- **Disparada (Correr):** consome a Ação Padrão para dobrar o movimento do turno. Indisponível sob Exausto, Exaurido, Sobrecarregado ou efeitos que impeçam correr.\n- **Movimento 0:** aplica-se sob Agarrado, Paralisado, Congelado, Amarrado, Morrendo, Morto ou Imobilizado pela carga.\n- **Modificadores especiais:** Gigante Invulnerável e efeitos de aceleração dobram o deslocamento; inimigos dentro de Névoa da Alma têm o deslocamento reduzido à metade.']
+ ]},
+ {id:'c5.4',h:'5.4 Sistema de Ataque e Defesa',b:[
+  {f:'Ataque (ATA) = (Atributo da perícia da arma)d20 + bônus da perícia\n  • Briga e Armas Brancas = Força | Armas de Disparo e Arremesso = Destreza\nDefesa Base (DB) = 10\nDefesa (DF) = 10 + melhor proteção vestida por encaixe (Roupa, Tronco, Cabeça, Escudo) + modificadores\nDefesa Ativa (RF) = (Destreza)d20 + Esquiva (viu o ataque) ou Reflexo (surpreendido)'},
+  ['c5.4.p1','**Ordem fixa de resolução de cada ataque:**'],
+  ['c5.4.l1','- **1. Alvo Morrendo ou Morto:** acerta automaticamente, sem conceder ação extra ao atacante.\n- **2. 20 Natural no ataque:** sempre acerta, independentemente da defesa.\n- **3. RF < 10 (falha contra a DB):** o ataque acerta. Se ATA > 10, ocorre um **Acerto Violento** (+1 Ação Padrão para o atacante).\n- **4. ATA < 10 e RF > 10 (sem proficiência):** se o defensor possui DF > 10, não tem proficiência na proteção e obteve RF ≤ DF, ocorre **Defesa Completa** (golpe bloqueado, sem Retaliação).\n- **5. ATA < 10 e RF > 10 (demais casos):** ocorre **Retaliação** (o defensor ganha 1 ação extra imediata).\n- **6. Confronto direto:** compara-se ATA com o maior valor entre RF e DF. Se ATA ≥ maior valor, é **Acerto Normal**. Caso contrário, resulta em **Bloqueio Perfeito** (se DF > RF e DF > 10) ou **Esquiva Perfeita**.']
+ ]},
+ {id:'c5.5',h:'5.5 Retaliação, Críticos e Absorção de Dano',b:[
+  ['c5.5.l1','- **Retaliação:** concede 1 ação extra fora do turno (a ordem do combate pausa até o uso ou renúncia). Um ataque feito em Retaliação **não pode ser esquivado**. Limite de **1 Retaliação por personagem por turno**.\n- **Acertos Críticos:** ocorrem quando o maior d20 do ataque cai na margem da arma (20 ou 19–20). Os dados de dano da arma são rolados novamente e somados (bônus fixos não dobram). Em críticos que acertam: armas cortantes, perfurantes e balísticas aplicam Sangrando; armas contundentes e bastão elétrico aplicam Atordoado.\n- **Efeitos automáticos no acerto:** Zarabatana aplica Envenenado; Coquetel molotov e Lança-chamas aplicam Queimando.\n- **Ordem de absorção de dano:** Escudo de Êxtase (anula 1 dano físico) → Resistência a dano (redução fixa) → VT Temporário → Vital.']
+ ]},
+ {id:'c5.6',h:'5.6 Início do Turno, Estado de Alerta e Vulnerável',b:[
+  ['c5.6.p1','No início do turno de cada personagem, resolvem-se nesta ordem: (1) contagem de turnos em Morrendo; (2) dano contínuo (Envenenado 1, Sangrando 1, Queimando 1d4, Afogado 1d4); (3) perda de ação por Atordoado; (4) redução de estados com duração rolada e de rodadas de invocações; (5) impedimento de ação por Paralisado, Morrendo, Desistente ou Morto; (6) teste do trauma Paralisia na 1ª rodada; (7) encerramento de efeitos que duram "até o início do próximo turno".'],
+  ['c5.6.l1','- **Estado de Alerta (Ação Padrão):** concede +1 dado exclusivamente em Reflexo e Esquiva. Encerra-se ao ser atacado ou no início do seu próximo turno.\n- **Vulnerável:** usar a Ação Padrão em uma perícia fora de ataque ("Outra ação") ou realizar Síntese Cirúrgica em combate impõe −1 dado em Destreza até o início do próximo turno.']
+ ]},
+ {id:'c5.7',h:'5.7 Alcances, Linha de Visão e Cobertura',b:[
+  {tb:[['Categoria de Arma','Alcance Máximo'],['Corpo a corpo e Briga','Adjacente (~2,2 m)'],['Rifle de precisão, fuzis de assalto, bazuca','90 m'],['Metralhadora leve, lança-granadas','60 m'],['Arco longo','45 m'],['Arcos, bestas, submetralhadora e demais armas de disparo','30 m'],['Pistolas, revólver, pistola de pregos, explosivos de arremesso','24 m'],['Escopetas, espingardas, estilingue, zarabatana','15 m'],['Arpões e armas leves de arremesso (shuriken, kunai, dardo, chakram, bumerangue)','12 m']]},
+  ['c5.7.p1','Paredes e portas fechadas bloqueiam linha de visão e ataques à distância. Em **cobertura parcial** (parte das linhas de visão bloqueadas), o alvo recebe **+2 na Defesa**. Em **cobertura total**, o ataque à distância não pode ser feito (exceto com Disparo Etéreo). Ataques corpo a corpo ignoram cobertura e têm **Vantagem contra alvos Caídos**.']
+ ]},
+ {id:'c5.8',h:'5.8 Arremesso, Explosivos e Área',b:[
+  {live:'dt'},
+  ['c5.8.l1','- **Desvio na falha (Scatter):** o explosivo cai a 1,5 m + 0,5 m por ponto de falha (mínimo 1,5 m, máximo 9 m) em direção aleatória, parando ao atingir uma parede.\n- **Impacto em área:** raio padrão de 3 m (bazuca: 4,5 m), afetando todos com linha de visão ao ponto de impacto. Cada atingido rola **Resistência DT 12** (sucesso reduz o dano à metade e evita estados de acerto; Coquetel molotov não permite teste e aplica Queimando). Explosivos de arremesso são consumidos no uso e críticos dobram os dados de dano.']
+ ]},
+ {id:'c5.9',h:'5.9 Reações Instantâneas',b:[
+  ['c5.9.p1','Disponíveis na janela de defesa (não funcionam sob Apatia ou estados incapacitantes):'],
+  {tb:[['Reação','Custo','Requisito','Efeito'],['Desvio Improvável','5 ES','Manipulador de Probabilidades (Est. 3+)','Obriga o atacante a repetir a rolagem de ataque.'],['Brecha Rápida','5 ES','Ritual conhecido','Teleporta até 5 m para ponto visível e vazio, negando o ataque.'],['Duplica Efêmera','5 ES','Ritual conhecido','Role 1d2: em 1, o golpe atinge a ilusão e erra.'],['Intervenção Divina Menor','5 ES','Ritual conhecido','Reduz o dano recebido em 2d6.']]}
+ ]},
+ {id:'c5.10',h:'5.10 Invocações em Combate',b:[
+  {tb:[['Invocação','Vital','Dano','Duração'],['Fragmento Sombrio','4','1d6 (Ilusão)','3 rodadas'],['Lacaio da Inexistência','Metade do VT atual do invocador','Dado da arma pronta do invocador','3 rodadas'],['Avatar do Abismo','Metade do VT atual do invocador','4d10 (Ilusão/Físico)','3 rodadas'],['Tulpa / Criatura Livre','Definido pelo Mestre (padrão 8)','Definido (padrão 1d6)','Definido (padrão 3)']]},
+  ['c5.10.p1','**Cada invocação ataca 1× por turno, no turno do invocador, sem gastar a ação dele**, utilizando a perícia de ataque do invocador. Sua duração decai no início do turno do invocador, desaparecendo ao atingir 0 VT ou 0 rodadas.']
+ ]},
+ {id:'c5.11',h:'5.11 Morrendo e Morto',b:[
+  ['c5.11.p1','Ao chegar a 0 VT, o personagem entra em **Agonia / Morrendo**: não age, tem movimento 0, não sofre mais dano contínuo de veneno ou sangramento e dispõe de **3 turnos** para ser estabilizado por Sutura Bruta ou Síntese Cirúrgica. Seu turno é pulado automaticamente (contando 1 dos 3). Cada golpe sofrido enquanto Morrendo reduz 1 turno restante; um golpe com dano **≥ metade do Vital máximo** (arredondado para cima) finaliza o personagem na hora. Esgotados os 3 turnos, o personagem fica **Morto** (fora de combate definitivamente).']
+ ]}
+]},
+{id:'c6',h:'6. Sobrevivência, Medicina e Cenas de Trégua',secs:[
+ {id:'c6.1',h:'6.1 Combustão Vital',b:[
+  ['c6.1.p1','Quando não houver Essência suficiente para pagar uma habilidade ou ritual, o personagem pode declarar **Combustão Vital (ação livre)**: sacrifica **2 pontos de Vital real por cada 1 ES faltante**. Esse dano ignora armadura, resistência e VT Temporário.'],
+  ['c6.1.l1','- **Limite por turno:** no máximo Constituição + 2 pontos de ES gerados por turno.\n- **Estigmas de Sobrecarga:** até o fim da cena, vasos rompidos e sangramento nasal impõem −1d20 em Furtividade e em interações sociais para ocultar o estado físico.\n- **A Última Centelha:** permite zerar deliberadamente o próprio Vital para pagar uma habilidade, concedendo +1d20 no teste (ou +1 dado de efeito/dano). Logo após a resolução, o personagem entra em Agonia / Morrendo.']
+ ]},
+ {id:'c6.2',h:'6.2 Sutura Bruta e Síntese Cirúrgica',b:[
+  ['c6.2.p1','O Vital representa a integridade anatômica real e não se recupera apenas dormindo. A medicina divide-se em estabilização emergencial e reconstrução definitiva:'],
+  ['c6.2.l1','- **Sutura Bruta (Ação Padrão):** alcance adjacente, consome 1 carga de Suprimento de Emergência, DT 15. Qualquer personagem pode executar usando Inteligência + Medicina, Inteligência pura ou Destreza pura. **Sucesso:** concede 2d6 + Inteligência de VT Temporário (+1d6 se tirar 20+) e suspende Sangrando até o fim da cena. **Falha:** 1d4 de VT Temporário. Estabiliza alvos em Morrendo. Pontos de VT Temporário não acumulam (vale o maior) e somem ao fim da cena; sofrer um crítico ou esforço extremo rasga os pontos, deixando Ferida Exposta (+3 na DT cirúrgica).\n- **Síntese Cirúrgica (Ação Preparatória de Trégua ou Ação Padrão em Combate):** exige treino em Medicina e 1 carga de Kit Cirúrgico/Médico. Em combate, deixa o operador Vulnerável. DT 15 (ou DT 18 se houver Ferida Exposta ou se o paciente estiver Morrendo). Patamar 0–1 impõe −1d20; Patamar 3 concede +1d20; autocirurgia impõe −1d20. **Sucesso:** restaura 2d8 + Inteligência + Estágio de VT Permanente e remove Sangrando ou Ferida Exposta. **Sucesso Cirúrgico (DT +5):** restaura 3d8 + Inteligência + Estágio e anula Agonia Física naquela Trégua. **Falha:** restaura 1d6 + Inteligência e instala Infecção Tecidual (−1d20 em Constituição e Força). Estabiliza alvos em Morrendo. Na Trégua, operar reduz a recuperação de ES e Lucidez do médico em −1 Patamar.']
+ ]},
+ {id:'c6.3',h:'6.3 Repouso e Recuperação: Cenas de Trégua',b:[
+  ['c6.3.p1','Uma Cena de Trégua dura de 1 a 4 horas sem combate e recupera exclusivamente **Essência e Lucidez**. Calcula-se o **Patamar Final** (limitado entre 0 e 3) somando o Patamar Base do Ambiente (1 Hostil/Precário · 2 Protegido/Improvisado · 3 Refúgio Seguro) aos modificadores individuais:'],
+  ['c6.3.l1','- **Agonia Física (−1 Patamar):** Vital ≤ 10 ou estar sob Sangrando, Infecção Tecidual ou Ferida Exposta (anulado por Sucesso Cirúrgico).\n- **Mente Turva (−1 Patamar):** Lucidez entre 9 e 15, ou já ter sofrido algum Colapso.\n- **Mente Estilhaçada (−2 Patamares):** Lucidez ≤ 8. Exige teste de Intuição DT 15; na falha, recupera 0 de Lucidez, 1 ES e faz barulho ao despertar.'],
+  {tb:[['Patamar Final','Classificação','Essência (ES)','Lucidez (Intuição = Percepção)','Consequência ao Despertar'],['0','Insatisfatório','1d4','1 ponto fixo','Recebe estado Exaurido (−1d20 no 1º teste).'],['1','Raso','1d6 + Estágio','1d4 + Percepção','Mantém condições atuais.'],['2','Reparador','2d6 + Estágio','2d6 + Percepção','Remove condições passageiras*.'],['3','Pleno','3d8 + Estágio','2d8 + Percepção','Remove condições passageiras* e concede +1d20 no 1º teste.']]},
+  ['c6.3.p2','*Condições passageiras removidas nos Patamares 2 e 3: Ansioso, Tenso, Enjoado, Sonolento, Exausto, Exaurido, Torpor, Estigmas de Sobrecarga, Emotivo, Eufórico, Apatia, Confuso e Amedrontado.'],
+  ['c6.3.p3','**Ações Preparatórias de Trégua (1 por personagem):** Fortificar Perímetro (Inteligência ou Força DT 15 eleva ambiente de 1 para 2); Ancorar Aliado (Intuição ou Arte DT 15 anula 1 ponto de penalidade de Lucidez); Montar Vigília (evita emboscadas; vigia sofre −1 Patamar de ES e 0 Lucidez); Sedação Química (ignora penalidades de Lucidez, mas aplica Torpor na cena seguinte); Síntese Cirúrgica (opera ferimentos).'],
+  {box:'Exemplo prático de Cena de Trégua',id:'c6.3.ex',t:'Um agente de Estágio 3 (Percepção 2) descansa em um quarto escuro e destrancado (Patamar Base 1) com 12 de Lucidez (Mente Turva: −1) e 18 VT (sem Agonia). Seu Patamar Final cairia para 0. Com um aliado usando Fortificar Perímetro (elevando a sala para Patamar 2) e outro usando Ancorar Aliado (anulando o −1), o agente descansa no Patamar 2 (Reparador), recuperando 2d6 + 3 ES e 2d6 + 2 Lucidez.'}
+ ]}
+]},
+{id:'c7',h:'7. Furtividade, Exploração, Portas e Acústica',secs:[
+ {id:'c7.1',h:'7.1 Visão, Neblina e Iluminação',b:[
+  ['c7.1.l1','- **Cone de visão:** cada personagem enxerga um cone de 120° à frente. Paredes e portas fechadas bloqueiam visão, luz e passagem.\n- **Neblina por cômodo:** o jogador visualiza apenas o cômodo atual (sem memória visual ao sair) e, por portas abertas, apenas o recorte dentro do seu cone. No escuro absoluto, vê apenas um círculo curto ao redor.\n- **Lanternas e fontes portáteis:** qualquer item de luz no inventário (lanterna, tocha, lampião, vela, isqueiro, sinalizador, celular) é ligado/desligado como ação livre e projeta um facho de 60° com alcance de 8 quadrados (12 m).\n- **Lâmpadas e interruptores:** iluminam o cômodo inteiro (ou raio de 6 quadrados / 9 m em área aberta). Interruptores controlam as lâmpadas do mesmo cômodo; o Mestre pode acionar quedas de energia.']
+ ]},
+ {id:'c7.2',h:'7.2 Portas, Cadeados e Abertura Furtiva',b:[
+  ['c7.2.p1','Portas destrancadas são abertas ou fechadas como ação livre. Portas trancadas só podem ser destrancadas pelo Mestre (tentar abrir gera som de maçaneta forçada). Quando há inimigos do lado oposto a até **12 quadrados (18 m)** da porta, escolhe-se o modo de abertura:'],
+  {live:'doors'}
+ ]},
+ {id:'c7.3',h:'7.3 Furtividade por Proximidade e Propagação Sonora',b:[
+  ['c7.3.l1','- **Teste de proximidade:** ao entrar no raio de audição de um inimigo hostil fora do cone de visão dele, rola-se Furtividade contra {{stealthDT}}. O raio de audição equivale a (alcance de visão ÷ 1,5 m) × 0,45, limitado entre 2 e 5 quadrados (3 a 7,5 m). Um novo teste contra o mesmo inimigo só ocorre após andar 1,5 quadrado e passarem 4 segundos.\n- **Falha e abafamento:** falhar gera onda sonora de raio 3 + (0,5 × margem) quadrados (máx. 7 quadrados / 10,5 m). Paredes abafam o som: através de paredes, inimigos só ouvem se estiverem nos 65% mais próximos do raio.\n- **Investigação:** inimigos que ouvem barulhos entram em estado de Investigação ("?"), deslocam-se até a origem e desistem após 12 segundos sem encontrar alvos. Inimigos já em combate ignoram novos ruídos.']
+ ]},
+ {id:'c7.4',h:'7.4 Inimigos Hostis, Engajamento e Modo Espectador',b:[
+  ['c7.4.p1','Inimigos possuem cone de visão padrão de 90° e alcance de 10 m (configuráveis) e podem atuar em vigia fixa, patrulha ou rota definida. Ao avistarem um alvo (jogador ou NPC aliado/neutro), entram em Alerta ("!") e iniciam combate apenas para os envolvidos no mesmo cômodo (ou até 6 quadrados / 9 m em mapas abertos). **Sem contato por 5 segundos, o personagem desengaja.** Se o Mestre encerrar o combate com inimigos vivos, eles se tornam **Rendidos / Neutros**. Personagens posicionados em mapas secundários acompanham a cena principal em **Modo Espectador**.']
+ ]}
+]},
+{id:'c8',h:'8. Teosofia, Tulpas e Catálogo de Rituais',secs:[
+ {id:'c8.0',h:'',b:[
+  ['c8.p1','Rituais são atos de projeção da consciência que rompem os limites da realidade comum e alcançam planos mais sutis da existência, como ensina a Teosofia. Eles se fundamentam em cinco **Elementos Primários** e suas combinações, os **Sub-Elementos**:'],
+  ['c8.l1','- **Fé:** crença, convicção e ligação com o invisível; conecta o praticante a forças espirituais ou divinas.\n- **Natureza:** forças orgânicas, vitais e primitivas; ancora o ritual no mundo físico, flora, fauna e energia vital.\n- **Inexistência:** o vazio, ausência ou negação; dissolve formas e acessa planos onde nada se sustenta.\n- **Ilusão:** percepções distorcidas e enganos; manipula sentidos e oculta a realidade.\n- **Verdade:** realidade absoluta e essência das coisas; revela o oculto além das aparências.'],
+  ['c8.p2','**Sub-Elementos:** Sol (Fé + Natureza — energia vital e purificação); Desrealização (Natureza + Inexistência — dissolução da realidade física); Pofenia (Inexistência + Ilusão — padrões falsos e realidades alternativas); Confabulação (Ilusão + Verdade — memórias falsas que parecem reais); Metáfora (Verdade + Fé — revelações expressas simbolicamente).'],
+  {live:'subel'},
+  {box:'Aprofundamento opcional: Rituais, Teosofia e Tulpas',id:'c8.box',t:'Na Teosofia, rituais harmonizam mente, energia, intenção e símbolos para alinhar a consciência a verdades universais, explorando a correspondência entre microcosmo e macrocosmo. Nesse contexto, as tulpas — entidades ou formas de consciência criadas pela mente através de intenção e concentração — são uma extensão prática desses princípios: enquanto rituais se estruturam como cerimônias simbólicas, tulpas manifestam-se como projeções vivas da mente.'},
+  {glitch:'c8.glitch',t:'"VOCES N@O ENT3ND3M... O M3$TR3... 3L3 $@B3... 3 O @MIGO? AH... O @M1GO N@O POD3 $3R CONF1@DO! VOCE$ @CH@M QU3 TULP@$ $@O BRINQU3DO$? QU3 RITU@1$ $@O T3@TRO? N@O! O M3$TR3 OB$3RV@ C@D@ P3N$@M3NTO $3U... C@D@ $OMBR@... QU3M VOCÊ CH@M@ D3 \'@MIGO\' $ORR1 POR D3NTRO... 3L3$ R3$P1R@M D3NTRO D@ $U@ C@B3Ç@... COM3M O $3U T3MPO... @ $U@ M3MOR1@... 3$CUT3M-M3... @NT3$ QU3 O M3$TR3 CH@M3..."'}
+ ]},
+ {id:'c8.1',h:'8.1 Regras de Conjuração',b:[
+  ['c8.1.p1','Conjurar um ritual exige o gasto da Essência correspondente à potência escolhida (ou o uso de Combustão Vital), **sem necessidade de teste de conjuração**: **Base = 5 ES · Avançada = 10 ES · Próspera = 20 ES**. Rituais com execução *Reação* podem ser disparados fora do turno.']
+ ]},
+ {id:'c8.2',h:'8.2 Rituais de Natureza',b:[{live:'ritual',el:'Natureza'}]},
+ {id:'c8.3',h:'8.3 Rituais de Inexistência',b:[{live:'ritual',el:'Inexistência'}]},
+ {id:'c8.4',h:'8.4 Rituais de Ilusão',b:[{live:'ritual',el:'Ilusão'}]},
+ {id:'c8.5',h:'8.5 Rituais de Verdade',b:[{live:'ritual',el:'Verdade'}]},
+ {id:'c8.6',h:'8.6 Rituais de Fé',b:[{live:'ritual',el:'Fé'}]},
+ {id:'c8.7',h:'8.7 Rituais de outros elementos',b:[{live:'ritual',el:'*'}],auto:1}
+]},
+{id:'c9',h:'9. Carga, Inventário, Armamentos e Proteções',secs:[
+ {id:'c9.1',h:'9.1 Carga, Encaixes e Proficiência',b:[
+  {f:'Limite de Carga = 3 + Força (+2 com Mochila ou Maleta)\nPeso por item = Bolso: 0 (cada 5 itens de bolso = 1 de Carga) · Leve: 1 · Médio: 2 · Pesado: 3'},
+  {tb:[['Excesso de Carga','Nível','Penalidade Automática'],['1 a 2 acima','Pesado','−1 dado em Acrobacia, Atletismo, Escalada, Esquiva, Furtividade, Natação e Reflexo; −2 na Defesa.'],['3 a 4 acima','Sobrecarregado','Estado Exausto (−1 dado em testes físicos, não corre/salta); −2 dados em Esquiva e Reflexo; −5 na Defesa.'],['Mais de 4 acima','Imobilizado','−5 na Defesa; movimento 0; não ataca e não esquiva.']]},
+  ['c9.1.l1','- **Regras de peso vestido:** roupas comuns vestidas pesam 0; escudos vestidos pesam o valor cheio; **todas as demais proteções vestidas pesam −1 de Carga (mínimo 1)**. Itens largados no chão pesam 0.\n- **Encaixes no corpo:** 2 mãos (arma Pesada ocupa 2; escudo ocupa 1); cintura/coldre até 2 itens Leves ou Médios (nada Pesado); bolsos até 2 itens Leves + itens de Bolso; bandoleira 1 arma Pesada (exige possuir bandoleira); mochila sem limite de encaixe.\n- **Proficiência em proteções:** o arquétipo Lutador e as vocações Militar e Seguranças são proficientes em todas as proteções; os demais personagens registram proficiência item a item.\n- **Manuseio:** Saque Rápido (livre, 1×/turno, da cintura/bandoleira para as mãos); Saque de Mochila (Ação Padrão); Descarte de Emergência (livre, solta a mochila no chão).\n- O talento *Força do Cotidiano* (Lixeiro) ignora todas as penalidades de carga enquanto ativo.']
+ ]},
+ {id:'c9.2',h:'9.2 Tabela Completa de Armamentos',b:[{live:'weapons'}]},
+ {id:'c9.3',h:'9.3 Tabela Completa de Proteções',b:[
+  ['c9.3.p1','A Defesa total soma 10 + a melhor proteção vestida de cada encaixe (Roupa, Tronco, Cabeça e Escudo).'],
+  {live:'prot'}
+ ]},
+ {id:'c9.4',h:'9.4 Equipamentos Gerais',b:[{live:'gear'}]}
+]},
+{id:'c10',h:'10. Estados, Condições e Personalização',secs:[
+ {id:'c10.1',h:'10.1 Tabela Consolidada de Estados e Condições',b:[{live:'status'}]},
+ {id:'c10.2',h:'10.2 Personalização de Campanha e Bestiário',b:[
+  ['c10.2.p1','O Mestre pode ajustar o sistema por campanha criando, editando ou restaurando Vocações, Trilhas, Rituais, Itens, Estados, Traumas, Sub-Elementos e Regras da Mesa. Toda alteração feita aqui ou na central ⚙️ Alterações do Sistema chega às fichas e ao combate na hora.'],
+  ['c10.2.l1','- **Bestiário (modelo padrão):** criaturas classificadas em Inimigo, Elite, Chefe ou Entidade, com base editável de Vitalidade (padrão 20), Defesa (padrão 12), Ataque (padrão +3), Dano (padrão 1d6), perícias e notas táticas.\n- **Regras da Mesa configuráveis:** deslocamento base por turno (padrão 9 m), DT base de Arremesso até 6 m (padrão 12, deslocando toda a tabela proporcionalmente) e DT de Furtividade dos inimigos (padrão 10 + Percepção, ou valor fixo).'],
+  {live:'table'},
+  {live:'beast'}
+ ]}
+]}
+];
+
+/* ===================================================================
+   TULPA · ETAPA 31 — 📖 Manual Vivo (fonte única da verdade)
+   - Camada de texto: MAN31 (t31c.js) + edições do Mestre por campanha
+     em campaign_store, chave "manual" (sem tabela nova).
+   - Camada viva: vocações, trilhas, rituais, itens, estados, traumas,
+     bestiário e regras da mesa são lidos de list29/cur29, os MESMOS
+     dados que alimentam fichas e combate (chave "rules"). Editar aqui
+     usa o mesmo editor validado da central ⚙️ Alterações do Sistema,
+     então fichas, combate e avisos do Perseus seguem o caminho de sempre.
+   =================================================================== */
+const M31={open:false,q:'',pv:false,camp:'',data:null,fetching:false,edit:null,seen:'',toc:false,scrollAt:0};
+T3.man31=M31;
+const defMan31=()=>({v:1,rev:0,ed:{},add:[],ttl:{},secs:[],log:[]});
+const man31=()=>M31.data||(M31.data=defMan31());
+const gm31=()=>{try{return isGM6()&&!!camp3()&&!M31.pv}catch(e){return false}};
+const norm31=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const ridm31=()=>'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ---------- carregar, gravar e transmitir ---------- */
+async function fetchMan31(want=0,tries=0){
+  const c=camp3();if(!c){M31.data=defMan31();M31.camp='';return}
+  if(M31.fetching){M31.again=Math.max(M31.again||0,want||1);return}
+  M31.fetching=true;let got=0;
+  try{
+    const v=await stGet6('manual');if(camp3()?.id!==c.id)return;
+    const d={...defMan31(),...(v&&typeof v==='object'?v:{})};got=Number(d.rev)||0;
+    const old=M31.camp===c.id?Number(man31().rev)||0:-1;
+    if(got>=old||M31.camp!==c.id){M31.data=d;M31.camp=c.id;if(M31.open)paint31(true)}
+  }catch(e){console.warn('[T31] ler manual',e);if(M31.camp!==c.id){M31.data=defMan31();M31.camp=c.id}}
+  finally{M31.fetching=false}
+  if(want&&got<want&&tries<6)setTimeout(()=>fetchMan31(want,tries+1),400+tries*300);
+  else if(M31.again){const a=M31.again;M31.again=0;fetchMan31(a>1?a:0)}
+}
+async function saveMan31(label){
+  if(!isGM6()||!camp3()){toast('Somente o Mestre edita o Manual.');return false}
+  const D=man31();D.rev=Math.max((Number(D.rev)||0)+1,Date.now());
+  D.log=[{at:Date.now(),label:String(label||'').slice(0,120)},...(D.log||[])].slice(0,40);
+  try{await stPut6('manual','manual',JSON.parse(JSON.stringify(D)));try{cast6({t:'man31',rev:D.rev,label:String(label||'').slice(0,80)})}catch(e){}
+    seenSet31(D.rev);paint31(true);return true}
+  catch(e){console.warn('[T31] gravar manual',e);toast('Não consegui salvar o Manual. Tente de novo.');return false}
+}
+onCast6(p=>{
+  if(!p||p.t!=='man31'||p.from===uid3())return;
+  fetchMan31(Number(p.rev)||0);
+  if(!isGM6())toast('📖 O Mestre atualizou o Manual'+(p.label?': '+String(p.label).slice(0,60):'')+'.');
+  setTimeout(badge31,1500);
+});
+const seenKey31=()=>'tulpa_man_seen_'+(camp3()?.id||'x');
+const seenGet31=()=>Number(lsGet6(seenKey31(),0))||0;
+function seenSet31(r){try{localStorage.setItem(seenKey31(),JSON.stringify(Number(r)||0))}catch(e){}badge31()}
+function badge31(){const n=!!camp3()&&(Number(man31().rev)||0)>seenGet31()&&M31.camp===camp3()?.id;$$('.m31-open').forEach(b=>b.classList.toggle('m31-new',n))}
+/* sistema → manual: toda mudança de regras redesenha o manual aberto */
+{const _sr31=setRules29;setRules29=function(){const out=_sr31.apply(this,arguments);try{if(M31.open)paint31(true)}catch(e){console.warn('[T31] regras',e)}return out}}
+
+/* ---------- texto: marcação simples, tokens vivos e links cruzados ---------- */
+function tokens31(s){
+  const mv=(()=>{try{return T3.moveBase?.()||9}catch(e){return 9}})();
+  const st=(()=>{try{return Number(typeof AI23!=='undefined'&&AI23.dt)||0}catch(e){return 0}})();
+  return s.replace(/\{\{move\}\}/g,String(mv).replace('.',',')+' m')
+    .replace(/\{\{stealthDT\}\}/g,st?`**DT ${st}** (fixa da mesa)`:'**DT = 10 + Percepção do inimigo** (entre 10 e 20, ou DT fixa de mesa)');
+}
+function refs31(){
+  if(M31.refs&&M31.refsAt===M31.renderAt)return M31.refs;
+  const m=new Map();
+  try{list29('status').filter(r=>r.st!=='del').forEach(r=>m.set(norm31(r.name),{k:'status',key:r.key,n:r.name}))}catch(e){}
+  try{list29('ritual').filter(r=>r.st!=='del').forEach(r=>m.set(norm31(r.name.replace(/\s*\(.*\)$/,'')),{k:'ritual',key:r.key,n:r.name}))}catch(e){}
+  [['sangramento','sangrando'],['caidos','caido'],['caídos','caido'],['agonia / morrendo','agonia'],['morrendo','agonia'],['desperto','']].forEach(([a,b])=>{if(b&&!m.has(norm31(a)))m.set(norm31(a),{k:'status',key:b,n:a})});
+  const names=[...m.keys()].filter(k=>k.length>3).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  M31.refs={m,re:names.length?new RegExp('(^|[^\\p{L}])('+names.join('|')+')(?![\\p{L}])','giu'):null};M31.refsAt=M31.renderAt;
+  return M31.refs;
+}
+function link31(html){
+  const R=refs31();if(!R.re)return html;
+  /* só nos trechos de texto (fora das tags); o texto é comparado sem acento */
+  return html.split(/(<[^>]+>)/).map(part=>{
+    if(!part||part[0]==='<')return part;
+    const flat=norm31(part);if(flat.length!==part.length)return part;
+    let out='',last=0;R.re.lastIndex=0;let m;
+    while((m=R.re.exec(flat))){const st=m.index+m[1].length,en=st+m[2].length,e=R.m.get(m[2]);if(!e)continue;
+      out+=part.slice(last,st)+`<button type="button" class="m31-ref" data-rk="${e.k}" data-rv="${esc(e.key)}">${part.slice(st,en)}</button>`;last=en}
+    return out+part.slice(last);
+  }).join('');
+}
+function inl31(s){return esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g,'$1<i>$2</i>')}
+function md31(src,{link=true}={}){
+  const lines=tokens31(String(src||'')).split('\n');let html='',list=false;
+  lines.forEach(l=>{
+    const li=l.match(/^\s*-\s+(.*)$/);
+    if(li){if(!list){html+='<ul>';list=true}html+=`<li>${inl31(li[1])}</li>`;return}
+    if(list){html+='</ul>';list=false}
+    if(l.trim())html+=`<p>${inl31(l)}</p>`;
+  });
+  if(list)html+='</ul>';
+  return link?link31(html):html;
+}
+
+/* ---------- componentes vivos (lidos dos dados do sistema) ---------- */
+const live31=sec=>{try{return list29(sec).filter(r=>r.st!=='del').map(r=>({row:r,v:cur29(sec,r.key)}))}catch(e){console.warn('[T31] dados',sec,e);return[]}};
+const gmB31=(sec,key,name)=>gm31()?gmBtns29(sec,key,name):'';
+const gmA31=(sec,l)=>gm31()?`<div class="m31-addrow">${gmAdd29(sec,l)}</div>`:'';
+const tag31=st=>st==='edit'?'<span class="m31-st edit" title="Alterado pelo Mestre nesta campanha">editado</span>':st==='new'?'<span class="m31-st new" title="Criado pelo Mestre nesta campanha">novo</span>':'';
+const tb31=(head,rows,cls='')=>`<div class="m31-tw"><table class="m31-tb ${cls}"><thead><tr>${head.map(h=>`<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+const tr31=(cells,{gm='',key=''}={})=>`<tr class="m31-row"${key?` data-key="${esc(key)}"`:''}>${cells.map((c,i)=>`<td>${c}${i===0&&gm?gm:''}</td>`).join('')}</tr>`;
+const cost31=c=>{const n=Number(c);return n>0?`${n} ES`:'Passivo'};
+const LIVE31={
+  skills(){const sk=(typeof BASE_SKILLS!=='undefined'?BASE_SKILLS:[]).filter(s=>s!=='História');const n=Math.ceil(sk.length/3),cols=[0,1,2].map(i=>sk.slice(i*n,(i+1)*n));
+    const rows=[];for(let r=0;r<n;r++)rows.push(`<tr class="m31-row">${cols.map(c=>c[r]?`<td><b>${esc(c[r])}</b></td><td>${esc(SKILL_ATTR[c[r]]||'')}</td>`:'<td></td><td></td>').join('')}</tr>`);
+    return tb31(['Perícia','Atributo','Perícia','Atributo','Perícia','Atributo'],rows,'m31-skills')},
+  tiers(){const rows=[];for(let s=1;s<=10;s++){const L=E.tierLimits(s);rows.push(tr31([String(s),String(L.five),String(L.ten),String(L.fifteen),L.free10?'+1 perícia sobe direto para +10 (sem gastar escolha de +5)':'—']))}
+    return tb31(['Estágio','Escolhas de +5','Mestre (+10)','Maestria (+15)','Regra especial'],rows)},
+  stages(){const rows=[];const P={3:'1º (se Desperto)',5:'2º',8:'3º',10:'4º'};for(let s=1;s<=10;s++){const x=STAGES[s]||STAGES[1];rows.push(tr31([String(s),esc(stageName(s)),String(x.vt),String(x.luc),String(x.es),(x.attr?'+':'')+x.attr,P[s]||'—']))}
+    return tb31(['Estágio','Título','Vital','Lucidez','Essência','Atributos extras (acum.)','Poder de Trilha'],rows)},
+  voc(){const L=live31('voc').sort((a,b)=>String(a.v.name).localeCompare(String(b.v.name),'pt-BR'));
+    return gmA31('voc','Vocação')+`<p class="m31-count">${L.length} vocações</p><div class="m31-cards">${L.map(({row,v})=>`<article class="m31-card m31-row" data-key="${esc(row.key)}"><header><h4>${esc(v.name)}</h4>${tag31(row.st)}${gmB31('voc',row.key,v.name)}</header>${v.desc?`<p class="m31-desc">${esc(v.desc)}</p>`:''}<div class="m31-chips">${(v.skills||[]).filter(Boolean).map(s=>`<span class="m31-chip">${esc(s)} +V</span>`).join('')}</div><ul class="m31-tal">${(v.talents||[]).filter(t=>t&&t.name).map(t=>`<li><b>${esc(t.name)}</b> <span class="m31-cost">${cost31(t.cost)}</span><br>${link31(esc(t.desc||''))}</li>`).join('')}</ul></article>`).join('')}</div>`},
+  track(b){const L=live31('track').filter(x=>(x.v.archetype||'')===b.arch).sort((a,c)=>String(a.v.name).localeCompare(String(c.v.name),'pt-BR'));
+    return gmA31('track','Trilha')+L.map(({row,v})=>{const ars=v.name==='Arsenal Mental';return`<article class="m31-track m31-row" data-key="${esc(row.key)}"><header><h4>${esc(v.name)}</h4>${tag31(row.st)}${gmB31('track',row.key,v.name)}</header>${v.desc?`<p class="m31-desc">${esc(v.desc)}</p>`:''}<ol class="m31-stages">${(v.stages||[]).map((s,i)=>{let c=cost31(s.cost);if(ars&&i<3&&[1,2,4,5,10,20].includes(Number(s.cost)))c=`${[5,10,20][i]} ES · variante ${[1,2,4][i]} ES`;return`<li><span class="m31-stg">Estágio ${esc(String(s.stage))}</span> <b>${esc(s.name||'')}</b> <span class="m31-cost">${c}</span><div>${link31(esc(s.desc||''))}</div></li>`}).join('')}</ol></article>`}).join('')||'<p class="sub">Nenhuma trilha neste arquétipo.</p>'},
+  extase(){return tb31(['Bônus','Grupo','Efeito mecânico'],EXTASE_DEFS.map(x=>tr31([`<b>${esc(x.name)}</b>`,esc(x.grp),esc(x.text)])))+'<p class="m31-note">Os bônus de Êxtase são fixos do sistema.</p>'},
+  trauma(){const L=live31('trauma');return gmA31('trauma','Trauma')+tb31(['Trauma','Grupo','Penalidade mecânica'],L.map(({row,v})=>tr31([`<b>${esc(v.name)}</b>${tag31(row.st)}`,esc(v.grp||''),esc(v.text||'')],{gm:gmB31('trauma',row.key,v.name),key:row.key})))},
+  turn(){const mv=String(T3.moveBase?.()||9).replace('.',',');return tb31(['Recurso','Quantidade','Aplicação'],[
+    ['Movimento',`${mv} m por turno`,'Gastos em metros reais no seu turno (configurável de 1 a 60 m por mesa).'],
+    ['Ação Padrão','1 por turno','Atacar, arremessar, conjurar ritual, Sutura Bruta, Síntese Cirúrgica, usar perícia ("Outra ação"), Estado de Alerta, levantar-se (Caído), sacar da mochila ou Disparada. (+1 ação por Acerto Violento).'],
+    ['Talento','1 por turno','Não gasta Ação Padrão.'],
+    ['Saque Rápido','1 por turno','Livre: move arma da cintura/coldre ou bandoleira para as mãos.'],
+    ['Ações livres de cena','Livre','Descarte de Emergência (soltar mochila), ligar/desligar lanterna, abrir/fechar porta destrancada, acionar interruptor, declarar Combustão Vital.'],
+    ['Reação','Fora do turno','Retaliação (1×/turno) e talentos ou rituais de reação.']].map(r=>tr31([`<b>${esc(r[0])}</b>`,esc(r[1]),link31(esc(r[2]))])))+(gm31()?`<div class="m31-addrow"><button type="button" class="gm29-b gm29-add" data-m31tab="1">⚖ Regras da Mesa</button></div>`:'')},
+  dt(){const d=[6,12,18,24,30,36];let f=x=>12;try{f=dtFor14}catch(e){}
+    return`<p><b>DT do teste de Arremesso pela distância até o ponto mirado:</b></p>`+tb31(['Distância',...d.map(m=>'até '+m+' m'),'cada 6 m a mais'],[`<tr class="m31-row"><td><b>DT</b></td>${d.map(m=>`<td>${f(m)}</td>`).join('')}<td>+2</td></tr>`])+(gm31()?`<div class="m31-addrow"><button type="button" class="gm29-b gm29-add" data-m31tab="1">⚖ Ajustar DT base (Regras da Mesa)</button></div>`:'')},
+  doors(){let dt=12;try{dt=dtDoor22()}catch(e){}return tb31(['Modo','Teste exigido','Onda sonora gerada'],[tr31(['<b>Normal</b>','Nenhum','5 quadrados (7,5 m).']),tr31(['<b>Furtiva</b>',`Destreza + Furtividade (DT ${dt})`,'Sucesso: 1,2 quadrado (~1,8 m). Falha: rangido de 6 + (0,9 × margem da falha) quadrados (máx. 22 quadrados / 33 m).'])])},
+  ritual(b){const base=['Natureza','Inexistência','Ilusão','Verdade','Fé'];
+    const L=live31('ritual').filter(x=>b.el==='*'?!base.includes(x.v.element):x.v.element===b.el);
+    if(!L.length&&b.el==='*')return'';
+    return(b.el==='*'?'':gmA31('ritual','Ritual'))+L.map(({row,v})=>{const lv=v.levels||[v.desc,'',''];return`<article class="m31-rit m31-row" data-key="${esc(row.key)}"><header><h4>Ritual: ${esc(v.name)}</h4>${tag31(row.st)}${gmB31('ritual',row.key,v.name)}</header><p class="m31-meta">${[['Elemento',v.element],['Execução',v.exec],['Alcance',v.alcance],['Alvo',v.alvo],['Duração',v.dur]].filter(x=>x[1]).map(([k,x])=>`<span><i>${k}:</i> ${esc(x)}</span>`).join('')}</p><dl class="m31-pot">${['Base · 5 ES','Avançada · 10 ES','Próspera · 20 ES'].map((n,i)=>lv[i]?`<dt>${n}</dt><dd>${link31(esc(lv[i]))}</dd>`:'').join('')}</dl></article>`}).join('')},
+  subel(){let L=[];try{L=(rules29().subel||[])}catch(e){}
+    if(!L.length&&!gm31())return'';
+    return`<div class="m31-subel"><h4>Sub-Elementos da campanha</h4>${gmA31('subel','Sub-Elemento')}${L.map(s=>`<p class="m31-row" data-key="${esc(s.id)}"><b>${esc(s.name)}</b> <span class="m31-chip">${esc(s.element||'')}</span>${gmB31('subel',s.id,s.name)} — ${esc(s.desc||'')}</p>`).join('')||'<p class="sub">Nenhum sub-elemento próprio ainda.</p>'}</div>`},
+  weapons(){const L=live31('item').filter(x=>String(x.row.key).startsWith('weapon|'));
+    const fx=w=>[...(w.effects||[]).map(e=>(STATUS_BY_ID[e.status]?.name||e.status)+(e.when==='crit'?' no crítico':' no acerto')),w.area?'área':'' ].filter(Boolean).join(' · ')||'—';
+    return gmA31('item','Item')+tb31(['Arma','Cat.','Peso','Dano','Crít.','Perícia','Efeito'],L.map(({row,v})=>tr31([`<b>${esc(v.name)}</b>${tag31(row.st)}`,esc(v.cat||''),esc(v.peso||''),esc(v.dado||''),(Number(v.critMin)||20)>=20?'20':v.critMin+'–20',esc(v.skill||''),link31(esc(fx(v)))],{gm:gmB31('item',row.key,v.name),key:row.key})).concat(tr31(['<b>Soco (desarmado)</b> <span class="m31-st sys">sistema</span>','Corpo a corpo','Bolso','1d2','20','Briga','—'])),'m31-weap')},
+  prot(){const L=live31('item').filter(x=>String(x.row.key).startsWith('prot|'));
+    return tb31(['Proteção','Categoria','Peso','Defesa','Encaixe'],L.map(({row,v})=>tr31([`<b>${esc(v.name)}</b>${tag31(row.st)}`,esc(v.cat||''),esc(v.peso||''),'+'+(Number(v.def)||0),esc((SLOT_LABEL[v.slot]||v.slot||'').replace(' (colete/armadura)',''))],{gm:gmB31('item',row.key,v.name),key:row.key})))},
+  gear(){const L=live31('item').filter(x=>String(x.row.key).startsWith('gear|'));
+    return tb31(['Item','Peso','Cargas iniciais'],L.map(({row,v})=>tr31([`<b>${esc(v.name)}</b>${tag31(row.st)}`,esc(v.peso||''),String(v.qty||1)],{gm:gmB31('item',row.key,v.name),key:row.key})))},
+  status(){const L=live31('status');
+    const mech=s=>{const a=[];const dot=s.dot?.fixed||s.dot?.dice;if(dot)a.push(`${dot} de dano por turno`);if(s.defense)a.push(`${s.defense>0?'+':''}${s.defense} na Defesa`);if(s.physDice)a.push(`${s.physDice} dado em testes físicos`);const f=new Set(s.flags||[]);if(f.has('semMover'))a.push('movimento 0');if(f.has('semAgir'))a.push('não age');if(f.has('semAtacar'))a.push('não ataca');if(f.has('semDefender'))a.push('sem defesa');if(f.has('semReacao'))a.push('sem reações');if((s.disadv||[]).length)a.push('desvantagem em ataques');return a.join(' · ')};
+    return gmA31('status','Estado')+tb31(['Estado','Efeito mecânico oficial','Automação no site'],L.map(({row,v})=>tr31([`<b>${esc(v.name)}</b>${tag31(row.st)}${v.group==='sistema'?' <span class="m31-st sys">sistema</span>':''}`,esc(v.text||''),esc(mech(v))||'—'],{gm:gmB31('status',row.key,v.name),key:row.key})),'m31-status')},
+  table(){let t={};try{t=rules29().table||{}}catch(e){}const st=Number(t.dtStealth)||0;
+    return`<div class="m31-rules"><h4>Regras desta mesa${gm31()?' <button type="button" class="gm29-b" data-m31tab="1" title="Editar Regras da Mesa">✏️</button>':''}</h4><ul><li>Deslocamento base: <b>${String(Number(t.move)||9).replace('.',',')} m</b> por turno</li><li>DT do Arremesso até 6 m: <b>${Number(t.dtThrow)||12}</b></li><li>DT de Furtividade dos inimigos: <b>${st?st+' (fixa)':'10 + Percepção do inimigo'}</b></li></ul></div>`},
+  beast(){let L=[];try{L=rules29().beast||[]}catch(e){}
+    if(!L.length&&!gm31())return'<p class="m31-note">O Bestiário desta campanha ainda está vazio.</p>';
+    return`<h4 class="m31-sub">Bestiário da campanha</h4>${gmA31('beast','Criatura')}<div class="m31-cards">${L.map(b=>`<article class="m31-card m31-row" data-key="${esc(b.id)}"><header><h4>${esc(b.name)}</h4><span class="m31-chip">${esc(b.tier||'Inimigo')}</span>${gmB31('beast',b.id,b.name)}</header><p class="m31-meta"><span><i>Vitalidade:</i> ${esc(String(b.vital??'—'))}</span><span><i>Defesa:</i> ${esc(String(b.def??'—'))}</span><span><i>Ataque:</i> ${esc(String(b.atk??'—'))}</span><span><i>Dano:</i> ${esc(String(b.dano??'—'))}</span></p>${b.skills?`<p>${link31(esc(b.skills))}</p>`:''}${b.notes?`<p class="m31-desc">${esc(b.notes)}</p>`:''}</article>`).join('')}</div>`}
+};
+
+/* ---------- blocos de texto com edição do Mestre ---------- */
+const bid31=b=>Array.isArray(b)?b[0]:(b&&(b.id||b.glitch))||'';
+const btxt31=b=>Array.isArray(b)?b[1]:b.t;
+function gmTxt31(id,{edited=false,added=false}={}){
+  if(!gm31())return'';
+  return`<span class="m31-gm" role="group" aria-label="Mestre: bloco de texto"><button type="button" class="gm29-b" data-m31e="${esc(id)}" title="Editar texto" aria-label="Editar texto">✏️</button><button type="button" class="gm29-b" data-m31a="${esc(id)}" title="Adicionar parágrafo abaixo" aria-label="Adicionar parágrafo abaixo">＋</button><button type="button" class="gm29-b" data-m31d="${esc(id)}" title="Excluir" aria-label="Excluir bloco">🗑️</button>${edited&&!added?`<button type="button" class="gm29-b" data-m31r="${esc(id)}" title="Restaurar o texto original do manual" aria-label="Restaurar original">↺</button>`:''}</span>`;
+}
+function editor31(id,text){return`<div class="m31-edit" data-ed="${esc(id)}"><label class="sub" for="m31ta">Texto (use **negrito**, *itálico* e linhas começando com "- " para listas)</label><textarea id="m31ta" rows="${Math.min(14,Math.max(4,String(text).split('\n').length+2))}">${esc(text)}</textarea><div class="m31-edbar"><button type="button" class="btn small primary" data-m31save="${esc(id)}">Salvar no Manual</button><button type="button" class="btn small" data-m31cancel="1">Cancelar</button></div></div>`}
+function blockHtml31(b){
+  const D=man31();
+  if(b&&b.live){const f=LIVE31[b.live];let h='';try{h=f?f(b):''}catch(e){console.warn('[T31] componente',b.live,e);h='<p class="sub">Não consegui montar esta tabela agora.</p>'}return h?`<div class="m31-live" data-live="${esc(b.live)}">${h}</div>`:''}
+  if(b&&b.tb)return tb31(b.tb[0],b.tb.slice(1).map(r=>tr31(r.map((c,i)=>i===0?`<b>${esc(c)}</b>`:link31(esc(c))))));
+  if(b&&b.f)return`<pre class="m31-f">${esc(tokens31(b.f))}</pre>`;
+  const id=bid31(b),ed=D.ed[id];
+  if(ed&&ed.del)return gm31()?`<div class="m31-blk m31-gone"><span class="sub">Bloco removido nesta campanha.</span> <button type="button" class="gm29-b" data-m31r="${esc(id)}">↺ Restaurar</button></div>`:'';
+  const txt=ed&&ed.t!=null?ed.t:btxt31(b);
+  if(M31.edit===id)return editor31(id,txt);
+  if(b.box)return`<aside class="m31-aside m31-blk" data-bid="${esc(id)}"><h5>${esc(b.box)}</h5>${md31(txt)}${gmTxt31(id,{edited:!!ed})}</aside>`;
+  if(b.glitch)return`<blockquote class="m31-glitch m31-blk" data-bid="${esc(id)}">${md31(txt,{link:false})}${gmTxt31(id,{edited:!!ed})}</blockquote>`;
+  return`<div class="m31-blk" data-bid="${esc(id)}">${md31(txt)}${gmTxt31(id,{edited:!!ed})}</div>`;
+}
+function addsAfter31(id){
+  const D=man31();return(D.add||[]).filter(a=>a.after===id).map(a=>{
+    const ed=D.ed[a.id];if(ed&&ed.del)return'';
+    const txt=ed&&ed.t!=null?ed.t:a.t;
+    const self=M31.edit===a.id?editor31(a.id,txt):`<div class="m31-blk m31-added" data-bid="${esc(a.id)}">${md31(txt)}${gmTxt31(a.id,{added:true})}</div>`;
+    return self+addsAfter31(a.id);
+  }).join('');
+}
+function secHtml31(s,chap){
+  const D=man31(),h=D.ttl[s.id]!=null?D.ttl[s.id]:s.h;
+  const blocks=(s.b||[]).map(b=>{const id=bid31(b);return blockHtml31(b)+(id?addsAfter31(id):'')}).join('')+addsAfter31('end:'+s.id);
+  if(!blocks.trim()&&s.auto)return'';
+  const head=h||M31.edit==='ttl:'+s.id?(M31.edit==='ttl:'+s.id?`<div class="m31-edit" data-ed="ttl:${esc(s.id)}"><label class="sub" for="m31ti">Título da seção</label><input id="m31ti" value="${esc(h)}"><div class="m31-edbar"><button type="button" class="btn small primary" data-m31save="ttl:${esc(s.id)}">Salvar título</button><button type="button" class="btn small" data-m31cancel="1">Cancelar</button></div></div>`:`<h3 class="m31-h3">${esc(h)}${gm31()?`<button type="button" class="gm29-b m31-gm" data-m31t="${esc(s.id)}" title="Renomear seção" aria-label="Renomear seção">✏️</button>`:''}</h3>`):'';
+  const tail=gm31()?`<div class="m31-addrow m31-gm"><button type="button" class="gm29-b gm29-add" data-m31a="end:${esc(s.id)}">＋ Parágrafo no fim da seção</button></div>`:'';
+  return`<section class="m31-sec" id="m31-${esc(s.id)}" data-sec="${esc(s.id)}">${head}${blocks}${tail}</section>`;
+}
+function chapters31(){
+  const D=man31();
+  return MAN31.map(c=>({...c,secs:[...c.secs,...(D.secs||[]).filter(x=>x.chap===c.id).map(x=>({id:x.id,h:x.h,b:[],custom:1}))]}));
+}
+function content31(){
+  const D=man31();
+  return chapters31().map(c=>{const h=D.ttl[c.id]!=null?D.ttl[c.id]:c.h;
+    const secs=c.secs.map(s=>secHtml31(s,c)).join('');
+    return`<section class="m31-chap" id="m31-${esc(c.id)}" data-chap="${esc(c.id)}">${c.id==='intro'?'':`<h2 class="m31-h2">${esc(h)}${gm31()?`<button type="button" class="gm29-b m31-gm" data-m31t="${esc(c.id)}" title="Renomear capítulo" aria-label="Renomear capítulo">✏️</button>`:''}</h2>`}${secs}${gm31()&&c.id!=='intro'?`<div class="m31-addrow m31-gm"><button type="button" class="gm29-b gm29-add" data-m31ns="${esc(c.id)}">＋ Nova seção neste capítulo</button></div>`:''}</section>`}).join('');
+}
+function toc31(){
+  const D=man31();
+  return`<ol class="m31-toc">${chapters31().filter(c=>c.id!=='intro').map(c=>{const h=D.ttl[c.id]!=null?D.ttl[c.id]:c.h;const secs=c.secs.filter(s=>(D.ttl[s.id]!=null?D.ttl[s.id]:s.h));
+    return`<li data-tc="${esc(c.id)}"><details><summary><a href="#m31-${esc(c.id)}" data-go="${esc(c.id)}">${esc(h)}</a></summary>${secs.length?`<ol>${secs.map(s=>`<li data-ts="${esc(s.id)}"><a href="#m31-${esc(s.id)}" data-go="${esc(s.id)}">${esc(D.ttl[s.id]!=null?D.ttl[s.id]:s.h)}</a></li>`).join('')}</ol>`:''}</details></li>`}).join('')}</ol>`;
+}
+
+/* ---------- janela ---------- */
+function shell31(){
+  let w=$('man31');if(w)return w;
+  w=document.createElement('div');w.id='man31';w.className='man31 hide';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label','Manual do Sistema');
+  w.innerHTML=`<div class="m31-box">
+    <header class="m31-top">
+      <button type="button" class="btn small m31-tocbtn" id="m31toc" aria-expanded="false" aria-controls="m31nav">☰ Sumário</button>
+      <div class="m31-ttl"><h1>📖 ${esc(MAN31_TITLE)}</h1><p class="sub">${esc(MAN31_SUB)}</p></div>
+      <div class="m31-tools">
+        <label class="m31-search"><span class="sr-only">Buscar no Manual</span><input type="search" id="m31q" placeholder="Buscar ritual, estado, vocação, item ou regra…" autocomplete="off"></label>
+        <span class="m31-hits sub" id="m31hits" aria-live="polite"></span>
+        <label class="t3-switch m31-pvsw hide" id="m31pvw"><input type="checkbox" id="m31pv"><span>👁️ Pré-visualizar como Player</span></label>
+        <button type="button" class="btn small" id="m31print" title="Gera um PDF com o conteúdo atual (use Salvar como PDF na janela de impressão)">📥 <span class="m31-pl">Baixar </span>PDF<span class="m31-pl"> Atualizado</span></button>
+        <button type="button" class="btn small" id="m31x">Fechar</button>
+      </div>
+    </header>
+    <div class="m31-body">
+      <nav class="m31-nav" id="m31nav" aria-label="Sumário do Manual"></nav>
+      <div class="m31-main" id="m31main" tabindex="-1"><div class="m31-paper"><div class="m31-cover"><p class="m31-eyebrow">Sistema de Interpretação Teosófica &amp; Realista</p><h1>${esc(MAN31_TITLE)}</h1><p class="m31-coversub">${esc(MAN31_SUB)}</p><p class="m31-camp sub" id="m31camp"></p></div><div id="m31content"></div></div></div>
+    </div>
+  </div><div class="m31-pop hide" id="m31pop" role="tooltip"></div>`;
+  document.body.append(w);
+  $('m31x').onclick=close31;
+  w.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('m31pop').classList.contains('hide')){pop31(null);return}if($('sys29')&&!$('sys29').classList.contains('hide'))return;close31()}});
+  $('m31toc').onclick=()=>{M31.toc=!M31.toc;w.classList.toggle('m31-tocopen',M31.toc);$('m31toc').setAttribute('aria-expanded',String(M31.toc))};
+  let qt=0;$('m31q').oninput=e=>{clearTimeout(qt);qt=setTimeout(()=>{M31.q=e.target.value.trim();paint31(!M31.q);const f=$q('#m31content mark.m31-hl');if(f)f.scrollIntoView({block:'center'});else if(M31.q)$('m31main').scrollTop=0},140)};
+  $('m31pv').onchange=e=>{M31.pv=e.target.checked;M31.edit=null;paint31(true)};
+  $('m31print').onclick=print31;
+  $('m31nav').addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(!a)return;e.preventDefault();go31(a.dataset.go);if(innerWidth<900){M31.toc=false;w.classList.remove('m31-tocopen');$('m31toc').setAttribute('aria-expanded','false')}});
+  const main=$('m31main');
+  main.addEventListener('click',click31);
+  main.addEventListener('mouseover',e=>{const r=e.target.closest('.m31-ref');if(r&&matchMedia('(hover:hover)').matches)pop31(r)});
+  main.addEventListener('mouseout',e=>{const r=e.target.closest('.m31-ref');if(r&&!e.relatedTarget?.closest?.('.m31-pop')&&matchMedia('(hover:hover)').matches)setTimeout(()=>{if(!$('m31pop').matches(':hover'))pop31(null)},120)});
+  main.addEventListener('scroll',()=>{const n=Date.now();if(n-M31.scrollAt<120)return;M31.scrollAt=n;spy31()},{passive:true});
+  $('m31pop').addEventListener('mouseleave',()=>pop31(null));
+  return w;
+}
+function open31(target){
+  const w=shell31();M31.open=true;w.classList.remove('hide');document.body.classList.add('m31-on');base31(w);
+  const c=camp3();
+  if(c&&M31.camp!==c.id){M31.data=null;M31.camp=c.id;fetchMan31()}else if(c)fetchMan31();
+  if(!c){M31.data=defMan31();M31.camp=''}
+  if(c&&isGM6()){try{fetchRules29?.(false)}catch(e){}}
+  paint31();
+  setTimeout(()=>{$('m31main')?.focus({preventScroll:true});if(target)go31(target)},30);
+}
+/* algumas estéticas usam painel translúcido (vidro): o manual ganha uma base sólida da mesma família de cor */
+function base31(w){
+  try{const cs=getComputedStyle(document.body),bg=cs.backgroundColor,m=bg.match(/rgba?\(([^)]+)\)/);let base='';
+    if(m){const p=m[1].split(',').map(Number);if(p.length<4||p[3]>=.95)base=bg}
+    if(!base){const t=cs.color.match(/\d+/g)?.map(Number)||[230,230,230];const lum=(t[0]*.299+t[1]*.587+t[2]*.114);base=lum>140?'#14171d':'#f7f4ee'}
+    w.style.setProperty('--m31-base',base)}catch(e){}
+}
+function close31(){M31.open=false;M31.edit=null;pop31(null);$('man31')?.classList.add('hide');document.body.classList.remove('m31-on');if(camp3())seenSet31(man31().rev)}
+T3.manualOpen=open31;T3.manualClose=close31;
+function paint31(keep){
+  const w=$('man31');if(!w||!M31.open)return;
+  M31.renderAt=Date.now();
+  const main=$('m31main'),top=keep?main.scrollTop:0;
+  const isM=isGM6()&&!!camp3();
+  $('m31pvw').classList.toggle('hide',!isM);$('m31pv').checked=M31.pv;
+  w.classList.toggle('m31-gmmode',gm31());
+  const c=camp3();$('m31camp').textContent=c?`Campanha: ${c.name||''}${isM?(gm31()?' · Mestre (edição ligada)':' · pré-visualização de Player'):''}`:'Manual base (entre numa campanha para ver as regras da sua mesa)';
+  $('m31content').innerHTML=content31();
+  $('m31nav').innerHTML=toc31();
+  try{bindGm29($('m31content'))}catch(e){}
+  if(M31.q)search31(true);else $('m31hits').textContent='';
+  main.scrollTop=top;spy31();
+  if(M31.edit){const t=$('m31ta')||$('m31ti');if(t){t.focus();t.scrollIntoView?.({block:'center'})}}
+}
+function go31(id){const el=$('m31-'+id);if(!el)return;const main=$('m31main');const y=el.getBoundingClientRect().top-main.getBoundingClientRect().top+main.scrollTop;main.scrollTo({top:y-12,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});el.classList.add('m31-flash');setTimeout(()=>el.classList.remove('m31-flash'),1200)}
+function spy31(){
+  const main=$('m31main');if(!main)return;const y=main.scrollTop+80;let cur='';
+  $$('.m31-sec,.m31-chap',main).forEach(s=>{if(s.offsetTop<=y&&!s.classList.contains('m31-hid'))cur=s.dataset.sec||s.dataset.chap||cur});
+  $$('#m31nav a').forEach(a=>a.classList.toggle('on',a.dataset.go===cur));
+}
+
+/* ---------- busca instantânea com destaque ---------- */
+function search31(silent){
+  const main=$('m31content');if(!main)return;
+  if(!silent){paint31(true);return}
+  const q=norm31(M31.q);let hits=0;
+  $$('mark.m31-hl',main).forEach(m=>m.replaceWith(document.createTextNode(m.textContent)));
+  if(!q){$$('.m31-hid',main).forEach(e=>e.classList.remove('m31-hid'));$('m31hits').textContent='';$$('#m31nav li').forEach(l=>l.classList.remove('m31-dim'));return}
+  const has=el=>norm31(el.textContent).includes(q);
+  $$('.m31-sec',main).forEach(sec=>{
+    const rows=$$('.m31-row',sec),head=$q('.m31-h3',sec);
+    let any=false;
+    if(rows.length){let n=0;rows.forEach(r=>{const ok=has(r);r.classList.toggle('m31-hid',!ok);if(ok)n++});any=n>0;
+      const txt=$$('.m31-blk',sec).some(has)||(head&&has(head));if(!any&&txt){rows.forEach(r=>r.classList.remove('m31-hid'));any=true}}
+    else any=has(sec);
+    sec.classList.toggle('m31-hid',!any);
+  });
+  $$('.m31-chap',main).forEach(c=>c.classList.toggle('m31-hid',!$$('.m31-sec',c).some(s=>!s.classList.contains('m31-hid'))));
+  /* destaque nos textos visíveis */
+  const walker=document.createTreeWalker(main,NodeFilter.SHOW_TEXT,{acceptNode:n=>{const p=n.parentElement;if(!p||p.closest('.m31-hid,textarea,input,.m31-gm,.gm29,button.gm29-b,script,style'))return NodeFilter.FILTER_REJECT;return norm31(n.nodeValue).includes(q)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  nodes.forEach(n=>{const v=n.nodeValue,f=norm31(v);if(f.length!==v.length)return;const frag=document.createDocumentFragment();let i=0,j;
+    while((j=f.indexOf(q,i))>=0){frag.append(v.slice(i,j));const m=document.createElement('mark');m.className='m31-hl';m.textContent=v.slice(j,j+q.length);frag.append(m);hits++;i=j+q.length}
+    frag.append(v.slice(i));n.replaceWith(frag)});
+  $('m31hits').textContent=hits?`${hits} resultado${hits>1?'s':''}`:'Nada encontrado';
+  $$('#m31nav [data-ts],#m31nav [data-tc]').forEach(l=>{const id=l.dataset.ts||l.dataset.tc,el=$('m31-'+id);l.classList.toggle('m31-dim',!!el&&el.classList.contains('m31-hid'))});
+}
+
+/* ---------- links cruzados: resumo rápido sem sair da página ---------- */
+function refBody31(k,key){
+  try{
+    if(k==='status'){const s=cur29('status',key);const dot=s.dot?.fixed||s.dot?.dice;return`<b>${esc(s.name)}</b><span class="m31-pk">Estado</span><p>${esc(s.text||'')}</p>${s.narr?`<p class="m31-narr">“${esc(s.narr)}”</p>`:''}${dot?`<p class="sub">Dano por turno: ${esc(String(dot))}</p>`:''}`}
+    if(k==='ritual'){const r=cur29('ritual',key);return`<b>${esc(r.name)}</b><span class="m31-pk">Ritual · ${esc(r.element||'')}</span><p class="sub">${esc([r.exec,r.alcance,r.dur].filter(Boolean).join(' · '))}</p><p>${esc((r.levels||[r.desc])[0]||'')}</p>`}
+    if(k==='trauma'){const t=cur29('trauma',key);return`<b>${esc(t.name)}</b><span class="m31-pk">Trauma · ${esc(t.grp||'')}</span><p>${esc(t.text||'')}</p>`}
+  }catch(e){}
+  return'';
+}
+function pop31(el){
+  const p=$('m31pop');if(!p)return;
+  if(!el){p.classList.add('hide');M31.popFor=null;return}
+  const h=refBody31(el.dataset.rk,el.dataset.rv);if(!h){p.classList.add('hide');return}
+  M31.popFor=el;p.innerHTML=h+(el.dataset.rk!=='trauma'?`<button type="button" class="btn small" data-popgo="${el.dataset.rk}">Ver na tabela</button>`:'');
+  p.classList.remove('hide');
+  const r=el.getBoundingClientRect(),pw=Math.min(340,innerWidth-24);p.style.width=pw+'px';
+  let x=Math.max(12,Math.min(innerWidth-pw-12,r.left+r.width/2-pw/2)),y=r.bottom+8;
+  const ph=p.offsetHeight;if(y+ph>innerHeight-12)y=Math.max(12,r.top-ph-8);
+  p.style.left=x+'px';p.style.top=y+'px';
+  const g=p.querySelector('[data-popgo]');if(g)g.onclick=()=>{const k=el.dataset.rk,v=el.dataset.rv;pop31(null);const sec=k==='status'?'c10.1':null;
+    if(k==='ritual'){const row=$q(`.m31-rit[data-key="${CSS.escape(v)}"]`);if(row){row.scrollIntoView({block:'center'});row.classList.add('m31-flash');setTimeout(()=>row.classList.remove('m31-flash'),1200)}return}
+    if(sec){go31(sec);setTimeout(()=>{const row=$q(`#m31-${CSS.escape(sec)} tr[data-key="${CSS.escape(v)}"]`);if(row){row.scrollIntoView({block:'center'});row.classList.add('m31-flash');setTimeout(()=>row.classList.remove('m31-flash'),1200)}},350)}};
+}
+document.addEventListener('click',e=>{if(!M31.open)return;const p=$('m31pop');if(p&&!p.classList.contains('hide')&&!e.target.closest('.m31-pop,.m31-ref'))pop31(null)},true);
+
+/* ---------- cliques do Mestre (texto) e links ---------- */
+async function click31(e){
+  const t=e.target;
+  const ref=t.closest('.m31-ref');if(ref){e.preventDefault();if(M31.popFor===ref&&!$('m31pop').classList.contains('hide'))pop31(null);else pop31(ref);return}
+  const tab=t.closest('[data-m31tab]');if(tab){try{open29('table')}catch(err){}return}
+  if(!gm31()&&!t.closest('[data-m31cancel]'))return;
+  const D=man31();
+  const ed=t.closest('[data-m31e]');if(ed){M31.edit=ed.dataset.m31e;paint31(true);return}
+  const ti=t.closest('[data-m31t]');if(ti){M31.edit='ttl:'+ti.dataset.m31t;paint31(true);return}
+  const ad=t.closest('[data-m31a]');if(ad){const id=ridm31();D.add=D.add||[];D.add.push({id,after:ad.dataset.m31a,t:''});M31.edit=id;M31.newId=id;paint31(true);return}
+  const ns=t.closest('[data-m31ns]');if(ns){const h=prompt('Título da nova seção:','Nova seção');if(!h||!h.trim())return;const id=ridm31();D.secs=D.secs||[];D.secs.push({id,chap:ns.dataset.m31ns,h:h.trim().slice(0,120)});await saveMan31('Nova seção: '+h.trim());return}
+  const de=t.closest('[data-m31d]');if(de){const id=de.dataset.m31d;if(!confirm('Excluir este bloco do Manual desta campanha? Texto original do manual pode ser restaurado depois.'))return;
+    const me=(D.add||[]).find(a=>a.id===id);
+    if(me){D.add.forEach(a=>{if(a.after===id)a.after=me.after});D.add=D.add.filter(a=>a.id!==id);delete D.ed[id]}
+    else D.ed[id]={del:1};
+    await saveMan31('Bloco removido');return}
+  const rs=t.closest('[data-m31r]');if(rs){delete D.ed[rs.dataset.m31r];await saveMan31('Texto restaurado');return}
+  if(t.closest('[data-m31cancel]')){if(M31.newId){D.add=(D.add||[]).filter(a=>!(a.id===M31.newId&&!a.t));M31.newId=null}M31.edit=null;paint31(true);return}
+  const sv=t.closest('[data-m31save]');if(sv){const id=sv.dataset.m31save;
+    if(id.startsWith('ttl:')){const v=($('m31ti')?.value||'').trim().slice(0,140);if(!v){toast('O título não pode ficar vazio.');return}D.ttl[id.slice(4)]=v;M31.edit=null;await saveMan31('Título: '+v);return}
+    const v=($('m31ta')?.value||'').replace(/\r/g,'').trim();
+    if(!v){toast('Escreva o texto ou use 🗑️ para excluir.');return}
+    if(v.length>6000){toast('Texto muito longo (máximo 6000 caracteres por bloco).');return}
+    const a=(D.add||[]).find(x=>x.id===id);if(a){a.t=v;delete D.ed[id]}else D.ed[id]={t:v};
+    M31.edit=null;M31.newId=null;
+    const sec=$q(`[data-ed="${CSS.escape(id)}"]`)?.closest('.m31-sec');const h=sec?$q('.m31-h3',sec)?.textContent:'';
+    await saveMan31(h||'Texto do Manual');return}
+}
+
+/* ---------- PDF atualizado (impressão limpa) ---------- */
+function print31(){
+  if(M31.q){M31.q='';$('m31q').value='';paint31(true)}
+  M31.edit=null;const pv=M31.pv;M31.pv=true;paint31(true);
+  $$('#man31 details').forEach(d=>d.open=true);
+  document.body.classList.add('m31-print');
+  const done=()=>{document.body.classList.remove('m31-print');M31.pv=pv;paint31(true);removeEventListener('afterprint',done)};
+  addEventListener('afterprint',done);
+  setTimeout(()=>{try{window.print()}catch(e){done()}},60);
+}
+
+/* ---------- botões de entrada ---------- */
+function entry31(){
+  $$('.t3-themewrap.in-top').forEach(w=>{if(w.querySelector('.m31-open'))return;const b=document.createElement('button');b.type='button';b.className='btn small ghost m31-open t31-top';b.innerHTML='<span aria-hidden="true">📖</span> Manual';b.title='Manual do Sistema';b.onclick=()=>open31();w.prepend(b)});
+  const grid=$q('#campaignHub .portal-grid');
+  if(grid&&!$('openMan31')){const b=document.createElement('button');b.className='portal-card m31-card m31-open';b.id='openMan31';b.innerHTML='<div class="symbol">📖</div><h2>Manual do Sistema</h2><p>Regras, catálogos e lore da campanha, sempre atualizados com o que vale na mesa.</p>';b.onclick=()=>open31();grid.prepend(b)}
+  badge31();
+}
+setTimeout(entry31,0);setTimeout(entry31,1600);setInterval(()=>{try{entry31()}catch(e){}},2500);
+M6.hooks.leave.push(()=>{if(M31.open)close31();M31.data=null;M31.camp=''});
+T3.manualDbg={md31,refs31,search31,fetchMan31,saveMan31,LIVE31,man31};
+console.info('[Tulpa] Etapa 31 carregada (Manual Vivo)');
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
