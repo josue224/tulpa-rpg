@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="21/11 11:56">
+<meta name="tulpa-build" content="21/11 12:12">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3284,6 +3284,43 @@ body.m31-on #t3Cat,body.m31-on .t3-cat,body.m31-on #t3CatBubble{visibility:hidde
 .rs-ctlrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.rs-ctlb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;flex:1;min-width:200px}.rs-ctlb .sub{flex-basis:100%;margin:2px 0 0}
 .rs-prev{width:64px;height:64px;display:grid;place-items:center}
 body.m31-print .rsym{filter:none!important}
+
+/* Etapa 33 · Ciclo Elemental */
+.cy33w{margin:14px 0 18px;padding:0}
+.cy33{display:block;width:100%;max-width:880px;height:auto;margin:0 auto;overflow:visible;color:var(--text,currentColor);font-family:var(--f-ui,inherit)}
+.cy33 .cy-star{fill:none;stroke:currentColor;stroke-width:1.6;opacity:.16}
+.cy33 .cy-arc{fill:none;stroke:currentColor;stroke-width:3.4;opacity:.75;transition:opacity .25s,stroke-width .25s}
+.cy33 .cy-head{fill:currentColor}
+.cy33 .cy-sub rect{fill:var(--panel,transparent);stroke:currentColor;stroke-width:2.6}
+.cy33 .cy-pill{font-size:25px;font-weight:700;letter-spacing:.02em;text-anchor:middle;dominant-baseline:central;fill:currentColor}
+.cy33 .cy-desc{font-size:24px;text-anchor:middle;fill:currentColor;opacity:.85;paint-order:stroke;stroke:var(--panel,#fff);stroke-width:10px;stroke-linejoin:round}
+.cy33 .cy-sub{transition:opacity .25s}
+.cy33 .cy-el{cursor:pointer;color:color-mix(in srgb,var(--rs-hue) 62%,var(--text,currentColor));outline:none}
+.cy33 .cy-disc{fill:currentColor;opacity:.06;transition:opacity .25s}
+.cy33 .cy-ring{fill:none;stroke:currentColor;stroke-width:4.4}
+.cy33 .cy-ic{fill:none;stroke:currentColor;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.cy33 .cy-ic .cy-fill{fill:currentColor;stroke:none}
+.cy33 .cy-name{font-size:36px;font-weight:800;letter-spacing:.03em;fill:var(--text,currentColor);dominant-baseline:central;font-family:var(--f-display,inherit)}
+.cy33 .cy-el:is(:hover,:focus-visible,.on,.sel) .cy-disc{opacity:.16}
+.cy33 .cy-el:is(:hover,:focus-visible) .cy-ic{transform:scale(1.08)}
+.cy33 .cy-el:focus-visible .cy-ring{stroke-width:7}
+.cy33 .cy-el.sel .cy-ring{stroke-width:7}
+.cy33w.cy-focus .cy-arc:not(.on){opacity:.18}.cy33w.cy-focus .cy-arc.on{stroke-width:4.6;opacity:1}
+.cy33w.cy-focus .cy-sub:not(.on){opacity:.3}
+.cy-leg{display:none;list-style:none;margin:10px 0 0;padding:0;font-size:.9rem}
+.cy-leg li{padding:6px 0;border-top:1px solid var(--line,rgba(128,128,128,.25));transition:opacity .25s}
+.cy-leg .cy-eq{opacity:.7;font-size:.85em;margin-left:4px}.cy-leg .cy-ld{display:block;opacity:.85}
+.cy33w.cy-focus .cy-leg li:not(.on){opacity:.45}
+.cy-hint{text-align:center;margin:6px 0 0}
+.cy-det{margin:4px 0 14px;border:1px solid var(--line,rgba(128,128,128,.3));border-radius:12px;padding:8px 14px}
+.cy-det>summary{cursor:pointer;font-weight:700;list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cy-det>summary::-webkit-details-marker{display:none}
+.cy-det>summary::after{content:'▾';margin-left:auto;transition:transform .25s}.cy-det[open]>summary::after{transform:rotate(180deg)}
+.cy-det>summary .sub{font-weight:400}.cy-sumic{font-size:1.1em}
+.cy-det .cy33{max-width:620px}
+@media (max-width:640px){.cy33 .cy-sub{display:none}.cy-leg{display:block}.cy33 .cy-name{font-size:44px}.cy33 .cy-arc{stroke-width:4.4}}
+@media (prefers-reduced-motion:reduce){.cy33 .cy-ic,.cy33 .cy-arc,.cy33 .cy-sub,.cy33 .cy-disc{transition:none}.cy33 .cy-el:is(:hover,:focus-visible) .cy-ic{transform:none}}
+body.m31-print .cy-sub{display:inline}body.m31-print .cy-hint{display:none}
 
 </style>
 <script id="tulpa-etapa3">
@@ -7816,7 +7853,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='21/11 11:56';
+const BUILD8='21/11 12:12';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -9292,7 +9329,13 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'✴️ Símbolos dos Rituais',w:'a',open:1,b:`<ul>
+  {t:'⟡ Diagrama do Ciclo Elemental',w:'a',open:1,b:`<ul>
+    <li>Os cinco elementos e os sub-elementos que nascem entre eles (Sol, Desrealização, Pofenia, Confabulação e Metáfora) num diagrama só.</li>
+    <li>No <b>📖 Manual</b>, capítulo 8: toque num elemento para ir direto aos rituais dele.</li>
+    <li>Na ficha, em <b>Registros → Repertório ritualístico</b>, abra "Ciclo Elemental": tocar num elemento filtra os rituais daquele elemento.</li>
+    <li>Passar o mouse num elemento acende os dois sub-elementos ligados a ele.</li>
+  </ul>`},
+  {t:'✴️ Símbolos dos Rituais',w:'a',b:`<ul>
     <li>Os <b>40 símbolos</b> do livro de regras (V1.2) foram redesenhados em vetor, com traço limpo e anel perfeito, mantendo o desenho original de cada um.</li>
     <li>Aparecem nos <b>cartões de ritual da ficha</b>, no <b>menu de combate</b>, na janela de <b>conjuração</b>, no <b>Manual</b>, no resumo rápido e na central ⚙️. Cada elemento tem a sua cor, ajustada para ter boa leitura em todas as estéticas.</li>
     <li>Ao conjurar, o símbolo do ritual brilha na tela por um instante.</li>
@@ -17404,6 +17447,120 @@ function symCtl32(){
 /* ---------- regras: o símbolo viaja junto com o ritual ---------- */
 {const _rs=ritSet29;ritSet29=function(x,o){_rs.apply(this,arguments);if(o&&o.sym!==undefined){if(o.sym)x.sym=o.sym;else delete x.sym}}}
 console.info('[Tulpa] Etapa 32 carregada (símbolos dos rituais)');
+
+/* ===================================================================
+   TULPA · ETAPA 33 — Diagrama do Ciclo Elemental
+   - SVG desenhado no próprio site (nítido, segue a cor de texto e os
+     tons de elemento da estética ativa).
+   - Manual (cap. 8): tocar num elemento leva aos rituais dele.
+   - Ficha (Repertório ritualístico): bloco recolhível; tocar num
+     elemento filtra o catálogo de rituais.
+   - Passar o mouse/foco num elemento destaca os dois sub-elementos
+     que nascem dele.
+   =================================================================== */
+const CY33={
+  els:[
+    {n:'Fé',k:'fe',sec:'c8.6'},
+    {n:'Natureza',k:'nat',sec:'c8.2'},
+    {n:'Inexistência',k:'inx',sec:'c8.3'},
+    {n:'Ilusão',k:'ilu',sec:'c8.4'},
+    {n:'Verdade',k:'ver',sec:'c8.5'}
+  ],
+  /* sub-elemento entre o elemento i e o i+1 */
+  subs:[
+    {n:'Sol',d:['Energia vital','e purificação.']},
+    {n:'Desrealização',d:['Dissolução da','realidade física.']},
+    {n:'Pofenia',d:['Padrões falsos e','realidades alternativas.']},
+    {n:'Confabulação',d:['Memórias falsas que','parecem reais.']},
+    {n:'Metáfora',d:['Revelações expressas','simbolicamente.']}
+  ],
+  icon:{
+    fe:'<path d="M0 -44L24 -6L0 30L-24 -6Z"/><path d="M-28 0L0 44L28 0"/><path class="cy-fill" d="M0 -28L4.5 -10.5L20 -6L4.5 -1.5L0 16L-4.5 -1.5L-20 -6L-4.5 -10.5Z"/>',
+    nat:'<path d="M0 4C-12 -8 -11 -28 0 -40C11 -28 12 -8 0 4Z"/><path d="M0 4C-10 -4 -28 -8 -34 -26C-18 -28 -4 -18 0 4Z"/><path d="M0 4C10 -4 28 -8 34 -26C18 -28 4 -18 0 4Z"/><path d="M0 4V-30M0 4L-26 -21M0 4L26 -21"/><path d="M-38 12H38"/><path d="M0 4V36M0 14C-6 22 -14 22 -17 34M0 14C6 22 14 22 17 34M-17 34V40M17 34V40M-24 12C-26 18 -32 18 -34 24M24 12C26 18 32 18 34 24"/>',
+    inx:'<path class="cy-fill" d="M-4 -30A30 30 0 0 0 -4 30A37 37 0 0 1 -4 -30Z"/><circle cx="4" cy="0" r="27"/><path d="M17 -23.6A27 27 0 0 1 17 23.6"/><path d="M27 -19A33 33 0 0 1 27 19" stroke-dasharray="8 6"/>',
+    ilu:'<path d="M0 -38L36 24H-36Z"/><path d="M0 -12L27 34H-27Z"/><path d="M-21 0L-12 -15M21 0L12 -15"/>',
+    ver:'<circle cx="0" cy="-36" r="9"/><path d="M0 -27L32 26H-32Z"/><path d="M0 -26V44" stroke-dasharray="9 7"/>'
+  }
+};
+let cyN33=0;
+function cycleSvg33(){
+  const mid_='cyArr'+(++cyN33);
+  const W=1400,H=960,cx=700,cy=470,Rp=290,r=70;
+  const LP=[[310,-280],[450,90],[0,360],[-450,90],[-310,-280]];
+  const P=CY33.els.map((e,i)=>{const a=(-90+72*i)*Math.PI/180;return{...e,x:cx+Rp*Math.cos(a),y:cy+Rp*Math.sin(a),a}});
+  const f=v=>v.toFixed(1);
+  /* linhas da estrela (pentagrama) */
+  let star='';for(let i=0;i<5;i++){const A=P[i],B=P[(i+2)%5];star+=`M${f(A.x)} ${f(A.y)}L${f(B.x)} ${f(B.y)}`}
+  /* arcos entre vizinhos + rótulos dos sub-elementos */
+  let arcs='',pills='';
+  P.forEach((A,i)=>{const B=P[(i+1)%5],mx=(A.x+B.x)/2,my=(A.y+B.y)/2,ox=mx-cx,oy=my-cy,ol=Math.hypot(ox,oy),ux=ox/ol,uy=oy/ol;
+    const C={x:mx+ux*46,y:my+uy*46};
+    const cut=(p,q,d)=>{const dx=q.x-p.x,dy=q.y-p.y,l=Math.hypot(dx,dy);return{x:p.x+dx/l*d,y:p.y+dy/l*d}};
+    const s=cut(A,C,r+16),e=cut(B,C,r+16);
+    const sub=CY33.subs[i];
+    arcs+=`<path class="cy-arc" data-a="${A.k}" data-b="${B.k}" d="M${f(s.x)} ${f(s.y)}Q${f(C.x)} ${f(C.y)} ${f(e.x)} ${f(e.y)}" marker-start="url(#${mid_})" marker-end="url(#${mid_})"/>`;
+    const mid={x:.25*s.x+.5*C.x+.25*e.x,y:.25*s.y+.5*C.y+.25*e.y};
+    const L={x:cx+LP[i][0],y:cy+LP[i][1]},w=sub.n.length*17+48;
+    pills+=`<g class="cy-sub" data-a="${A.k}" data-b="${B.k}" transform="translate(${f(L.x)} ${f(L.y)})"><title>${esc(sub.n)}: ${esc(A.n)} + ${esc(B.n)}. ${esc(sub.d.join(' '))}</title><rect x="${-w/2}" y="-24" width="${w}" height="48" rx="24"/><text class="cy-pill" y="1">${esc(sub.n.toUpperCase())}</text><text class="cy-desc" y="52">${esc(sub.d[0])}</text><text class="cy-desc" y="82">${esc(sub.d[1])}</text></g>`;
+  });
+  /* elementos */
+  const lab=(e)=>{const dx=Math.cos(e.a),dy=Math.sin(e.a);
+    if(e.k==='fe')return`<text class="cy-name" x="0" y="${-r-30}" text-anchor="middle">${esc(e.n.toUpperCase())}</text>`;
+    const right=dx>0;return`<text class="cy-name" x="${right?r+24:-r-24}" y="2" text-anchor="${right?'start':'end'}">${esc(e.n.toUpperCase())}</text>`};
+  const els=P.map(e=>`<g class="cy-el rs-${e.k}" data-el="${esc(e.n)}" data-k="${e.k}" data-sec="${e.sec}" transform="translate(${f(e.x)} ${f(e.y)})" role="button" tabindex="0" aria-label="${esc(e.n)}: ver rituais deste elemento"><circle class="cy-disc" r="${r}"/><circle class="cy-ring" r="${r}"/><g class="cy-ic">${CY33.icon[e.k]}</g>${lab(e)}</g>`).join('');
+  return`<svg class="cy33" viewBox="0 0 ${W} ${H}" role="group" aria-label="Diagrama do Ciclo Elemental: cinco elementos e os sub-elementos que nascem entre eles">
+    <defs><marker id="${mid_}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10L3 5Z" class="cy-head"/></marker></defs>
+    <path class="cy-star" d="${star}"/>${arcs}${pills}${els}</svg>`;
+}
+function cycle33(where){
+  const leg=CY33.subs.map((s,i)=>{const a=CY33.els[i],b=CY33.els[(i+1)%5];return`<li data-a="${a.k}" data-b="${b.k}"><b>${esc(s.n)}</b> <span class="cy-eq">${esc(a.n)} + ${esc(b.n)}</span> <span class="cy-ld">${esc(s.d.join(' '))}</span></li>`}).join('');
+  return`<figure class="cy33w cy-${where}">${cycleSvg33()}<figcaption><ul class="cy-leg">${leg}</ul><p class="sub cy-hint">${where==='sheet'?'Toque num elemento para ver só os rituais dele.':'Toque num elemento para ir aos rituais dele.'}</p></figcaption></figure>`;
+}
+T3.cycle33=cycle33;
+/* celular: sem as etiquetas dos sub-elementos, recorta o desenho para os nomes ficarem maiores */
+const vb33=()=>{const n=matchMedia('(max-width:640px)').matches;$$('svg.cy33').forEach(s=>{const v=n?'40 40 1320 770':'0 0 1400 960';if(s.getAttribute('viewBox')!==v)s.setAttribute('viewBox',v)})};
+addEventListener('resize',vb33);new MutationObserver(m=>{if(m.some(x=>x.addedNodes.length))vb33()}).observe(document.body,{childList:true,subtree:true});
+
+/* destaque: elemento ativo acende os dois sub-elementos vizinhos */
+function hi33(fig,k){
+  if(!fig)return;fig.classList.toggle('cy-focus',!!k);
+  fig.querySelectorAll('.cy-el').forEach(g=>g.classList.toggle('on',g.dataset.k===k));
+  fig.querySelectorAll('.cy-arc,.cy-sub,.cy-leg li').forEach(g=>g.classList.toggle('on',!!k&&(g.dataset.a===k||g.dataset.b===k)));
+}
+const act33=g=>{
+  const fig=g.closest('.cy33w');if(!fig)return;
+  if(fig.classList.contains('cy-manual')){try{go31(g.dataset.sec)}catch(e){}return}
+  const sel=$('ritualElement');if(!sel)return;
+  const same=sel.value===g.dataset.el;sel.value=same?'':g.dataset.el;sel.dispatchEvent(new Event('change'));
+  fig.dataset.sel=same?'':g.dataset.k;fig.querySelectorAll('.cy-el').forEach(x=>x.classList.toggle('sel',!same&&x===g));
+  if(!same)toast(`Mostrando rituais de ${g.dataset.el}.`);
+};
+document.addEventListener('click',e=>{const g=e.target.closest('.cy33 .cy-el');if(g)act33(g)});
+document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const g=e.target.closest?.('.cy33 .cy-el');if(g){e.preventDefault();act33(g)}});
+document.addEventListener('pointerover',e=>{const g=e.target.closest?.('.cy33 .cy-el');const fig=e.target.closest?.('.cy33w');if(fig)hi33(fig,g?g.dataset.k:'')});
+document.addEventListener('focusin',e=>{const g=e.target.closest?.('.cy33 .cy-el');if(g)hi33(g.closest('.cy33w'),g.dataset.k)});
+document.addEventListener('focusout',e=>{const g=e.target.closest?.('.cy33 .cy-el');if(g)hi33(g.closest('.cy33w'),'')});
+document.addEventListener('pointerout',e=>{const fig=e.target.closest?.('.cy33w');if(fig&&!fig.contains(e.relatedTarget))hi33(fig,'')});
+
+/* Manual: componente vivo no capítulo 8 */
+LIVE31.cycle=()=>cycle33('manual');
+{const c8=MAN31.find(c=>c.id==='c8');const s0=c8&&c8.secs.find(s=>s.id==='c8.0');
+ if(s0&&!s0.b.some(b=>b&&b.live==='cycle')){const i=s0.b.findIndex(b=>Array.isArray(b)&&b[0]==='c8.l1');s0.b.splice(i>=0?i+1:1,0,{live:'cycle'})}}
+
+/* Ficha: bloco recolhível no Repertório ritualístico */
+function sheet33(){
+  const cat=$('ritualCatalog');if(!cat||$('cy33sheet'))return;
+  const grid=cat.closest('.panel')?.querySelector('.grid.two');if(!grid)return;
+  const d=document.createElement('details');d.className='cy-det';d.id='cy33sheet';
+  let open=false;try{open=localStorage.getItem('tulpa_cy_open')==='1'}catch(e){}
+  d.open=open;
+  d.innerHTML=`<summary><span class="cy-sumic" aria-hidden="true">⟡</span> Ciclo Elemental <span class="sub">os cinco elementos e seus sub-elementos</span></summary>${cycle33('sheet')}`;
+  d.addEventListener('toggle',()=>{try{localStorage.setItem('tulpa_cy_open',d.open?'1':'0')}catch(e){}});
+  grid.before(d);
+  const sel=$('ritualElement');if(sel)sel.addEventListener('change',()=>{const fig=d.querySelector('.cy33w');const k=(CY33.els.find(x=>x.n===sel.value)||{}).k||'';fig.querySelectorAll('.cy-el').forEach(x=>x.classList.toggle('sel',x.dataset.k===k))});
+}
+setTimeout(sheet33,500);setInterval(()=>{try{sheet33()}catch(e){}},2500);
+console.info('[Tulpa] Etapa 33 carregada (Ciclo Elemental)');
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
