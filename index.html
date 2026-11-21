@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="21/11 13:54">
+<meta name="tulpa-build" content="21/11 14:13">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3357,6 +3357,12 @@ body{--h-fe:#d39a26;--h-nat:#3f9a5c;--h-inx:#8270cc;--h-ilu:#c4579c;--h-ver:#3b9
 .sub34-pill small{opacity:.75;font-weight:500;margin-left:2px}
 @media (max-width:640px){.sub34-head{flex-direction:column;align-items:flex-start}}
 
+/* Etapa 35 · aprimoramentos e itens vivos */
+.wm35-list{display:grid;gap:8px;margin-top:8px}
+.wm35{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line,rgba(128,128,128,.3));border-radius:10px;cursor:pointer}
+.wm35 input{margin-top:3px;flex:none}.wm35:has(input:checked){border-color:var(--accent,currentColor);background:color-mix(in srgb,var(--accent,#888) 10%,transparent)}
+.wm35-tag{font-weight:600}
+
 </style>
 <script id="tulpa-etapa3">
 (()=>{
@@ -3402,6 +3408,31 @@ const SLOT_LABEL={roupa:'Roupa',tronco:'Tronco (colete/armadura)',cabeca:'Cabeç
 const GEAR=[
 ['Lanterna','Leve'],['Medidor EMF','Leve'],['Termômetro','Leve'],['Toca-fitas','Leve'],['Câmera','Médio'],['Kit médico','Médio',3],['Kit cirúrgico','Médio',3],['Suprimento de Emergência (ataduras/kit tático)','Leve',3],['Chaves','Bolso'],['Isqueiro','Bolso'],['Fita K7','Bolso'],['Munição solta','Bolso'],['Ampola','Bolso'],['Pílula','Bolso'],['Calmante forte','Bolso'],['Antibiótico','Bolso']
 ].map(([name,peso,qty])=>({name,peso,qty:qty||1}));
+
+/* ---- Onda 2 (Expansão): armas, proteções e equipamentos novos ---- */
+const W2=(name,cat,peso,dado,critMin,skill,fx=[],note='',area=false)=>({name,cat,peso,dado,critMin,skill,area,effects:fx.map(([status,when])=>({status,when})),note});
+WEAPONS.push(
+W2('Pé-de-cabra','Corpo a corpo','Médio','1d6',20,'Armas Brancas',[['atordoado','crit']],'também força portas e tampas (+5 em Atletismo para arrombar)'),
+W2('Bisturi','Corpo a corpo','Bolso','1d4',18,'Armas Brancas',[['sangrando','crit']],'cortes precisos'),
+W2('Foice de jardinagem','Corpo a corpo','Médio','1d8',19,'Armas Brancas',[['sangrando','crit']]),
+W2('Taco com pregos','Corpo a corpo','Médio','1d8',20,'Armas Brancas',[['sangrando','crit']],'improvisado e cruel'),
+W2('Corrente com cadeado','Corpo a corpo','Médio','1d6',20,'Armas Brancas',[['agarrado','crit']],'enrola o alvo no crítico'),
+W2('Punhal de ferro frio','Corpo a corpo','Leve','1d4',19,'Armas Brancas',[['exposto','crit']],'ferro frio: criaturas de Inexistência e Ilusão sofrem +1d4'),
+W2('Pistola sinalizadora','Distância','Médio','1d6',20,'Armas de Disparo',[['queimando','hit'],['ofuscado','crit']],'ilumina a área por 1 rodada'),
+W2('Arpão de mergulho','Distância','Médio','1d8',19,'Armas de Disparo',[['agarrado','hit']],'alcance curto; o cabo prende o alvo'),
+W2('Rifle de dardos tranquilizantes','Distância','Médio','1d2',20,'Armas de Disparo',[['sonolento','hit']],'dardo sedativo'),
+W2('Espingarda de sal grosso','Distância','Pesado','1d6',20,'Armas de Disparo',[['exposto','crit']],'sal grosso: espantos e espíritos recuam'),
+W2('Bomba de fumaça','Especial','Leve','1d2',20,'Arremesso',[['ofuscado','hit']],'nuvem de 3 m por 2 rodadas',true),
+W2('Granada de luz (flashbang)','Especial','Leve','1d2',20,'Arremesso',[['ofuscado','hit'],['surdo','hit']],'estouro de luz e som',true),
+W2('Frasco de água benta','Especial','Leve','1d4',20,'Arremesso',[['corroido','hit']],'queima o que é profano',true),
+W2('Coquetel de ácido','Especial','Leve','1d6',20,'Arremesso',[['corroido','hit']],'frasco artesanal',true),
+W2('Boleadeira','Distância','Leve','1d4',20,'Arremesso',[['caido','hit']],'enrola as pernas do alvo')
+);
+[['Jaqueta de couro com tachas','Vestimenta','Médio',2,'roupa'],['Colete de cerâmica leve','Equipamento','Médio',4,'tronco'],['Capacete de motociclista','Equipamento','Médio',2,'cabeca'],['Porta de carro (escudo)','Equipamento','Pesado',3,'escudo'],['Manto bordado com sigilos','Vestimenta','Leve',1,'roupa']].forEach(([name,cat,peso,def,slot])=>PROTECTIONS.push({name,cat,peso,def,slot}));
+[['Kit de gazuas','Bolso'],['Lupa de joalheiro','Bolso'],['Binóculos','Leve'],['Estetoscópio','Bolso'],['Máscara de gás','Leve'],['Gravador de voz digital','Leve'],
+ ['Morfina (ampola)','Bolso',2],['Adrenalina (autoinjetor)','Bolso',2],['Ansiolítico','Bolso',3],['Antídoto','Bolso',2],['Bandagem hemostática','Bolso',3],['Café extraforte','Bolso',3],['Sais aromáticos','Bolso',2],['Pomada para queimaduras','Bolso',2],
+ ['Amuleto de olho turco','Bolso'],['Relógio de bolso parado','Bolso'],['Espelho de obsidiana','Leve'],['Rosário de dentes','Bolso'],['Vela de sebo negro','Leve'],['Ferradura torta','Bolso'],['Medalhão do vigia','Leve'],['Boneca sem rosto','Leve']
+].forEach(([name,peso,qty])=>GEAR.push({name,peso,qty:qty||1}));
 
 /* Estados (Tabela de Estado + estados do sistema). mods: attrDice, skillDice, physDice, socialDice, skillFlat, defense, disadv, flags, dot */
 const ST=(id,name,group,narr,text,extra)=>({id,name,group,narr,text,...extra});
@@ -3499,6 +3530,40 @@ const EXTASE_DEFS=[
 const EXTASE_BY_ID=Object.fromEntries(EXTASE_DEFS.map(t=>[t.id,t]));
 
 /* Correções de catálogo: arquétipo correto das trilhas segundo o manual */
+/* ---- Onda 2 (Expansão): trilhas novas do Despertar ---- */
+const NEW_TRACKS=[
+{archetype:'Lutador',name:'Corpo Votivo',desc:'Você oferece o próprio corpo como promessa: a dor vira escudo para quem luta ao seu lado.',stages:[
+ {stage:3,name:'Pele Votiva',desc:'Gaste 5 ES: +3 na Defesa por 2 rodadas.',cost:5},
+ {stage:5,name:'Juramento de Sangue',desc:'Gaste 10 ES: +2 no dano dos seus ataques corpo a corpo até o fim da cena. Sempre que um aliado a até 3 m cair a 0 VT, você recupera 1d8 VT.',cost:10},
+ {stage:8,name:'Mártir',desc:'Gaste 15 ES: por 3 rodadas, você recebe no lugar de um aliado a até 3 m todo o dano que ele sofreria, e tem resistência 5 a qualquer dano.',cost:15},
+ {stage:10,name:'Relicário Vivo',desc:'+3 na Defesa enquanto estiver com menos da metade do Vital, e imunidade a Amedrontado e Apavorado.',cost:0}]},
+{archetype:'Lutador',name:'Caçador do Véu',desc:'Treinado para enfrentar o que atravessa o véu: rastreia, prende e quebra criaturas que não deveriam existir.',stages:[
+ {stage:3,name:'Faro do Outro Lado',desc:'Gaste 5 ES: +5 em Rastreamento e Observação até o fim da cena para seguir criaturas teosóficas.',cost:5},
+ {stage:5,name:'Golpe de Ferro Frio',desc:'Gaste 10 ES: seu próximo ataque causa +1d8 de dano e o alvo fica Exposto.',cost:10},
+ {stage:8,name:'Corrente de Prata',desc:'Gaste 15 ES: prende um inimigo a até 6 m, que fica Agarrado e Iluminado (Atletismo DT 16 para se soltar).',cost:15},
+ {stage:10,name:'Sentença do Caçador',desc:'+1 dado de dano contra criaturas de Inexistência e Ilusão, e seus críticos contra elas acontecem com 18–20.',cost:0}]},
+{archetype:'Gênio',name:'Arquivista do Impossível',desc:'Cataloga o inexplicável. Cada fato anotado vira uma arma, e cada contradição, uma porta.',stages:[
+ {stage:3,name:'Índice Remissivo',desc:'Gaste 5 ES: +10 em Pesquisa e Investigação até o fim da cena.',cost:5},
+ {stage:5,name:'Nota de Rodapé',desc:'Gaste 10 ES: marca um inimigo estudado. Ele fica Marcado, e você e aliados têm +2 no ataque contra ele por 3 rodadas.',cost:10},
+ {stage:8,name:'Errata',desc:'Gaste 15 ES, uma vez por cena: anule o último teste (seu, de um aliado ou de um inimigo a até 9 m), que deve ser rolado de novo.',cost:15},
+ {stage:10,name:'Biblioteca Interior',desc:'Imune a Fragmentado e Ecoado, e +5 em Teosofia em todos os testes.',cost:0}]},
+{archetype:'Gênio',name:'Engenheiro de Ruído',desc:'Domina som, sinal e interferência. Silencia aliados, ensurdece inimigos e derruba qualquer aparelho.',stages:[
+ {stage:3,name:'Interferência',desc:'Gaste 5 ES: cria ruído que encobre o grupo, e você e aliados próximos têm +5 em Furtividade por 2 rodadas.',cost:5},
+ {stage:5,name:'Frequência Dissonante',desc:'Gaste 10 ES: inimigos a até 6 m fazem Resistência (DT 14) ou ficam Surdos por 2 rodadas.',cost:10},
+ {stage:8,name:'Pulso Eletromagnético',desc:'Gaste 15 ES: desliga eletrônicos em 15 m. Inimigos de Ilusão ou tecnológicos sofrem 4d6 de dano (Resistência DT 16 reduz à metade).',cost:15},
+ {stage:10,name:'Silêncio Calculado',desc:'Você e aliados a até 6 m abrem portas e andam sem fazer barulho (portas furtivas sem teste), e você tem +5 em Tecnologia sempre.',cost:0}]},
+{archetype:'Ritualista',name:'Liturgista do Sol',desc:'Sacerdote da luz que cura e queima. A Fé e a Natureza respondem à sua voz.',stages:[
+ {stage:3,name:'Brasa Benta',desc:'Gaste 5 ES: cura 8 VT de um aliado tocado e remove Envenenado.',cost:5},
+ {stage:5,name:'Coroa de Raios',desc:'Gaste 10 ES: até 3 aliados ficam Abençoados até o fim da cena.',cost:10},
+ {stage:8,name:'Meio-Dia Eterno',desc:'Gaste 15 ES: inimigos a até 9 m sofrem 3d6 de dano radiante e ficam Ofuscados (Resistência DT 16 reduz à metade e evita o estado).',cost:15},
+ {stage:10,name:'Coração de Estrela',desc:'Rituais de Fé, Natureza e Sol custam 2 ES a menos (mínimo 1), e suas curas somam +2 VT.',cost:0}]},
+{archetype:'Ritualista',name:'Cartógrafo do Nada',desc:'Desenha mapas de lugares que não existem e caminha por eles. Distância, para você, é sugestão.',stages:[
+ {stage:3,name:'Passo Sem Chão',desc:'Gaste 5 ES: teleporte-se até 6 m para um ponto visível e ganhe +2 na Defesa até o próximo turno.',cost:5},
+ {stage:5,name:'Mapa Rasurado',desc:'Gaste 10 ES: um inimigo a até 9 m fica Desrealizado e perde o movimento no próximo turno.',cost:10},
+ {stage:8,name:'Atlas do Vazio',desc:'Gaste 15 ES: abra uma passagem para um lugar onde você esteve nas últimas 24 h. Até 4 aliados podem atravessar antes de ela fechar.',cost:15},
+ {stage:10,name:'Ninguém em Lugar Nenhum',desc:'Uma vez por cena, quando seria reduzido a 0 VT, você some e reaparece a até 9 m com 1 VT.',cost:0}]}
+];
+NEW_TRACKS.forEach(t=>{if(!ORIGINAL_TRACKS.some(x=>x.name===t.name))ORIGINAL_TRACKS.push(JSON.parse(JSON.stringify(t)))});
 const TRACK_ARCH_FIX={'Operador Neural':'Gênio','Canalizador das Sombras':'Ritualista','Bombardeiro Mental':'Lutador'};
 
 /* Novas vocações (última página do manual) */
@@ -3694,6 +3759,13 @@ const TALENT_TARGETS={
 'Lacaio da Inexistência':{mode:'self',summon:{name:'Lacaio da Inexistência',vt:'half',dmg:'weapon',rounds:3,el:'Inexistência'}},
 'Avatar do Abismo':{mode:'self',summon:{name:'Avatar do Abismo',vt:'half',dmg:'4d10',rounds:3,el:'Ilusão'}}
 };
+Object.assign(TALENT_TARGETS,{
+'Juramento de Sangue':{mode:'self'},'Golpe de Ferro Frio':{mode:'enemy',status:'exposto'},'Corrente de Prata':{mode:'enemy',status:'agarrado'},
+'Nota de Rodapé':{mode:'enemy',status:'marcado'},'Errata':{mode:'any'},
+'Interferência':{mode:'ally',area:true},'Frequência Dissonante':{mode:'enemy',area:true,status:'surdo',save:true},'Pulso Eletromagnético':{mode:'enemy',area:true,dmg:'4d6',save:true},
+'Brasa Benta':{mode:'ally',heal:8},'Coroa de Raios':{mode:'ally',status:'abencoado'},'Meio-Dia Eterno':{mode:'enemy',area:true,dmg:'3d6',status:'ofuscado',save:true},
+'Mapa Rasurado':{mode:'enemy',status:'desrealizado'},'Atlas do Vazio':{mode:'ally',area:true}
+});
 
 if(typeof module!=='undefined')module.exports={CARGA,SOCIAL,MENTAL_ATTRS,AGILITY_SKILLS,ATTACK_SKILLS,WEAPONS,UNARMED,PROTECTIONS,SLOT_LABEL,GEAR,STATUS_DEFS,STATUS_BY_ID,TRAUMA_DEFS,TRAUMA_BY_ID,EXTASE_DEFS,EXTASE_BY_ID,TRACK_ARCH_FIX,NEW_VOCATIONS,NEW_SKILLS,RITUAL_FULL,REST_TABLE,PASSING_STATUSES};
 
@@ -4016,6 +4088,7 @@ function mergeCatalog(){
   [tracks,ORIGINAL_TRACKS].forEach(list=>list.forEach(t=>{if(t.name!=='Arsenal Mental')return;t.stages.forEach(s=>{const k={3:0,5:1,8:2}[s.stage];if(k===undefined)return;s.cost=ac[k];s.desc=s.desc.replace(/\b(?:Gaste |gastando |ao custo de )?\d+ ES[;,]?\s*/i,'')})}));
   [vocations,ORIGINAL_VOCATIONS].forEach(list=>NEW_VOCATIONS.forEach(v=>{if(!list.some(x=>x.name===v.name))list.push(JSON.parse(JSON.stringify(v)))}));
   [tracks,ORIGINAL_TRACKS].forEach(list=>list.forEach(t=>{if(TRACK_ARCH_FIX[t.name])t.archetype=TRACK_ARCH_FIX[t.name]}));
+  [tracks,ORIGINAL_TRACKS].forEach(list=>NEW_TRACKS.forEach(t=>{if(!list.some(x=>x.name===t.name))list.push(JSON.parse(JSON.stringify(t)))}));
   /* Manual Oficial (Edição Revisada): Percepção é atributo, a perícia das vocações é Observação; História virou Pesquisa */
   [vocations,ORIGINAL_VOCATIONS,NEW_VOCATIONS].forEach(list=>list.forEach(v=>{if(Array.isArray(v.skills))v.skills=v.skills.map(s=>s==='Percepção'?'Observação':s==='História'?'Pesquisa':s);if(v.name==='Negociador Internacional')(v.talents||[]).forEach(t=>{if(t&&typeof t.desc==='string')t.desc=t.desc.replace(/História/g,'Pesquisa')})}));
   vocations.forEach(v=>{const nv=NEW_VOCATIONS.find(x=>x.name===v.name);if(nv)v.talents.forEach((t,i)=>{if(nv.talents[i]?.effects&&!t.effects)t.effects=nv.talents[i].effects;if(nv.talents[i]?.noBonus)t.noBonus=true})});
@@ -4670,7 +4743,7 @@ const SKILL_ALIAS={artes:'Arte',ciencia:'Ciências',mecanico:'Mecânica','resist
 function parseSkillBonuses(desc){
   const out=[],re=/\+(\d+)\s+(?:temporários?\s+)?(?:em um teste de|no teste de|na perícia|em|para)\s+([^.;+]+)/gi;let m;
   while((m=re.exec(desc||''))){
-    let phrase=m[2].split(/\s+(?:por|durante|até|no|na|contra|conforme|para|e\s+\+)\b/i)[0];
+    let phrase=m[2].split(/\s+(?:por|durante|até|no|na|contra|conforme|para|e\s+\+)(?=\s|$)/i)[0];
     phrase=phrase.replace(/^um teste de\s+/i,'').replace(/[\s,]+e\s*$/i,'').trim();
     phrase.split(/\s+(?:ou|e)\s+|\s*\/\s*|\s*,\s*/i).map(normTxt).forEach(p=>{
       const sk=BASE_SKILLS.find(s=>normTxt(s)===p)||SKILL_ALIAS[p];if(sk&&!out.some(o=>o.skill===sk))out.push({skill:sk,value:+m[1]})});
@@ -7977,7 +8050,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='21/11 13:54';
+const BUILD8='21/11 14:13';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -9453,7 +9526,15 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'🌊 Expansão · Onda 1: rituais, estados e vocações',w:'a',open:1,b:`<ul>
+  {t:'🌊 Expansão · Onda 2: trilhas, itens e aprimoramentos',w:'a',open:1,b:`<ul>
+    <li><b>6 trilhas novas de Despertar</b>: Corpo Votivo e Caçador do Véu (Lutador), Arquivista do Impossível e Engenheiro de Ruído (Gênio), Liturgista do Sol e Cartógrafo do Nada (Ritualista). Os poderes aplicam bônus, estados, curas e dano sozinhos.</li>
+    <li><b>15 armas novas</b>, incluindo arremessáveis táticos (bomba de fumaça, flashbang, água benta, coquetel de ácido, boleadeira), e <b>5 proteções novas</b>.</li>
+    <li><b>Ferramentas e artefatos</b> que valem enquanto estão nas mãos, na cintura ou no bolso. Alguns artefatos são amaldiçoados e cobram um preço.</li>
+    <li><b>8 consumíveis</b> com botão <b>Usar</b> no inventário: Morfina, Adrenalina, Ansiolítico, Antídoto, Bandagem hemostática, Café extraforte, Sais aromáticos e Pomada para queimaduras.</li>
+    <li><b>🔧 Aprimoramentos de armas</b>: até 2 por arma (Fio Afiado, Contrapeso, Serrilha, Bobina Elétrica, Banho de Veneno, Mira Telescópica, Cano Longo, Munição Incendiária, Carga de Sal Grosso e Sigilo Gravado). Eles mudam o dado, o crítico, o peso e os estados da própria arma.</li>
+    <li>Corrigido: bônus de talentos com a palavra "até" (como "+10 em Pesquisa e Investigação até o fim da cena") agora valem para todas as perícias citadas.</li>
+  </ul>`},
+  {t:'🌊 Expansão · Onda 1: rituais, estados e vocações',w:'a',b:`<ul>
     <li><b>15 rituais novos</b>, todos com sigilo próprio: Pele de Casca, Esporos do Sono, Mão do Vazio, Véu da Ausência, Porta que Não Estava Lá, Fantoche de Sombra, Luz da Evidência, Sentença Exposta, Bênção do Limiar, Chama da Devoção, Fotossíntese Sagrada (Sol), Gravidade Esquecida (Desrealização), Profecia Estatística (Pofenia), Álibi Perfeito (Confabulação) e Fábula do Inimigo (Metáfora). O grimório agora tem 70 rituais.</li>
     <li><b>11 estados novos</b> que mexem de verdade no combate: Abençoado, Enraizado, Iluminado, Velado, Exposto, Inspirado, Vaticinado, Desrealizado, Ecoado, Fragmentado e Corroído (dano por turno). Os rituais novos aplicam esses estados nos alvos.</li>
     <li><b>12 vocações novas</b>: Perito Criminal, Enfermeiro de UTI, Legista, Bibliotecário de Acervo Restrito, Médium de Feira, Batedor de Carteira, Chaveiro, Agente Penitenciário, Ator de Teatro, Operador de Drone, Restaurador de Arte e Contrabandista.</li>
@@ -17802,6 +17883,130 @@ new MutationObserver(m=>{if(m.some(x=>x.addedNodes.length))requestAnimationFrame
 /* compatibilidade: rituais personalizados antigos marcados como "Apofenia" */
 setTimeout(()=>{try{RITUALS.forEach(r=>{if(r.element==='Apofenia')r.element='Pofenia'});(window.data?.customRituals||[]).forEach(r=>{if(r.element==='Apofenia')r.element='Pofenia'})}catch(e){}},800);
 console.info('[Tulpa] Etapa 34 carregada (Sub-Elementos e rituais inéditos)');
+
+/* ===================================================================
+   TULPA · ETAPA 35 — Expansão Onda 2: itens vivos e aprimoramentos
+   - ITEMFX35: ferramentas e artefatos (alguns amaldiçoados) dão bônus/
+     penalidades reais no motor enquanto estão nas mãos, cintura ou bolso.
+   - USE35: consumíveis médicos e psicológicos com botão "Usar".
+   - WMOD35: aprimoramentos de armas (até 2 por arma) que mudam a própria
+     arma do inventário (dado, margem de crítico, peso, efeitos).
+   =================================================================== */
+const ITEMFX35={
+  'Kit de gazuas':{fx:{skillDice:{'Segurança':1}},txt:'+1 dado em Segurança.'},
+  'Lupa de joalheiro':{fx:{skillDice:{'Identificação':1}},txt:'+1 dado em Identificação.'},
+  'Binóculos':{fx:{skillDice:{'Observação':1}},txt:'+1 dado em Observação.'},
+  'Estetoscópio':{fx:{skillDice:{'Medicina':1}},txt:'+1 dado em Medicina (e ouvir através de portas e cofres).'},
+  'Máscara de gás':{fx:{skillDice:{'Resistência':1}},txt:'+1 dado em Resistência; gases e esporos não o afetam enquanto usada.'},
+  'Gravador de voz digital':{fx:{skillDice:{'Audição':1}},txt:'+1 dado em Audição; capta vozes que o ouvido não pega.'},
+  'Amuleto de olho turco':{fx:{skillDice:{'Resistência':1}},txt:'+1 dado em Resistência contra efeitos mentais.',art:1},
+  'Relógio de bolso parado':{fx:{skillDice:{'Reflexo':1,'Esquiva':1,'Pesquisa':-1}},txt:'+1 dado em Reflexo e Esquiva. Maldição: −1 dado em Pesquisa (as horas se embaralham).',art:1,curse:1},
+  'Espelho de obsidiana':{fx:{skillDice:{'Teosofia':1,'Intuição':1,'Empatia':-1}},txt:'+1 dado em Teosofia e Intuição. Maldição: −1 dado em Empatia (você vê o que não deveria nas pessoas).',art:1,curse:1},
+  'Rosário de dentes':{fx:{dmg:2,socialDice:-1},txt:'+2 no dano corpo a corpo. Maldição: −1 em testes sociais.',art:1,curse:1},
+  'Vela de sebo negro':{fx:{skillDice:{'Furtividade':1,'Intuição':-1}},txt:'Acesa nas mãos: +1 dado em Furtividade (a luz não denuncia). Maldição: −1 dado em Intuição.',art:1,curse:1},
+  'Ferradura torta':{fx:{skillDice:{'Sorte':1}},txt:'+1 dado em Sorte.',art:1},
+  'Medalhão do vigia':{fx:{defense:1},txt:'+1 na Defesa.',art:1},
+  'Boneca sem rosto':{fx:{skillDice:{'Enganação':1,'Furtividade':1},defense:-1},txt:'+1 dado em Enganação e Furtividade. Maldição: −1 na Defesa (ela atrai o olhar das coisas).',art:1,curse:1}
+};
+const fxOn35=it=>!!ITEMFX35[it.name]&&!['mochila','chao'].includes(it.loc);
+{const _cm=E.computeMods;E.computeMods=function(d){
+  const m=_cm.apply(this,arguments);
+  try{(d?.inventory?.items||[]).forEach(it=>{if(fxOn35(it)){const f=ITEMFX35[it.name];E.addSrc(m,f.fx,(f.art?'Artefato: ':'Item: ')+it.name)}})}catch(e){}
+  return m}}
+
+const USE35={
+  'Morfina (ampola)':{heal:'2d6',add:['torpor'],txt:'Cura 2d6 VT; você fica em Torpor.'},
+  'Adrenalina (autoinjetor)':{rem:['atordoado','exausto','sonolento'],add:['euforico'],txt:'Remove Atordoado, Exausto e Sonolento; você fica Eufórico.'},
+  'Ansiolítico':{luc:'1d6',rem:['ansioso','amedrontado','tenso'],add:['sonolento'],txt:'Recupera 1d6 de Lucidez e remove Ansioso, Amedrontado e Tenso; você fica Sonolento.'},
+  'Antídoto':{rem:['envenenado','enjoado'],txt:'Remove Envenenado e Enjoado.'},
+  'Bandagem hemostática':{heal:'1d4',rem:['sangrando'],txt:'Remove Sangrando e cura 1d4 VT.'},
+  'Café extraforte':{rem:['sonolento','exaurido'],txt:'Remove Sonolento e Exaurido.'},
+  'Sais aromáticos':{rem:['atordoado','desrealizado'],txt:'Remove Atordoado e Desrealizado.'},
+  'Pomada para queimaduras':{heal:'1d4',rem:['queimando','corroido'],txt:'Remove Queimando e Corroído e cura 1d4 VT.'}
+};
+async function use35(id){
+  const inv=E.ensureInv(data),it=inv.items.find(i=>i.id===id);const u=it&&USE35[it.name];if(!u)return;
+  const ok=await askModal('USAR ITEM',it.name,`<p>${esc(u.txt)}</p><p class="sub">Gasta 1 unidade (restam ${it.qty||1}).</p>`,'Usar');if(!ok)return;
+  const mx=STAGES[data.stage]||STAGES[1],log=[];
+  if(u.heal){const r=E.rollExpr(u.heal).total;data.vital=Math.min(mx.vt,(Number(data.vital)||0)+r);log.push(`+${r} VT`)}
+  if(u.luc){const r=E.rollExpr(u.luc).total;data.lucidity=Math.min(mx.luc,(Number(data.lucidity)||0)+r);log.push(`+${r} Lucidez`)}
+  data.statuses=data.statuses||[];
+  (u.rem||[]).forEach(s=>{if(data.statuses.some(x=>x.id===s)){data.statuses=data.statuses.filter(x=>x.id!==s);log.push('sem '+(STATUS_BY_ID[s]?.name||s))}});
+  (u.add||[]).forEach(s=>{if(!data.statuses.some(x=>x.id===s)){data.statuses.push({id:s,at:Date.now()});log.push(STATUS_BY_ID[s]?.name||s)}});
+  it.qty=Math.max(0,(Number(it.qty)||1)-1);if(!it.qty)inv.items=inv.items.filter(i=>i.id!==id);
+  save();toast(`${it.name}: ${log.join(', ')||'usado'}.`);
+  try{if(camp3())insertRow(charById(activeCharacterId),'Item',{detail:{cmb:'log',text:`${nm(charById(activeCharacterId))} usou ${it.name} (${log.join(', ')||'sem efeito visível'}).`}}).catch(()=>{})}catch(e){}
+}
+T3.use35=use35;
+
+/* ---------- aprimoramentos de armas ---------- */
+const DSTEP35=['1d2','1d3','1d4','1d6','1d8','1d10','1d12','2d8'];
+const PSTEP35=['Bolso','Leve','Médio','Pesado'];
+const up35=(v,arr)=>{const i=arr.indexOf(v);return i>=0&&i<arr.length-1?arr[i+1]:v};
+const melee35=w=>w.cat==='Corpo a corpo',gun35=w=>w.skill==='Armas de Disparo',blade35=w=>w.skill==='Armas Brancas';
+const addFx35=(w,status,when)=>{if(!w.effects.some(e=>e.status===status))w.effects.push({status,when})};
+const WMOD35=[
+  {id:'afiada',name:'Fio Afiado',ok:w=>melee35(w)&&blade35(w),txt:'Crítico 1 ponto mais fácil (mínimo 17).',req:'Artesanato DT 12 · pedra de amolar',ap:w=>{w.critMin=Math.max(17,(Number(w.critMin)||20)-1)}},
+  {id:'contrapeso',name:'Contrapeso',ok:w=>melee35(w),txt:'O dado de dano sobe um passo (1d6 → 1d8). A arma fica um passo mais pesada.',req:'Mecânica DT 13 · chumbo e fita',ap:w=>{w.dado=up35(w.dado,DSTEP35);w._peso=1}},
+  {id:'serrilha',name:'Serrilha',ok:w=>melee35(w)&&blade35(w),txt:'Críticos causam Sangrando.',req:'Artesanato DT 12 · lima',ap:w=>addFx35(w,'sangrando','crit')},
+  {id:'bobina',name:'Bobina Elétrica',ok:w=>melee35(w),txt:'Críticos causam Atordoado.',req:'Tecnologia DT 14 · bateria e fios',ap:w=>addFx35(w,'atordoado','crit')},
+  {id:'envenenada',name:'Banho de Veneno',ok:w=>blade35(w),txt:'Acertos causam Envenenado.',req:'Ciências DT 14 · toxina',ap:w=>addFx35(w,'envenenado','hit')},
+  {id:'mira',name:'Mira Telescópica',ok:w=>gun35(w),txt:'Crítico 1 ponto mais fácil (mínimo 17).',req:'Mecânica DT 12 · luneta',ap:w=>{w.critMin=Math.max(17,(Number(w.critMin)||20)-1)}},
+  {id:'canolongo',name:'Cano Longo',ok:w=>gun35(w),txt:'O dado de dano sobe um passo. A arma fica um passo mais pesada.',req:'Mecânica DT 14 · cano sobressalente',ap:w=>{w.dado=up35(w.dado,DSTEP35);w._peso=1}},
+  {id:'incendiaria',name:'Munição Incendiária',ok:w=>gun35(w),txt:'Críticos causam Queimando.',req:'Ciências DT 13 · fósforo',ap:w=>addFx35(w,'queimando','crit')},
+  {id:'salgrosso',name:'Carga de Sal Grosso',ok:w=>gun35(w),txt:'Críticos deixam o alvo Exposto (espíritos e espantos recuam).',req:'Teosofia DT 12 · sal benzido',ap:w=>addFx35(w,'exposto','crit')},
+  {id:'sigilo',name:'Sigilo Gravado',ok:()=>true,txt:'Acertos deixam o alvo Marcado (a arma "lembra" de quem feriu).',req:'Teosofia DT 15 · gravação ritual (1 hora)',ap:w=>addFx35(w,'marcado','hit')}
+];
+const WMOD_BY35=Object.fromEntries(WMOD35.map(m=>[m.id,m]));
+function applyMods35(it){
+  if(!it.wBase)it.wBase=JSON.parse(JSON.stringify(it.w));if(!it.pesoBase)it.pesoBase=it.peso;
+  const w=JSON.parse(JSON.stringify(it.wBase));w.effects=w.effects||[];let peso=it.pesoBase;
+  (it.mods||[]).forEach(id=>{const m=WMOD_BY35[id];if(m&&m.ok(w)){m.ap(w);if(w._peso){peso=up35(peso,PSTEP35);delete w._peso}}});
+  w.mods=(it.mods||[]).slice();it.w=w;it.peso=peso;if(w.peso)w.peso=peso;
+}
+async function mod35(id){
+  const inv=E.ensureInv(data),it=inv.items.find(i=>i.id===id);if(!it||it.kind!=='weapon')return;
+  const base=it.wBase||it.w,cur=new Set(it.mods||[]);
+  const list=WMOD35.filter(m=>m.ok(base));
+  if(!list.length){toast('Esta arma não aceita aprimoramentos.');return}
+  SEL35=new Set(cur);
+  const ok=await askModal('APRIMORAR ARMA',it.name,`<p class="sub">Até <b>2 aprimoramentos</b> por arma. O teste e o material indicados são feitos na mesa, com o Mestre.</p><div class="wm35-list">${list.map(m=>`<label class="wm35"><input type="checkbox" value="${m.id}" ${cur.has(m.id)?'checked':''}><span><b>${esc(m.name)}</b> ${esc(m.txt)}<br><span class="sub">${esc(m.req)}</span></span></label>`).join('')}</div>`,'Aplicar');
+  if(!ok)return;
+  const sel=[...SEL35];
+  if(sel.length>2){toast('No máximo 2 aprimoramentos por arma.');return}
+  it.mods=sel;applyMods35(it);save();
+  toast(sel.length?`${it.name}: ${sel.map(i=>WMOD_BY35[i].name).join(' + ')}.`:`${it.name} voltou ao original.`);
+}
+T3.mod35=mod35;T3.CAT35={WEAPONS,GEAR,PROTECTIONS,ITEMFX35,USE35,WMOD35,NEW_TRACKS};
+let SEL35=new Set();
+document.addEventListener('change',e=>{if(!e.target.matches?.('.wm35 input'))return;if(e.target.checked&&SEL35.size>=2){e.target.checked=false;toast('No máximo 2 aprimoramentos por arma.');return}if(e.target.checked)SEL35.add(e.target.value);else SEL35.delete(e.target.value)});
+
+/* ---------- inventário: botões e etiquetas ---------- */
+{const _il=itemLine;itemLine=function(it){
+  let h=_il.apply(this,arguments);
+  let extra='';
+  if(it.kind==='weapon'){const n=(it.mods||[]).length;extra+=`${(it.mods||[]).map(i=>WMOD_BY35[i]?`<span class="tag wm35-tag" title="${esc(WMOD_BY35[i].txt)}">🔧 ${esc(WMOD_BY35[i].name)}</span>`:'').join('')}<button class="btn small" data-mod35="${it.id}" title="Aprimoramentos de arma">🔧 Aprimorar${n?` (${n}/2)`:''}</button>`}
+  if(USE35[it.name])extra+=`<button class="btn small primary" data-use35="${it.id}" title="${esc(USE35[it.name].txt)}">Usar</button><span class="sub">${esc(USE35[it.name].txt)}</span>`;
+  if(ITEMFX35[it.name]){const f=ITEMFX35[it.name],on=fxOn35(it);extra+=`<span class="tag ${f.curse?'t3-chip-bad':'t3-chip-good'}" title="${esc(f.txt)}">${f.art?(f.curse?'☠ artefato amaldiçoado':'✶ artefato'):'🔍 ferramenta'}${on?'':' · guardado'}</span><span class="sub">${esc(f.txt)}${on?'':' Só vale nas mãos, na cintura ou no bolso.'}</span>`}
+  if(extra)h=h.replace('<div class="inline" style="margin-top:4px">','<div class="inline" style="margin-top:4px">'+extra);
+  return h}}
+document.addEventListener('click',e=>{
+  const u=e.target.closest('[data-use35]');if(u){e.preventDefault();use35(u.dataset.use35);return}
+  const m=e.target.closest('[data-mod35]');if(m){e.preventDefault();mod35(m.dataset.mod35)}
+});
+
+/* ---------- Manual Vivo: capítulo 9 ---------- */
+LIVE31.wmods=()=>tb31(['Aprimoramento','Aceita','Efeito','Teste e material'],WMOD35.map(m=>tr31([`<b>${esc(m.name)}</b>`,esc(m.id==='sigilo'?'qualquer arma':['afiada','serrilha'].includes(m.id)?'lâminas corpo a corpo':m.id==='envenenada'?'armas brancas':['contrapeso','bobina'].includes(m.id)?'corpo a corpo':'armas de disparo'),link31(esc(m.txt)),esc(m.req)])));
+LIVE31.itemfx=()=>tb31(['Item','Tipo','Efeito enquanto carregado'],Object.entries(ITEMFX35).map(([n,f])=>tr31([`<b>${esc(n)}</b>`,f.art?(f.curse?'Artefato amaldiçoado':'Artefato'):'Ferramenta',link31(esc(f.txt))])));
+LIVE31.consum=()=>tb31(['Consumível','Efeito ao usar'],Object.entries(USE35).map(([n,u])=>tr31([`<b>${esc(n)}</b>`,link31(esc(u.txt))])));
+{const c9=MAN31.find(c=>c.id==='c9');
+ if(c9&&!c9.secs.some(s=>s.id==='c9.w2')){const n=c9.secs.length;
+  c9.secs.push(
+   {id:'c9.w2',h:`9.${n+1} Aprimoramentos de Armas`,b:[['c9.w2.p','Cada arma aceita até **2 aprimoramentos**. O jogador abre o inventário, toca em **🔧 Aprimorar** na arma e escolhe; o teste e o material ficam a cargo da mesa. O aprimoramento muda a própria arma: dado, margem de crítico, peso (e a carga) e os estados aplicados no acerto ou no crítico.'],{live:'wmods'}]},
+   {id:'c9.fx2',h:`9.${n+2} Ferramentas e Artefatos`,b:[['c9.fx2.p','Ferramentas e artefatos só funcionam **nas mãos, na cintura ou no bolso**; guardados na mochila, não fazem nada. Artefatos amaldiçoados cobram um preço enquanto você os carrega.'],{live:'itemfx'}]},
+   {id:'c9.cs2',h:`9.${n+3} Consumíveis Médicos e Psicológicos`,b:[['c9.cs2.p','Consumíveis têm o botão **Usar** no inventário. Cada uso gasta 1 unidade, aplica o efeito na ficha e avisa a mesa.'],{live:'consum'}]}
+  )}}
+console.info('[Tulpa] Etapa 35 carregada (Onda 2: itens vivos e aprimoramentos)');
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
