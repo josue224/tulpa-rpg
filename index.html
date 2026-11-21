@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="20/11 23:57">
+<meta name="tulpa-build" content="21/11 00:25">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3071,6 +3071,14 @@ body.sys29-open{overflow:hidden}
 #t3Roll.dx30{box-shadow:0 0 0 2px var(--dx1),0 0 30px var(--dx2)}
 .dx30-p{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;pointer-events:none;animation:dx30fly 1.1s ease-out forwards;opacity:0}
 @keyframes dx30fly{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(.2);opacity:0}}
+
+/* ---- Etapa 31 · sair/entrar na call ---- */
+#mbCall .btn.vc-quit{background:#b3261e;border-color:#b3261e;color:#fff}
+#mbCall .btn.vc-enter{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
+.table-char.out-call .tc-head .av{position:relative}
+.table-char.out-call .tc-head .av::after{content:"🎧";position:absolute;right:-4px;bottom:-4px;width:18px;height:18px;border-radius:50%;background:#b3261e;font-size:10px;line-height:18px;text-align:center;opacity:.9;box-shadow:0 0 0 2px var(--bg,#111)}
+.table-char.out-call .tc-head .av::before{content:"";position:absolute;right:-6px;bottom:6px;width:22px;height:2px;background:#fff;transform:rotate(-45deg);z-index:2;opacity:.9}
+.table-char.out-call .tc-head .av.speaking{outline:none;box-shadow:none}
 
 </style>
 <script id="tulpa-etapa3">
@@ -7601,7 +7609,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='20/11 23:57';
+const BUILD8='21/11 00:25';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -7680,6 +7688,7 @@ async function vSignal8(m){
   }
   try{
     if(m.t==='hello'||m.t==='st'){
+      if(V8.gone&&V8.gone[from])delete V8.gone[from];
       if(m.t==='st'){const lt=m.speaking?Date.now():(V8.states[from]?.talkAt||0);V8.states[from]={muted:!!m.muted,speaking:!!m.speaking,at:Date.now(),sid:m.sid,talkAt:lt};voicePaint8()}
       if(!V8.peers.has(from)){if(uid3()<from)await vOffer8(from,m.sid);else if(!m.to)vSend8({t:'hello',to:from})}
       if(m.t==='hello'){V8.states[from]=V8.states[from]||{muted:false,speaking:false,at:Date.now(),sid:m.sid};voiceBar8();voicePaint8()}
@@ -7697,7 +7706,7 @@ async function vSignal8(m){
       const p=V8.peers.get(from),cs=m.cs||(m.c?[m.c]:[]);if(!p||!cs.length)return;
       for(const c of cs){{const t=(c&&c.candidate||'').match(/ typ (\w+)/);if(t)p.rc[t[1]]=(p.rc[t[1]]||0)+1}if(p.pc.remoteDescription&&p.pc.remoteDescription.type){try{await p.pc.addIceCandidate(c)}catch(e){}}else p.pending.push(c)}
     }else if(m.t==='fix'){vMicSwap8('fix');
-    }else if(m.t==='bye'){vClosePeer8(from);V8.bad.delete(from);delete V8.states[from];voiceBar8();voicePaint8()}
+    }else if(m.t==='bye'){vClosePeer8(from);V8.bad.delete(from);delete V8.states[from];(V8.gone=V8.gone||{})[from]=1;voiceBar8();voicePaint8()}
   }catch(e){console.warn('[T8] sinal '+m.t,e)}
 }
 /* detecção de voz: contorno verde enquanto a pessoa fala */
@@ -7730,7 +7739,7 @@ async function voiceJoin8(id){
   V8.joining=true;V8.callId=id;V8.sid=Math.random().toString(36).slice(2,10);V8.on=true;V8.muted=false;V8.listenOnly=false;V8.states={};
   const camp=camp3().id,gm=isGM6();
   if(!gm){fx5('start');say('📞 O Mestre iniciou a <b>call</b>. Você já está dentro: é só falar. Use 🎙 no topo da mesa para mutar.')}
-  voiceBar8();
+  vBg8(true);voiceBar8();
   try{V8.stream=await vMic8();vMicWatch8()}
   catch(e){V8.listenOnly=true;V8.stream=null;toast('Sem acesso ao microfone: você entrou só ouvindo. Libere o microfone no navegador e toque em “Ligar microfone”.')}
   V8.joining=false;
@@ -7754,7 +7763,7 @@ function voiceLeave8(silent=false){
   [...V8.peers.keys()].forEach(vClosePeer8);
   vStopStream8();
   try{if(V8.ch)sb()?.removeChannel(V8.ch)}catch(e){}
-  V8.bad.clear();V8.ch=null;V8.live=false;V8.on=false;V8.callId='';V8.states={};V8.me.speaking=false;V8.blocked=false;V8.joining=false;
+  V8.bad.clear();V8.ch=null;V8.live=false;V8.on=false;V8.callId='';V8.states={};V8.gone={};V8.me.speaking=false;V8.blocked=false;V8.joining=false;vBg8(false);
   if(!silent){voiceBar8();voicePaint8()}
 }
 async function voiceRetryMic8(){
@@ -7782,7 +7791,8 @@ T3.voiceJoin=voiceJoin8;T3.voiceLeave=voiceLeave8;T3.voiceStart=voiceStart8;T3.v
 
 onState6(st=>{
   const c=st.call||{};
-  if(c.on&&c.id){if(V8.callId!==c.id)voiceJoin8(c.id)}
+  if(c.on&&c.id){if(V8.leftId&&V8.leftId!==c.id)V8.leftId='';if(V8.callId!==c.id&&V8.leftId!==c.id)voiceJoin8(c.id)}
+  else if(V8.leftId){V8.leftId=''}
   else if(V8.on){const was=V8.on;voiceLeave8();if(was&&!isGM6())toast('O Mestre encerrou a call.')}
   const wsig=JSON.stringify(c.whisper||null);
   if(V8.on&&V8.wsig!==wsig){
@@ -7792,7 +7802,53 @@ onState6(st=>{
   if(!V8.on)V8.wsig='null';
   voiceBar8();voicePaint8();
 });
-M6.hooks.leave.push(()=>voiceLeave8());
+M6.hooks.leave.push(()=>{V8.leftId='';voiceLeave8()});
+/* ---------- sair e entrar na call (jogador) ---------- */
+function voiceQuit8(){
+  const id=M6.state.call?.id;if(!id||isGM6()||!V8.on)return;
+  V8.leftId=id;voiceLeave8(true);voiceBar8();voicePaint8();toast('📞 Você saiu da call. O microfone foi desligado.');
+}
+function voiceReenter8(){
+  const c=M6.state.call;if(!c?.on||!c.id){toast('A call já foi encerrada.');return}
+  V8.leftId='';voiceJoin8(c.id);voiceBar8();
+}
+T3.voiceQuit=voiceQuit8;T3.voiceReenter=voiceReenter8;
+/* ---------- continuidade em segundo plano ----------
+   Nada aqui pausa o áudio ao trocar de aba ou bloquear a tela. Media Session mostra a call
+   nos controles do sistema, o wakeLock evita o aparelho dormir (se o navegador deixar) e,
+   ao voltar à aba ou à rede, as conexões que caíram são refeitas. */
+async function vWake8(){try{if(V8.on&&navigator.wakeLock&&document.visibilityState==='visible'&&!V8.wl){V8.wl=await navigator.wakeLock.request('screen');V8.wl.addEventListener('release',()=>{V8.wl=null})}}catch(e){V8.wl=null}}
+function vResume8(){
+  try{actx()}catch(e){}
+  try{V8.peers.forEach(p=>{if(p.audio.srcObject&&p.audio.paused){const r=p.audio.play();if(r&&r.catch)r.catch(()=>{})}})}catch(e){}
+  try{if(V8.vad&&V8.vad.ctx&&V8.vad.ctx.state==='suspended')V8.vad.ctx.resume()}catch(e){}
+}
+function vBg8(on){
+  try{if('mediaSession' in navigator){
+    if(on){
+      navigator.mediaSession.metadata=new MediaMetadata({title:'Chamada de Voz — TULPA RPG',artist:'Mesa em Andamento'});
+      navigator.mediaSession.playbackState='playing';
+      ['play','pause'].forEach(a=>{try{navigator.mediaSession.setActionHandler(a,()=>{vResume8();try{navigator.mediaSession.playbackState='playing'}catch(e){}})}catch(e){}});
+    }else{navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none'}
+  }}catch(e){}
+  if(on)vWake8();else{try{V8.wl&&V8.wl.release()}catch(e){}V8.wl=null}
+}
+function vRecover8(){
+  if(!V8.on)return;
+  vResume8();vWake8();
+  try{
+    V8.peers.forEach((p,u)=>{
+      const s=p.pc.connectionState;
+      if(s==='connected')return;
+      if(uid3()<u){try{p.pc.restartIce()}catch(e){}vOffer8(u,p.sid)}
+    });
+    vSend8({t:'hello'});
+  }catch(e){console.warn('[T8] recuperar',e)}
+}
+T3.voiceRecover=vRecover8;
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')vRecover8()});
+window.addEventListener('online',()=>setTimeout(vRecover8,600));
+window.addEventListener('pageshow',()=>vRecover8());
 /* som bloqueado pelo navegador (voz ou música): aviso grande e liga no primeiro toque na tela */
 const audioNeed8=()=>!!((V8.on&&V8.blocked)||(YT6.blocked&&wantMusic6()?.playing));
 function unlockAudio8(){
@@ -7821,21 +7877,24 @@ function voiceBar8(){
   const box=$('mbCall');if(!box)return;
   const isM=isGM6(),c=M6.state.call||{},w=Array.isArray(c.whisper)&&c.whisper.length?c.whisper:null,names=w?w.map(u=>nm(charOfUser6(u))||'jogador').join(', '):'';
   const gmU=vGm8(),badN=vBad8().map(u=>u===gmU?'Mestre':(nm(charOfUser6(u))||'jogador')).join(', '),hasTurn=!!(c.ice&&c.ice.length),cfgTurn=!!String(prefs.turnUrl||'').trim()||turnClean8(M6.state.turn).length>0;
-  const sig=[isM,c.on,V8.on,V8.muted,V8.listenOnly,V8.blocked,V8.joining,vCount8(),names,w&&w.includes(uid3()),badN,hasTurn,cfgTurn].join('|');
+  const outCall=!!(c.on&&!isM&&!V8.on&&V8.leftId&&V8.leftId===c.id);
+  const sig=[outCall,isM,c.on,V8.on,V8.muted,V8.listenOnly,V8.blocked,V8.joining,vCount8(),names,w&&w.includes(uid3()),badN,hasTurn,cfgTurn].join('|');
   if(box.dataset.sig===sig)return;box.dataset.sig=sig;
   if(!c.on){box.innerHTML=isM?'<button type="button" class="btn small primary" id="vcStart">📞 Iniciar call</button><button type="button" class="btn small '+(cfgTurn?'':'warn')+'" id="vcTurn" title="Ajuda a voz a conectar em redes difíceis (4G, Wi-Fi de empresa)">🌐 Servidor TURN'+(cfgTurn?' ✓':'')+'</button><span class="sub">Todos na mesa entram na hora.</span>':'<span class="sub vc-off">📞 Sem call no momento</span>';const s=$('vcStart');if(s)s.onclick=voiceStart8;const tb=$('vcTurn');if(tb)tb.onclick=vTurnModal8;return}
+  if(outCall){box.innerHTML='<span class="sub vc-off">🎧 Você está fora da call</span><button type="button" class="btn small vc-enter" id="vcEnter">📞 Entrar na Call</button>';const e=$('vcEnter');if(e)e.onclick=voiceReenter8;return}
   box.innerHTML=`<span class="vc-live"><i></i>${V8.joining?'Entrando na call…':`Na call · ${vCount8()}`}</span>
    ${V8.listenOnly?'<button type="button" class="btn small primary" id="vcMic">🎙 Ligar microfone</button>':`<button type="button" class="btn small ${V8.muted?'danger':''}" id="vcMute" aria-pressed="${V8.muted}">${V8.muted?'🔇 Mudo':'🎙 Microfone'}</button>`}
    <label class="mb-vol vc-vol" title="Volume das vozes (só para você)"><span aria-hidden="true">🗣</span><input type="range" id="vcVol" min="0" max="100" step="1" value="${prefs.callVol??100}" aria-label="Volume das vozes"></label>
    ${V8.blocked?'<button type="button" class="btn small primary" id="vcUnlock">▶ Ativar áudio</button>':''}
    ${isM?`<button type="button" class="btn small ${w?'primary':''}" id="vcWhisper">🤫 Sussurro</button>${w?'<button type="button" class="btn small" id="vcAll">↩ Áudio geral</button>':''}<button type="button" class="btn small danger" id="vcEnd">Encerrar call</button>`:''}
+   ${!isM&&V8.on?'<button type="button" class="btn small vc-quit" id="vcQuit">📞 Sair da Call</button>':''}
    <button type="button" class="btn small" id="vcDiag" title="Ver como está a conexão de voz" aria-label="Diagnóstico da voz">🔎</button>
    ${isM?`<button type="button" class="btn small ${hasTurn?'':'warn'}" id="vcTurn" title="Servidor TURN">🌐 TURN${hasTurn?' ✓':''}</button>`:''}
    ${badN?`<span class="vc-warn" role="status">⚠ A voz não conectou com ${esc(badN)}. ${isM?'Provável rede restrita: configure o servidor TURN (🌐) e reinicie a call.':'Avise o Mestre: pode faltar um servidor TURN.'}</span>`:''}
    ${w?`<span class="vc-whisper">${isM?'Falando só com '+esc(names):w.includes(uid3())?'🤫 Conversa particular com o Mestre':'🤫 O Mestre está em conversa particular'}</span>`:''}`;
   const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
   on('vcMute',()=>voiceMute8());on('vcMic',voiceRetryMic8);on('vcEnd',()=>{if(confirm('Encerrar a call para todos?'))voiceEnd8()});on('vcAll',()=>voiceWhisper8([]));
-  on('vcUnlock',()=>unlockAudio8());
+  on('vcUnlock',()=>unlockAudio8());on('vcQuit',voiceQuit8);
   on('vcWhisper',vWhisperModal8);on('vcTurn',vTurnModal8);on('vcDiag',vDiagModal8);
   const v=$('vcVol');if(v)v.oninput=()=>{prefs.callVol=Number(v.value)||0;savePrefs();vRoute8()};
 }
@@ -7971,6 +8030,8 @@ function voicePaint8(){
   $$('#tableCharacters .table-char.seat').forEach(card=>{
     const u=card.dataset.uid,s=st(u),av=card.querySelector('.tc-head .av');
     if(av){av.classList.toggle('speaking',!!(s.inCall&&s.speaking&&vAllowed8(u)));av.classList.toggle('muted',!!(s.inCall&&s.muted))}
+    const out=c.on&&(u===me?(!isGM6()&&!V8.on&&!!V8.leftId):(V8.on&&!!(V8.gone&&V8.gone[u])&&!s.inCall));
+    card.classList.toggle('out-call',!!out);
     card.classList.toggle('in-call',!!s.inCall);card.classList.toggle('whisper',!!(w&&w.has(u)&&(isGM6()||w.has(me))));
   });
   const mav=$q('#mAv .av');if(mav){const s=st(gm);mav.classList.toggle('speaking',!!(s.inCall&&s.speaking&&vAllowed8(gm)));mav.classList.toggle('muted',!!(s.inCall&&s.muted))}
@@ -9024,7 +9085,13 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'⚙️ Alterações do Sistema e novos motivos para juntar Óbolos',w:'a',open:1,b:`<ul>
+  {t:'📞 Call mais firme, Arcade por regra e tela flexível',w:'a',open:1,b:`<ul>
+    <li><b>Arcade e Perseus:</b> livres enquanto não há call. Com a call ativa os botões somem; voltam no ⏸ Intervalo ou quando seu personagem está fora do mapa principal. Se a call começar com você jogando, a mesa te chama de volta.</li>
+    <li><b>Sair da Call / Entrar na Call:</b> o jogador sai quando quiser (o microfone desliga) e volta pelo botão verde. Sair não libera os jogos.</li>
+    <li><b>Em segundo plano:</b> a call continua com a aba em segundo plano, aparece nos controles do sistema e reconecta sozinha ao voltar.</li>
+    <li><b>Transmitir Tela:</b> escolha tela inteira, janela ou aba, com áudio opcional. No celular só dá para assistir.</li>
+  </ul>`},
+  {t:'⚙️ Alterações do Sistema e novos motivos para juntar Óbolos',w:'a',b:`<ul>
    <li><b>⚙️ Alterações do Sistema</b> (só o Mestre, na Central da campanha): crie, edite ou exclua Vocações, Trilhas, Rituais, Itens do manual, Estados (dano por turno, Defesa, não pode se mover, desvantagem…), Traumas, Bestiário, Sub-Elementos e as Regras da Mesa (deslocamento base, DT do Arremesso e de Furtividade). Conteúdo do manual tem ↺ para voltar ao original.</li>
    <li><b>Edição direto na ficha:</b> o Mestre vê ✏️ 🗑️ ＋ nas listas normais (vocação, trilha, rituais, itens e estados). O antigo Painel do Mestre saiu. Para os jogadores a ficha continua limpa.</li>
    <li><b>Na hora, para todos:</b> a mudança chega às fichas e ao combate sem recarregar. Só quem é afetado recebe o aviso: <b>!</b> no card e na aba, um quadro com <i>Antes → Depois</i> e o Perseus contando o que mudou.</li>
@@ -9410,13 +9477,16 @@ document.addEventListener('webkitfullscreenchange',()=>{if(!fsEl12()&&MG.fsNativ
 window.addEventListener('orientationchange',()=>setTimeout(mgLayout,120));
 /* o Arcade abre no ⏸ Intervalo e também para quem está no Modo Espectador (personagem em outro mapa) */
 /* e agora também a qualquer momento, pelo menu (modo livre: não fecha quando a sessão retoma) */
-const arcOk12=()=>!!M6.state.pause?.on||(!isGM6()&&!!T3.specOf?.(uid3()))||!!MG.free;
+/* regra: livre sem call; com call ativa (estado GLOBAL da mesa, sair da call não destrava) só no Intervalo ou fora do mapa principal */
+const canAccessArcade=()=>!M6.state.call?.on||!!M6.state.pause?.on||(!isGM6()&&!!T3.specOf?.(uid3()));
+T3.canAccessArcade=canAccessArcade;
+const arcOk12=()=>canAccessArcade();
 T3.arcOk=arcOk12;
-const arcFree12=()=>{if(!M6.state.pause?.on&&!(!isGM6()&&T3.specOf?.(uid3())))MG.free=true};
+const arcFree12=()=>{if(!M6.state.pause?.on&&!(!isGM6()&&T3.specOf?.(uid3()))&&!M6.state.call?.on)MG.free=true};
 T3.arcFree=arcFree12;
 function mgOpen(){
   arcFree12();
-  if(!arcOk12()){toast('Os mini-games abrem durante o ⏸ Intervalo.');return}
+  if(!arcOk12()){toast('Com a call ativa, o Arcade abre só no ⏸ Intervalo.');return}
   actx();mgJoinCh();sprLoad();mgRootEl().classList.add('show');MG.open=true;document.body.classList.add('mg-on');
   if(MG.room)(MG.g?null:mgLobby());else mgHub();
 }
@@ -9656,7 +9726,7 @@ onState6(()=>{
   if(arcOk12()&&camp3()){mgJoinCh();if(M6.state.pause?.on)mgPauseUi();boardRender()}
   else{
     const was=MG.open||!!MG.room;
-    if(was){mgClose();if(!isGM6())toast(MG.specWas?'🎲 O seu personagem voltou à cena. De volta à mesa!':'▶ O Mestre retomou a sessão. De volta à mesa!')}
+    if(was){mgClose();if(!isGM6())toast(M6.state.call?.on&&!M6.state.pause?.on&&!(!isGM6()&&T3.specOf?.(uid3()))?(MG.specWas?'🎲 O seu personagem voltou à cena. De volta à mesa!':'📞 A call começou. De volta à mesa!'):MG.specWas?'🎲 O seu personagem voltou à cena. De volta à mesa!':'▶ O Mestre retomou a sessão. De volta à mesa!')}
     $('mgInv')?.remove();if(MG.ch)mgLeaveCh();
   }
 });
@@ -13490,7 +13560,7 @@ function petEat20(id){
 const TABS20=[['room','🏠 Quarto'],['shop','🛍️ Loja'],['ach','🏆 Conquistas'],['rank','📊 Ranking']];
 function petOpen20(tab){
   arcFree12();
-  if(!arcOk12()){toast('O Perseus recebe visitas durante o ⏸ Intervalo.');return}
+  if(!arcOk12()){toast('Com a call ativa, o Perseus recebe visitas só no ⏸ Intervalo.');return}
   actx();mgJoinCh();sprLoad();mgRootEl().classList.add('show');MG.open=true;document.body.classList.add('mg-on');
   mgLeaveRoom();mgStop();fx20.reset();petLoad20();PS20.tab=tab||PS20.tab||'room';PS20.sayNext=Date.now()+1200;
   petRender20();
@@ -14952,7 +15022,14 @@ function bar26(){
   const after=$('mbHand')||$('mbCall');if(after)after.after(g);else bar.append(g);
   $('arcBtn26').onclick=arcGo26;$('petBtn26').onclick=()=>{if(!camp3()){toast('Entre numa mesa para visitar o Perseus.');return}T3.petOpen?.('room')};
 }
-setInterval(()=>{try{bar26()}catch(e){}},1200);
+function vis26(){
+  let ok=true;try{ok=!camp3()||T3.canAccessArcade?T3.canAccessArcade():true}catch(e){}
+  $$('.t26-arc,#mbArc26').forEach(e=>{e.hidden=!ok;e.style.display=ok?'':'none'});
+  if(!ok&&MG.open){try{mgClose()}catch(e){}}
+}
+T3.vis26=vis26;
+onState6(()=>{try{vis26()}catch(e){}});
+setInterval(()=>{try{bar26();vis26()}catch(e){}},1200);
 {const _it26=T3.initTheme;T3.initTheme=function(){const out=_it26.apply(this,arguments);try{top26()}catch(e){}return out}}
 setTimeout(top26,0);setTimeout(top26,1500);
 
@@ -15158,13 +15235,13 @@ function scPeer28(to){
   return p;
 }
 async function scStart28(){
-  if(!scOk28()){toast('Este navegador não consegue transmitir a tela.');return}
+  if(!scOk28()){toast('Transmitir a tela não funciona neste navegador (celulares não permitem). Use um computador. Assistir funciona normalmente.');return}
   if(!camp3()){toast('Entre numa mesa para transmitir.');return}
   if(!isGM6()&&!SC28.granted){scAsk28();return}
-  let st;try{st=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:24,max:30}},audio:true})}catch(e){toast('Transmissão cancelada.');SC28.granted=false;scBar28();return}
+  let st;try{st=await navigator.mediaDevices.getDisplayMedia({video:{cursor:'always'},audio:true})}catch(e){toast('Transmissão cancelada.');SC28.granted=false;scBar28();return}
   if(SC28.sharer&&SC28.sharer!==uid3())scViewClose28();
   scStop28(true);SC28.stream=st;SC28.sharer=uid3();SC28.sharerName=scName28(uid3());
-  st.getVideoTracks()[0]?.addEventListener('ended',()=>scStop28());
+  st.getVideoTracks().forEach(t=>{t.onended=()=>{if(SC28.stream===st)scStop28()}});
   scSend28({k:'start',name:SC28.sharerName});SC28.lastStart=Date.now();
   toast('🖥️ Sua tela está sendo transmitida para a mesa.');scBar28();
 }
