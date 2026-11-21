@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#090b10">
-<meta name="tulpa-build" content="20/11 22:04">
+<meta name="tulpa-build" content="20/11 23:57">
 <title>TULPA RPG — Registro de Agente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2913,6 +2913,164 @@ html body:not(.t3-pal) .ae-tab[aria-selected="true"]{color:#fff}
 .ae-cglass{flex-direction:row!important;align-items:center}
 @media (max-width:560px){.ae-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ae-desc{display:none}.ae-prev{height:76px}}
 @media (prefers-reduced-motion:reduce){.ae-card{transition:none}.ae-card:hover{transform:none}}
+/* ===== Etapa 26 ===== */
+.t26-arc{font-weight:700;white-space:nowrap}
+#t3Cat{touch-action:none;-webkit-user-select:none;user-select:none}
+#t3Cat.t26-drag{animation:none!important;transform:scale(1.12) rotate(-6deg);cursor:grabbing;filter:drop-shadow(0 14px 18px rgba(0,0,0,.45))}
+#t3Cat .t3-catimg{pointer-events:none}
+.cb-unlock26{position:absolute;right:10px;bottom:10px;z-index:6;padding:6px 10px;border-radius:999px;border:1px dashed var(--line,#888);background:color-mix(in oklab,var(--panel,#222) 88%,transparent);color:var(--muted,#bbb);font:600 12px/1.2 inherit;cursor:pointer;opacity:.75}
+.cb-unlock26:hover,.cb-unlock26:focus-visible{opacity:1}
+.cb-unlock26.on{border-style:solid;border-color:#e2a03f;color:#e2a03f;opacity:1;box-shadow:0 0 0 2px rgba(226,160,63,.25)}
+.mb-arc26{display:inline-flex;gap:6px;flex-wrap:wrap}
+/* ===== Etapa 27: Despertar ===== */
+.awk27{position:relative;overflow:hidden;border:1px solid color-mix(in oklab,var(--gold,#c8a66a) 55%,var(--line,#888))}
+.awk27:not(.done){background:radial-gradient(120% 140% at 0% 0%,color-mix(in oklab,var(--gold,#c8a66a) 22%,transparent),transparent 60%),var(--panel,#fff)}
+.awk27-hero{display:flex;gap:16px;align-items:flex-start;margin-bottom:12px}
+.awk27-hero h2{margin:0 0 6px}
+.awk27-hero p{margin:0 0 8px;max-width:62ch}
+.awk27-ico{font-size:22px;line-height:1}
+.awk27-ico.big{font-size:44px;filter:drop-shadow(0 0 12px color-mix(in oklab,var(--gold,#c8a66a) 70%,transparent));animation:awk27 3.2s ease-in-out infinite}
+@keyframes awk27{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.12) rotate(8deg)}}
+.awk27-row{display:flex;gap:12px;align-items:center}.awk27-row b{display:block}
+.awk27-btn{font-size:16px;padding:10px 18px}
+@media (prefers-reduced-motion:reduce){.awk27-ico.big{animation:none}}
+@media (max-width:560px){.awk27-hero{flex-direction:column;gap:8px}}
+/* ===== Etapa 28: transmissão de tela ===== */
+.mb-scr28{display:inline-flex;gap:6px;flex-wrap:wrap}
+.sc28-on{border-color:#d9534f!important;color:#d9534f!important}
+.sc28{position:fixed;right:16px;top:84px;width:min(640px,calc(100vw - 32px));height:min(400px,60vh);min-width:260px;min-height:170px;max-width:calc(100vw - 16px);max-height:calc(100vh - 24px);resize:both;overflow:hidden;z-index:88;display:flex;flex-direction:column;background:#0b0d10;border:1px solid var(--line,#444);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.sc28.hide{display:none}
+.sc28.min{height:auto!important;min-height:0;resize:none}.sc28.min .sc28-v{display:none}
+.sc28-h{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;background:#14181e;color:#eef2f7;font-size:13px}
+.sc28-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc28-btns{display:inline-flex;gap:2px}
+.sc28-btns button{background:transparent;border:0;color:inherit;font-size:15px;min-width:32px;min-height:32px;border-radius:8px;cursor:pointer}
+.sc28-btns button:hover,.sc28-btns button:focus-visible{background:rgba(255,255,255,.12)}
+.sc28-v{flex:1;min-height:0;display:flex;background:#000}
+.sc28-v video{width:100%;height:100%;object-fit:contain;background:#000}
+.sc28-asks{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:95;display:flex;flex-direction:column;gap:8px;width:min(460px,calc(100vw - 32px))}
+.sc28-ask{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:var(--panel,#fff);color:var(--text,#222);border:2px solid var(--accent,#8e3e34);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.sc28-ask-b{display:inline-flex;gap:6px}
+@media (max-width:560px){.sc28{left:8px;right:8px;top:64px;width:auto;height:38vh;resize:vertical}}
+
+/* ===== Etapa 29 — Alterações do Sistema ===== */
+.master-panel{display:none!important}
+.sys29{position:fixed;inset:0;z-index:120;background:rgba(5,6,10,.62);display:flex;align-items:stretch;justify-content:center;padding:24px 16px;backdrop-filter:blur(3px)}
+.sys29.hide{display:none}
+body.sys29-open{overflow:hidden}
+.sys29-box{width:min(1100px,100%);display:flex;flex-direction:column;background:var(--panel,#151a21);color:var(--text,#eef2f7);border:1px solid var(--line,rgba(255,255,255,.12));border-radius:var(--ae-rad,16px);box-shadow:0 24px 70px rgba(0,0,0,.5);overflow:hidden;min-height:0}
+.sys29-top{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line,rgba(255,255,255,.12))}
+.sys29-top h2{margin:0;font-size:1.25rem}.sys29-top .sub{margin:4px 0 0;max-width:60ch}
+.sys29-body{display:grid;grid-template-columns:220px 1fr;min-height:0;flex:1}
+.sys29-nav{display:flex;flex-direction:column;gap:2px;padding:10px;border-right:1px solid var(--line,rgba(255,255,255,.12));overflow:auto}
+.sys29-tab{all:unset;cursor:pointer;padding:9px 10px;border-radius:10px;font-size:.92rem;line-height:1.25}
+.sys29-tab:hover{background:color-mix(in srgb,var(--accent,#e59a8c) 12%,transparent)}
+.sys29-tab.on{background:color-mix(in srgb,var(--accent,#e59a8c) 22%,transparent);font-weight:700}
+.sys29-tab:focus-visible,.gm29-b:focus-visible{outline:2px solid var(--accent,#e59a8c);outline-offset:2px}
+.sys29-main{padding:14px 18px 20px;overflow:auto;min-width:0}
+.sys29-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:10px}
+.sys29-head h3{margin:0;font-size:1.1rem}.sys29-head #sys29add{margin-left:auto}
+.sys29-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.sys29-row{display:flex;gap:10px;align-items:center;padding:9px 11px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:12px;background:color-mix(in srgb,var(--text,#fff) 3%,transparent)}
+.sys29-row .grow{flex:1;min-width:0}.sys29-row .sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sys29-row.del{opacity:.6}.sys29-row.del b{text-decoration:line-through}
+.sys29-acts{display:flex;gap:4px;flex-shrink:0}
+.sys29-p{font-size:.72rem;padding:1px 7px}.sys29-p.edit{background:#7a5a2b;color:#fff}.sys29-p.new{background:#2f6f4f;color:#fff}.sys29-p.del{background:#8e3e34;color:#fff}
+.sys29-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+.sys29-form .field.full,.sys29-form .sys29-fs,.sys29-form .sys29-3,.sys29-form .sys29-k,.sys29-form .t3-check,.sys29-form .sys29-save,.sys29-form p.full{grid-column:1/-1}
+.sys29-3,.sys29-k{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.sys29-k{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sys29-k.hide{display:none}
+.sys29-fs{border:1px solid var(--line,rgba(255,255,255,.12));border-radius:12px;padding:8px 12px 12px;display:grid;gap:8px}
+.sys29-fs legend{padding:0 6px;font-weight:700}
+.sys29-save{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.sys29-log{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.sys29-log>li{padding:9px 11px;border-radius:12px;border:1px solid var(--line,rgba(255,255,255,.1))}
+.sys29-log time{opacity:.7;font-size:.8rem;margin-right:6px}
+.sys29-card .symbol{font-size:1.6rem}
+@media (max-width:760px){
+  .sys29{padding:0}.sys29-box{border-radius:0}
+  .sys29-body{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sys29-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line,rgba(255,255,255,.12));padding:8px}
+  .sys29-tab{white-space:nowrap;flex-shrink:0}
+  .sys29-main{padding:12px 16px 24px}
+  .sys29-form,.sys29-3,.sys29-k{grid-template-columns:1fr}
+  .sys29-row{flex-wrap:wrap}.sys29-row .sub{white-space:normal}
+}
+/* botões inline do Mestre */
+.gm29{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}
+.gm29-b{border:1px solid var(--line,rgba(255,255,255,.18));background:transparent;color:inherit;border-radius:8px;padding:2px 7px;font-size:.82rem;cursor:pointer;line-height:1.4;min-height:28px}
+.gm29-b:hover{background:color-mix(in srgb,var(--accent,#e59a8c) 18%,transparent)}
+.gm29-add{border-style:dashed}
+.gm29-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.ritual-card .gm29{margin-left:auto}
+/* avisos de mudança */
+.rn29{position:fixed;left:16px;bottom:16px;z-index:130;display:flex;flex-direction:column;gap:8px;width:min(360px,calc(100vw - 32px));pointer-events:none}
+.rn29-card{pointer-events:auto;background:var(--panel,#151a21);color:var(--text,#eef2f7);border:1px solid var(--accent,#e59a8c);border-radius:14px;padding:10px 12px;box-shadow:0 14px 40px rgba(0,0,0,.45);animation:rn29in .25s ease-out}
+@keyframes rn29in{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.rn29-card{animation:none}}
+.rn29-head{display:flex;gap:8px;align-items:flex-start}.rn29-head b{flex:1;line-height:1.3}
+.rn29-x{border:0;background:transparent;color:inherit;cursor:pointer;font-size:1rem;min-width:28px;min-height:28px}
+.rn29-bang,.rn29-card-bang,.rn29-tab-bang{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#e8b04a;color:#1b1206;font-weight:900;font-size:.8rem;flex-shrink:0}
+.rn29-ch{margin:6px 0;padding-left:18px;font-size:.88rem}.rn29-ch s{opacity:.65}.rn29-ch ins{text-decoration:none;font-weight:700}
+.table-char{position:relative}
+.rn29-card-bang{position:absolute;top:6px;right:6px;z-index:3;box-shadow:0 0 0 3px rgba(232,176,74,.35)}
+.navbtn{position:relative}.rn29-tab-bang{margin-left:6px;width:18px;height:18px;font-size:.72rem}
+.subel29-list{list-style:none;padding:0;margin:0;display:grid;gap:8px}.subel29-list p{margin:4px 0 0}
+
+/* ===== Etapa 30 — Óbolos: quarto, visitas, cápsulas, visual da mesa, missões, apostas ===== */
+.pt-tabs{flex-wrap:nowrap}
+.x30{display:flex;flex-direction:column;gap:12px}
+.x30-room{width:100%;max-width:480px;aspect-ratio:480/420;height:auto;border-radius:14px;align-self:center;background:#0d0f18}
+.x30-ico{font-size:2.4rem;line-height:1;width:64px;text-align:center}
+.x30-fr{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.x30-fr li{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:14px}
+.x30-fr canvas{width:100%;height:auto;aspect-ratio:160/140;border-radius:10px}
+.x30-fr li>div{display:flex;flex-direction:column}
+.x30-vhead{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}.x30-vhead h3{margin:0;font-size:1.05rem}
+.x30-sub{display:flex;gap:6px}
+.x30-mach{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:10px}
+.x30-capsule{font-size:5rem;line-height:1;filter:drop-shadow(0 8px 18px rgba(0,0,0,.4))}
+.x30-capsule.shake{animation:x30sh .12s linear infinite}
+@keyframes x30sh{0%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}100%{transform:rotate(-8deg)}}
+.x30-album{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.x30-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;padding:10px 6px;border-radius:12px;border:2px solid #8a8f98;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(0,0,0,.12));overflow:hidden}
+.x30-card b{font-size:.82rem;line-height:1.2}.x30-cico{font-size:2rem;line-height:1.1}
+.x30-rar{font-size:.7rem;opacity:.8}
+.x30-card.r-r{border-color:#4f8fe8}.x30-card.r-e{border-color:#a45ee8;box-shadow:0 0 14px rgba(164,94,232,.35)}
+.x30-card.r-m{border-color:#e8c15e;box-shadow:0 0 18px rgba(232,193,94,.45)}
+.x30-card.r-m::after{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 35%,rgba(255,120,220,.35) 45%,rgba(120,240,255,.35) 52%,rgba(255,250,150,.35) 59%,transparent 68%);animation:x30holo 3s linear infinite;pointer-events:none}
+@keyframes x30holo{from{transform:translateX(-30%)}to{transform:translateX(30%)}}
+.x30-card.lock{opacity:.45;filter:grayscale(1)}.x30-card.lock::after{display:none}
+.x30-card.big{width:min(240px,100%);padding:16px 12px;gap:6px}.x30-card.big .x30-cico{font-size:3.6rem}.x30-card.big b{font-size:1.05rem}
+.x30-card.reveal{animation:x30rev .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes x30rev{from{transform:scale(.6) rotateY(90deg);opacity:0}to{transform:none;opacity:1}}
+.x30-new{font-weight:800;color:#2f9f6f}
+.x30-miss{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.x30-miss li{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:12px}
+.x30-miss li .grow{flex:1;display:flex;flex-direction:column;gap:4px}.x30-miss li.done{opacity:.7}.x30-miss li.done b{text-decoration:line-through}
+.x30-rew{font-weight:800;white-space:nowrap}
+.x30-bet{margin:6px 0}.x30-warn{color:#e8b04a}.x30-betres{font-weight:800;text-align:center;margin:8px 0}
+.tt30{display:block;font-size:.72rem;font-weight:700;letter-spacing:.02em;color:var(--second,#c8a66a);line-height:1.2}
+.mg-players .tt30{display:inline;margin-left:6px}
+.x30-frprev{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:#33405a;color:#fff;font-weight:800;font-size:1.4rem;flex-shrink:0}
+.x30-dxprev{width:60px;height:60px;border-radius:14px;display:grid;place-items:center;font-size:1.8rem;background:radial-gradient(circle,var(--c1) 0,var(--c2) 70%);flex-shrink:0}
+/* molduras animadas na foto */
+.fr30{position:relative;border-radius:50%;isolation:isolate}
+.fr30::before{content:"";position:absolute;inset:-5px;border-radius:50%;z-index:-1}
+.fr30-fogo::before{background:conic-gradient(from 0deg,#3d6bff,#7fd4ff,#b05cff,#3d6bff);animation:fr30spin 2.4s linear infinite;filter:blur(1px)}
+.fr30-neon::before{background:conic-gradient(#ff2bd6,#00f0ff,#ff2bd6);animation:fr30pulse 1.6s ease-in-out infinite}
+.fr30-dourado::before{background:conic-gradient(#b8860b,#ffe9a0,#d4a017,#fff6cc,#b8860b);animation:fr30spin 4s linear infinite}
+.fr30-glitch::before{background:linear-gradient(90deg,#00f0ff,#ff2bd6);animation:fr30glitch .9s steps(2) infinite}
+.fr30-glitch{animation:fr30jit 2.2s steps(1) infinite}
+@keyframes fr30spin{to{transform:rotate(360deg)}}
+@keyframes fr30pulse{50%{filter:blur(3px) brightness(1.4);transform:scale(1.05)}}
+@keyframes fr30glitch{0%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}100%{transform:translate(0,0)}}
+@keyframes fr30jit{0%,92%,100%{transform:none}94%{transform:translateX(2px)}96%{transform:translateX(-2px)}}
+@media (prefers-reduced-motion:reduce){.fr30::before,.fr30,.x30-card.r-m::after,.x30-capsule.shake,.x30-card.reveal{animation:none!important}}
+/* efeito de dado */
+#t3Roll.dx30{box-shadow:0 0 0 2px var(--dx1),0 0 30px var(--dx2)}
+.dx30-p{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;pointer-events:none;animation:dx30fly 1.1s ease-out forwards;opacity:0}
+@keyframes dx30fly{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(.2);opacity:0}}
 
 </style>
 <script id="tulpa-etapa3">
@@ -4928,7 +5086,7 @@ kb('arquetipo','Arquétipo',['arquetipo','lutador','genio','ritualista','estagio
  'No <b>Estágio 3</b> você escolhe um arquétipo: <b>Lutador</b> (linha de frente, armas), <b>Gênio</b> (versátil, resolve problemas) ou <b>Ritualista</b> (domina rituais, mas todo poder tem preço). Cada um tem <b>6 trilhas</b>.',
  {go:[G('track','#archSelect')],rel:['trilha','dica-build']});
 kb('trilha','Trilhas e poderes',['trilha','trilhas','poderes','estagio 5','estagio 8','estagio 10','habilidades de trilha'],
- 'A trilha é a sua especialização. Ela concede <b>um poder novo nos Estágios 3, 5, 8 e 10</b>, pagos com <b>Essência (ES)</b>. Na aba <b>Arquétipo &amp; Trilha</b> escolha o arquétipo, depois a trilha e confirme.',
+ 'A trilha é a sua especialização. Ela concede <b>um poder novo nos Estágios 3, 5, 8 e 10</b>, pagos com <b>Essência (ES)</b>. Ela só é liberada depois do <b>✨ Despertar</b> (botão na aba <b>Arquétipo &amp; Trilha</b>, usado quando o Despertar acontece na história). Ao despertar, o personagem recebe na hora os poderes dos estágios que já alcançou.',
  {go:[G('track','#trackSelect')],rel:['arquetipo','talentos','essencia']});
 kb('talentos','Talentos e habilidades',['talento','talentos','habilidade','usar talento','ativar talento','bonus de talento','usar habilidade'],
  'Talentos custam <b>Essência</b> e <b>não gastam seu turno</b>, mas só <b>um por turno</b> em combate. Se ele dá bônus em perícia, o bônus some <b>depois da primeira rolagem</b> que o usa. Talentos pessoais valem só para você; os de aliado perguntam quem recebe.',
@@ -5042,7 +5200,7 @@ kb('historico','Histórico e rolagens na tela',['historico','rolagens','rolagem 
  'Rolagens da <b>mesa</b> e do <b>combate</b> aparecem na tela de todos e no histórico (com os dados de ataque, defesa e dano). As feitas dentro da ficha são <b>privadas</b> por padrão: dá para mostrar na mesa em <b>⚙ Aparência › Rolagens da ficha</b>.',
  {go:[{settings:true}],rel:['visao-mesa']});
 kb('tema','Tema escuro e celular',['tema escuro','modo escuro','escuro','claro','celular','mobile','funciona no celular','mudar de tema','mudo de tema','tamanho do texto','fonte grande','letra grande','aparencia'],
- 'Em <b>⚙ Aparência</b> você troca <b>tema</b> (claro, escuro, automático), <b>visualização</b> (automática, celular ou computador) e <b>tamanho do texto</b>. O botão ☾/☀ no topo troca o tema na hora.',
+ 'Em <b>⚙ Aparência</b> você escolhe a <b>estética</b> da galeria (ou a <b>Estrutura Clássica</b>, que tem claro e escuro) e o <b>tamanho do texto</b>. Celular e computador se ajustam sozinhos ao tamanho da tela.',
  {go:[{settings:true}]});
 kb('voltar','Botão Voltar',['voltar','tela anterior','botao voltar','como volto'],
  'O botão <b>← Voltar</b> (topo da tela) leva à tela anterior, inclusive entre as abas da ficha. O botão <b>Central</b> volta ao início.');
@@ -5075,7 +5233,7 @@ const TOURS={
   {h:'Atributos',t:'Distribua <b>7 pontos</b> entre os 8 atributos (mínimo 1, máximo 3). Cada ponto = 1 d20. Dica: não deixe Destreza no 1.',go:G('attributes','#attributes')},
   {h:'Vocação',t:'Escolha o que ele fazia antes da Teosofia e clique em <b>Confirmar vocação</b>. Dá <b>+V em 3 perícias</b> e 2 talentos.',go:G('vocation','#vocSelect')},
   {h:'Perícias extras',t:'Escolha as <b>8 perícias extras</b> (+5 cada) que combinam com a história do personagem. As outras ficam em +1.',go:G('skills','#extraSkillsLabel')},
-  {h:'Arquétipo e trilha',t:'No <b>Estágio 3</b> escolha Lutador, Gênio ou Ritualista e uma trilha. Estágio 1 ou 2? Pule este passo, nada de pressa.',go:G('track','#archSelect')},
+  {h:'Arquétipo e trilha',t:'A Trilha só chega com o <b>✨ Despertar</b>, quando ele acontece na história. Até lá o personagem sobe de Estágio normalmente. Depois de despertar, escolha Lutador, Gênio ou Ritualista e uma trilha.',go:G('track','#archSelect')},
   {h:'Talentos',t:'Veja os talentos da vocação e da trilha. Eles gastam <b>Essência</b>, mas não gastam turno.',go:G('talents','#vocationTalents')},
   {h:'Equipamento',t:'Adicione uma <b>arma</b>, uma <b>proteção</b> (vista no corpo) e, se quiser, uma mochila. Isso define sua Defesa e seus ataques.',go:G('inventory','#addList')},
   {h:'Toques finais',t:'Escreva a <b>crônica, conexões e anotações</b> no fim de Registros. Pronto! Peça <i>“revisar minha ficha”</i> e eu confiro se esqueceu algo.',go:G('records','#notes')}]},
@@ -5251,7 +5409,8 @@ function reviewSheet(){
   else if(used<st.extra)B(`Faltam <b>${st.extra-used}</b> perícia(s) extra(s) (você usou ${used} de ${st.extra}).`,G('skills','#extraSkillsLabel'));
   else if(used>st.extra)B(`Você marcou <b>${used-st.extra}</b> perícia(s) extra(s) a mais que o limite (${st.extra}).`,G('skills','#extraSkillsLabel'));
   else O(`Perícias extras: ${used}/${st.extra}`);
-  if(d.stage>=3){
+  if(d.stage>=3&&!(d.awakened===true||(d.awakened==null&&!!d.track)||d.freeMode))O('Ainda não <b>despertou</b>: segue subindo de Estágio sem Trilha até o ✨ Despertar acontecer na história.');
+  else if(d.stage>=3){
     if(!d.archetype)B('Você está no Estágio 3+ e ainda não escolheu <b>arquétipo</b>.',G('track','#archSelect'));
     else if(!d.track)B(`Arquétipo <b>${esc(d.archetype)}</b> escolhido, mas falta a <b>trilha</b>.`,G('track','#trackSelect'));
     else O(`Trilha: <b>${esc(d.track)}</b> (${esc(d.archetype)})`);
@@ -7181,7 +7340,7 @@ function mapMove7(e){
     if(!d.moved&&Math.hypot(p.sx-d.sx,p.sy-d.sy)<5)return;d.moved=true;
     const g=mapCfg7(),t=(M6.state.tokens||[]).find(q=>q.id===d.id);let x=(p.wx-d.ox-g.ox)/g.cell,y=(p.wy-d.oy-g.oy)/g.cell;
     const prev=MAP7.live[d.id]||tokPos7(t||{x,y}),a=prev.a!=null?prev.a:t?.a;
-    if(t&&!isGM6()){/* o jogador arrasta com colisão: não atravessa paredes nem portas fechadas */
+    if(t&&(!isGM6()||(inCb14()&&!T3.cbFree?.()&&T3.cbNoSnap?.(t)))){/* o jogador (e o Mestre com o token da vez) arrasta com colisão e gasta metros */
       const s=t.s||1,c0=[g.ox+(prev.x+s/2)*g.cell,g.oy+(prev.y+s/2)*g.cell],c1=[g.ox+(x+s/2)*g.cell,g.oy+(y+s/2)*g.cell];
       let [nx,ny]=collide10(c0[0],c0[1],c1[0],c1[1],tokR10(t),blockers10());if(T3.cbMove)[nx,ny]=T3.cbMove(t,c0[0],c0[1],nx,ny,'drag');x=(nx-g.ox)/g.cell-s/2;y=(ny-g.oy)/g.cell-s/2}
     MAP7.live[d.id]={x,y,a,until:Date.now()+60000};
@@ -7200,7 +7359,7 @@ function mapUp7(e){
     if(!d.moved){delete MAP7.live[d.id];tapTok7(t,e);return}
     const g=mapCfg7(),l=MAP7.live[d.id]||t,sz=t.s||1;
     let x=Math.max(0,Math.min(g.cols-sz,Math.round(l.x))),y=Math.max(0,Math.min(g.rows-sz,Math.round(l.y)));
-    if(!isGM6()&&T3.cbNoSnap&&T3.cbNoSnap(t)){x=l.x;y=l.y}
+    if(T3.cbNoSnap&&T3.cbNoSnap(t)&&(!isGM6()||!T3.cbFree?.())){x=l.x;y=l.y}
     else if(!isGM6()){/* encaixa na grade só se o encaixe não entrar numa parede */
       const c0=[g.ox+(l.x+sz/2)*g.cell,g.oy+(l.y+sz/2)*g.cell],[nx,ny]=collide10(c0[0],c0[1],g.ox+(x+sz/2)*g.cell,g.oy+(y+sz/2)*g.cell,tokR10(t),blockers10());
       const sx=(nx-g.ox)/g.cell-sz/2,sy=(ny-g.oy)/g.cell-sz/2;if(Math.abs(sx-x)+Math.abs(sy-y)>.05){x=sx;y=sy}}
@@ -7442,7 +7601,7 @@ M6.hooks.leave.push(()=>{MAP7.imgKey='';MAP7.img=null;MAP7.sel=null;MAP7.ring=nu
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='20/11 22:04';
+const BUILD8='20/11 23:57';
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -8865,7 +9024,23 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'🎨 Galeria de Estéticas, Perseus animado e furtividade de verdade',w:'a',open:1,b:`<ul>
+  {t:'⚙️ Alterações do Sistema e novos motivos para juntar Óbolos',w:'a',open:1,b:`<ul>
+   <li><b>⚙️ Alterações do Sistema</b> (só o Mestre, na Central da campanha): crie, edite ou exclua Vocações, Trilhas, Rituais, Itens do manual, Estados (dano por turno, Defesa, não pode se mover, desvantagem…), Traumas, Bestiário, Sub-Elementos e as Regras da Mesa (deslocamento base, DT do Arremesso e de Furtividade). Conteúdo do manual tem ↺ para voltar ao original.</li>
+   <li><b>Edição direto na ficha:</b> o Mestre vê ✏️ 🗑️ ＋ nas listas normais (vocação, trilha, rituais, itens e estados). O antigo Painel do Mestre saiu. Para os jogadores a ficha continua limpa.</li>
+   <li><b>Na hora, para todos:</b> a mudança chega às fichas e ao combate sem recarregar. Só quem é afetado recebe o aviso: <b>!</b> no card e na aba, um quadro com <i>Antes → Depois</i> e o Perseus contando o que mudou.</li>
+   <li><b>🐱 Perseus com mais coisas para comprar</b> (nada muda as regras do RPG): 🪑 decorar o quarto e 🏘️ visitar o quarto dos amigos com 💜 carinho; 🃏 cápsulas com Álbum de 30 figurinhas (Comum, Raro, Épico e Mítico holográfico); ✨ molduras animadas, títulos e efeitos de dado que a mesa vê; 🎯 três missões por dia.</li>
+   <li><b>🎰 Apostas amigáveis</b> nas salas multiplayer de Vôlei, Ritual Rhythm, UNO, Rinha e Jogo da Velha: o anfitrião escolhe o valor, quem vencer leva o pote e empate devolve.</li>
+  </ul>`},
+  {t:'🕹 Arcade a qualquer hora, ✨ Despertar, 🖥️ Transmitir Tela e turno travado',w:'a',b:`<ul>
+   <li><b>🕹 Arcade e 🐱 Visitar o Perseus</b> abrem a qualquer momento, pelo topo ou pela barra da mesa. Não precisa de chamada nem de Intervalo. No ⏸ Intervalo continua igual: fecha quando o Mestre retoma.</li>
+   <li><b>Perseus arrastável:</b> segure e arraste o gato (mouse ou dedo) para qualquer canto. Clique simples continua abrindo a conversa. Ele lembra o lugar. Para voltar ao canto: ⚙ Aparência › Perseus.</li>
+   <li><b>⚙ Aparência mais limpa:</b> o botão ☾/☀ do topo saiu (ele bagunçava as estéticas). Claro e escuro ficam na <b>Estrutura Clássica</b>. Celular e computador agora se ajustam sozinhos.</li>
+   <li><b>✨ Despertar:</b> a Trilha não aparece mais sozinha no Estágio 3. O personagem sobe de Estágio sem Trilha até o Despertar acontecer na história. Aí o jogador ou o Mestre toca em <b>✨ Despertar</b> (aba Arquétipo &amp; Trilha) e ele recebe os poderes dos estágios que já alcançou. Fichas que já tinham Trilha continuam como estão.</li>
+   <li><b>Combate com turno travado:</b> no mapa só o token da vez se move, inclusive para o Mestre. Na vez de um NPC, o Mestre move só aquele NPC. Na vez de um jogador, o Mestre fica sem mover tokens (menus e fichas continuam livres). Para emergências existe <b>🔓 Destravar Posição Manual</b> no canto do mapa, desligado por padrão.</li>
+   <li><b>🖥️ Transmitir Tela</b> na barra da mesa: o Mestre transmite direto para todos. O jogador pede e o Mestre vê <i>“[Nome] quer transmitir a tela — Permitir / Recusar”</i>. A tela abre numa janela que dá para redimensionar, minimizar e pôr em tela cheia, sem mexer no áudio da call (o som da tela começa mudo: 🔇/🔊). O Mestre encerra qualquer transmissão no ⛔.</li>
+   <li><b>Metros contados sempre:</b> o arrasto do Mestre com o token do NPC também gasta os 9 m, e o token não "pula" para a grade no fim. Teclado, setas, analógico e arrasto usam a mesma conta.</li>
+  </ul>`},
+  {t:'🎨 Galeria de Estéticas, Perseus animado e furtividade de verdade',w:'a',b:`<ul>
    <li><b>🎨 Galeria de Estéticas:</b> em ⚙ Aparência, 36 estéticas em 4 categorias (Frutiger, Retrô-Futurismo, Surreais e Liminares, Natureza e Fantasia). Cada uma muda cores, letras, cantos, vidro, sombras, ornamentos, botões e textura da tela. Na aba Clássicas ficam as paletas antigas e a 🎨 Personalizada, que agora também escolhe botões, textura, ornamento, sombra, letras e cantos.</li>
    <li><b>🐱 Perseus sem gravata:</b> visual novo em todo o site (assistente, Arcade, Intervalo e skins). Ele reage com animações ao 20 e ao 1 natural, início de combate, golpes fortes, Morrendo, perda de Lucidez e Colapso, música na mesa, Intervalo, barulhos e conquistas. Dá para desligar em ⚙ do Perseus.</li>
    <li><b>Mapa limpo:</b> nome e barras do token aparecem só no token selecionado, sob o cursor ou na vez dele. Os broches de conquista em volta do avatar só aparecem ao passar o cursor no card.</li>
@@ -9234,14 +9409,18 @@ document.addEventListener('fullscreenchange',()=>{if(!fsEl12()&&MG.fsNative){MG.
 document.addEventListener('webkitfullscreenchange',()=>{if(!fsEl12()&&MG.fsNative){MG.fsNative=false;if(MG.full){MG.full=false;mgLayout()}}});
 window.addEventListener('orientationchange',()=>setTimeout(mgLayout,120));
 /* o Arcade abre no ⏸ Intervalo e também para quem está no Modo Espectador (personagem em outro mapa) */
-const arcOk12=()=>!!M6.state.pause?.on||(!isGM6()&&!!T3.specOf?.(uid3()));
+/* e agora também a qualquer momento, pelo menu (modo livre: não fecha quando a sessão retoma) */
+const arcOk12=()=>!!M6.state.pause?.on||(!isGM6()&&!!T3.specOf?.(uid3()))||!!MG.free;
 T3.arcOk=arcOk12;
+const arcFree12=()=>{if(!M6.state.pause?.on&&!(!isGM6()&&T3.specOf?.(uid3())))MG.free=true};
+T3.arcFree=arcFree12;
 function mgOpen(){
+  arcFree12();
   if(!arcOk12()){toast('Os mini-games abrem durante o ⏸ Intervalo.');return}
   actx();mgJoinCh();sprLoad();mgRootEl().classList.add('show');MG.open=true;document.body.classList.add('mg-on');
   if(MG.room)(MG.g?null:mgLobby());else mgHub();
 }
-function mgClose(){mgLeaveRoom();mgStop();const r=$('mgRoot');if(r)r.classList.remove('show');MG.open=false;document.body.classList.remove('mg-on');mgLayout()}
+function mgClose(){MG.free=false;mgLeaveRoom();mgStop();const r=$('mgRoot');if(r)r.classList.remove('show');MG.open=false;document.body.classList.remove('mg-on');mgLayout()}
 function mgBack(){if(MG.view==='hub'){mgClose();return}mgLeaveRoom();mgHub()}
 T3.mgOpen=mgOpen;T3.mgClose=mgClose;
 
@@ -9473,6 +9652,7 @@ function mgPauseUi(){
   $('mgOpenBtn').onclick=mgOpen;boardRender();
 }
 onState6(()=>{
+  if(M6.state.pause?.on)MG.free=false;
   if(arcOk12()&&camp3()){mgJoinCh();if(M6.state.pause?.on)mgPauseUi();boardRender()}
   else{
     const was=MG.open||!!MG.room;
@@ -10278,7 +10458,7 @@ function mvInfo14(ch){
   if(m.flags.has('semMover'))return{max:0,base:0,why:'um estado impede você de se mover',canRun:false};
   const ci=E.cargaInfo(d,E.hasEffect(d,'Força do Cotidiano'));
   if(ci.level>=3)return{max:0,base:0,why:'Imobilizado pela carga',canRun:false};
-  let base=MOVE14;const why=[];
+  let base=(typeof T3.moveBase==='function'?Number(T3.moveBase())||MOVE14:MOVE14);const why=[];
   const fx=d.activeEffects||[];
   if(E.hasEffect(d,'Gigante Invulnerável')||fx.some(e=>/desloc\w*\s+dobrad|velocidade\s+dobrad|acelera[çc][ãa]o/i.test(e.desc||''))){base*=2;why.push('deslocamento dobrado')}
   if(fx.some(e=>/n[ée]voa da alma/i.test(e.name||'')&&String(e.source||'').startsWith('ext:'))){base/=2;why.push('Névoa da Alma')}
@@ -13309,6 +13489,7 @@ function petEat20(id){
 /* ===================== interface ===================== */
 const TABS20=[['room','🏠 Quarto'],['shop','🛍️ Loja'],['ach','🏆 Conquistas'],['rank','📊 Ranking']];
 function petOpen20(tab){
+  arcFree12();
   if(!arcOk12()){toast('O Perseus recebe visitas durante o ⏸ Intervalo.');return}
   actx();mgJoinCh();sprLoad();mgRootEl().classList.add('show');MG.open=true;document.body.classList.add('mg-on');
   mgLeaveRoom();mgStop();fx20.reset();petLoad20();PS20.tab=tab||PS20.tab||'room';PS20.sayNext=Date.now()+1200;
@@ -14741,6 +14922,1241 @@ function aeSync25(){
 const aeRebind25=()=>$$('.t3-setbtn').forEach(b=>{if(b.onclick!==openSettings)b.onclick=openSettings});
 setTimeout(aeRebind25,0);setTimeout(aeRebind25,1500);setInterval(aeRebind25,5000);
 try{ae25()}catch(e){}
+
+/* ===================================================================
+   TULPA · ETAPA 26 — Arcade pelo menu, configurações limpas, Perseus
+   arrastável e trava de turno no combate (inclusive para o Mestre)
+   =================================================================== */
+
+/* ---------- 1a. Arcade a qualquer momento ---------- */
+function arcGo26(){
+  if(!camp3()){toast('Entre numa mesa para abrir o Tulpa Arcade.');return}
+  try{mgOpen()}catch(e){console.warn('[T26] arcade',e)}
+}
+T3.arcGo=arcGo26;
+/* o botão ☾/☀ sai do topo (quebrava as estéticas); no lugar entra o Arcade */
+function top26(){
+  $$('.t3-themebtn').forEach(b=>b.remove());
+  $$('.t3-themewrap.in-top').forEach(w=>{
+    if(w.querySelector('.t26-arc'))return;
+    const a=document.createElement('button');a.type='button';a.className='btn small ghost t26-arc';
+    a.innerHTML='<span aria-hidden="true">🕹</span> Arcade';a.title='Tulpa Arcade e o quarto do Perseus (não precisa da chamada nem do Intervalo)';
+    a.onclick=arcGo26;w.prepend(a);
+  });
+}
+/* também na barra da mesa (ao lado da call e da mão), que aparece no celular */
+function bar26(){
+  const bar=$('mesaBar');if(!bar||$('mbArc26'))return;
+  const g=document.createElement('div');g.id='mbArc26';g.className='mb-group mb-arc26';
+  g.innerHTML='<button type="button" class="btn small" id="arcBtn26">🕹 Arcade</button><button type="button" class="btn small" id="petBtn26">🐱 Visitar o Perseus</button>';
+  const after=$('mbHand')||$('mbCall');if(after)after.after(g);else bar.append(g);
+  $('arcBtn26').onclick=arcGo26;$('petBtn26').onclick=()=>{if(!camp3()){toast('Entre numa mesa para visitar o Perseus.');return}T3.petOpen?.('room')};
+}
+setInterval(()=>{try{bar26()}catch(e){}},1200);
+{const _it26=T3.initTheme;T3.initTheme=function(){const out=_it26.apply(this,arguments);try{top26()}catch(e){}return out}}
+setTimeout(top26,0);setTimeout(top26,1500);
+
+/* ---------- 1b. configurações: sem seletor de visualização e claro/escuro só na Estrutura Clássica ---------- */
+if(prefs.view!=='auto'){prefs.view='auto';try{savePrefs()}catch(e){}}
+function cfg26(){
+  const mb=$('modalBody');if(!mb)return;
+  mb.querySelector('[data-pref="view"]')?.closest('.field')?.remove();
+  const f=mb.querySelector('.ae-classic')||mb.querySelector('.pal-grid')?.closest('.field');
+  if(f){
+    const l=f.querySelector(':scope>label');if(l)l.textContent='Estrutura Clássica: claro ou escuro';
+    if(!f.querySelector('.t26-note')){const n=document.createElement('p');n.className='sub t26-note';n.textContent='Claro e escuro valem para a Estrutura Clássica. As estéticas da galeria já trazem as próprias cores.';(l||f.firstChild)?.after?.(n)}
+  }
+  const pf=mb.querySelector('[data-pref="perseus"]')?.closest('.field');
+  if(pf&&!pf.querySelector('#catReset26')){
+    const b=document.createElement('button');b.type='button';b.className='btn small';b.id='catReset26';b.textContent='Levar o Perseus de volta ao canto';b.style.marginTop='8px';
+    b.onclick=()=>{catReset26();toast('O Perseus voltou ao canto da tela.')};pf.append(b);
+  }
+}
+{const _os26=openSettings;openSettings=function(){const out=_os26.apply(this,arguments);try{cfg26()}catch(e){console.warn('[T26] config',e)}return out};T3.openSettings=openSettings}
+$$('.t3-setbtn').forEach(b=>b.onclick=openSettings);
+
+/* ---------- 1c. Perseus arrastável (mouse e dedo) ---------- */
+const PD26={key:'tulpa_perseus_pos',p:null,skip:0};
+try{PD26.p=JSON.parse(localStorage.getItem(PD26.key)||'null')}catch(e){PD26.p=null}
+const clampN26=(v,a,b)=>Math.max(a,Math.min(b,v));
+function catXY26(c){const vw=innerWidth,vh=innerHeight,w=c.offsetWidth||80,h=c.offsetHeight||80,p=PD26.p;
+  return{x:clampN26(p.fx*(vw-w),8,Math.max(8,vw-w-8)),y:clampN26(p.fy*(vh-h),10,Math.max(10,vh-h-8)),w,h}}
+function catPlace26(){
+  const c=$('t3Cat');if(!c)return;
+  if(!PD26.p){['left','top','right','bottom'].forEach(k=>c.style[k]='');near26();return}
+  const q=catXY26(c);c.style.left=q.x+'px';c.style.top=q.y+'px';c.style.right='auto';c.style.bottom='auto';near26();
+}
+function catReset26(){PD26.p=null;try{localStorage.removeItem(PD26.key)}catch(e){}catPlace26()}
+T3.catReset=catReset26;
+/* balão e animação acompanham o gato */
+function near26(){
+  const c=$('t3Cat'),b=$('t3CatBubble'),pa=$('pa24');
+  [b,pa].forEach(el=>{if(el)['left','top','right','bottom','maxWidth'].forEach(k=>el.style[k]='')});
+  if(!c||!PD26.p)return;
+  const vw=innerWidth,vh=innerHeight,q=catXY26(c),r={left:q.x,top:q.y,right:q.x+q.w,bottom:q.y+q.h},right=q.x+q.w/2>vw/2;
+  if(b){
+    if(right){b.style.right=(vw-r.left+6)+'px';b.style.left='auto';b.style.maxWidth=Math.max(140,Math.min(270,r.left-14))+'px'}
+    else{b.style.left=(r.right+6)+'px';b.style.right='auto';b.style.maxWidth=Math.max(140,Math.min(270,vw-r.right-14))+'px'}
+    if(r.top<170){b.style.top=(r.top+q.h*.25)+'px';b.style.bottom='auto'}else{b.style.bottom=(vh-r.bottom+q.h*.35)+'px';b.style.top='auto'}
+  }
+  if(pa){
+    if(right){pa.style.right=Math.max(6,vw-r.right)+'px';pa.style.left='auto'}else{pa.style.left=Math.max(6,r.left)+'px';pa.style.right='auto'}
+    if(r.top>220){pa.style.bottom=(vh-r.top+6)+'px';pa.style.top='auto'}else{pa.style.top=(r.bottom+6)+'px';pa.style.bottom='auto'}
+  }
+}
+function catDrag26(){
+  const c=$('t3Cat');if(!c||c.dataset.drag26)return;c.dataset.drag26='1';c.style.touchAction='none';
+  c.title='Perseus: clique para conversar · segure e arraste para mudar de lugar';
+  let st=null;
+  c.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    const r=c.getBoundingClientRect();st={id:e.pointerId,sx:e.clientX,sy:e.clientY,ox:e.clientX-r.left,oy:e.clientY-r.top,moved:false};
+    try{c.setPointerCapture(e.pointerId)}catch(x){}
+  });
+  c.addEventListener('pointermove',e=>{
+    if(!st||e.pointerId!==st.id)return;
+    if(!st.moved){if(Math.hypot(e.clientX-st.sx,e.clientY-st.sy)<=6)return;st.moved=true;c.classList.add('t26-drag');$('t3CatBubble')?.classList.remove('show')}
+    const vw=innerWidth,vh=innerHeight,w=c.offsetWidth||80,h=c.offsetHeight||80;
+    const x=clampN26(e.clientX-st.ox,8,Math.max(8,vw-w-8)),y=clampN26(e.clientY-st.oy,10,Math.max(10,vh-h-8));
+    PD26.p={fx:+(x/Math.max(1,vw-w)).toFixed(4),fy:+(y/Math.max(1,vh-h)).toFixed(4)};
+    c.style.left=x+'px';c.style.top=y+'px';c.style.right='auto';c.style.bottom='auto';e.preventDefault();
+  });
+  const end=e=>{
+    if(!st||e.pointerId!==st.id)return;const mv=st.moved;st=null;c.classList.remove('t26-drag');
+    try{c.releasePointerCapture(e.pointerId)}catch(x){}
+    if(mv){PD26.skip=Date.now();try{localStorage.setItem(PD26.key,JSON.stringify(PD26.p))}catch(x){}catPlace26()}
+  };
+  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
+  /* arrastar não abre o chat; clique simples continua abrindo */
+  c.addEventListener('click',e=>{if(Date.now()-PD26.skip<350){e.stopImmediatePropagation();e.preventDefault()}},true);
+  catPlace26();
+}
+{const _ip26=T3.initPerseus;T3.initPerseus=function(){const out=_ip26.apply(this,arguments);try{catDrag26()}catch(e){console.warn('[T26] Perseus',e)}return out}}
+setTimeout(catDrag26,0);
+addEventListener('resize',()=>{clearTimeout(PD26.rt);PD26.rt=setTimeout(catPlace26,120)});
+{const _r26=react24;react24=function(){const out=_r26.apply(this,arguments);try{near26()}catch(e){}return out};PerseusAnimator.react=react24}
+{const _say26=T3.say;if(typeof _say26==='function')T3.say=function(){const out=_say26.apply(this,arguments);try{near26()}catch(e){}return out}}
+
+/* ---------- 4. combate: só o token da vez se move ---------- */
+const CB26={unlock:false,cur:null};
+const lock26=()=>inCb14()&&!CB26.unlock;
+T3.cbFree=()=>!!CB26.unlock;
+const _cm26=canMove7;
+canMove7=function(tok){
+  if(!_cm26(tok))return false;
+  if(!lock26())return true;
+  const ch=charById(tok?.charId),cur=cur14();
+  if(!ch||!cur||ch.id!==cur.id)return false;   /* fora da vez ninguém mexe (nem o Mestre) */
+  return controls(ch);                           /* na vez de um jogador o Mestre também fica travado */
+};
+T3.canMove=canMove7;
+/* aviso quando alguém tenta arrastar um token fora da vez */
+document.addEventListener('pointerdown',e=>{
+  try{
+    if(!MAP7.cv||e.target!==MAP7.cv||!lock26()||MAP7.tool!=='move')return;
+    const p=mapPt7(e),t=mapHit7(p.wx,p.wy);if(!t||!_cm26(t)||canMove7(t))return;
+    const cur=cur14(),n=cur?.data?.name||'outro personagem';
+    deny14(isGM6()&&cur&&!controls(cur)?`Vez de ${n} (jogador): os tokens ficam travados até a vez de um NPC.`:`Vez de ${n}: só esse token se move agora.`);
+  }catch(x){}
+},true);
+/* botão de emergência do Mestre (desligado por padrão) e seleção automática do token da vez */
+function unlockUi26(){
+  const st=MAP7.stage;let b=$('cbUnlock26');
+  const show=!!st&&isGM6()&&inCb14();
+  if(!inCb14())CB26.unlock=false;
+  if(!show){if(b)b.remove();return}
+  if(!b||b.parentNode!==st){b?.remove();b=document.createElement('button');b.type='button';b.id='cbUnlock26';b.className='cb-unlock26';st.append(b);
+    b.onclick=()=>{CB26.unlock=!CB26.unlock;unlockUi26();toast(CB26.unlock?'🔓 Posição manual liberada: você pode mover qualquer token (sem gastar metros).':'🔒 Trava de turno ligada de novo.');try{actButton10();mapDraw7()}catch(e){}}}
+  const sig=CB26.unlock?'on':'off';if(b.dataset.sig!==sig){b.dataset.sig=sig;b.classList.toggle('on',CB26.unlock);b.setAttribute('aria-pressed',CB26.unlock);
+    b.innerHTML=CB26.unlock?'🔒 Travar de novo':'🔓 Destravar Posição Manual';b.title=CB26.unlock?'Voltar a travar o mapa no token da vez':'Emergência: mover um token preso fora da vez (não gasta metros)'}
+}
+setInterval(()=>{
+  try{
+    unlockUi26();
+    if(!inCb14()){CB26.cur=null;return}
+    const cur=cur14(),id=cur?.id||null;if(id===CB26.cur)return;CB26.cur=id;
+    if(cur&&controls(cur)){const t=tok14(cur.id);if(t&&(isGM6()||!MAP7.sel)){MAP7.sel=t.id;try{actButton10();mapDraw7()}catch(e){}}}
+  }catch(e){}
+},600);
+console.info('[Tulpa] Etapa 26 carregada');
+
+/* ===================================================================
+   TULPA · ETAPA 27 — Despertar: a Trilha só chega quando o personagem
+   desperta na história (o Estágio continua subindo sem Trilha)
+   =================================================================== */
+/* fichas antigas que já têm trilha contam como despertas */
+const awk27=(d=data)=>!!d&&(d.awakened===true||(d.awakened==null&&!!d.track)||!!d.freeMode);
+T3.awakened=awk27;
+function awkCard27(){
+  const tab=$('tab-track');if(!tab)return;
+  const panels=[...tab.querySelectorAll(':scope>.panel')];
+  let c=$('awk27');
+  if(!c){c=document.createElement('div');c.id='awk27';c.className='panel awk27';tab.prepend(c)}
+  const on=awk27();
+  panels.forEach(p=>p.classList.toggle('hide',!on));
+  if(on){
+    const st=Number(data.stage)||1,since=Number(data.awakenStage)||0;
+    c.className='panel awk27 done';
+    c.innerHTML=`<div class="awk27-row"><span class="awk27-ico" aria-hidden="true">✨</span><div><b>Desperto</b><span class="sub">${data.awakened===true&&since?`Despertou no Estágio ${since}. `:''}${st>=3?'A Trilha recebe os poderes de todos os estágios já alcançados (3, 5, 8 e 10).':'Os poderes da Trilha começam no Estágio 3.'}</span></div></div>`;
+    return;
+  }
+  const st=Number(data.stage)||1;
+  c.className='panel awk27';
+  c.innerHTML=`<div class="awk27-hero"><span class="awk27-ico big" aria-hidden="true">✨</span><div><h2>Despertar</h2>
+    <p>Este personagem <b>ainda não despertou</b>. Ele continua subindo de Estágio normalmente, só que <b>sem Trilha</b>.</p>
+    <p class="sub">Quando o Despertar acontecer na história, o jogador ou o Mestre toca no botão. A escolha de Arquétipo e Trilha é liberada e ele recebe na hora os poderes dos estágios que já alcançou${st>=3?` (está no Estágio ${st})`:''} e dos próximos.</p></div></div>
+    <div class="inline"><button type="button" class="btn primary awk27-btn" id="awkBtn27">✨ Despertar</button><span class="sub">Estágio atual: <b>${st}</b></span></div>`;
+  $('awkBtn27').onclick=awkAsk27;
+}
+function awkAsk27(){
+  const n=data.name||'Este personagem';
+  openModal('DESPERTAR','✨ '+n+' desperta?',`<p>Use quando o Despertar acontecer na narrativa. Depois disso a aba libera a escolha de <b>Arquétipo</b> e <b>Trilha</b>.</p><div class="notice">Ao escolher a Trilha, ${esc(n)} recebe os poderes de todos os estágios que já alcançou (Estágio ${Number(data.stage)||1}).</div>`,'✨ Despertar agora',()=>{
+    data.awakened=true;data.awakenStage=Number(data.stage)||1;data.awakenedAt=new Date().toISOString();
+    closeModal();save();
+    toast('✨ '+n+' despertou! Escolha o Arquétipo e a Trilha.');
+    try{T3.perseusAnim?.react('extase')}catch(e){}
+    try{const ch=charById(activeCharacterId);if(ch&&camp3()&&typeof insertRow==='function')insertRow(ch,'Despertar',{detail:{cmb:'log',text:`✨ ${n} despertou no Estágio ${data.awakenStage}.`}}).catch(()=>{})}catch(e){}
+    setTimeout(()=>$('archSelect')?.focus(),300);
+  });
+}
+T3.awaken=awkAsk27;
+{const _rt27=renderTracks;renderTracks=function(){const out=_rt27.apply(this,arguments);try{awkCard27();if(!awk27()){const b=$('confirmTrack');if(b)b.disabled=true}}catch(e){console.warn('[T27] despertar',e)}return out}}
+{const _pv27=previewTrack;previewTrack=function(){const out=_pv27.apply(this,arguments);try{if(!awk27())$('confirmTrack').disabled=true}catch(e){}return out}}
+/* Visão Geral */
+{const _r27=render;render=function(){const out=_r27.apply(this,arguments);try{const o=$('overviewTrack');if(o&&!awk27()&&!data.track)o.innerHTML='Ainda não despertou. <button type="button" class="btn small" data-awk27="1">✨ Despertar</button>'}catch(e){}return out}}
+document.addEventListener('click',e=>{if(e.target.closest?.('[data-awk27]'))awkAsk27()});
+console.info('[Tulpa] Etapa 27 carregada');
+
+/* ===================================================================
+   TULPA · ETAPA 28 — 🖥️ Transmitir Tela (getDisplayMedia + WebRTC)
+   Mestre transmite livremente; jogador pede permissão ao Mestre.
+   Malha própria (separada do áudio da call) no canal "tulpa-screen-<campanha>".
+   =================================================================== */
+const SC28={sid:Math.random().toString(36).slice(2,10),ch:null,camp:'',live:false,stream:null,sharer:null,sharerName:'',peers:new Map(),view:null,asks:{},granted:false,beat:0,lastStart:0};
+T3.screen=SC28;
+const scName28=u=>{try{if(u===vGm8())return'Mestre';const ch=charOfUser6(u);return String((ch&&nm(ch))||M6.present?.[u]?.name||'Jogador').slice(0,32)}catch(e){return'Jogador'}};
+const scOk28=()=>!!navigator.mediaDevices?.getDisplayMedia&&typeof RTCPeerConnection==='function';
+function scSend28(o){try{if(SC28.ch&&SC28.live)SC28.ch.send({type:'broadcast',event:'sc',payload:{...o,from:uid3(),fs:SC28.sid}})}catch(e){}}
+function scJoin28(){
+  const c=camp3();if(!c){scLeave28();return}
+  if(SC28.ch&&SC28.camp===c.id)return;scLeave28();SC28.camp=c.id;
+  try{const s=sb();if(!s||typeof s.channel!=='function')return;
+    const ch=s.channel('tulpa-screen-'+c.id,{config:{broadcast:{self:false}}});
+    ch.on('broadcast',{event:'sc'},({payload})=>{try{scMsg28(payload||{})}catch(e){console.warn('[T28] tela',e)}});
+    ch.subscribe(st=>{if(st==='SUBSCRIBED'){SC28.live=true;scSend28({k:'who'})}});SC28.ch=ch;
+  }catch(e){console.warn('[T28] canal',e)}
+}
+function scLeave28(){scStop28(true);scViewClose28();try{SC28.ch&&sb()?.removeChannel?.(SC28.ch)}catch(e){}try{SC28.ch?.unsubscribe?.()}catch(e){}SC28.ch=null;SC28.live=false;SC28.camp=''}
+/* ---------- quem transmite ---------- */
+function scPeer28(to){
+  let p=SC28.peers.get(to);if(p)return p;/* to = sessão de quem assiste */
+  const pc=new RTCPeerConnection({iceServers:iceServers8()});p={pc,to};SC28.peers.set(to,p);
+  SC28.stream.getTracks().forEach(t=>pc.addTrack(t,SC28.stream));
+  pc.onicecandidate=e=>{if(e.candidate)scSend28({k:'ice',ts:to,c:e.candidate.toJSON?e.candidate.toJSON():e.candidate,dir:'v'})};
+  pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc.connectionState)){try{pc.close()}catch(e){}SC28.peers.delete(to)}};
+  pc.createOffer().then(o=>pc.setLocalDescription(o)).then(()=>scSend28({k:'offer',ts:to,sdp:{type:pc.localDescription.type,sdp:pc.localDescription.sdp}})).catch(e=>console.warn('[T28] oferta',e));
+  return p;
+}
+async function scStart28(){
+  if(!scOk28()){toast('Este navegador não consegue transmitir a tela.');return}
+  if(!camp3()){toast('Entre numa mesa para transmitir.');return}
+  if(!isGM6()&&!SC28.granted){scAsk28();return}
+  let st;try{st=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:24,max:30}},audio:true})}catch(e){toast('Transmissão cancelada.');SC28.granted=false;scBar28();return}
+  if(SC28.sharer&&SC28.sharer!==uid3())scViewClose28();
+  scStop28(true);SC28.stream=st;SC28.sharer=uid3();SC28.sharerName=scName28(uid3());
+  st.getVideoTracks()[0]?.addEventListener('ended',()=>scStop28());
+  scSend28({k:'start',name:SC28.sharerName});SC28.lastStart=Date.now();
+  toast('🖥️ Sua tela está sendo transmitida para a mesa.');scBar28();
+}
+function scStop28(silent){
+  const mine=SC28.sharer===uid3()&&SC28.stream;
+  SC28.peers.forEach(p=>{try{p.pc.close()}catch(e){}});SC28.peers.clear();
+  if(SC28.stream){SC28.stream.getTracks().forEach(t=>{try{t.stop()}catch(e){}});SC28.stream=null}
+  if(mine){scSend28({k:'stop'});SC28.sharer=null;SC28.granted=false;if(!silent)toast('Transmissão encerrada.')}
+  scBar28();
+}
+T3.screenStart=scStart28;T3.screenStop=scStop28;
+/* ---------- permissão ---------- */
+function scAsk28(){
+  if(SC28.asking&&Date.now()-SC28.asking<20000){toast('Pedido enviado. Esperando o Mestre.');return}
+  SC28.asking=Date.now();scSend28({k:'ask',name:scName28(uid3())});toast('✋ Pedido enviado ao Mestre. A tela só aparece depois que ele permitir.');scBar28();
+}
+function scAskUi28(u,name){
+  if(!isGM6())return;SC28.asks[u]=name;
+  let box=$('scAsk28');if(!box){box=document.createElement('div');box.id='scAsk28';box.className='sc28-asks';box.setAttribute('role','alertdialog');document.body.append(box)}
+  box.innerHTML=Object.entries(SC28.asks).map(([id,n])=>`<div class="sc28-ask"><span>🖥️ <b>${esc(n)}</b> quer transmitir a tela</span><span class="sc28-ask-b"><button type="button" class="btn small primary" data-scok="${esc(id)}">Permitir</button><button type="button" class="btn small" data-scno="${esc(id)}">Recusar</button></span></div>`).join('');
+  if(!Object.keys(SC28.asks).length)box.remove();
+  $$('[data-scok]',box).forEach(b=>b.onclick=()=>{const id=b.dataset.scok;delete SC28.asks[id];scSend28({k:'grant',to:id});scAskUi28();toast('Permissão enviada.')});
+  $$('[data-scno]',box).forEach(b=>b.onclick=()=>{const id=b.dataset.scno;delete SC28.asks[id];scSend28({k:'deny',to:id});scAskUi28()});
+  try{T3.fx?.('click')}catch(e){}
+}
+/* ---------- quem assiste ---------- */
+function scView28(from,name,fs){
+  let v=SC28.view;
+  if(v&&(v.from!==from||v.fs!==fs)){scViewClose28();v=null}
+  if(!v){
+    const pc=new RTCPeerConnection({iceServers:iceServers8()});v={from,fs,pc,name};SC28.view=v;
+    pc.onicecandidate=e=>{if(e.candidate)scSend28({k:'ice',ts:fs,c:e.candidate.toJSON?e.candidate.toJSON():e.candidate,dir:'s'})};
+    pc.ontrack=e=>{const vid=scPanel28(from,name).querySelector('video');vid.srcObject=e.streams&&e.streams[0]?e.streams[0]:new MediaStream([e.track]);vid.play?.().catch(()=>{})};
+    pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc.connectionState))scViewClose28()};
+  }
+  return v;
+}
+function scPanel28(from,name){
+  let p=$('sc28');
+  if(!p){p=document.createElement('section');p.id='sc28';p.className='sc28';p.setAttribute('aria-label','Tela transmitida');
+    p.innerHTML=`<header class="sc28-h"><b class="sc28-t"></b><span class="sc28-btns"><button type="button" data-sca="snd" title="Ouvir o som da tela" aria-pressed="false">🔇</button><button type="button" data-sca="min" title="Minimizar">▁</button><button type="button" data-sca="full" title="Tela cheia">⛶</button><button type="button" data-sca="kill" class="sc28-kill" title="Encerrar esta transmissão">⛔</button><button type="button" data-sca="x" title="Fechar">✕</button></span></header><div class="sc28-v"><video playsinline autoplay muted></video></div>`;
+    document.body.append(p);
+    p.querySelector('[data-sca="snd"]').onclick=e=>{const v=p.querySelector('video');v.muted=!v.muted;e.currentTarget.textContent=v.muted?'🔇':'🔊';e.currentTarget.setAttribute('aria-pressed',!v.muted)};
+    p.querySelector('[data-sca="min"]').onclick=()=>p.classList.toggle('min');
+    p.querySelector('[data-sca="full"]').onclick=()=>{const v=p.querySelector('.sc28-v');try{document.fullscreenElement?document.exitFullscreen():(v.requestFullscreen||v.webkitRequestFullscreen).call(v)}catch(e){}};
+    p.querySelector('[data-sca="kill"]').onclick=()=>{if(SC28.view)scSend28({k:'kill',to:SC28.view.from});scViewClose28();toast('Transmissão encerrada pelo Mestre.')};
+    p.querySelector('[data-sca="x"]').onclick=()=>{p.classList.add('hide');SC28.hidden=SC28.view?.from||true};
+  }
+  p.classList.remove('hide');SC28.hidden=null;
+  p.querySelector('.sc28-t').textContent=name==='Mestre'?'🖥️ Tela do Mestre':'🖥️ Tela de '+(name||'alguém');
+  p.querySelector('.sc28-kill').hidden=!isGM6();
+  return p;
+}
+function scViewClose28(){const v=SC28.view;if(v){try{v.pc.close()}catch(e){}}SC28.view=null;const p=$('sc28');if(p){const vid=p.querySelector('video');if(vid)vid.srcObject=null;p.remove()}if(SC28.sharer!==uid3())SC28.sharer=null;scBar28()}
+/* ---------- mensagens ---------- */
+function scMsg28(m){
+  const me=uid3(),from=m.from;if(!from)return;
+  if(m.to&&m.to!==me)return;if(m.ts&&m.ts!==SC28.sid)return;if(m.fs===SC28.sid)return;
+  switch(m.k){
+    case'who':if(SC28.stream&&SC28.sharer===me)scSend28({k:'start',name:SC28.sharerName,ts:m.fs});break;
+    case'start':
+      if(SC28.stream&&SC28.sharer===me){scStop28(true);toast('Outra pessoa começou a transmitir. A sua tela parou.')}
+      SC28.sharer=from;SC28.sharerName=m.name||scName28(from);
+      if(!SC28.view||SC28.view.fs!==m.fs){scViewClose28();SC28.sharer=from;SC28.sharerSid=m.fs;scSend28({k:'want',ts:m.fs})}
+      scBar28();break;
+    case'want':if(SC28.stream&&SC28.sharer===me&&m.fs){const old=SC28.peers.get(m.fs);if(old){try{old.pc.close()}catch(e){}SC28.peers.delete(m.fs)}scPeer28(m.fs)}break;
+    case'offer':{const v=scView28(from,SC28.sharerName||scName28(from),m.fs);v.pc.setRemoteDescription(m.sdp).then(()=>v.pc.createAnswer()).then(a=>v.pc.setLocalDescription(a)).then(()=>scSend28({k:'answer',ts:m.fs,sdp:{type:v.pc.localDescription.type,sdp:v.pc.localDescription.sdp}})).then(()=>{(v.q||[]).forEach(c=>v.pc.addIceCandidate(c).catch(()=>{}));v.q=null}).catch(e=>console.warn('[T28] resposta',e));break}
+    case'answer':{const p=SC28.peers.get(m.fs);if(p)p.pc.setRemoteDescription(m.sdp).catch(()=>{});break}
+    case'ice':{
+      if(m.dir==='s'){const p=SC28.peers.get(m.fs);if(p)p.pc.addIceCandidate(m.c).catch(()=>{})}
+      else{const v=SC28.view;if(v&&v.fs===m.fs){if(v.pc.remoteDescription)v.pc.addIceCandidate(m.c).catch(()=>{});else(v.q=v.q||[]).push(m.c)}}
+      break}
+    case'stop':if(SC28.view?.fs===m.fs||SC28.sharerSid===m.fs){scViewClose28();SC28.sharer=null;scBar28()}break;
+    case'ask':if(isGM6())scAskUi28(from,m.name||scName28(from));break;
+    case'grant':if(from===vGm8()){SC28.granted=true;SC28.asking=0;scBar28();toast('✅ O Mestre permitiu. Toque em 🖥️ Começar transmissão.');try{T3.fx?.('click')}catch(e){}}break;
+    case'deny':if(from===vGm8()){SC28.asking=0;SC28.granted=false;scBar28();toast('O Mestre recusou a transmissão agora.')}break;
+    case'kill':if(from===vGm8()&&SC28.sharer===me){scStop28(true);toast('⛔ O Mestre encerrou a sua transmissão.')}break;
+  }
+}
+/* ---------- botão na barra da mesa ---------- */
+function scBar28(){
+  const bar=$('mesaBar');if(!bar)return;
+  let g=$('mbScr28');
+  if(!g){g=document.createElement('div');g.id='mbScr28';g.className='mb-group mb-scr28';const after=$('mbArc26')||$('mbHand')||$('mbCall');if(after)after.after(g);else bar.append(g)}
+  const me=uid3(),mine=SC28.sharer===me&&!!SC28.stream,isM=isGM6(),hid=SC28.view&&$('sc28')?.classList.contains('hide');
+  const sig=[mine,isM,SC28.granted,!!SC28.asking,SC28.sharer||'',!!hid].join('|');if(g.dataset.sig===sig)return;g.dataset.sig=sig;
+  let h='';
+  if(mine)h=`<button type="button" class="btn small sc28-on" id="scBtn28">⏹ Parar transmissão</button>`;
+  else if(isM||SC28.granted)h=`<button type="button" class="btn small ${SC28.granted?'primary':''}" id="scBtn28">🖥️ ${SC28.granted?'Começar transmissão':'Transmitir Tela'}</button>`;
+  else h=`<button type="button" class="btn small" id="scBtn28" ${SC28.asking?'disabled':''}>🖥️ ${SC28.asking?'Esperando o Mestre…':'Transmitir Tela'}</button>`;
+  if(SC28.sharer&&!mine&&hid)h+=`<button type="button" class="btn small" id="scShow28">👁 Ver tela de ${esc(SC28.sharerName||'alguém')}</button>`;
+  g.innerHTML=h;
+  $('scBtn28').onclick=()=>mine?scStop28():scStart28();
+  const sh=$('scShow28');if(sh)sh.onclick=()=>{$('sc28')?.classList.remove('hide');SC28.hidden=null;scBar28()};
+}
+setInterval(()=>{
+  try{
+    if(camp3())scJoin28();else if(SC28.ch)scLeave28();
+    scBar28();
+    /* quem transmite se anuncia de tempos em tempos (para quem chegou depois) */
+    if(SC28.stream&&SC28.sharer===uid3()&&Date.now()-SC28.lastStart>6000){SC28.lastStart=Date.now();scSend28({k:'start',name:SC28.sharerName})}
+  }catch(e){}
+},1500);
+try{M6.hooks.leave.push(()=>scLeave28())}catch(e){}
+console.info('[Tulpa] Etapa 28 carregada');
+
+/* ===================================================================
+   TULPA · ETAPA 29 — ⚙️ Alterações do Sistema (central do Mestre),
+   edição inline nas fichas, regras por campanha em tempo real e
+   avisos só para quem a mudança afeta (com o Perseus falando)
+   Guardado em campaign_store, chave "rules" (sem tabela nova).
+   =================================================================== */
+const R29={camp:'',rules:null,base:null,sec:'voc',q:'',edit:null,loadedAt:0,fetching:false,lastCast:0};
+T3.rules29=R29;
+const cl29=o=>o==null?o:JSON.parse(JSON.stringify(o));
+const defRules29=()=>({v:1,rev:0,voc:{},track:{},ritual:{},item:{},status:{},trauma:{},beast:[],subel:[],table:{},log:[]});
+const rules29=()=>R29.rules||(R29.rules=defRules29());
+const ARCH29=['Lutador','Gênio','Ritualista'];
+const PESO29=['Bolso','Leve','Médio','Pesado'];
+const SEC29=[['voc','✦','Vocações'],['track','⌁','Trilhas'],['ritual','✶','Rituais'],['item','▣','Itens e Equipamentos'],['status','☠','Estados e Condições'],['beast','👹','Bestiário'],['trauma','☾','Traumas e Colapsos'],['subel','✧','Sub-Elementos'],['table','⚖','Regras da Mesa'],['log','🕘','Histórico']];
+const KIND29={voc:'Vocação',track:'Trilha',ritual:'Ritual',item:'Item',status:'Estado',beast:'Bestiário',trauma:'Trauma',subel:'Sub-Elemento',table:'Regras da Mesa'};
+
+/* ---------- conteúdo original (antes de qualquer alteração do Mestre) ---------- */
+function base29(){
+  if(R29.base)return R29.base;
+  const voc=cl29(ORIGINAL_VOCATIONS);NEW_VOCATIONS.forEach(n=>{if(!voc.some(x=>x.name===n.name))voc.push(cl29((vocations||[]).find(v=>v.name===n.name)||n))});
+  R29.base={
+    voc,track:cl29(ORIGINAL_TRACKS),
+    ritual:cl29(RITUALS.filter(r=>!/^(custom|gm)-/.test(String(r.id)))),
+    weapon:cl29(WEAPONS),prot:cl29(PROTECTIONS),gear:cl29(GEAR),
+    status:cl29(STATUS_DEFS),trauma:cl29(TRAUMA_DEFS),
+  };
+  return R29.base;
+}
+const tkey29=t=>t.archetype+'|'+t.name;
+const ikey29=(kind,name)=>kind+'|'+name;
+const elems29=()=>[...new Set(RITUALS.map(r=>r.element).filter(Boolean))];
+const skills29=()=>[...new Set([...(typeof BASE_SKILLS!=='undefined'?BASE_SKILLS:[]),...(typeof NEW_SKILLS!=='undefined'?NEW_SKILLS:[])])].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+
+/* ---------- aplicar as regras no conteúdo vivo ---------- */
+function pickVoc29(o){const x={};['name','desc'].forEach(k=>{if(o[k]!=null)x[k]=o[k]});if(Array.isArray(o.skills))x.skills=o.skills.slice(0,3);return x}
+function applyVoc29(){
+  const R=rules29(),B=base29();let ch=false;
+  Object.entries(R.voc||{}).forEach(([key,o])=>{
+    if(!o)return;
+    if(o.del){const n=vocations.length;vocations=vocations.filter(v=>v.name!==key&&v.name!==o.name);return}
+    if(o.name&&o.name!==key&&vocations.some(x=>x.name===o.name))vocations=vocations.filter(x=>x.name!==key); /* o catálogo antigo devolve o nome original */
+    let v=vocations.find(x=>x.name===key)||vocations.find(x=>x.name===o.name);
+    if(!v){const b=B.voc.find(x=>x.name===key);if(!b&&!o.add)return;v=cl29(b||{name:key,desc:'',skills:[],talents:[]});vocations.push(v)}
+    Object.assign(v,pickVoc29(o));
+    if(Array.isArray(o.talents)){v.talents=v.talents||[];o.talents.forEach((t,i)=>{if(!t)return;const cur=v.talents[i]||(v.talents[i]={name:'',cost:1,desc:''});['name','desc'].forEach(k=>{if(t[k]!=null)cur[k]=t[k]});if(t.cost!=null)cur.cost=Number(t.cost)||0})}
+    if(data&&data.vocation===key&&o.name&&o.name!==key){data.vocation=o.name;ch=true}
+  });
+  return ch;
+}
+function applyTrack29(){
+  const R=rules29(),B=base29();let ch=false;
+  Object.entries(R.track||{}).forEach(([key,o])=>{
+    if(!o)return;const [arch,name]=key.split('|');
+    if(o.del){tracks=tracks.filter(t=>!(t.archetype===arch&&(t.name===name||t.name===o.name)));return}
+    let t=tracks.find(x=>x.archetype===arch&&x.name===name)||tracks.find(x=>x.name===o.name&&x.archetype===(o.archetype||arch));
+    if(!t){const b=B.track.find(x=>tkey29(x)===key);if(!b&&!o.add)return;t=cl29(b||{name,archetype:arch,desc:'',stages:[3,5,8,10].map(s=>({stage:s,name:'',desc:''}))});tracks.push(t)}
+    if(o.name!=null)t.name=o.name;if(o.desc!=null)t.desc=o.desc;if(o.archetype)t.archetype=o.archetype;
+    if(Array.isArray(o.stages)){t.stages=t.stages||[];o.stages.forEach((s,i)=>{if(!s)return;const cur=t.stages[i]||(t.stages[i]={stage:[3,5,8,10][i],name:'',desc:''});if(s.name!=null)cur.name=s.name;if(s.desc!=null)cur.desc=s.desc})}
+    if(data&&data.track===name&&data.archetype===arch&&o.name&&o.name!==name){data.track=o.name;ch=true}
+  });
+  return ch;
+}
+function rebuildItems29(){
+  const R=rules29(),B=base29();
+  const one=(kind,arr,base)=>{
+    arr.length=0;
+    base.forEach(b=>{const o=R.item[ikey29(kind,b.name)];if(o&&o.del)return;const x=cl29(b);x._k29=b.name;if(o)itemSet29(kind,x,o);arr.push(x)});
+    Object.entries(R.item).forEach(([k,o])=>{if(o&&o.add&&!o.del&&k.startsWith(kind+'|')){const x=itemNew29(kind,o);x._k29=k.slice(kind.length+1);arr.push(x)}});
+  };
+  one('weapon',WEAPONS,B.weapon);one('prot',PROTECTIONS,B.prot);one('gear',GEAR,B.gear);
+}
+function itemSet29(kind,x,o){
+  if(o.name)x.name=o.name;if(o.peso)x.peso=o.peso;
+  if(kind==='weapon'){if(o.dado)x.dado=o.dado;if(o.critMin!=null)x.critMin=Number(o.critMin)||20;if(o.cat)x.cat=o.cat;if(o.skill)x.skill=o.skill;if(o.note!=null)x.note=o.note}
+  if(kind==='prot'){if(o.def!=null)x.def=Number(o.def)||0;if(o.slot)x.slot=o.slot;if(o.note!=null)x.note=o.note}
+  if(kind==='gear'){if(o.note!=null)x.note=o.note}
+}
+function itemNew29(kind,o){
+  const x=kind==='weapon'?{name:o.name,cat:o.cat||'Corpo a corpo',peso:o.peso||'Médio',dado:o.dado||'1d6',critMin:Number(o.critMin)||20,skill:o.skill||'Armas Brancas',area:false,effects:[],note:o.note||''}
+    :kind==='prot'?{name:o.name,cat:'Equipamento',peso:o.peso||'Médio',def:Number(o.def)||0,slot:o.slot||'tronco',note:o.note||''}
+    :{name:o.name,peso:o.peso||'Leve',qty:1,note:o.note||''};
+  return x;
+}
+/* itens que já estão nos inventários acompanham a mudança do catálogo */
+function syncInv29(d){
+  if(!d||!d.inventory||!Array.isArray(d.inventory.items))return false;
+  const R=rules29();let ch=false;
+  d.inventory.items.forEach(it=>{
+    if(!it||!it.kind)return;const k=it._k29||it.name,o=R.item[ikey29(it.kind,k)];if(!o||o.del)return;
+    const want={name:o.name||k,peso:o.peso||it.peso};
+    if(want.name!==it.name||want.peso!==it.peso){it.name=want.name;it.peso=want.peso;ch=true}
+    if(it._k29!==k){it._k29=k;ch=true}
+    if(it.kind==='weapon'&&it.w){const w=it.w;if(o.dado&&w.dado!==o.dado){w.dado=o.dado;ch=true}if(o.critMin!=null&&w.critMin!==Number(o.critMin)){w.critMin=Number(o.critMin);ch=true}if(o.skill&&w.skill!==o.skill){w.skill=o.skill;ch=true}if(w.name!==it.name){w.name=it.name;ch=true}if(w.peso!==it.peso){w.peso=it.peso;ch=true}}
+    if(it.kind==='prot'&&it.p){if(o.def!=null&&it.p.def!==Number(o.def)){it.p.def=Number(o.def);ch=true}if(o.slot&&it.p.slot!==o.slot){it.p.slot=o.slot;ch=true}}
+  });
+  return ch;
+}
+function rebuildStatus29(){
+  const R=rules29(),B=base29();
+  STATUS_DEFS.length=0;
+  B.status.forEach(b=>{
+    const o=R.status[b.id],t=STATUS_BY_ID[b.id]||(STATUS_BY_ID[b.id]={});
+    Object.keys(t).forEach(k=>delete t[k]);Object.assign(t,cl29(b));
+    if(o&&o.del){Object.keys(t).forEach(k=>{if(!['id','name','group','narr','text'].includes(k))delete t[k]});t.text='(removido pelo Mestre)';t._off=true;return}
+    if(o)statusSet29(t,o);STATUS_DEFS.push(t);
+  });
+  Object.entries(R.status).forEach(([id,o])=>{if(!o||!o.add)return;const t=STATUS_BY_ID[id]||(STATUS_BY_ID[id]={});Object.keys(t).forEach(k=>delete t[k]);
+    if(o.del){Object.assign(t,{id,name:o.name||id,group:'manual',narr:'',text:'(removido pelo Mestre)',_off:true});return}
+    Object.assign(t,{id,name:o.name||id,group:'manual',narr:o.narr||'',text:o.text||''});statusSet29(t,o);STATUS_DEFS.push(t)});
+}
+function statusSet29(t,o){
+  ['name','text','narr'].forEach(k=>{if(o[k]!=null)t[k]=o[k]});
+  if(o.dot!=null){const n=Number(o.dot)||0;if(n>0)t.dot={fixed:n,label:t.dot?.label||t.name};else delete t.dot}
+  if(o.defense!=null){const n=Number(o.defense)||0;if(n)t.defense=n;else delete t.defense}
+  if(o.physDice!=null){const n=Number(o.physDice)||0;if(n)t.physDice=n;else delete t.physDice}
+  const fl=new Set(t.flags||[]);
+  if(o.noMove!=null){o.noMove?fl.add('semMover'):fl.delete('semMover')}
+  if(o.loseAct!=null){o.loseAct?fl.add('perdeAcao'):fl.delete('perdeAcao')}
+  if(fl.size)t.flags=[...fl];else delete t.flags;
+  if(o.disAtk!=null){const ds=new Set(t.disadv||[]);o.disAtk?ds.add('ataque'):ds.delete('ataque');if(ds.size)t.disadv=[...ds];else delete t.disadv}
+}
+function rebuildTrauma29(){
+  const R=rules29(),B=base29();
+  TRAUMA_DEFS.length=0;
+  B.trauma.forEach(b=>{const o=R.trauma[b.id],t=TRAUMA_BY_ID[b.id]||(TRAUMA_BY_ID[b.id]={});Object.keys(t).forEach(k=>delete t[k]);Object.assign(t,cl29(b));
+    if(o&&o.del){Object.keys(t).forEach(k=>{if(!['id','name','grp','text'].includes(k))delete t[k]});t.text='(removido pelo Mestre)';t._off=true;return}
+    if(o)['name','text','grp'].forEach(k=>{if(o[k]!=null)t[k]=o[k]});TRAUMA_DEFS.push(t)});
+  Object.entries(R.trauma).forEach(([id,o])=>{if(!o||!o.add)return;const t=TRAUMA_BY_ID[id]||(TRAUMA_BY_ID[id]={});Object.keys(t).forEach(k=>delete t[k]);Object.assign(t,{id,name:o.name||id,grp:o.grp||'Mente',text:o.text||''});if(o.del){t._off=true;return}TRAUMA_DEFS.push(t)});
+}
+function rebuildRitual29(){
+  const R=rules29(),B=base29();
+  const keep=RITUALS.filter(r=>String(r.id).startsWith('custom-'));RITUALS.length=0;
+  B.ritual.forEach(b=>{const o=R.ritual[b.id];if(o&&o.del)return;const x=cl29(b);if(o)ritSet29(x,o);RITUALS.push(x)});
+  Object.entries(R.ritual).forEach(([id,o])=>{if(!o||!o.add||o.del)return;const x={id,name:o.name||id,element:o.element||'Natureza',cost:o.cost||'5 ES',desc:'',levels:['','','']};ritSet29(x,o);RITUALS.push(x)});
+  keep.forEach(r=>RITUALS.push(r));
+}
+function ritSet29(x,o){
+  ['name','element','cost'].forEach(k=>{if(o[k])x[k]=o[k]});
+  if(Array.isArray(o.levels)){x.levels=x.levels||['','',''];o.levels.forEach((l,i)=>{if(l!=null)x.levels[i]=l});x.desc=x.levels[0]||x.desc}
+}
+/* regras da mesa: deslocamento base, DT do Arremesso e DT de Furtividade */
+T3.moveBase=()=>{const n=Number(rules29().table?.move);return n>0?n:9};
+{const _dt29=dtFor14;dtFor14=function(m){const b=Number(rules29().table?.dtThrow);return _dt29(m)+(b>0?b-12:0)};T3.cbDbg&&(T3.cbDbg.dtFor14=dtFor14)}
+function applyTable29(){const t=rules29().table||{};if(t.dtStealth!=null&&typeof AI23!=='undefined')AI23.dt=Number(t.dtStealth)||0}
+
+function rebuildAll29(){
+  try{rebuildItems29()}catch(e){console.warn('[T29] itens',e)}
+  try{rebuildStatus29()}catch(e){console.warn('[T29] estados',e)}
+  try{rebuildTrauma29()}catch(e){console.warn('[T29] traumas',e)}
+  try{rebuildRitual29()}catch(e){console.warn('[T29] rituais',e)}
+  try{applyTable29()}catch(e){}
+}
+/* toda vez que a ficha desenha, vocações, trilhas e inventário seguem as regras da campanha */
+const canEdit29=()=>{try{const ch=charById(activeCharacterId);return !ch||ch.ownerId===uid3()||isGM6()}catch(e){return true}};
+{const _r29=render;render=function(){
+  let ch=false;
+  try{ch=applyVoc29()||ch;ch=applyTrack29()||ch;ch=syncInv29(data)||ch}catch(e){console.warn('[T29] aplicar',e)}
+  const out=_r29.apply(this,arguments);
+  try{const n=vocations.length;applyVoc29();if(vocations.length!==n){renderVocations();previewVoc()}}catch(e){}
+  if(ch&&canEdit29()&&!R29.saving){R29.saving=true;setTimeout(()=>{try{save()}catch(e){}R29.saving=false},60)}
+  try{gmInline29()}catch(e){}
+  return out;
+}}
+
+/* ---------- carregar, gravar e transmitir ---------- */
+function setRules29(r,{notify=false}={}){
+  const old=R29.rules;
+  R29.rules={...defRules29(),...(r&&typeof r==='object'?r:{})};
+  ['voc','track','ritual','item','status','trauma','table'].forEach(k=>{if(!R29.rules[k]||typeof R29.rules[k]!=='object'||Array.isArray(R29.rules[k]))R29.rules[k]={}});
+  ['beast','subel','log'].forEach(k=>{if(!Array.isArray(R29.rules[k]))R29.rules[k]=[]});
+  rebuildAll29();
+  try{render()}catch(e){}
+  try{if(typeof renderAddList==='function'&&$('addList'))renderAddList()}catch(e){}
+  try{if(typeof renderStatesList==='function'&&$('stList'))renderStatesList()}catch(e){}
+  try{if($('ritualCatalog'))renderRituals()}catch(e){}
+  try{subelPanel29()}catch(e){}
+  if(notify)notify29();else seenAll29();
+  if($('sys29')&&!$('sys29').classList.contains('hide')&&!R29.edit)paint29();
+  return old;
+}
+async function fetchRules29(notify=true,want=0,tries=0){
+  const c=camp3();if(!c)return;
+  if(R29.fetching){R29.again=Math.max(R29.again||0,want||1);return}
+  R29.fetching=true;let got=0;
+  try{const v=await stGet6('rules');if(camp3()?.id!==c.id)return;
+    const rev=Number(v?.rev)||0;got=rev;
+    if(!(R29.rules&&rev&&rev<=(Number(R29.rules.rev)||0)&&R29.camp===c.id)){setRules29(v||defRules29(),{notify});}
+    R29.loadedAt=Date.now()}
+  catch(e){console.warn('[T29] ler regras',e)}
+  finally{R29.fetching=false}
+  /* o aviso pode chegar antes da gravação ficar visível: tenta de novo */
+  if(want&&got<want&&tries<6)setTimeout(()=>fetchRules29(notify,want,tries+1),400+tries*300);
+  else if(R29.again){const a=R29.again;R29.again=0;fetchRules29(notify,a>1?a:0)}
+}
+T3.rulesFetch=fetchRules29;T3.rules29dbg=()=>stGet6('rules');T3.c29=()=>({STATUS_BY_ID,STATUS_DEFS,WEAPONS,PROTECTIONS,GEAR,RITUALS,TRAUMA_DEFS});
+async function saveRules29(entry){
+  if(!isGM6()){toast('Somente o Mestre altera as regras do sistema.');return false}
+  const R=rules29();R.rev=Math.max((Number(R.rev)||0)+1,Date.now());
+  if(entry){R.log.unshift({id:rid(),at:Date.now(),...entry});R.log=R.log.slice(0,80);seen29().add(R.log[0].id);seenSave29()}
+  setRules29(R);
+  try{await stPut6('rules','rules',cl29(R));castRules29(R.rev);return true}
+  catch(e){console.warn('[T29] gravar regras',e);toast('Não consegui salvar na nuvem: '+(e?.message||'erro'));return false}
+}
+onCast6(p=>{if(p&&p.t==='rules29'&&p.from!==uid3())fetchRules29(true,Number(p.rev)||0)});
+/* canal próprio: o aviso chega mesmo com a ficha aberta (fora da Visão de Mesa) */
+function chan29(){
+  const c=camp3();if(!c){if(R29.ch){try{R29.ch.unsubscribe?.()}catch(e){}R29.ch=null;R29.chCamp=''}return}
+  if(R29.ch&&R29.chCamp===c.id)return;
+  try{if(R29.ch)R29.ch.unsubscribe?.()}catch(e){}R29.ch=null;R29.chLive=false;
+  try{const s=sb();if(!s||typeof s.channel!=='function')return;
+    const ch=s.channel('tulpa-rules-'+c.id,{config:{broadcast:{self:false}}});
+    ch.on('broadcast',{event:'r'},({payload})=>{if(payload&&payload.from!==uid3())fetchRules29(true,Number(payload.rev)||0)});
+    ch.subscribe(st=>{if(st==='SUBSCRIBED')R29.chLive=true});R29.ch=ch;R29.chCamp=c.id;
+  }catch(e){console.warn('[T29] canal',e)}
+}
+const castRules29=rev=>{try{cast6({t:'rules29',rev})}catch(e){}try{if(R29.ch&&R29.chLive)R29.ch.send({type:'broadcast',event:'r',payload:{rev,from:uid3()}})}catch(e){}};
+setInterval(()=>{
+  try{
+    const c=camp3();
+    if(!c){if(R29.camp){R29.camp='';setRules29(defRules29())}return}
+    if(R29.camp!==c.id){R29.camp=c.id;R29.rules=null;R29.seen=null;setRules29(defRules29());fetchRules29(true)}
+    else if(Date.now()-R29.loadedAt>45000){R29.loadedAt=Date.now();fetchRules29(true)} /* reserva caso o tempo real falhe */
+    chan29();sysBtn29();badges29();
+  }catch(e){}
+},1500);
+
+/* ---------- avisos: só para quem a mudança afeta ---------- */
+const seenKey29=()=>'tulpa_rules_seen_'+(camp3()?.id||'x');
+function seen29(){if(!R29.seen){const a=lsGet6(seenKey29(),null);R29.seen=new Set(Array.isArray(a)?a:[]);R29.seenFirst=!Array.isArray(a)}return R29.seen}
+function seenSave29(){lsSet6(seenKey29(),[...seen29()].slice(-200))}
+function seenAll29(){const s=seen29();(rules29().log||[]).forEach(e=>s.add(e.id));seenSave29()}
+const alertKey29=()=>'tulpa_rules_alert_'+(camp3()?.id||'x');
+function alerts29(){return lsGet6(alertKey29(),{})||{}}
+function ritTab29(){return($('ritualCatalog')?.closest('.tab')?.id||'tab-talents').slice(4)}
+function hits29(e){
+  const c=camp3();if(!c)return[];
+  const mine=(c.characters||[]).filter(ch=>ch&&ch.ownerId===uid3()&&!gmChar6(ch));
+  const out=[];
+  mine.forEach(ch=>{
+    const d=dOf6(ch)||{},names=[e.key,e.label].filter(Boolean);let tab='';
+    if(e.kind==='voc'&&names.includes(d.vocation))tab='vocation';
+    if(e.kind==='track'){const [a,n]=String(e.key).split('|');if(d.track&&(d.track===n||d.track===e.label))tab='track'}
+    if(e.kind==='ritual'&&(d.knownRituals||[]).includes(e.key))tab=ritTab29();
+    if(e.kind==='item'){const [k,n]=String(e.key).split('|');if((d.inventory?.items||[]).some(it=>it&&it.kind===k&&[n,e.label].includes(it._k29||it.name)))tab='inventory'}
+    if(e.kind==='status'&&(d.statuses||[]).some(s=>s&&s.id===e.key))tab='states';
+    if(e.kind==='trauma'&&(d.traumas||[]).some(s=>s&&s.id===e.key))tab='mind';
+    if(e.kind==='table')tab='combat';
+    if(tab)out.push({ch,tab});
+  });
+  return out;
+}
+function notify29(){
+  const s=seen29(),first=R29.seenFirst;R29.seenFirst=false;
+  const fresh=(rules29().log||[]).filter(e=>e&&!s.has(e.id));fresh.forEach(e=>s.add(e.id));seenSave29();
+  if(first||isGM6()||!fresh.length)return;
+  const A=alerts29();let shown=0;
+  fresh.slice().reverse().forEach(e=>{
+    const h=hits29(e);if(!h.length)return;
+    h.forEach(({ch,tab})=>{const a=A[ch.id]||(A[ch.id]={tabs:{},at:0});a.tabs[tab]=1;a.at=Date.now()});
+    if(shown++<3)pop29(e,h);
+  });
+  lsSet6(alertKey29(),A);badges29();
+}
+const chg29=e=>(e.changes||[]).slice(0,4).map(([f,a,b])=>`<li><b>${esc(f)}:</b> <s>${esc(String(a??'—')).slice(0,90)}</s> → <ins>${esc(String(b??'—')).slice(0,90)}</ins></li>`).join('');
+function pop29(e,h){
+  let box=$('rn29');if(!box){box=document.createElement('div');box.id='rn29';box.className='rn29';box.setAttribute('role','status');box.setAttribute('aria-live','polite');document.body.append(box)}
+  const who=[...new Set(h.map(x=>nm(x.ch)))].join(', ');
+  const card=document.createElement('div');card.className='rn29-card';
+  const what=e.del?'removeu':e.add?'criou':'alterou';
+  card.innerHTML=`<div class="rn29-head"><span class="rn29-bang" aria-hidden="true">!</span><b>O Mestre ${what} ${esc(KIND29[e.kind]||'')}: ${esc(e.label||e.key)}</b><button type="button" class="rn29-x" aria-label="Fechar aviso">✕</button></div>${e.changes?.length?`<ul class="rn29-ch">${chg29(e)}</ul>`:''}<div class="sub">Afeta: ${esc(who)}. A ficha já foi recalculada.</div>`;
+  card.querySelector('.rn29-x').onclick=()=>card.remove();
+  box.prepend(card);while(box.children.length>3)box.lastElementChild.remove();
+  setTimeout(()=>card.remove(),14000);
+  const ch1=e.changes?.[0];
+  try{say(`<b>Psiu, ${esc(nm(h[0].ch))}!</b> O Mestre ${what} <b>${esc(e.label||e.key)}</b>${ch1?`: ${esc(ch1[0])} <s>${esc(String(ch1[1]??'—')).slice(0,40)}</s> → <b>${esc(String(ch1[2]??'—')).slice(0,40)}</b>`:''}. Já ajustei a sua ficha.`,9000)}catch(err){}
+  try{T3.perseusAnim?.react('noise')}catch(err){}
+}
+function badges29(){
+  const A=alerts29(),c=camp3();if(!c)return;
+  const mineHas=Object.keys(A).some(id=>{const ch=charById(id);return ch&&ch.ownerId===uid3()&&Object.keys(A[id].tabs||{}).length});
+  $$('#tableCharacters .table-char[data-uid]').forEach(card=>{
+    const on=card.dataset.uid===uid3()&&mineHas;let b=card.querySelector('.rn29-card-bang');
+    if(on&&!b){b=document.createElement('span');b.className='rn29-card-bang';b.textContent='!';b.title='O Mestre mudou regras que afetam a sua ficha';card.append(b)}
+    if(!on&&b)b.remove();
+  });
+  const tabs=A[activeCharacterId]?.tabs||{};
+  $$('.navbtn[data-tab]').forEach(n=>{const on=!!tabs[n.dataset.tab];let b=n.querySelector('.rn29-tab-bang');if(on&&!b){b=document.createElement('span');b.className='rn29-tab-bang';b.textContent='!';b.setAttribute('aria-label','alterado pelo Mestre');n.append(b)}if(!on&&b)b.remove()});
+}
+document.addEventListener('click',ev=>{
+  const n=ev.target.closest?.('.navbtn[data-tab]');if(!n||!activeCharacterId)return;
+  const A=alerts29(),a=A[activeCharacterId];if(!a||!a.tabs[n.dataset.tab])return;
+  delete a.tabs[n.dataset.tab];if(!Object.keys(a.tabs).length)delete A[activeCharacterId];lsSet6(alertKey29(),A);setTimeout(badges29,0);
+},true);
+
+/* ---------- lista "efetiva" de cada seção (original + alterações) ---------- */
+function list29(sec){
+  const R=rules29(),B=base29(),st=(o,native)=>!o?'orig':o.del?'del':native?'edit':'new';
+  if(sec==='voc'){
+    const rows=B.voc.map(b=>{const o=R.voc[b.name];return{key:b.name,name:o?.name||b.name,sub:(o?.skills||b.skills||[]).join(' · '),st:st(o,true)}});
+    Object.entries(R.voc).forEach(([k,o])=>{if(o&&o.add&&!B.voc.some(b=>b.name===k))rows.push({key:k,name:o.name||k,sub:(o.skills||[]).join(' · '),st:st(o,false)})});
+    return rows;
+  }
+  if(sec==='track'){
+    const rows=B.track.map(b=>{const k=tkey29(b),o=R.track[k];return{key:k,name:o?.name||b.name,sub:o?.archetype||b.archetype,st:st(o,true)}});
+    Object.entries(R.track).forEach(([k,o])=>{if(o&&o.add&&!B.track.some(b=>tkey29(b)===k))rows.push({key:k,name:o.name||k,sub:o.archetype||k.split('|')[0],st:st(o,false)})});
+    return rows;
+  }
+  if(sec==='ritual'){
+    const rows=B.ritual.map(b=>{const o=R.ritual[b.id];return{key:b.id,name:o?.name||b.name,sub:(o?.element||b.element)+' · '+(o?.cost||b.cost),st:st(o,true)}});
+    Object.entries(R.ritual).forEach(([k,o])=>{if(o&&o.add)rows.push({key:k,name:o.name||k,sub:(o.element||'')+' · '+(o.cost||'5 ES'),st:st(o,false)})});
+    return rows;
+  }
+  if(sec==='item'){
+    const rows=[];
+    [['weapon','Arma',B.weapon],['prot','Proteção',B.prot],['gear','Equipamento',B.gear]].forEach(([kind,lbl,arr])=>{
+      arr.forEach(b=>{const k=ikey29(kind,b.name),o=R.item[k];rows.push({key:k,name:o?.name||b.name,sub:lbl+' · '+(o?.peso||b.peso)+(kind==='weapon'?' · '+(o?.dado||b.dado):'')+(kind==='prot'?' · Defesa '+(o?.def??b.def):''),st:st(o,true)})});
+      Object.entries(R.item).forEach(([k,o])=>{if(o&&o.add&&k.startsWith(kind+'|'))rows.push({key:k,name:o.name,sub:lbl+' · '+(o.peso||'')+(kind==='weapon'?' · '+(o.dado||''):'')+(kind==='prot'?' · Defesa '+(o.def??0):''),st:st(o,false)})});
+    });
+    return rows;
+  }
+  if(sec==='status'){
+    const rows=B.status.map(b=>{const o=R.status[b.id];const dot=o?.dot!=null?Number(o.dot):b.dot?.fixed;return{key:b.id,name:o?.name||b.name,sub:(dot?`${dot} de dano por turno · `:'')+String(o?.text??b.text).slice(0,80),st:st(o,true)}});
+    Object.entries(R.status).forEach(([k,o])=>{if(o&&o.add)rows.push({key:k,name:o.name||k,sub:(Number(o.dot)?`${o.dot} de dano por turno · `:'')+String(o.text||'').slice(0,80),st:st(o,false)})});
+    return rows;
+  }
+  if(sec==='trauma'){
+    const rows=B.trauma.map(b=>{const o=R.trauma[b.id];return{key:b.id,name:o?.name||b.name,sub:(o?.grp||b.grp)+' · '+String(o?.text??b.text).slice(0,80),st:st(o,true)}});
+    Object.entries(R.trauma).forEach(([k,o])=>{if(o&&o.add)rows.push({key:k,name:o.name||k,sub:(o.grp||'')+' · '+String(o.text||'').slice(0,80),st:st(o,false)})});
+    return rows;
+  }
+  if(sec==='beast')return(R.beast||[]).map(b=>({key:b.id,name:b.name,sub:`${b.tier||'Inimigo'} · VT ${b.vital||'—'} · Defesa ${b.def||'—'} · ${b.dano||'—'}`,st:'new'}));
+  if(sec==='subel')return(R.subel||[]).map(b=>({key:b.id,name:b.name,sub:(b.element||'')+' · '+String(b.desc||'').slice(0,80),st:'new'}));
+  return[];
+}
+/* valores atuais de um registro (para o formulário e para o "antes") */
+function cur29(sec,key){
+  const R=rules29(),B=base29();
+  if(sec==='voc'){const b=B.voc.find(x=>x.name===key),o=R.voc[key]||{};const v=cl29(b||{name:key,desc:'',skills:['','',''],talents:[{},{}]});Object.assign(v,pickVoc29(o));if(o.talents)o.talents.forEach((t,i)=>{v.talents[i]={...(v.talents[i]||{}),...t}});return v}
+  if(sec==='track'){const b=B.track.find(x=>tkey29(x)===key),o=R.track[key]||{};const [a,n]=String(key).split('|');const t=cl29(b||{name:n,archetype:a,desc:'',stages:[3,5,8,10].map(s=>({stage:s,name:'',desc:''}))});if(o.name)t.name=o.name;if(o.desc!=null)t.desc=o.desc;if(o.archetype)t.archetype=o.archetype;if(o.stages)o.stages.forEach((s,i)=>{t.stages[i]={...(t.stages[i]||{}),...s}});return t}
+  if(sec==='ritual'){const b=B.ritual.find(x=>x.id===key),o=R.ritual[key]||{};const x=cl29(b||{id:key,name:'',element:'Natureza',cost:'5 ES',desc:'',levels:['','','']});ritSet29(x,o);if(!x.levels)x.levels=[x.desc||'','',''];return x}
+  if(sec==='item'){const [kind,n]=String(key).split('|'),arr=kind==='weapon'?B.weapon:kind==='prot'?B.prot:B.gear,b=arr.find(x=>x.name===n),o=R.item[key]||{};const x=b?cl29(b):itemNew29(kind,{name:n,...o});if(b)itemSet29(kind,x,o);x.kind=kind;return x}
+  if(sec==='status'){const b=B.status.find(x=>x.id===key),o=R.status[key]||{};const t=cl29(b||{id:key,name:'',group:'manual',narr:'',text:''});statusSet29(t,o);return t}
+  if(sec==='trauma'){const b=B.trauma.find(x=>x.id===key),o=R.trauma[key]||{};const t=cl29(b||{id:key,name:'',grp:'Mente',text:''});['name','text','grp'].forEach(k=>{if(o[k]!=null)t[k]=o[k]});return t}
+  if(sec==='beast')return cl29((R.beast||[]).find(x=>x.id===key)||{id:key,name:'',tier:'Inimigo',vital:20,def:12,atk:'+3',dano:'1d6',skills:'',notes:''});
+  if(sec==='subel')return cl29((R.subel||[]).find(x=>x.id===key)||{id:key,name:'',element:'Natureza',desc:''});
+  return{};
+}
+const isNative29=(sec,key)=>{const B=base29();return sec==='voc'?B.voc.some(x=>x.name===key):sec==='track'?B.track.some(x=>tkey29(x)===key):sec==='ritual'?B.ritual.some(x=>x.id===key):sec==='item'?(()=>{const [k,n]=String(key).split('|');return(k==='weapon'?B.weapon:k==='prot'?B.prot:B.gear).some(x=>x.name===n)})():sec==='status'?B.status.some(x=>x.id===key):sec==='trauma'?B.trauma.some(x=>x.id===key):false};
+
+/* ---------- a central ---------- */
+function sysBtn29(){
+  const gm=isGM6()&&!!camp3();
+  const mb=$('masterBtn');if(mb){if(!mb.dataset.t29){mb.dataset.t29='1';mb.innerHTML='⚙️ Alterações do Sistema';mb.onclick=()=>open29()}mb.classList.toggle('hide',!gm)}
+  $('masterPanel')?.classList.remove('open');
+  const grid=$q('#campaignHub .portal-grid');
+  if(grid){let b=$('openSys29');
+    if(!b&&gm){b=document.createElement('button');b.className='portal-card sys29-card';b.id='openSys29';b.innerHTML='<div class="symbol">⚙️</div><h2>Alterações do Sistema</h2><p>Vocações, Trilhas, Rituais, Itens, Estados, Bestiário e regras da mesa desta campanha.</p>';b.onclick=()=>open29();grid.append(b)}
+    if(b)b.classList.toggle('hide',!gm)}
+}
+T3.sysOpen=(s,k)=>open29(s,k);
+function open29(sec,key){
+  if(!isGM6()){toast('Somente o Mestre abre as Alterações do Sistema.');return}
+  if(!camp3()){toast('Entre numa campanha primeiro.');return}
+  let w=$('sys29');
+  if(!w){w=document.createElement('div');w.id='sys29';w.className='sys29 hide';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label','Alterações do Sistema');
+    w.innerHTML=`<div class="sys29-box"><header class="sys29-top"><div><h2>⚙️ Alterações do Sistema</h2><p class="sub">Vale para toda a campanha e chega às fichas e ao combate na hora. Só quem for afetado recebe aviso.</p></div><button type="button" class="btn small" id="sys29x">Fechar</button></header><div class="sys29-body"><nav class="sys29-nav" aria-label="Seções"></nav><section class="sys29-main" id="sys29main"></section></div></div>`;
+    document.body.append(w);
+    w.querySelector('#sys29x').onclick=close29;
+    w.addEventListener('click',e=>{if(e.target===w)close29()});
+    w.addEventListener('keydown',e=>{if(e.key==='Escape')close29()});
+  }
+  w.querySelector('.sys29-nav').innerHTML=SEC29.map(([id,ico,n])=>`<button type="button" class="sys29-tab" data-s29="${id}">${ico} ${n}</button>`).join('');
+  $$('[data-s29]',w).forEach(b=>b.onclick=()=>{R29.sec=b.dataset.s29;R29.edit=null;R29.q='';paint29()});
+  if(sec)R29.sec=sec;R29.edit=null;
+  w.classList.remove('hide');document.body.classList.add('sys29-open');
+  if(key!==undefined)edit29(R29.sec,key);else paint29();
+}
+function close29(){$('sys29')?.classList.add('hide');document.body.classList.remove('sys29-open');R29.edit=null}
+const stTag29={orig:'',edit:'<span class="pill sys29-p edit">editado</span>',new:'<span class="pill sys29-p new">novo</span>',del:'<span class="pill sys29-p del">removido</span>'};
+function paint29(){
+  const w=$('sys29'),m=$('sys29main');if(!w||!m)return;
+  $$('[data-s29]',w).forEach(b=>b.classList.toggle('on',b.dataset.s29===R29.sec));
+  const sec=R29.sec,lbl=SEC29.find(s=>s[0]===sec)?.[2]||'';
+  if(sec==='table')return tableForm29(m);
+  if(sec==='log')return logView29(m);
+  const q=R29.q.toLowerCase(),rows=list29(sec).filter(r=>!q||(r.name+' '+r.sub).toLowerCase().includes(q));
+  const counts=list29(sec).reduce((a,r)=>(a[r.st]=(a[r.st]||0)+1,a),{});
+  m.innerHTML=`<div class="sys29-head"><h3>${esc(lbl)}</h3><span class="sub">${list29(sec).length} no total${counts.edit?` · ${counts.edit} editados`:''}${counts.new&&!['beast','subel'].includes(sec)?` · ${counts.new} novos`:''}${counts.del?` · ${counts.del} removidos`:''}</span><button type="button" class="btn primary small" id="sys29add">＋ Novo</button></div>
+    <input class="search" id="sys29q" placeholder="Buscar em ${esc(lbl.toLowerCase())}" value="${esc(R29.q)}" aria-label="Buscar">
+    <ul class="sys29-list">${rows.slice(0,400).map(r=>`<li class="sys29-row ${r.st}"><div class="grow"><b>${esc(r.name)}</b> ${stTag29[r.st]}<div class="sub">${esc(r.sub)}</div></div><div class="sys29-acts">${r.st==='del'?`<button type="button" class="btn small" data-rs29="${esc(r.key)}" title="Restaurar">↺ Restaurar</button>`:`<button type="button" class="btn small" data-e29="${esc(r.key)}" aria-label="Editar ${esc(r.name)}">✏️</button><button type="button" class="btn small danger" data-d29="${esc(r.key)}" aria-label="Excluir ${esc(r.name)}">🗑️</button>${r.st==='edit'?`<button type="button" class="btn small" data-rs29="${esc(r.key)}" title="Voltar ao original">↺</button>`:''}`}</div></li>`).join('')||'<li class="empty">Nada por aqui ainda. Use ＋ Novo.</li>'}</ul>`;
+  const qi=$('sys29q');qi.oninput=()=>{R29.q=qi.value;const p=qi.selectionStart;paint29();const n=$('sys29q');n.focus();try{n.setSelectionRange(p,p)}catch(e){}};
+  $('sys29add').onclick=()=>edit29(sec,null);
+  $$('[data-e29]',m).forEach(b=>b.onclick=()=>edit29(sec,b.dataset.e29));
+  $$('[data-d29]',m).forEach(b=>b.onclick=()=>del29(sec,b.dataset.d29));
+  $$('[data-rs29]',m).forEach(b=>b.onclick=()=>restore29(sec,b.dataset.rs29));
+}
+/* ---------- formulários ---------- */
+const fI29=(id,l,v,t='text',x='')=>`<div class="field"><label for="${id}">${l}</label><input id="${id}" type="${t}" value="${esc(String(v??''))}" ${x}></div>`;
+const fT29=(id,l,v,r=3)=>`<div class="field full"><label for="${id}">${l}</label><textarea id="${id}" rows="${r}">${esc(String(v??''))}</textarea></div>`;
+const fS29=(id,l,v,opts)=>`<div class="field"><label for="${id}">${l}</label><select id="${id}">${opts.map(o=>Array.isArray(o)?o:[o,o]).map(([a,b])=>`<option value="${esc(a)}" ${String(a)===String(v)?'selected':''}>${esc(b)}</option>`).join('')}</select></div>`;
+const fC29=(id,l,v)=>`<label class="t3-check"><input type="checkbox" id="${id}" ${v?'checked':''}> ${l}</label>`;
+const gv29=id=>{const e=$(id);return e?(e.type==='checkbox'?e.checked:e.value.trim()):''};
+function edit29(sec,key){
+  const m=$('sys29main');if(!m){open29(sec,key);return}
+  R29.sec=sec;R29.edit={sec,key};$$('[data-s29]').forEach(b=>b.classList.toggle('on',b.dataset.s29===sec));
+  const isNew=key==null,c=isNew?null:cur29(sec,key),lbl=KIND29[sec];
+  let f='';
+  if(sec==='voc'){const v=c||{name:'',desc:'',skills:['','',''],talents:[{name:'',cost:1,desc:''},{name:'',cost:2,desc:''}]},sk=['',...skills29()];
+    f=fI29('e29n','Nome',v.name)+fT29('e29d','Descrição',v.desc)+`<div class="sys29-3">${[0,1,2].map(i=>fS29('e29s'+i,'Perícia '+(i+1)+' (+V)',v.skills[i]||'',sk)).join('')}</div>`+[0,1].map(i=>{const t=v.talents?.[i]||{};return`<fieldset class="sys29-fs"><legend>Talento ${i+1}</legend>${fI29('e29t'+i+'n','Nome',t.name)}${fI29('e29t'+i+'c','Custo (ES)',t.cost??1,'number','min="0" max="20"')}${fT29('e29t'+i+'d','Efeito',t.desc,2)}</fieldset>`}).join('')}
+  if(sec==='track'){const t=c||{name:'',archetype:'Lutador',desc:'',stages:[3,5,8,10].map(s=>({stage:s,name:'',desc:''}))};
+    f=fS29('e29a','Arquétipo',t.archetype,ARCH29)+fI29('e29n','Nome da trilha',t.name)+fT29('e29d','Resumo',t.desc)+(t.stages||[]).slice(0,4).map((s,i)=>`<fieldset class="sys29-fs"><legend>Estágio ${s.stage||[3,5,8,10][i]}</legend>${fI29('e29g'+i+'n','Habilidade',s.name)}${fT29('e29g'+i+'d','Efeito',s.desc,2)}</fieldset>`).join('')}
+  if(sec==='ritual'){const r=c||{name:'',element:elems29()[0]||'Natureza',cost:'5 ES',levels:['','','']};
+    f=fI29('e29n','Nome',r.name)+fS29('e29el','Elemento',r.element,elems29())+fI29('e29c','Custo base',r.cost)+fT29('e29l0','Execução base',r.levels?.[0]??r.desc)+fT29('e29l1','Avançada (10 ES)',r.levels?.[1],2)+fT29('e29l2','Próspera (20 ES)',r.levels?.[2],2)}
+  if(sec==='item'){const it=c||{kind:'weapon',name:'',peso:'Médio',dado:'1d6',critMin:20,cat:'Corpo a corpo',skill:'Armas Brancas',def:2,slot:'tronco',note:''},k=it.kind;
+    f=(isNew?fS29('e29k','Tipo',k,[['weapon','Arma'],['prot','Proteção'],['gear','Equipamento']]):'')+fI29('e29n','Nome',it.name)+fS29('e29p','Peso',it.peso,PESO29)
+     +`<div class="sys29-k" data-k29="weapon">${fI29('e29dado','Dano',it.dado||'1d6','text','placeholder="1d8 ou 2d6+1"')}${fI29('e29crit','Crítico a partir de',it.critMin??20,'number','min="2" max="20"')}${fS29('e29cat','Categoria',it.cat||'Corpo a corpo',['Corpo a corpo','Distância','Especial'])}${fS29('e29sk','Perícia de ataque',it.skill||'Armas Brancas',ATTACK_SKILLS)}</div>`
+     +`<div class="sys29-k" data-k29="prot">${fI29('e29def','Defesa',it.def??2,'number','min="0" max="20"')}${fS29('e29slot','Espaço no corpo',it.slot||'tronco',Object.entries(SLOT_LABEL))}</div>`
+     +fT29('e29note','Descrição',it.note||'',2)}
+  if(sec==='status'){const s=c||{name:'',text:'',narr:''};
+    f=fI29('e29n','Nome',s.name)+fT29('e29d','Regra (o que aparece na ficha)',s.text,2)+fT29('e29nr','Narração',s.narr,2)+`<div class="sys29-3">${fI29('e29dot','Dano por turno (PV)',s.dot?.fixed??0,'number','min="0" max="50"')}${fI29('e29def','Defesa (− penalidade)',s.defense??0,'number','min="-20" max="20"')}${fI29('e29ph','Dados em testes físicos',s.physDice??0,'number','min="-5" max="5"')}</div>`
+     +fC29('e29mv','Não pode se mover',(s.flags||[]).includes('semMover'))+fC29('e29atk','Desvantagem em ataques',(s.disadv||[]).includes('ataque'))+fC29('e29act','Perde a próxima ação',(s.flags||[]).includes('perdeAcao'))}
+  if(sec==='trauma'){const t=c||{name:'',grp:'Mente',text:''};f=fI29('e29n','Nome',t.name)+fI29('e29g','Grupo',t.grp)+fT29('e29d','Efeito',t.text)}
+  if(sec==='beast'){const b=c||cur29('beast',null);f=fI29('e29n','Nome',b.name)+fS29('e29tier','Tipo',b.tier||'Inimigo',['Inimigo','Elite','Chefe','Entidade'])+`<div class="sys29-3">${fI29('e29vt','Vitalidade',b.vital,'number','min="1" max="999"')}${fI29('e29def','Defesa',b.def,'number','min="0" max="40"')}${fI29('e29atk','Ataque (bônus)',b.atk)}</div>`+fI29('e29dano','Dano',b.dano)+fT29('e29sk','Perícias e poderes',b.skills,2)+fT29('e29nt','Notas e comportamento',b.notes,3)}
+  if(sec==='subel'){const s=c||cur29('subel',null);f=fI29('e29n','Nome do sub-elemento',s.name)+fS29('e29el','Elemento de origem',s.element,elems29())+fT29('e29d','Descrição e efeitos',s.desc)}
+  m.innerHTML=`<div class="sys29-head"><button type="button" class="btn small" id="e29back">← Voltar</button><h3>${isNew?'Novo':'Editar'} ${esc((lbl||'').toLowerCase())}</h3>${!isNew&&isNative29(sec,key)?'<span class="sub">Conteúdo do manual. Dá para voltar ao original depois.</span>':''}</div><form class="sys29-form" id="e29f">${f}<div class="sys29-save"><button type="submit" class="btn primary">Salvar e aplicar na mesa</button><button type="button" class="btn" id="e29cancel">Cancelar</button></div></form>`;
+  const kSync=()=>{const k=isNew&&sec==='item'?gv29('e29k'):c?.kind;$$('[data-k29]',m).forEach(d=>d.classList.toggle('hide',d.dataset.k29!==k))};
+  if(sec==='item'){kSync();$('e29k')&&($('e29k').onchange=kSync)}
+  $('e29back').onclick=$('e29cancel').onclick=()=>{R29.edit=null;paint29()};
+  $('e29f').onsubmit=async ev=>{ev.preventDefault();const ok=await submit29(sec,key,c);if(ok){R29.edit=null;paint29()}};
+  setTimeout(()=>$('e29n')?.focus(),30);
+}
+/* compara antes x depois para o aviso */
+function diff29(a,b,fields){const out=[];fields.forEach(([k,l,fmt])=>{const f=fmt||(x=>x==null?'':Array.isArray(x)?x.join(', '):String(x));const x=f(a?.[k]),y=f(b?.[k]);if(x!==y)out.push([l,x||'—',y||'—'])});return out}
+async function submit29(sec,key,c){
+  const R=rules29(),isNew=key==null,name=gv29('e29n');
+  if(!name){toast('Dê um nome.');return false}
+  let k=key,o,after,changes=[];
+  if(sec==='voc'){
+    const skills=[0,1,2].map(i=>gv29('e29s'+i)).filter(Boolean);if(skills.length!==3||new Set(skills).size!==3){toast('Escolha três perícias diferentes.');return false}
+    const talents=[0,1].map(i=>({name:gv29('e29t'+i+'n'),cost:Number(gv29('e29t'+i+'c'))||0,desc:gv29('e29t'+i+'d')}));
+    o={name,desc:gv29('e29d'),skills,talents};if(isNew){k=name;if(list29('voc').some(r=>r.key===k||r.name===k)){toast('Já existe uma vocação com esse nome.');return false}o.add=1}else if(R.voc[key]?.add)o.add=1;
+    changes=diff29(c,o,[['name','Nome'],['skills','Perícias'],['desc','Descrição']]);
+    [0,1].forEach(i=>{const a=c?.talents?.[i]||{},b=talents[i];if(a.name!==b.name)changes.push([`Talento ${i+1}`,a.name,b.name]);else if((a.desc||'')!==b.desc||Number(a.cost)!==b.cost)changes.push([`Talento ${a.name||i+1}`,`${a.cost??'—'} ES · ${String(a.desc||'').slice(0,50)}`,`${b.cost} ES · ${b.desc.slice(0,50)}`])});
+    R.voc[k]=o;
+  }
+  if(sec==='track'){
+    const arch=gv29('e29a'),stages=[0,1,2,3].map(i=>({name:gv29('e29g'+i+'n'),desc:gv29('e29g'+i+'d')}));
+    o={name,archetype:arch,desc:gv29('e29d'),stages};
+    if(isNew){k=arch+'|'+name;if(R.track[k]||base29().track.some(t=>tkey29(t)===k)){toast('Essa trilha já existe.');return false}o.add=1}else if(R.track[key]?.add)o.add=1;
+    changes=diff29(c,o,[['name','Nome'],['archetype','Arquétipo'],['desc','Resumo']]);
+    stages.forEach((s,i)=>{const a=c?.stages?.[i]||{};if((a.name||'')!==s.name||(a.desc||'')!==s.desc)changes.push([`Estágio ${a.stage||[3,5,8,10][i]}`,`${a.name||''} ${String(a.desc||'').slice(0,40)}`.trim(),`${s.name} ${s.desc.slice(0,40)}`.trim()])});
+    R.track[k]=o;
+  }
+  if(sec==='ritual'){
+    o={name,element:gv29('e29el'),cost:gv29('e29c')||'5 ES',levels:[gv29('e29l0'),gv29('e29l1'),gv29('e29l2')]};
+    if(isNew){k='gm-'+name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-')+'-'+rid().slice(0,4);o.add=1}else if(R.ritual[key]?.add)o.add=1;
+    changes=diff29({name:c?.name,element:c?.element,cost:c?.cost,l0:c?.levels?.[0]},{name:o.name,element:o.element,cost:o.cost,l0:o.levels[0]},[['name','Nome'],['element','Elemento'],['cost','Custo'],['l0','Efeito base']]);
+    R.ritual[k]=o;
+  }
+  if(sec==='item'){
+    const kind=isNew?gv29('e29k'):c.kind;
+    o={name,peso:gv29('e29p'),note:gv29('e29note')};
+    if(kind==='weapon'){const dado=gv29('e29dado');if(!/^\d+d\d+([+-]\d+)?$/i.test(dado)){toast('Dano inválido. Use algo como 1d8 ou 2d6+1.');return false}Object.assign(o,{dado,critMin:Math.min(20,Math.max(2,Number(gv29('e29crit'))||20)),cat:gv29('e29cat'),skill:gv29('e29sk')})}
+    if(kind==='prot')Object.assign(o,{def:Math.max(0,Number(gv29('e29def'))||0),slot:gv29('e29slot')});
+    if(isNew){k=ikey29(kind,name);if(list29('item').some(r=>r.key===k)){toast('Já existe um item com esse nome.');return false}o.add=1}else if(R.item[key]?.add)o.add=1;
+    changes=diff29(c,o,[['name','Nome'],['peso','Peso'],['dado','Dano'],['critMin','Crítico'],['def','Defesa'],['note','Descrição']].filter(([f])=>f!=='dado'&&f!=='critMin'||kind==='weapon').filter(([f])=>f!=='def'||kind==='prot'));
+    R.item[k]=o;
+  }
+  if(sec==='status'){
+    o={name,text:gv29('e29d'),narr:gv29('e29nr'),dot:Number(gv29('e29dot'))||0,defense:Number(gv29('e29def'))||0,physDice:Number(gv29('e29ph'))||0,noMove:gv29('e29mv'),disAtk:gv29('e29atk'),loseAct:gv29('e29act')};
+    if(isNew){k='gm-'+name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').slice(0,24)+'-'+rid().slice(0,4);o.add=1}else if(R.status[key]?.add)o.add=1;
+    const flat=s=>({name:s?.name,text:s?.text,dot:s?.dot?.fixed??(typeof s?.dot==='number'?s.dot:0),defense:s?.defense||0,physDice:s?.physDice||0,noMove:(s?.flags||[]).includes('semMover')||!!s?.noMove,disAtk:(s?.disadv||[]).includes('ataque')||!!s?.disAtk,loseAct:(s?.flags||[]).includes('perdeAcao')||!!s?.loseAct});
+    const yes=x=>x?'sim':'não';
+    changes=diff29(flat(c),o,[['name','Nome'],['dot','Dano por turno'],['defense','Defesa'],['physDice','Dados físicos'],['noMove','Não pode se mover',yes],['disAtk','Desvantagem em ataques',yes],['loseAct','Perde a ação',yes],['text','Regra']]);
+    R.status[k]=o;
+  }
+  if(sec==='trauma'){
+    o={name,grp:gv29('e29g')||'Mente',text:gv29('e29d')};
+    if(isNew){k='gm-'+rid().slice(0,6);o.add=1}else if(R.trauma[key]?.add)o.add=1;
+    changes=diff29(c,o,[['name','Nome'],['grp','Grupo'],['text','Efeito']]);R.trauma[k]=o;
+  }
+  if(sec==='beast'||sec==='subel'){
+    const arr=R[sec];k=isNew?'gm-'+rid().slice(0,8):key;
+    o=sec==='beast'?{id:k,name,tier:gv29('e29tier'),vital:Number(gv29('e29vt'))||1,def:Number(gv29('e29def'))||0,atk:gv29('e29atk'),dano:gv29('e29dano'),skills:gv29('e29sk'),notes:gv29('e29nt')}:{id:k,name,element:gv29('e29el'),desc:gv29('e29d')};
+    const i=arr.findIndex(x=>x.id===k);changes=diff29(c,o,sec==='beast'?[['name','Nome'],['vital','Vitalidade'],['def','Defesa'],['atk','Ataque'],['dano','Dano']]:[['name','Nome'],['element','Elemento'],['desc','Descrição']]);
+    if(i>=0)arr[i]=o;else arr.push(o);
+  }
+  if(!isNew&&!changes.length){toast('Nada mudou.');return true}
+  const ok=await saveRules29({kind:sec,key:k,label:name,add:isNew?1:0,changes:isNew?[]:changes});
+  if(ok)toast(`${KIND29[sec]} ${isNew?'criado':'atualizado'}: ${name}. A mesa já recebeu.`);
+  return ok;
+}
+async function del29(sec,key){
+  const R=rules29(),row=list29(sec).find(r=>r.key===key);if(!row)return;
+  if(!confirm(`Excluir “${row.name}” de ${KIND29[sec]}? ${isNative29(sec,key)?'É conteúdo do manual: dá para restaurar depois.':'Não dá para desfazer.'}`))return;
+  if(sec==='beast'||sec==='subel')R[sec]=R[sec].filter(x=>x.id!==key);
+  else if(isNative29(sec,key))R[sec][key]={...(R[sec][key]||{}),del:1};
+  else{if(R[sec][key])R[sec][key].del=1}
+  await saveRules29({kind:sec,key,label:row.name,del:1,changes:[['Situação','ativo','removido']]});paint29();
+}
+async function restore29(sec,key){
+  const R=rules29(),row=list29(sec).find(r=>r.key===key);if(!row)return;
+  const o=R[sec][key];if(!o)return;
+  if(isNative29(sec,key)){const before=cur29(sec,key);delete R[sec][key];await saveRules29({kind:sec,key,label:row.name,changes:[['Situação',o.del?'removido':'editado','original do manual']]})}
+  else{delete o.del;await saveRules29({kind:sec,key,label:row.name,changes:[['Situação','removido','ativo']]})}
+  paint29();
+}
+function tableForm29(m){
+  const t=rules29().table||{};
+  m.innerHTML=`<div class="sys29-head"><h3>Regras da Mesa</h3><span class="sub">Valem para todos os combates da campanha.</span></div><form class="sys29-form" id="t29f">
+    ${fI29('t29mv','Deslocamento base por turno (m)',t.move||9,'number','min="1" max="60" step="0.5"')}
+    ${fI29('t29dt','DT do Arremesso até 6 m',t.dtThrow||12,'number','min="5" max="30"')}
+    ${fI29('t29st','DT de Furtividade dos inimigos (0 = 10 + Percepção)',t.dtStealth??0,'number','min="0" max="30"')}
+    <p class="sub full">A DT do Arremesso sobe +3 a cada 6 m a partir desse valor. Correr continua dobrando o deslocamento.</p>
+    <div class="sys29-save"><button type="submit" class="btn primary">Salvar e aplicar na mesa</button></div></form>`;
+  $('t29f').onsubmit=async ev=>{ev.preventDefault();const R=rules29(),old={...R.table};
+    const nv={move:Math.max(1,Number(gv29('t29mv'))||9),dtThrow:Math.max(5,Number(gv29('t29dt'))||12),dtStealth:Math.max(0,Number(gv29('t29st'))||0)};
+    const changes=diff29({move:old.move||9,dtThrow:old.dtThrow||12,dtStealth:old.dtStealth||0},nv,[['move','Deslocamento base (m)'],['dtThrow','DT do Arremesso'],['dtStealth','DT de Furtividade']]);
+    if(!changes.length){toast('Nada mudou.');return}
+    R.table=nv;if(await saveRules29({kind:'table',key:'table',label:'Regras da Mesa',changes}))toast('Regras da mesa atualizadas.');paint29()};
+}
+function logView29(m){
+  const L=rules29().log||[];
+  m.innerHTML=`<div class="sys29-head"><h3>Histórico</h3><span class="sub">As últimas ${L.length} alterações desta campanha.</span></div><ol class="sys29-log">${L.map(e=>`<li><time>${new Date(e.at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time> <b>${esc(KIND29[e.kind]||e.kind)}: ${esc(e.label||e.key)}</b> ${e.del?'removido':e.add?'criado':''}${e.changes?.length?`<ul class="rn29-ch">${chg29(e)}</ul>`:''}</li>`).join('')||'<li class="empty">Nenhuma alteração ainda.</li>'}</ol>`;
+}
+
+/* ---------- botões inline do Mestre nas listas normais da ficha ---------- */
+const gmBtns29=(sec,key,name)=>`<span class="gm29" role="group" aria-label="Mestre: ${esc(name)}"><button type="button" class="gm29-b" data-g29e="${sec}" data-k="${esc(key)}" title="Editar (Mestre)" aria-label="Editar ${esc(name)}">✏️</button><button type="button" class="gm29-b" data-g29d="${sec}" data-k="${esc(key)}" title="Excluir (Mestre)" aria-label="Excluir ${esc(name)}">🗑️</button></span>`;
+const gmAdd29=(sec,l)=>`<button type="button" class="gm29-b gm29-add" data-g29a="${sec}" title="Adicionar (Mestre)">＋ ${esc(l)}</button>`;
+function bindGm29(root){
+  $$('[data-g29e]',root).forEach(b=>b.onclick=e=>{e.stopPropagation();open29(b.dataset.g29e,b.dataset.k)});
+  $$('[data-g29d]',root).forEach(b=>b.onclick=e=>{e.stopPropagation();del29(b.dataset.g29d,b.dataset.k).then(()=>close29())});
+  $$('[data-g29a]',root).forEach(b=>b.onclick=e=>{e.stopPropagation();open29(b.dataset.g29a,null)});
+}
+const vocKey29=name=>{const R=rules29();const e=Object.entries(R.voc).find(([k,o])=>o&&o.name===name);return e?e[0]:name};
+const trkKey29=(arch,name)=>{const R=rules29();const e=Object.entries(R.track).find(([k,o])=>o&&o.name===name&&(o.archetype||k.split('|')[0])===arch);return e?e[0]:arch+'|'+name};
+function gmInline29(){
+  const gm=isGM6();document.body.classList.toggle('gm29-on',gm);
+  if(!gm){$$('.gm29,.gm29-add,.gm29-bar').forEach(e=>e.remove());return}
+  /* vocação */
+  const vp=$('vocPreview');if(vp&&!vp.querySelector('.gm29-bar')){const nm0=$('vocSelect')?.value;const bar=document.createElement('div');bar.className='gm29-bar';bar.innerHTML=(nm0&&vocations.some(v=>v.name===nm0)?gmBtns29('voc',vocKey29(nm0),nm0):'')+gmAdd29('voc','Nova vocação');vp.prepend(bar);bindGm29(bar)}
+  /* trilha */
+  const tp=$('trackPreview');if(tp&&!tp.querySelector('.gm29-bar')){const a=$('archSelect')?.value,n=$('trackSelect')?.value;const bar=document.createElement('div');bar.className='gm29-bar';bar.innerHTML=(a&&n&&tracks.some(t=>t.archetype===a&&t.name===n)?gmBtns29('track',trkKey29(a,n),n):'')+gmAdd29('track','Nova trilha');tp.prepend(bar);bindGm29(bar)}
+  /* rituais */
+  const rc=$('ritualCatalog');if(rc){$$('.ritual-card',rc).forEach(card=>{if(card.querySelector('.gm29'))return;const n=card.querySelector('h4')?.textContent;const r=RITUALS.find(x=>x.name===n);if(!r||String(r.id).startsWith('custom-'))return;const h=card.querySelector('.inline')||card;h.insertAdjacentHTML('beforeend',gmBtns29('ritual',r.id,r.name));bindGm29(card)});
+    const head=rc.closest('.panel')?.querySelector('.panel-head');if(head&&!head.querySelector('.gm29-add')){head.insertAdjacentHTML('beforeend',gmAdd29('ritual','Novo ritual'));bindGm29(head)}}
+}
+/* listas que não passam por render(): itens, estados */
+{const _al29=renderAddList;renderAddList=function(){const out=_al29.apply(this,arguments);try{
+  if(!isGM6())return out;const k=$('addKind')?.value,box=$('addList');if(!box||!['weapon','prot','gear'].includes(k))return out;
+  const arr=k==='weapon'?WEAPONS:k==='prot'?PROTECTIONS:GEAR;
+  $$('.skill',box).forEach(row=>{if(row.querySelector('.gm29'))return;const n=row.querySelector('.skill-name')?.textContent;const it=arr.find(x=>x.name===n);if(!it)return;(row.querySelector('.skill-right')||row).insertAdjacentHTML('afterbegin',gmBtns29('item',ikey29(k,it._k29||it.name),it.name))});
+  if(!box.querySelector('.gm29-add'))box.insertAdjacentHTML('afterbegin',`<div class="gm29-bar">${gmAdd29('item','Novo item no catálogo')}</div>`);
+  bindGm29(box);
+}catch(e){console.warn('[T29] itens inline',e)}return out}}
+{const _sl29=renderStatesList;renderStatesList=function(){const out=_sl29.apply(this,arguments);try{
+  if(!isGM6())return out;const box=$('stList');if(!box)return out;
+  $$('[data-st]',box).forEach(b=>{const row=b.closest('.t3-st');if(!row||row.querySelector('.gm29'))return;const s=STATUS_BY_ID[b.dataset.st];if(!s)return;b.insertAdjacentHTML('beforebegin',gmBtns29('status',s.id,s.name))});
+  if(!box.querySelector('.gm29-add'))box.insertAdjacentHTML('afterbegin',`<div class="gm29-bar">${gmAdd29('status','Novo estado')}</div>`);
+  bindGm29(box);
+}catch(e){console.warn('[T29] estados inline',e)}return out}}
+/* sub-elementos aparecem para todos junto do repertório de rituais */
+function subelPanel29(){
+  const rc=$('ritualCatalog');if(!rc)return;const panel=rc.closest('.panel');if(!panel)return;
+  const L=rules29().subel||[];let p=$('subel29');
+  if(!L.length){p&&p.remove();return}
+  if(!p){p=document.createElement('div');p.id='subel29';p.className='panel subel29';panel.after(p)}
+  const sig=JSON.stringify(L);if(p.dataset.sig===sig)return;p.dataset.sig=sig;
+  p.innerHTML=`<div class="panel-head"><h2>Sub-elementos da campanha</h2><span class="pill">${L.length}</span></div><ul class="subel29-list">${L.map(s=>`<li><b>${esc(s.name)}</b> <span class="tag">${esc(s.element||'')}</span><p>${esc(s.desc||'')}</p></li>`).join('')}</ul>`;
+}
+/* o painel antigo do Mestre sai da ficha */
+try{$('masterPanel')?.classList.add('hide')}catch(e){}
+try{base29()}catch(e){console.warn('[T29] base',e)}
+console.info('[Tulpa] Etapa 29 carregada');
+
+/* ===================================================================
+   TULPA · ETAPA 30 — Motivos para juntar Óbolos (100% fora das regras)
+   🪑 Quarto decorado + 🏘️ visitar o Perseus dos amigos com carinho
+   🃏 Cápsulas e Álbum de Figurinhas (Comum, Raro, Épico, Mítico)
+   ✨ Cosméticos: molduras animadas, títulos e efeitos de dado
+   🎯 Missões do dia e 🎰 apostas amigáveis nos jogos competitivos
+   Tudo fica em PET.x30 (salvo junto com o Perseus, na ficha).
+   =================================================================== */
+const PS30={deco:null,visit:null,raf:0,gtab:'cap',opening:false,likes:{},likesAt:0,bets:{},paid:{},betDone:{}};
+T3.x30=PS30;
+const MV30={
+  poster:{n:'Pôster do Véu',ico:'🖼️',p:40,x:58,y:96,s:56,d:'Um mapa antigo do Véu, preso com fita.'},
+  neon:{n:'Letreiro Neon',ico:'💡',p:70,x:232,y:44,s:42,d:'Pisca “TULPA” de madrugada.'},
+  globo:{n:'Globo Astral',ico:'🔮',p:65,x:334,y:96,s:44,d:'Mostra o céu de outro plano.'},
+  estante:{n:'Estante de Grimórios',ico:'📚',p:55,x:46,y:214,s:58,d:'Livros que sussurram quando ninguém olha.'},
+  aquario:{n:'Aquário Etéreo',ico:'🐠',p:90,x:432,y:150,s:44,d:'Peixes que nadam no ar.'},
+  fliperama:{n:'Fliperama',ico:'🕹️',p:150,x:46,y:330,s:64,d:'Joga Voo Além do Véu sozinho, de noite.'},
+  planta:{n:'Plantinha da Natureza',ico:'🪴',p:30,x:446,y:360,s:52,d:'Cresce um pouco a cada carinho.'},
+  vitrola:{n:'Vitrola',ico:'📻',p:80,x:378,y:376,s:46,d:'Toca discos antigos de Essência.'},
+  discos:{n:'Coleção de Discos',ico:'💿',p:45,x:336,y:398,s:30,d:'Do Ritual Rhythm aos clássicos.'},
+  tapete:{n:'Tapete Rúnico',ico:'🟣',p:35,x:214,y:404,s:34,d:'Fica embaixo do Perseus. Ele aprova.'},
+  telescopio:{n:'Telescópio',ico:'🔭',p:110,x:142,y:392,s:40,d:'Para espiar o Plano Astral.'},
+  trofeu:{n:'Troféu do Arcade',ico:'🏆',p:120,x:130,y:96,s:38,d:'Ninguém sabe de qual jogo.'},
+};
+const CARDS30=[
+  ['nat','Natureza','🌿','c','Folha que fala com raízes.'],['ine','Inexistência','🕳️','c','Um buraco que olha de volta.'],['ilu','Ilusão','🎭','c','Nada aqui é o que parece.'],['ver','Verdade','👁️','c','O olho que não pisca.'],['fe','Fé','🕯️','c','A vela que nunca apaga.'],
+  ['ampola','Ampola de Essência','🧪','c','Brilha quando alguém mente.'],['fita','Fita K7 Maldita','📼','c','Lado B: só estática.'],['lanterna','Lanterna Fraca','🔦','c','Pisca nas horas erradas.'],['emf','Medidor EMF','📟','c','Apita perto do Mestre.'],['racao','Ração Astral','🥣','c','O Perseus aprova.'],
+  ['loaf','Perseus Pão','🍞','c','Formato de pão. Cortisol zero.'],['chill','Perseus de Boa','😎','c','Nada abala.'],['guaxinim','Guaxinim do Lixo','🦝','c','Parente distante.'],
+  ['cao','Cão de Fumaça','🐕','r','Late sem som.'],['guarda','Homem do Guarda-chuva','☂️','r','Nunca chove onde ele está.'],['sombra','Sombra Faminta','👤','r','Come a luz da lanterna.'],['boneca','Boneca do Sótão','🪆','r','Muda de lugar à noite.'],
+  ['67','Perseus 67','6️⃣','r','Ninguém sabe por quê.'],['omg','Perseus OMG','😱','r','Viu o 20 natural.'],['guitarra','Perseus Guitarrista','🎸','r','Solo de Essência.'],['espelho','Espelho Partido','🪞','r','Sete anos de Lucidez.'],
+  ['colapso','Colapso de Lucidez','🌀','e','A mente rachou.'],['extase','Êxtase','✨','e','Tudo brilha demais.'],['abismo','Labirinto do Abismo','🗝️','e','A chave abre outra porta.'],['trono','Trono do Mestre','👑','e','Só um senta.'],['vazio','O Vazio','⬛','e','Não tem verso.'],
+  ['veu','Além do Véu','🌌','m','O outro lado também te vê.'],['perseus','Perseus Cósmico','🐈‍⬛','m','O gato original. Holográfico.'],['mestre','O Mestre','🎲','m','Rola atrás do escudo.'],['tulpa','A Tulpa','🫥','m','Nasceu da sua mente.'],
+].map(([id,n,ico,r,d])=>({id,n,ico,r,d}));
+const RAR30={c:{n:'Comum',w:60,dup:4},r:{n:'Raro',w:27,dup:8},e:{n:'Épico',w:10,dup:15},m:{n:'Mítico',w:3,dup:30}};
+const CAP30=25;
+const FR30={fogo:{n:'Fogo Astral',ico:'🔥',p:120,d:'Chamas azuis giram em volta da foto.'},glitch:{n:'Glitch',ico:'📺',p:110,d:'A foto treme como fita velha.'},neon:{n:'Brilho Neon',ico:'💗',p:90,d:'Contorno rosa e ciano que pulsa.'},dourado:{n:'Dourado',ico:'🥇',p:180,d:'Moldura de ouro com brilho correndo.'}};
+const TT30={volei:{n:'Lenda do Vôlei',p:80},inabalavel:{n:'Mente Inabalável',p:80},uno:{n:'Mestre do UNO',p:70},rei:{n:'Rei do Arcade',p:150},gato:{n:'Tutor de Gato Astral',p:50},colecao:{n:'Colecionador do Véu',p:0,need:'Complete 20 figurinhas do Álbum.'},sortudo:{n:'Sortudo do 20',p:100},sombra:{n:'Andarilho das Sombras',p:90}};
+const DX30={brasas:{n:'Brasas',ico:'🔥',p:70,col:['#ff9b3d','#ffd36b','#ff5a2a']},estrelas:{n:'Chuva de Estrelas',ico:'⭐',p:80,col:['#fff4b0','#ffd36b','#b9c8ff']},glitch:{n:'Glitch',ico:'👾',p:90,col:['#00f0ff','#ff2bd6','#ffffff']},ouro:{n:'Ouro',ico:'🪙',p:120,col:['#ffd36b','#e8b04a','#fff1c0']},coracoes:{n:'Corações',ico:'💜',p:60,col:['#ff7ab6','#c08cff','#ffd1e8']}};
+const MS30=[
+  {id:'voo20',t:'Faça 20 pontos no Voo Além do Véu',g:'voo',k:'score',n:20,r:40},
+  {id:'salto',t:'Faça 300 pontos no Salto Astral',g:'salto',k:'score',n:300,r:35},
+  {id:'uno',t:'Vença 1 partida de UNO Teosófico',g:'uno',k:'win',n:1,r:50},
+  {id:'velha',t:'Vença 1 Jogo da Velha Teosófico',g:'velha',k:'win',n:1,r:35},
+  {id:'volley',t:'Vença 1 partida de Tulpa Volley',g:'volley',k:'win',n:1,r:50},
+  {id:'rinha',t:'Vença 1 luta na Rinha de Tulpas',g:'rinha',k:'win',n:1,r:45},
+  {id:'rhythm',t:'Vença 1 duelo no Ritual Rhythm',g:'rhythm',k:'win',n:1,r:45},
+  {id:'play3',t:'Jogue 3 partidas de qualquer jogo',g:'*',k:'play',n:3,r:30},
+  {id:'play5',t:'Jogue 5 partidas de qualquer jogo',g:'*',k:'play',n:5,r:45},
+  {id:'runner',t:'Corra 600 m no Corredor do Vazio',g:'runner',k:'score',n:600,r:40},
+  {id:'blast',t:'Faça 400 pontos no Block Blast Astral',g:'blast',k:'score',n:400,r:35},
+  {id:'feed',t:'Alimente o Perseus 3 vezes',g:'pet',k:'feed',n:3,r:25},
+  {id:'caps',t:'Abra 1 cápsula de figurinhas',g:'pet',k:'caps',n:1,r:20},
+  {id:'visit',t:'Deixe um carinho no Perseus de alguém',g:'pet',k:'like',n:1,r:25},
+];
+const BETG30=['volley','rhythm','uno','rinha','velha'];
+const BETV30=[0,10,25,50,100];
+
+/* ---------- estado salvo ---------- */
+function x30(){
+  petLoad20();const b={mv:{own:{},on:{}},cards:{},caps:0,cos:{own:{fr:{},tt:{},dx:{}},eq:{fr:'',tt:'',dx:''}},miss:{day:'',list:[]},bets:{}};
+  const x=PET.x30=PET.x30&&typeof PET.x30==='object'?PET.x30:{};
+  x.mv={own:{...(x.mv?.own||{})},on:{...(x.mv?.on||{})}};x.cards={...(x.cards||{})};x.caps=Number(x.caps)||0;
+  x.cos={own:{fr:{...(x.cos?.own?.fr||{})},tt:{...(x.cos?.own?.tt||{})},dx:{...(x.cos?.own?.dx||{})}},eq:{...b.cos.eq,...(x.cos?.eq||{})}};
+  x.miss=x.miss&&typeof x.miss==='object'?x.miss:b.miss;x.bets=x.bets&&typeof x.bets==='object'?x.bets:{};
+  return x;
+}
+T3.x30data=x30;
+const save30=()=>petSave20(true);
+/* cosméticos e quarto dos outros jogadores (vêm da ficha deles) */
+function petOfUid30(u){
+  if(!u)return null;if(u===uid3()){petLoad20();return PET}
+  const ch=(chars3()||[]).find(c=>c.ownerId===u&&!gmChar6(c)&&d14(c).perseus);return ch?d14(ch).perseus:null;
+}
+const cosOf30=u=>petOfUid30(u)?.x30?.cos?.eq||{};
+
+/* ---------- 🎯 missões do dia ---------- */
+const day30=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function hash30(s){let h=2166136261;for(const ch of String(s)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function missions30(){
+  const x=x30(),dk=day30();
+  if(x.miss.day!==dk||!Array.isArray(x.miss.list)||x.miss.list.length!==3){
+    const pool=MS30.slice();let h=hash30(dk+'|'+uid3());const pick=[];
+    while(pick.length<3&&pool.length){const i=h%pool.length;pick.push(pool.splice(i,1)[0].id);h=hash30(h+':'+pick.length)}
+    x.miss={day:dk,list:pick.map(id=>({id,p:0,done:false,paid:false}))};save30();
+  }
+  return x.miss.list.map(m=>({...m,def:MS30.find(d=>d.id===m.id)})).filter(m=>m.def);
+}
+function progress30(kind,{g='',score=0,win=false,n=1}={}){
+  try{
+    const x=x30();missions30();let ch=false;
+    x.miss.list.forEach(m=>{const d=MS30.find(q=>q.id===m.id);if(!d||m.done)return;
+      if(d.k!==kind)return;if(d.g!=='*'&&d.g!=='pet'&&d.g!==g)return;
+      if(kind==='score')m.p=Math.max(m.p,Number(score)||0);else if(kind==='win'){if(win)m.p+=1}else m.p+=n;
+      if(m.p>=d.n){m.done=true;m.p=d.n;if(!m.paid){m.paid=true;petEarn20(d.r,'Missão cumprida: '+d.t);fx5('mgWin');toast('🎯 Missão cumprida: '+d.t+' (+'+d.r+' 🪙)')}}
+      ch=true});
+    if(ch)save30();
+  }catch(e){console.warn('[T30] missão',e)}
+}
+T3.mission30=progress30;
+/* ---------- 🃏 cápsulas ---------- */
+function roll30(){const tot=Object.values(RAR30).reduce((a,r)=>a+r.w,0);let k=Math.random()*tot,rar='c';for(const [id,r] of Object.entries(RAR30)){if(k<r.w){rar=id;break}k-=r.w}
+  const pool=CARDS30.filter(c=>c.r===rar);return pool[Math.floor(Math.random()*pool.length)]}
+function openCap30(){
+  const x=x30();if(PS30.opening)return null;
+  if(PET.coins<CAP30){toast(`🪙 Faltam ${CAP30-PET.coins} Óbolos para uma cápsula.`);fx5('error');return null}
+  PET.coins-=CAP30;x.caps++;const c=roll30(),dup=(x.cards[c.id]||0)>0;x.cards[c.id]=(x.cards[c.id]||0)+1;
+  let back=0;if(dup){back=RAR30[c.r].dup;PET.coins+=back}
+  save30();petHeader20();progress30('caps');
+  if(Object.keys(x.cards).length>=20&&!x.cos.own.tt.colecao){x.cos.own.tt.colecao=1;save30();toast('🏅 Título liberado: Colecionador do Véu')}
+  return{c,dup,back};
+}
+T3.cap30=openCap30;
+/* ---------- telas novas dentro do Perseus ---------- */
+const NEWTABS30=[['deco','🪑 Decorar'],['visit','🏘️ Visitar'],['gacha','🃏 Cápsulas'],['cos','✨ Visual da Mesa'],['miss','🎯 Missões']];
+NEWTABS30.forEach(t=>{if(!TABS20.some(x=>x[0]===t[0]))TABS20.splice(TABS20.length-2,0,t)});
+{const _pr30=petRender20;petRender20=function(){
+  const mine=NEWTABS30.some(t=>t[0]===PS20.tab);cancelAnimationFrame(PS30.raf);PS30.raf=0;PS30.visit=PS30.visit&&PS20.tab==='visit'?PS30.visit:null;
+  if(!mine)return _pr30.apply(this,arguments);
+  const real=PS20.tab;PS20.tab='rank';try{_pr30.apply(this,arguments)}finally{PS20.tab=real}
+  $$('[data-ptab]').forEach(b=>{const on=b.dataset.ptab===real;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+  const body=$('ptBody');if(!body)return;
+  if(real==='deco')decoTab30(body);else if(real==='visit')visitTab30(body);else if(real==='gacha')gachaTab30(body);else if(real==='cos')cosTab30(body);else missTab30(body);
+}}
+/* --- 🪑 quarto --- */
+function deco30(x,on,t){
+  Object.keys(on||{}).forEach(k=>{const m=MV30[k];if(!m)return;
+    x.save();x.font=`${m.s}px system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif`;x.textAlign='center';x.textBaseline='middle';
+    if(k==='neon'){x.shadowColor='#ff4fd8';x.shadowBlur=10+Math.sin((t||0)*3)*6}
+    if(k==='aquario'){x.translate(0,Math.sin((t||0)*1.6)*2)}
+    x.fillText(m.ico,m.x,m.y);x.restore()});
+}
+{const _dl30=drawLamp20;drawLamp20=function(x,on,t){_dl30.apply(this,arguments);if(PS30.deco)try{deco30(x,PS30.deco,t)}catch(e){}}}
+{const _pd30=petDraw20;petDraw20=function(x,t){PS30.deco=x30().mv.on;try{return _pd30.apply(this,arguments)}finally{PS30.deco=null}}}
+function roomCanvas30(cv,pet,t=1){
+  const x=cv.getContext('2d'),eq=pet?.eq||{sk:'orig',bg:'quarto'},k=cv.width/PW20;
+  x.save();x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.scale(k,cv.height/PH20);
+  drawBg20(x,eq.bg||'quarto',PW20,PH20,t,true);PS30.deco=pet?.x30?.mv?.on||{};drawLamp20(x,true,t);PS30.deco=null;
+  const im=petImg20(eq,-1);if(im){const s=CS20;x.drawImage(im,CX20-s/2,CY20+s*.5-s,s,s)}
+  x.restore();
+}
+function decoTab30(body){
+  const x=x30();
+  body.innerHTML=`<div class="x30"><p class="pt-hint">Monte o quarto do seu Perseus. Os amigos da mesa podem visitar e deixar carinho.</p><canvas class="x30-room" id="x30room" width="480" height="420" aria-label="Prévia do quarto"></canvas>
+    <div class="pt-shop">${Object.entries(MV30).map(([k,m])=>{const own=!!x.mv.own[k],on=!!x.mv.on[k];return`<article class="pt-item${on?' eq':''}"><div class="x30-ico" aria-hidden="true">${m.ico}</div><div class="pt-itx"><b>${esc(m.n)}</b><span class="sub">${esc(m.d)}</span></div><button type="button" class="btn small ${own?'':'primary'}" data-mv30="${k}">${!own?`Comprar · 🪙 ${m.p}`:on?'Guardar':'Colocar no quarto'}</button></article>`}).join('')}</div></div>`;
+  const cv=$('x30room');const loop=now=>{roomCanvas30(cv,PET,now/1000);PS30.raf=requestAnimationFrame(loop)};if(SPR.ok)PS30.raf=requestAnimationFrame(loop);else setTimeout(()=>roomCanvas30(cv,PET),400);
+  $$('[data-mv30]').forEach(b=>b.onclick=()=>{const k=b.dataset.mv30,m=MV30[k];
+    if(!x.mv.own[k]){if(PET.coins<m.p){toast(`🪙 Faltam ${m.p-PET.coins} Óbolos para ${m.n}.`);fx5('error');return}PET.coins-=m.p;x.mv.own[k]=1;x.mv.on[k]=1;fx5('buy20');toast(`🪑 ${m.n} já está no quarto.`)}
+    else if(x.mv.on[k])delete x.mv.on[k];else x.mv.on[k]=1;
+    save30();petRender20()});
+}
+/* --- 🏘️ visitar --- */
+async function likes30(force){
+  if(!camp3())return PS30.likes;if(!force&&Date.now()-PS30.likesAt<15000)return PS30.likes;PS30.likesAt=Date.now();
+  try{const L=await stList6('like30');const m={};(L||[]).forEach(r=>{const t=r.meta?.t;if(!t)return;(m[t]=m[t]||[]).push(r.meta)});PS30.likes=m}catch(e){console.warn('[T30] carinhos',e)}
+  return PS30.likes;
+}
+function friends30(){
+  const seen=new Set(),out=[];
+  (chars3()||[]).forEach(c=>{if(!c||!c.ownerId||c.ownerId===uid3()||gmChar6(c)||seen.has(c.ownerId))return;const p=d14(c).perseus;if(!p||!p.eq)return;seen.add(c.ownerId);out.push({u:c.ownerId,n:nm(c),p})});
+  return out;
+}
+async function visitTab30(body){
+  if(PS30.visit)return visitRoom30(body,PS30.visit);
+  const fr=friends30(),L=await likes30();const mine=(L[uid3()]||[]).length;
+  if(PS20.tab!=='visit')return;
+  body.innerHTML=`<div class="x30"><p class="pt-hint">Seu Perseus recebeu <b>${mine}</b> ${mine===1?'carinho':'carinhos'}. Visite o quarto dos amigos da mesa e deixe um carinho (1 por dia em cada).</p>
+    ${fr.length?`<ul class="x30-fr">${fr.map(f=>`<li><canvas width="160" height="140" data-fr30="${esc(f.u)}" aria-hidden="true"></canvas><div><b>${esc(f.n)}</b><span class="sub">❤️ ${(L[f.u]||[]).length} · ${Object.keys(f.p.x30?.mv?.on||{}).length} móveis</span></div><button type="button" class="btn small primary" data-v30="${esc(f.u)}">Visitar</button></li>`).join('')}</ul>`:'<p class="empty">Ninguém da mesa abriu o Perseus ainda. Quando abrirem, o quarto aparece aqui.</p>'}</div>`;
+  const draw=()=>$$('[data-fr30]').forEach(cv=>{const f=fr.find(q=>q.u===cv.dataset.fr30);if(f)roomCanvas30(cv,f.p)});if(SPR.ok)draw();else setTimeout(draw,400);
+  $$('[data-v30]').forEach(b=>b.onclick=()=>{PS30.visit=b.dataset.v30;petRender20()});
+}
+async function visitRoom30(body,u){
+  const f=friends30().find(q=>q.u===u);if(!f){PS30.visit=null;return visitTab30(body)}
+  const L=await likes30(),k='like30:'+u+':'+uid3()+':'+day30(),done=(L[u]||[]).some(m=>m.f===uid3()&&m.day===day30());
+  if(PS20.tab!=='visit')return;
+  body.innerHTML=`<div class="x30"><div class="x30-vhead"><button type="button" class="btn small" id="x30back">← Voltar</button><h3>Quarto do Perseus de ${esc(f.n)}</h3><span class="sub">❤️ ${(L[u]||[]).length}</span></div><canvas class="x30-room" id="x30vroom" width="480" height="420" aria-label="Quarto de ${esc(f.n)}"></canvas>
+    <button type="button" class="btn primary" id="x30like" ${done?'disabled':''}>${done?'💜 Carinho deixado hoje':'💜 Deixar carinho'}</button></div>`;
+  const cv=$('x30vroom');const loop=now=>{roomCanvas30(cv,f.p,now/1000);PS30.raf=requestAnimationFrame(loop)};if(SPR.ok)PS30.raf=requestAnimationFrame(loop);else setTimeout(()=>roomCanvas30(cv,f.p),400);
+  $('x30back').onclick=()=>{PS30.visit=null;petRender20()};
+  $('x30like').onclick=async()=>{const b=$('x30like');b.disabled=true;
+    try{await stPut6(k,'like30',{meta:{t:u,f:uid3(),n:mgName?.()||'',day:day30(),at:Date.now()}});(PS30.likes[u]=PS30.likes[u]||[]).push({t:u,f:uid3(),day:day30()});
+      try{mgSend('like30',{to:u,n:mgName?.()||'Alguém'})}catch(e){}
+      fx5('coin20');toast(`💜 Carinho deixado no Perseus de ${f.n}.`);progress30('like');petRender20()}
+    catch(e){b.disabled=false;toast('Não consegui deixar o carinho agora.')}};
+}
+{const _om30=mgOnMsg;mgOnMsg=function(p){
+  try{
+    if(p&&p.t==='like30'&&p.to===uid3()){toast(`💜 ${String(p.n||'Alguém').slice(0,32)} deixou um carinho no seu Perseus!`);PS30.likesAt=0;return}
+    if(p&&p.t==='bet30'&&p.id){(PS30.paid[p.id]=PS30.paid[p.id]||{})[p.from]=!!p.ok;return}
+  }catch(e){}
+  return _om30.apply(this,arguments);
+}}
+/* --- 🃏 cápsulas e álbum --- */
+function gachaTab30(body){
+  const x=x30(),have=Object.keys(x.cards).length;
+  body.innerHTML=`<div class="x30"><div class="x30-sub" role="tablist">${[['cap','🎰 Máquina'],['alb',`📒 Álbum ${have}/${CARDS30.length}`]].map(([k,l])=>`<button type="button" role="tab" class="pt-tab${PS30.gtab===k?' on':''}" aria-selected="${PS30.gtab===k}" data-g30="${k}">${l}</button>`).join('')}</div><div id="x30g"></div></div>`;
+  $$('[data-g30]').forEach(b=>b.onclick=()=>{PS30.gtab=b.dataset.g30;petRender20()});
+  const g=$('x30g');
+  if(PS30.gtab==='alb'){
+    g.innerHTML=`<p class="pt-hint">Repetidas viram Óbolos: Comum +${RAR30.c.dup}, Raro +${RAR30.r.dup}, Épico +${RAR30.e.dup}, Mítico +${RAR30.m.dup}.</p><ul class="x30-album">${CARDS30.map(c=>{const n=x.cards[c.id]||0;return`<li class="x30-card r-${c.r}${n?'':' lock'}" title="${n?esc(c.n):'Ainda não tem'}"><span class="x30-cico" aria-hidden="true">${n?c.ico:'?'}</span><b>${n?esc(c.n):'???'}</b><span class="x30-rar">${RAR30[c.r].n}${n>1?' · x'+n:''}</span></li>`}).join('')}</ul>`;
+    return;
+  }
+  g.innerHTML=`<div class="x30-mach"><div class="x30-capsule" id="x30cap" aria-hidden="true">🥚</div><p>Cada cápsula custa <b>🪙 ${CAP30}</b>. Chances: Comum ${RAR30.c.w}%, Raro ${RAR30.r.w}%, Épico ${RAR30.e.w}%, Mítico ${RAR30.m.w}%.</p><button type="button" class="btn primary" id="x30open">Girar a máquina · 🪙 ${CAP30}</button><div id="x30res" aria-live="polite"></div></div>`;
+  $('x30open').onclick=()=>{if(PS30.opening)return;const r=openCap30();if(!r)return;PS30.opening=true;const cap=$('x30cap'),res=$('x30res');cap.classList.add('shake');fx5('activate');
+    setTimeout(()=>{PS30.opening=false;if(!$('x30res'))return;cap.classList.remove('shake');cap.textContent='✨';
+      res.innerHTML=`<div class="x30-card big r-${r.c.r} reveal"><span class="x30-cico" aria-hidden="true">${r.c.ico}</span><b>${esc(r.c.n)}</b><span class="x30-rar">${RAR30[r.c.r].n}</span><span class="sub">${esc(r.c.d)}</span>${r.dup?`<span class="sub">Repetida: +${r.back} 🪙</span>`:'<span class="x30-new">Nova no álbum!</span>'}</div>`;
+      fx5(r.c.r==='m'||r.c.r==='e'?'mgWin':'confirm');if(r.c.r==='m')try{T3.perseusAnim?.react('win')}catch(e){}
+      const lb=document.querySelector('[data-g30="alb"]');if(lb)lb.textContent=`📒 Álbum ${Object.keys(x30().cards).length}/${CARDS30.length}`},reduce30()?50:1000)};
+}
+const reduce30=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+/* --- ✨ cosméticos --- */
+function cosTab30(body){
+  const x=x30(),eq=x.cos.eq,own=x.cos.own;
+  const btn=(cat,k,p,need)=>{const o=!!own[cat][k]||p===0&&!need,on=eq[cat]===k;return`<button type="button" class="btn small ${o?'':'primary'}" data-c30="${cat}|${k}" ${need&&!own[cat][k]?'disabled':''}>${on?'Tirar':o?'Usar':need?'Bloqueado':`Comprar · 🪙 ${p}`}</button>`};
+  body.innerHTML=`<div class="x30"><p class="pt-hint">Só visual: aparece para a mesa toda e não muda nenhuma regra do RPG.</p>
+   <section class="pt-shop-sec"><h3>Molduras animadas</h3><p class="sub">Na sua foto do card da mesa.</p><div class="pt-shop">${Object.entries(FR30).map(([k,f])=>`<article class="pt-item${eq.fr===k?' eq':''}"><div class="x30-frprev fr30 fr30-${k}"><span>${esc((nm(myArcChar?.()||{})||'?').slice(0,1))}</span></div><div class="pt-itx"><b>${f.ico} ${esc(f.n)}</b><span class="sub">${esc(f.d)}</span></div>${btn('fr',k,f.p)}</article>`).join('')}</div></section>
+   <section class="pt-shop-sec"><h3>Títulos</h3><p class="sub">Embaixo do seu nome na mesa e no Arcade.</p><div class="pt-shop">${Object.entries(TT30).map(([k,t])=>`<article class="pt-item${eq.tt===k?' eq':''}"><div class="pt-itx"><b class="tt30">${esc(t.n)}</b><span class="sub">${t.need?esc(t.need):''}</span></div>${btn('tt',k,t.p,t.need)}</article>`).join('')}</div></section>
+   <section class="pt-shop-sec"><h3>Efeitos de dado</h3><p class="sub">Partículas quando você rola um dado na mesa.</p><div class="pt-shop">${Object.entries(DX30).map(([k,d])=>`<article class="pt-item${eq.dx===k?' eq':''}"><div class="x30-dxprev" style="--c1:${d.col[0]};--c2:${d.col[1]}" aria-hidden="true">${d.ico}</div><div class="pt-itx"><b>${esc(d.n)}</b></div>${btn('dx',k,d.p)}</article>`).join('')}</div></section></div>`;
+  $$('[data-c30]').forEach(b=>b.onclick=()=>{const [cat,k]=b.dataset.c30.split('|'),def=(cat==='fr'?FR30:cat==='tt'?TT30:DX30)[k];
+    if(!own[cat][k]&&!(def.p===0&&!def.need)){if(def.need)return;if(PET.coins<def.p){toast(`🪙 Faltam ${def.p-PET.coins} Óbolos.`);fx5('error');return}PET.coins-=def.p;own[cat][k]=1;eq[cat]=k;fx5('buy20');toast(`✨ ${def.n} é seu e já está em uso.`)}
+    else eq[cat]=eq[cat]===k?'':k;
+    save30();petRender20();cosApply30(true)});
+}
+/* --- 🎯 missões --- */
+function missTab30(body){
+  const L=missions30();
+  body.innerHTML=`<div class="x30"><p class="pt-hint">Três desafios novos por dia. Valem Óbolos, nunca bônus no RPG.</p><ol class="x30-miss">${L.map(m=>`<li class="${m.done?'done':''}"><div class="grow"><b>${esc(m.def.t)}</b><i class="pt-xp"><em style="width:${Math.round(100*Math.min(1,m.p/m.def.n))}%"></em></i><span class="sub">${m.done?'Cumprida':`${m.def.k==='score'?'Melhor: ':''}${m.p} / ${m.def.n}`}</span></div><span class="x30-rew">${m.done?'✓':'🪙 '+m.def.r}</span></li>`).join('')}</ol>
+   <p class="sub">Apostas amigáveis: nas salas multiplayer de Vôlei, Ritual Rhythm (FNF), UNO, Rinha e Jogo da Velha, o anfitrião escolhe quanto cada um aposta. Quem vencer leva o pote.</p></div>`;
+}
+/* progresso de cuidados (alimentar) */
+{const _pf30=petEat20;petEat20=function(){const out=_pf30.apply(this,arguments);try{progress30('feed')}catch(e){}return out}}
+
+/* ---------- 🎰 apostas amigáveis ---------- */
+const betOk30=r=>!!r&&r.mode==='multi'&&BETG30.includes(r.g);
+{const _lb30=mgLobby;mgLobby=function(){
+  const out=_lb30.apply(this,arguments);
+  try{
+    const r=MG.room,m=$('mgMain');if(!r||!m)return out;
+    /* títulos ao lado do nome */
+    $$('.mg-players li',m).forEach((li,i)=>{const p=r.players[i];if(!p||li.querySelector('.tt30'))return;const tt=TT30[cosOf30(p.u).tt];if(tt)li.querySelector('b')?.insertAdjacentHTML('afterend',`<span class="tt30">${esc(tt.n)}</span>`)});
+    if(!betOk30(r))return out;
+    const host=r.host===uid3(),bet=Number(r.bet)||0,pot=bet*r.players.length;petLoad20();
+    const box=document.createElement('div');box.className='x30-bet';
+    box.innerHTML=`<p class="mgb-h">🎰 Aposta amigável (Óbolos do Arcade)</p>${host?`<div class="mg-diff mini" role="group" aria-label="Valor da aposta">${BETV30.map(v=>`<button type="button" class="mg-dchip${v===bet?' on':''}" data-bet30="${v}">${v?'🪙 '+v:'Sem aposta'}</button>`).join('')}</div>`:''}
+      <p class="sub">${bet?`Cada um aposta <b>🪙 ${bet}</b>. Pote: <b>🪙 ${pot}</b>. Quem vencer leva tudo; empate devolve.`:'Sem aposta nesta sala.'}${bet&&PET.coins<bet?` <b class="x30-warn">Você tem só 🪙 ${PET.coins}: vai jogar fora do pote.</b>`:''}</p>`;
+    (m.querySelector('.mg-rule')||m.querySelector('.mg-lbtn'))?.after(box);
+    $$('[data-bet30]',box).forEach(b=>b.onclick=()=>{MG.room.bet=Number(b.dataset.bet30)||0;mgPublish();mgLobby()});
+  }catch(e){console.warn('[T30] aposta',e)}
+  return out;
+}}
+{const _sl30=mgStartLocal;mgStartLocal=function(room,seed,t0){
+  const out=_sl30.apply(this,arguments);
+  try{
+    const bet=Number(room?.bet)||0,key=room.id+':'+seed;
+    if(betOk30(room)&&bet>0&&room.players.some(p=>p.u===uid3())&&!PS30.betDone[key]){
+      petLoad20();const x=x30(),ok=PET.coins>=bet;
+      if(ok){PET.coins-=bet;x.bets[key]={bet,at:Date.now()};save30();toast(`🎰 Você apostou 🪙 ${bet}. Boa sorte!`)}else toast('🎰 Sem Óbolos para a aposta: você joga fora do pote.');
+      PS30.betDone[key]={bet,ok,n:room.players.length};(PS30.paid[room.id]=PS30.paid[room.id]||{})[uid3()]=ok;PS30.cur=key;
+      mgSend('bet30',{id:room.id,ok});
+    }else PS30.cur=bet>0?key:null;
+  }catch(e){console.warn('[T30] aposta início',e)}
+  return out;
+}}
+{const _so30=mgShowOver;mgShowOver=function(res){
+  const out=_so30.apply(this,arguments);
+  try{
+    const g=MG.room?.g||MG.C?.room?.g||'',mine=(res?.rows||[]).find(q=>q.u===uid3());
+    if(mine){progress30('play',{g});progress30('score',{g,score:mine.s});if(mine.w)progress30('win',{g,win:true})}
+    const key=PS30.cur,b=key&&PS30.betDone[key];
+    if(b&&!b.settled){b.settled=true;const id=key.split(':')[0],paid=PS30.paid[id]||{},x=x30();
+      const payers=Object.keys(paid).filter(u=>paid[u]),pot=b.bet*Math.max(payers.length,1);
+      const wins=(res.rows||[]).filter(q=>q.w&&paid[q.u]);let line='';
+      if(b.ok){
+        if(!wins.length){PET.coins+=b.bet;line=`🎰 Ninguém do pote venceu: sua aposta de 🪙 ${b.bet} voltou.`}
+        else if(wins.some(q=>q.u===uid3())){const prize=Math.floor(pot/wins.length);PET.coins+=prize;PET.st.earned=(PET.st.earned||0)+prize-b.bet;line=`🎰 Você levou o pote: +🪙 ${prize}!`;fx5('coin20')}
+        else line=`🎰 Perdeu a aposta (−🪙 ${b.bet}). Revanche?`;
+        delete x.bets[key];save30();petHeader20?.();
+      }else line=wins.length?`🎰 ${esc(wins.map(q=>q.n).join(', '))} levou o pote de 🪙 ${pot}.`:'';
+      const card=$('mgOver')?.querySelector('.mg-ocard');if(card&&line)card.querySelector('.mg-rank')?.insertAdjacentHTML('afterend',`<p class="x30-betres">${line}</p>`);
+    }
+  }catch(e){console.warn('[T30] fim de jogo',e)}
+  return out;
+}}
+
+/* ---------- ✨ cosméticos na mesa ---------- */
+function cosApply30(force){
+  const c=camp3();if(!c)return;
+  $$('#tableCharacters .table-char').forEach(card=>{
+    const ch=charById(card.dataset.cid);if(!ch||!ch.ownerId||gmChar6(ch))return;
+    const eq=cosOf30(ch.ownerId),av=card.querySelector('.tc-head>:first-child'),sig=[eq.fr||'',eq.tt||''].join('|');
+    if(!force&&card.dataset.c30===sig&&(!eq.fr||av?.classList.contains('fr30-'+eq.fr)))return;card.dataset.c30=sig;
+    if(av){[...av.classList].filter(k=>k.startsWith('fr30-')).forEach(k=>av.classList.remove(k));av.classList.toggle('fr30',!!eq.fr);if(eq.fr)av.classList.add('fr30-'+eq.fr)}
+    let t=card.querySelector('.tc-id .tt30');const tt=TT30[eq.tt];
+    if(tt){if(!t){t=document.createElement('span');t.className='tt30';card.querySelector('.tc-id h3')?.after(t)}t.textContent=tt.n}else t?.remove();
+  });
+}
+setInterval(()=>{try{cosApply30(false)}catch(e){}},1600);
+/* efeito de dado: partículas na rolagem (pelo dono do personagem) */
+{const _rf30=window.tulpaRollFx;window.tulpaRollFx=function(box,o={}){
+  const out=_rf30?_rf30.apply(this,arguments):undefined;
+  try{
+    const who=(o.who||[])[0]||'',ch=(chars3()||[]).find(c=>nm(c)===who);const u=ch?.ownerId||(who?'':uid3());
+    const dx=DX30[cosOf30(u||uid3()).dx];if(!dx||!box)return out;
+    box.classList.add('dx30');box.style.setProperty('--dx1',dx.col[0]);box.style.setProperty('--dx2',dx.col[1]);
+    if(reduce30())return out;
+    const n=18;for(let i=0;i<n;i++){const s=document.createElement('i');s.className='dx30-p';const a=Math.random()*Math.PI*2,r=60+Math.random()*90;
+      s.style.cssText=`--x:${Math.cos(a)*r}px;--y:${Math.sin(a)*r}px;background:${dx.col[i%dx.col.length]};animation-delay:${Math.random()*.15}s`;box.append(s);setTimeout(()=>s.remove(),1300)}
+  }catch(e){}
+  return out;
+}}
+console.info('[Tulpa] Etapa 30 carregada');
+T3.mg30={lobby:()=>mgLobby(),start:(r,s,t)=>mgStartLocal(r,s,t),over:res=>mgShowOver(res)};
 
 window.tulpaPubSummary=pubSummary;
 Object.assign(T3,{postInitiative,rescueAction,isDyingCh,showRollPopup,announceRoll,TALENT_TARGETS,E,setResource,STATUS_DEFS,parseSkillBonuses,resolveFor,processRow,CB,TURN,skillCalc3,sendFx,performAttack,doDefense,startAttack,UNARMED,WEAPONS,renderCombatUI,applyFxLocal,processTurnStart,charById});
