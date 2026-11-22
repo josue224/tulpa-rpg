@@ -1,51 +1,329 @@
 /* ==========================================================================
-   TULPA RPG — Onda 4 · Tulpa Arcade (vitrine) + barra de ferramentas do mapa no celular
-   Carrega DEPOIS de css/12-docs.css. Só estrutura: não mexe em cores nem nos
-   jogos em si (#mgRoot em tela cheia durante a partida continua igual).
+   TULPA RPG — Onda 4 · Tulpa Arcade + Quarto do Perseus + Mapa Tático Mobile
+   Carrega DEPOIS de css/12-docs.css.
+
+   REGRA DE OURO: zero cores fixas de tema — toda superfície, borda, destaque
+   e vidro herda dinamicamente as variáveis das estéticas (css/08 + css/10).
+   Não altera física, canvas nem tela cheia das partidas (#mgCv / .mg-full).
    ========================================================================== */
 
-/* ---------- 1. Arcade: vitrine alinhada ---------- */
-#mgRoot .mg-hub{gap:var(--sp-4,16px);max-width:1240px}
-/* filtros (dificuldade + atalhos) numa faixa limpa */
-#mgRoot .mg-gdrow{
-  grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2,8px) var(--sp-3,12px);
-  padding:var(--sp-3,12px) var(--sp-4,16px);margin:0;
+/* ---------- 1. TULPA ARCADE (#mgRoot): Vitrine & Filtros Limpos ---------- */
+#mgRoot .mg-top{
+  display:flex;align-items:center;gap:var(--sp-2,8px);
+  min-height:54px;padding:6px var(--sp-4,16px);
+  background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 95%,var(--bg,#090b10));
+  border-bottom:1px solid var(--border-subtle,var(--line,#2a3442));
 }
-#mgRoot .mg-gdrow>.sub{flex:1 0 100%;margin:0;order:9}
-#mgRoot .mg-gdrow .mg-gd{display:flex;flex-wrap:wrap;gap:var(--sp-2,8px)}
-#mgRoot .mg-gdrow #mgAchBtn{margin-left:auto}
-/* cards da mesma altura, botões sempre no pé e do mesmo tamanho */
-#mgRoot .mg-grid{gap:var(--sp-4,16px);grid-auto-rows:1fr}
-#mgRoot .mg-card{padding:var(--sp-4,16px);gap:var(--sp-3,12px)}
-#mgRoot .mg-card .mg-txt{flex:1 1 auto}
+html body.t3-pal[data-ae-glass="1"] #mgRoot .mg-top{
+  background:color-mix(in srgb,var(--panel,#11151d) 76%,transparent);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);
+  backdrop-filter:blur(14px) saturate(1.4);
+}
+#mgRoot .mg-top #mgTitle{
+  flex:1 1 auto;min-width:0;
+  font-size:var(--fs-lg,17px);line-height:var(--lh-tight,1.22);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#mgRoot .mg-tb{
+  min-width:38px;min-height:38px;border-radius:var(--shell-r,10px);
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  transition:background-color .14s ease,border-color .14s ease;
+}
+#mgRoot .mg-tb:hover{
+  background:var(--surf-hover,rgba(255,255,255,.08));
+  border-color:var(--border-strong,var(--accent,#b7d7d5));
+}
+
+/* Grade principal da vitrine: [Catálogo de jogos] [Salas & Placar] */
+#mgRoot .mg-hub{
+  max-width:1280px;margin:0 auto;
+  gap:var(--sp-4,16px);
+  align-items:start;
+}
+
+/* Faixa de filtros (Dificuldade + Atalhos do Perseus/Conquistas) */
+#mgRoot .mg-gdrow{
+  grid-column:1 / -1;
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:var(--sp-2,8px) var(--sp-3,12px);
+  padding:var(--sp-3,12px) var(--sp-4,16px);margin:0;
+  background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 94%,var(--bg,#090b10));
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  border-radius:var(--surface-r,12px);
+}
+#mgRoot .mg-gdrow>.sub{flex:1 0 100%;margin:2px 0 0;order:9;font-size:var(--fs-xs,12px);opacity:.82}
+#mgRoot .mg-gdrow .mg-gd{display:flex;flex-wrap:wrap;gap:6px}
+#mgRoot .mg-gdrow .mg-gdb{
+  min-height:34px;padding:0 11px;
+  border-radius:999px;
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  font-size:var(--fs-xs,12px);font-weight:600;
+  transition:border-color .14s ease,background-color .14s ease,transform .12s ease;
+}
+#mgRoot .mg-gdrow .mg-gdb.on{
+  border-color:var(--border-strong,var(--accent,#b7d7d5));
+  background:var(--surf-active,rgba(255,255,255,.12));
+}
+#mgRoot .mg-gdrow #ptHubBtn{margin-left:auto}
+#mgRoot .mg-gdrow #mgAchBtn{margin-left:0}
+#mgRoot .mg-gdrow:not(:has(#ptHubBtn)) #mgAchBtn{margin-left:auto}
+
+/* Catálogo de cards: altura uniforme, hierarquia limpa e botões sempre no rodapé */
+#mgRoot .mg-games{min-width:0}
+#mgRoot .mg-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(265px,1fr));
+  gap:var(--sp-3,12px);
+  grid-auto-rows:1fr;
+}
+#mgRoot .mg-card{
+  display:flex;flex-direction:column;gap:var(--sp-3,12px);
+  padding:var(--sp-4,16px);margin:0;
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  border-radius:var(--surface-r,12px);
+  transition:border-color .16s ease,transform .16s ease;
+}
+#mgRoot .mg-card:not(.soon):hover{
+  border-color:var(--border-strong,var(--accent,#b7d7d5));
+  transform:translateY(-2px);
+}
+#mgRoot .mg-card .mg-ico{
+  width:46px;height:46px;flex:none;
+  display:grid;place-items:center;
+  font-size:24px;
+  border-radius:var(--shell-r,10px);
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 12%,transparent);
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+}
+#mgRoot .mg-card .mg-txt{flex:1 1 auto;min-width:0}
+#mgRoot .mg-card .mg-txt h3{
+  margin:0 0 6px;font-size:var(--fs-md,15px);line-height:var(--lh-tight,1.25);
+}
+#mgRoot .mg-card .mg-txt p{
+  margin:0;font-size:var(--fs-xs,12.5px);line-height:1.45;opacity:.88;
+}
+#mgRoot .mg-card .mg-rec{
+  margin-top:8px!important;padding:4px 8px;display:inline-block;
+  border-radius:999px;font-size:var(--fs-2xs,11px)!important;
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 11%,transparent);
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+}
 #mgRoot .mg-card .mg-cbtn{
-  margin-top:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:var(--sp-2,8px);
+  margin-top:auto;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:var(--sp-2,8px);
 }
 #mgRoot .mg-card .mg-cbtn .btn{
-  min-height:var(--touch,44px);display:flex;align-items:center;justify-content:center;
+  min-height:var(--touch,44px);
+  display:flex;align-items:center;justify-content:center;
   text-align:center;white-space:normal;line-height:var(--lh-tight,1.25);
 }
-#mgRoot .mg-side{display:flex;flex-direction:column;gap:var(--sp-3,12px);align-self:start;min-width:0}
-
-@media (max-width:860px){
-  /* filtros primeiro, depois salas, depois os jogos (antes as salas vinham antes de tudo) */
-  #mgRoot .mg-gdrow{order:-2}
-  #mgRoot .mg-side{order:-1}
-  #mgRoot .mg-gdrow #mgAchBtn{margin-left:0}
-  #mgRoot .mg-card{flex-direction:column;flex-wrap:nowrap}
-  #mgRoot .mg-main{padding:var(--sp-3,12px) var(--sp-3,12px) calc(var(--sp-4,16px) + env(safe-area-inset-bottom,0px))}
+#mgRoot .mg-soonh{
+  margin:var(--sp-5,24px) 0 var(--sp-3,12px);
+  font-size:var(--fs-sm,13px);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-dim,var(--muted,#8d9aaa));
 }
 
-/* ---------- 2. Mapa da Mesa no celular: ferramentas numa única faixa rolável ---------- */
+/* Coluna lateral (Salas abertas + Placar da Pausa) */
+#mgRoot .mg-side{
+  display:flex;flex-direction:column;gap:var(--sp-3,12px);
+  align-self:start;min-width:0;
+}
+#mgRoot .mg-side>#mgRooms,
+#mgRoot .mg-side>.mg-board{
+  padding:var(--sp-4,16px);
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  border-radius:var(--surface-r,12px);
+  background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 92%,var(--bg,#090b10));
+}
+
+/* ---------- 2. PERSEUS (.pt): Quarto, Loja, Conquistas & Ranking ---------- */
+#mgRoot .pt{
+  max-width:1160px;margin:0 auto;
+  display:flex;flex-direction:column;gap:var(--sp-4,16px);
+}
+
+/* Cabeçalho do Perseus: Óbolos + Nível + Abas */
+#mgRoot .pt-head{
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2,8px) var(--sp-4,16px);
+  padding:var(--sp-3,12px) var(--sp-4,16px);
+  background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 94%,var(--bg,#090b10));
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  border-radius:var(--surface-r,12px);
+}
+#mgRoot .pt-purse{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:999px;
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 14%,transparent);
+  border:1px solid var(--border-strong,var(--line,#2a3442));
+  font-variant-numeric:tabular-nums;
+}
+#mgRoot .pt-lvl{
+  display:flex;align-items:center;gap:var(--sp-2,8px);
+  font-size:var(--fs-xs,12px);
+}
+#mgRoot .pt-tabs{
+  display:flex;flex-wrap:nowrap;gap:4px;margin-left:auto;
+  overflow-x:auto;scrollbar-width:none;max-width:100%;
+}
+#mgRoot .pt-tabs::-webkit-scrollbar{display:none}
+#mgRoot .pt-tab{
+  flex:none;min-height:38px;padding:0 var(--sp-3,12px);
+  border:1px solid transparent;border-radius:var(--shell-r,10px);
+  background:transparent;color:var(--ink-dim,var(--muted,#8d9aaa));
+  font:600 var(--fs-sm,13px)/1 var(--f-ui,inherit);white-space:nowrap;
+  transition:background-color .14s ease,color .14s ease,border-color .14s ease;
+}
+#mgRoot .pt-tab:hover{
+  color:var(--text,#edf2f7);background:var(--surf-hover,rgba(255,255,255,.06));
+}
+#mgRoot .pt-tab.on{
+  color:var(--text,#edf2f7);
+  background:var(--surf-active,rgba(255,255,255,.1));
+  border-color:var(--border-strong,var(--accent,#b7d7d5));
+}
+
+/* Quarto do Perseus: palco canvas + painel lateral equilibrados */
+#mgRoot .pt-room{
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.95fr);
+  gap:var(--sp-4,16px);align-items:start;
+}
+#mgRoot .pt-stage{
+  border-radius:var(--surface-r,12px);overflow:hidden;
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  box-shadow:0 14px 36px -18px rgba(0,0,0,.55);
+}
+#mgRoot .pt-side{
+  display:flex;flex-direction:column;gap:var(--sp-3,12px);min-width:0;
+}
+#mgRoot .pt-bars,
+#mgRoot .pt-panel{
+  padding:var(--sp-3,12px) var(--sp-4,16px);
+  background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 92%,var(--bg,#090b10));
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  border-radius:var(--surface-r,12px);
+}
+#mgRoot .pt-acts{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2,8px);
+}
+#mgRoot .pt-act{min-height:var(--touch,44px)}
+#mgRoot .pt-act.on{
+  border-color:var(--border-strong,var(--accent,#b7d7d5));
+  background:var(--surf-active,rgba(255,255,255,.12));
+}
+#mgRoot .pt-food{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:var(--sp-2,8px);
+}
+#mgRoot .pt-tools{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-2,8px);
+}
+
+/* Loja de Visual (.pt-shopwrap) */
+#mgRoot .pt-shopwrap{display:flex;flex-direction:column;gap:var(--sp-5,24px)}
+#mgRoot .pt-shop-sec h3{
+  margin:0 0 var(--sp-3,12px);
+  font-size:var(--fs-sm,13px);letter-spacing:.1em;text-transform:uppercase;
+  padding-bottom:var(--sp-2,8px);
+  border-bottom:1px solid var(--border-subtle,var(--line,#2a3442));
+}
+#mgRoot .pt-shop{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:var(--sp-3,12px);grid-auto-rows:1fr;
+}
+#mgRoot .pt-item{
+  display:flex;flex-direction:column;gap:var(--sp-2,8px);
+  padding:var(--sp-3,12px);
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  border-radius:var(--surface-r,12px);
+  background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 92%,var(--bg,#090b10));
+  transition:border-color .15s ease,transform .15s ease;
+}
+#mgRoot .pt-item:hover{border-color:var(--border-strong,var(--accent,#b7d7d5));transform:translateY(-2px)}
+#mgRoot .pt-item.eq{border-color:var(--accent,#b7d7d5);box-shadow:0 0 0 1px var(--accent,#b7d7d5)}
+#mgRoot .pt-item .pt-itx{flex:1 1 auto;display:flex;flex-direction:column;gap:3px}
+#mgRoot .pt-item .btn{margin-top:auto;min-height:38px;width:100%}
+
+/* Conquistas & Ranking (.pt-ach / .pt-rank) */
+#mgRoot .pt-ach,
+#mgRoot .pt-rank{display:flex;flex-direction:column;gap:var(--sp-3,12px)}
+#mgRoot .pt-filt{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+#mgRoot .pt-chip{
+  min-height:36px;padding:0 12px;border-radius:999px;
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  font-size:var(--fs-xs,12px);font-weight:600;
+  transition:border-color .14s ease,background-color .14s ease;
+}
+#mgRoot .pt-chip.on{
+  border-color:var(--border-strong,var(--accent,#b7d7d5));
+  background:var(--surf-active,rgba(255,255,255,.12));
+}
+#mgRoot .pt-case{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));
+  gap:var(--sp-2,8px);
+}
+#mgRoot .pt-achgrid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:var(--sp-3,12px);padding:0;margin:0;list-style:none;
+}
+#mgRoot .pt-rk{display:flex;flex-direction:column;gap:var(--sp-2,8px);padding:0;margin:0;list-style:none}
+#mgRoot .pt-rk>li{
+  padding:var(--sp-3,12px) var(--sp-4,16px);
+  border:1px solid var(--border-subtle,var(--line,#2a3442));
+  border-radius:var(--surface-r,12px);
+  background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 92%,var(--bg,#090b10));
+}
+#mgRoot .pt-rk>li.me{border-color:var(--border-strong,var(--accent,#b7d7d5))}
+
+/* ---------- 3. MOBILE (≤ 860px): Arcade, Perseus & Barra do Mapa ---------- */
 @media (max-width:860px){
+  /* Arcade mobile: filtros -> salas -> jogos */
+  #mgRoot .mg-top{padding:6px var(--sp-2,8px)}
+  #mgRoot .mg-main{
+    padding:var(--sp-3,12px) var(--sp-3,12px) calc(var(--sp-5,24px) + env(safe-area-inset-bottom,0px));
+  }
+  #mgRoot .mg-gdrow{order:-2;padding:var(--sp-3,12px)}
+  #mgRoot .mg-side{order:-1}
+  #mgRoot .mg-gdrow #ptHubBtn,
+  #mgRoot .mg-gdrow #mgAchBtn{margin-left:0;flex:1 1 auto}
+  #mgRoot .mg-grid{grid-template-columns:minmax(0,1fr)}
+  #mgRoot .mg-card{flex-direction:column;flex-wrap:nowrap}
+
+  /* Perseus mobile */
+  #mgRoot .pt-head{padding:var(--sp-2,8px) var(--sp-3,12px);gap:var(--sp-2,8px)}
+  #mgRoot .pt-tabs{margin-left:0;width:100%}
+  #mgRoot .pt-tab{min-height:var(--touch,44px)}
+  #mgRoot .pt-room{grid-template-columns:minmax(0,1fr)}
+  #mgRoot .pt-shop{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2,8px)}
+  #mgRoot .pt-achgrid{grid-template-columns:minmax(0,1fr)}
+
+  /* Barra de ferramentas do mapa tático no celular: 1 faixa rolável com toque de 44px */
   body.mesa-view #mapStage .map-tools{
-    display:flex;flex-direction:row;align-items:center;gap:var(--sp-2,8px);
-    left:var(--sp-2,8px);right:var(--sp-2,8px);top:var(--sp-2,8px);width:auto;max-width:none;
-    overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:var(--sp-1,4px) var(--sp-2,8px);
+    display:flex;flex-direction:row;align-items:center;gap:6px;
+    left:var(--sp-2,8px);right:var(--sp-2,8px);top:var(--sp-2,8px);
+    width:auto;max-width:none;
+    overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+    padding:4px 28px 4px 6px;
+    border-radius:var(--shell-r,10px);
+    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);
+    mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);
+  }
+  html body.t3-pal[data-ae-glass="1"].mesa-view #mapStage .map-tools{
+    -webkit-backdrop-filter:blur(12px) saturate(1.35);
+    backdrop-filter:blur(12px) saturate(1.35);
   }
   body.mesa-view #mapStage .map-tools::-webkit-scrollbar{display:none}
-  /* esmaece a borda direita para indicar que a faixa rola (modos Edição/Mestre/Players ficam depois) */
-  body.mesa-view #mapStage .map-tools{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
-  body.mesa-view #mapStage .map-tools .mt-row{flex:none;flex-wrap:nowrap;margin:0}
-  body.mesa-view #mapStage .map-tools .mt-btn{min-width:var(--touch,44px);min-height:var(--touch,44px)}
+  body.mesa-view #mapStage .map-tools .mt-row{flex:none;flex-wrap:nowrap;margin:0;gap:4px}
+  body.mesa-view #mapStage .map-tools .mt-btn{
+    min-width:var(--touch,44px);min-height:var(--touch,44px);
+    border-radius:min(var(--shell-r,10px),10px);
+  }
+}
+
+@media (max-width:460px){
+  #mgRoot .pt-shop{grid-template-columns:minmax(0,1fr)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #mgRoot .mg-card,#mgRoot .pt-item{transition:none}
+  #mgRoot .mg-card:hover,#mgRoot .pt-item:hover{transform:none}
 }
