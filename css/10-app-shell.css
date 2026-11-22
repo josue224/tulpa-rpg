@@ -1,0 +1,227 @@
+/* ==========================================================================
+   TULPA RPG — Onda 1 · App Shell + base estrutural + Mesa (VTT)
+   Carrega DEPOIS de 09-visual-etapas-26-39.css.
+
+   REGRA DE OURO: este arquivo só define ESTRUTURA (grid, espaçamento, escala
+   tipográfica, painéis). Cores, bordas, texturas e fontes de tema vêm das
+   variáveis que as estéticas (css/08 + js/38) já definem:
+   --bg --panel --panel2 --line --muted --text --accent --accent2 --ae-brad
+   --f-ui --f-display. Nunca fixe uma cor aqui.
+   ========================================================================== */
+
+/* ---------- 1. Tokens estruturais (escala 4/8 px) ---------- */
+:root{
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--sp-6:32px;--sp-7:48px;
+  --fs-xs:12px;--fs-sm:13px;--fs-md:15px;--fs-lg:18px;--fs-xl:24px;
+  --lh-tight:1.25;--lh-body:1.55;
+  --rail-w:64px;--rail-w-open:216px;--bar-h:60px;
+  --shell-r:var(--ae-brad,12px);
+  --shell-z:40;
+  --touch:44px;
+}
+
+/* ---------- 2. App Shell: rail (desktop) e barra inferior (celular) ---------- */
+#appRail60[hidden],#appMore60[hidden]{display:none!important}
+#appRail60{
+  position:fixed;z-index:var(--shell-z);top:0;left:0;bottom:0;width:var(--rail-w);
+  display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-3) var(--sp-2);
+  background:var(--panel,#11151d);color:var(--text,#edf2f7);
+  border-right:1px solid var(--line,#2a3442);
+  font-family:var(--f-ui,inherit);
+  overflow:hidden;
+  transition:width .18s ease,box-shadow .18s ease;
+}
+#appRail60.open{width:var(--rail-w-open);box-shadow:0 0 0 100vmax transparent,12px 0 32px -16px #0007}
+#appRail60 .rl-brand{
+  display:flex;align-items:center;gap:var(--sp-3);min-height:var(--touch);padding:0 var(--sp-2);
+  border:0;background:none;color:inherit;border-radius:var(--shell-r);text-align:left;
+}
+#appRail60 .rl-brand .rl-ico{color:var(--accent,#b7d7d5)}
+#appRail60 .rl-camp{display:none;min-width:0;line-height:var(--lh-tight)}
+#appRail60.open .rl-camp{display:block}
+#appRail60 .rl-camp b{display:block;font-size:var(--fs-sm);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appRail60 .rl-camp small{display:block;font-size:var(--fs-xs);color:color-mix(in srgb,var(--text,#edf2f7) 78%,var(--panel,#11151d));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#appRail60 .rl-list{display:flex;flex-direction:column;gap:var(--sp-1);margin:0;padding:0;list-style:none}
+#appRail60 .rl-sep{height:1px;margin:var(--sp-2) var(--sp-2);background:var(--line,#2a3442);border:0;flex:none}
+#appRail60 .rl-grow{flex:1 1 auto;min-height:var(--sp-2)}
+.rl-item{
+  position:relative;display:flex;align-items:center;gap:var(--sp-3);width:100%;
+  min-height:var(--touch);padding:0 var(--sp-2);margin:0;
+  border:1px solid transparent;border-radius:var(--shell-r);
+  background:transparent;color:color-mix(in srgb,var(--text,#edf2f7) 84%,var(--panel,#11151d));
+  font:600 var(--fs-sm)/var(--lh-tight) var(--f-ui,inherit);text-align:left;white-space:nowrap;
+  transition:background-color .15s ease,color .15s ease,border-color .15s ease;
+}
+.rl-item[hidden]{display:none!important}
+.rl-item:hover{color:var(--text,#edf2f7);background:color-mix(in srgb,var(--accent,#b7d7d5) 10%,transparent)}
+.rl-item[aria-current="page"]{
+  color:var(--text,#edf2f7);
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 18%,transparent);
+  border-color:color-mix(in srgb,var(--accent,#b7d7d5) 45%,transparent);
+}
+.rl-item[aria-current="page"]::before{
+  content:"";position:absolute;left:-9px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--accent,#b7d7d5);
+}
+.rl-item:focus-visible,#appRail60 .rl-brand:focus-visible{outline:2px solid var(--accent,#b7d7d5);outline-offset:2px}
+.rl-ico{flex:none;width:24px;height:24px;display:grid;place-items:center}
+.rl-ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rl-lbl{display:none;overflow:hidden;text-overflow:ellipsis}
+.rl-sh{display:none}
+#appRail60.open .rl-lbl{display:block}
+#appRail60 .rl-collapse svg{transition:transform .18s ease}
+#appRail60:not(.open) .rl-collapse svg{transform:rotate(180deg)}
+.rl-item.rl-more,#appMore60{display:none}
+
+/* conteúdo cede espaço ao rail (o rail aberto sobrepõe, não empurra o mapa) */
+body.has-shell{padding-left:var(--rail-w)}
+body.has-shell .topbar{position:sticky}
+
+/* o rail substitui os cards de atalho do hub */
+body.has-shell #campaignHub>.portal-grid{display:none}
+body.has-shell .t3-back-portal{display:none!important}
+
+/* ---------- 3. Mesa (VTT): mapa em primeiro lugar ---------- */
+body.mesa-view #portal{padding:var(--sp-3) var(--sp-4) var(--sp-5)}
+body.mesa-view #portal .portal-wrap{max-width:none;padding:0}
+body.mesa-view #portal .portal-brand,
+body.mesa-view #campaignHub>.hero{display:none!important}
+
+/* menos caixas aninhadas: o painel da mesa vira apenas uma área de trabalho */
+body.mesa-view #tablePanel,body.mesa-view.t3-mobile #tablePanel{
+  background:none;border:0;box-shadow:none;padding:0!important;margin:0;-webkit-backdrop-filter:none;backdrop-filter:none;
+  display:flex;flex-direction:column;gap:var(--sp-3);
+}
+body.mesa-view #tablePanel>.panel-head{margin:0;min-height:0;justify-content:flex-end;order:2;padding:0}
+body.mesa-view #tablePanel>.panel-head h2{display:none}
+body.mesa-view #tablePanel>.panel-head .pill{font-size:var(--fs-xs);padding:2px var(--sp-2)}
+body.mesa-view #tablePanel>.sub{display:none}
+body.mesa-view #tablePanel>#mesaBar{order:0}
+body.mesa-view #tablePanel>#mesaWrap{order:1}
+
+/* barra de ferramentas da mesa: uma linha limpa */
+body.mesa-view #mesaBar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2) var(--sp-4);
+  padding:var(--sp-2) var(--sp-3);margin:0;border-radius:var(--shell-r);
+}
+body.mesa-view #mesaBar .mb-group{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2);margin:0}
+body.mesa-view #mesaBar .mb-right{margin-left:auto}
+body.mesa-view #mesaBar .mb-shell60{margin-left:0}
+body.mesa-view #mesaBar .mb-shell60 .btn[aria-pressed="true"]{
+  border-color:var(--accent,#b7d7d5);
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 22%,transparent);
+}
+
+/* grade: [jogadores] [mesa central] [jogadores] */
+body.mesa-view #mesaWrap{
+  --seat:184px;
+  grid-template-columns:var(--seat) minmax(0,1fr) var(--seat);
+  gap:var(--sp-3);align-items:start;
+}
+body.mesa-view.mesa-seats-off #mesaWrap{grid-template-columns:0 minmax(0,1fr) 0;column-gap:0}
+body.mesa-view.mesa-seats-off #mesaWrap .table-char.seat{display:none!important}
+
+/* centro: mestre + combate + mapa, e painel (dock) retrátil à direita */
+body.mesa-view #mesaCenter{
+  display:grid;grid-template-columns:minmax(0,1fr) var(--dockw,0px);
+  column-gap:0;align-items:start;align-content:start;row-gap:var(--sp-3);
+}
+body.mesa-view.mesa-dock-on #mesaCenter{--dockw:min(380px,30vw)}
+body.mesa-view #mesaCenter>#mesaM,
+body.mesa-view #mesaCenter>#cbBar,
+body.mesa-view #mesaCenter>#mapStage,
+body.mesa-view #mesaCenter>#cbHud{grid-column:1}
+body.mesa-view #mesaCenter>#mesaDock{
+  grid-column:2;grid-row:1 / span 6;margin-left:var(--sp-3);
+  position:sticky;top:var(--sp-3);align-self:start;
+  height:calc(100vh - var(--sp-5));max-height:calc(100vh - var(--sp-5));
+  display:flex;flex-direction:column;overflow:hidden;
+}
+body.mesa-view #mesaCenter>#mesaDock .dock-pane{overflow:auto;min-height:0;flex:1 1 auto}
+body.mesa-view:not(.mesa-dock-on) #mesaCenter>#mesaDock{display:none}
+
+body.mesa-view #mesaCenter>#mesaDock .dock-tabs{flex:none;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+body.mesa-view #mesaCenter>#mesaDock .dock-tabs>*{flex:none}
+
+/* mestre compacto */
+body.mesa-view #mesaM{
+  width:100%;align-self:stretch;padding:var(--sp-2) var(--sp-3);
+  flex-direction:row;align-items:center;flex-wrap:wrap;gap:var(--sp-2) var(--sp-4);
+}
+body.mesa-view #mesaM .m-main{flex:1 1 auto;min-width:0}
+body.mesa-view #mesaM .m-av .av{--s:44px}
+body.mesa-view #mesaM .m-id b{font-size:var(--fs-lg);line-height:var(--lh-tight)}
+body.mesa-view #cbBar{margin:0;padding-block:var(--sp-1)}
+
+/* mapa: a maior área possível, sem perder a proporção 16:10 */
+body.mesa-view #mapStage:not(:fullscreen):not(.cb-full){
+  width:min(100%,calc((100vh - 232px) * 1.6));margin-inline:auto;
+  max-height:none;aspect-ratio:16 / 10;
+}
+
+/* ---------- 4. Tablet estreito: rail sempre recolhido, seats menores ---------- */
+@media (max-width:1180px){
+  body.mesa-view #mesaWrap{--seat:164px}
+  body.mesa-view.mesa-dock-on #mesaCenter{--dockw:min(340px,34vw)}
+}
+
+/* ---------- 5. Celular / janela estreita: barra inferior + gaveta ---------- */
+@media (max-width:860px){
+  :root{--shell-z:50}
+  body.has-shell{padding-left:0;padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom,0px))}
+  #appRail60,#appRail60.open{
+    top:auto;left:0;right:0;bottom:0;width:auto;height:calc(var(--bar-h) + env(safe-area-inset-bottom,0px));
+    flex-direction:row;align-items:stretch;gap:0;padding:0 var(--sp-1) env(safe-area-inset-bottom,0px);
+    border-right:0;border-top:1px solid var(--line,#2a3442);box-shadow:none;
+  }
+  #appRail60 .rl-brand,#appRail60 .rl-sep,#appRail60 .rl-grow,#appRail60 .rl-collapse{display:none!important}
+  #appRail60 .rl-list{display:contents}
+  #appRail60 .rl-list:nth-of-type(n+3){display:none}
+  #appRail60 .rl-list>li{flex:1 1 0;min-width:0;display:flex}
+  .rl-item{
+    flex-direction:column;justify-content:center;gap:2px;padding:var(--sp-1);
+    font-size:11px;text-align:center;border-radius:var(--shell-r);min-height:var(--bar-h);
+  }
+  .rl-lbl,#appRail60.open .rl-lbl{display:block;max-width:100%}
+  #appRail60 .rl-item .rl-sh{display:block;max-width:100%}
+  #appRail60 .rl-item .rl-sh+*{display:none}
+  #appRail60 .rl-item:has(.rl-sh) .rl-lbl{display:none}
+  .rl-item[aria-current="page"]::before{left:20%;right:20%;top:0;bottom:auto;width:auto;height:3px;border-radius:0 0 3px 3px}
+  .rl-item[data-more="1"]{display:none!important}
+  .rl-item.rl-more{display:flex}
+
+  #appMore60{
+    position:fixed;z-index:calc(var(--shell-z) + 1);left:var(--sp-3);right:var(--sp-3);
+    bottom:calc(var(--bar-h) + env(safe-area-inset-bottom,0px) + var(--sp-2));
+    display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-2);
+    background:var(--panel,#11151d);color:var(--text,#edf2f7);
+    border:1px solid var(--line,#2a3442);border-radius:var(--shell-r);box-shadow:0 18px 40px -12px #000a;
+  }
+  #appMore60 .rl-item{flex-direction:row;justify-content:flex-start;gap:var(--sp-3);min-height:var(--touch);padding:0 var(--sp-3);font-size:var(--fs-md);text-align:left}
+  body.has-shell .toast{bottom:calc(var(--bar-h) + env(safe-area-inset-bottom,0px) + var(--sp-4))}
+
+  /* Mesa no celular: mapa no topo, painel e jogadores empilhados */
+  body.mesa-view #portal{padding:var(--sp-2) var(--sp-2) var(--sp-4)}
+  body.mesa-view #mesaWrap,body.mesa-view.mesa-seats-off #mesaWrap{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--sp-2);
+  }
+  body.mesa-view #mesaCenter,body.mesa-view.mesa-dock-on #mesaCenter{display:block}
+  body.mesa-view #mesaCenter>*{margin-bottom:var(--sp-2)}
+  body.mesa-view #mesaCenter>#mesaDock{
+    position:static;height:auto;max-height:none;margin-left:0;display:block;overflow:visible;
+  }
+  body.mesa-view:not(.mesa-dock-on) #mesaCenter>#mesaDock{display:none}
+  body.mesa-view #mapStage:not(:fullscreen):not(.cb-full){width:100%;max-height:none}
+  body.mesa-view.mesa-seats-off #mesaWrap .table-char.seat{display:none!important}
+  body.mesa-view #mapStage .map-tools{max-width:calc(100% - var(--sp-4));overflow-x:auto}
+  body.mesa-view #mapStage .map-tools .mt-row{flex-wrap:nowrap}
+  body.mesa-view #mesaM{padding:var(--sp-2)}
+  body.mesa-view #mesaBar{padding:var(--sp-2);flex-wrap:nowrap;overflow-x:auto;gap:var(--sp-2);scrollbar-width:thin}
+  body.mesa-view #mesaBar .mb-group{flex:none;flex-wrap:nowrap}
+  body.mesa-view #mesaBar #mbCall .sub{display:none}
+  body.mesa-view #mesaBar .mb-right{margin-left:0}
+  body.mesa-view #mesaBar .btn{min-height:var(--touch)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #appRail60,.rl-item,#appRail60 .rl-collapse svg{transition:none}
+}

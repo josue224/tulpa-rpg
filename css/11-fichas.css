@@ -1,0 +1,84 @@
+/* ==========================================================================
+   TULPA RPG — Onda 2 · Fichas (estrutura)
+   Carrega DEPOIS de css/10-app-shell.css. Só layout/espaçamento: cores, fontes
+   e texturas vêm das variáveis das estéticas (--panel --line --text --accent …).
+   Ativo apenas em body.sheet-view (classe posta por js/60b-app-shell.js).
+   ========================================================================== */
+
+/* ---------- 1. topbar enxuta: Voltar/Manual/Arcade/Aparência já estão no rail ---------- */
+body.sheet-view .topbar .t3-back,
+body.sheet-view .topbar .t3-themewrap.in-top{display:none!important}
+body.sheet-view .topbar .top-actions{flex-wrap:wrap;gap:var(--sp-2);min-width:0}
+body.sheet-view .topbar .top-actions .status{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- 2. cabeçalho compacto (substitui o hero grande) ---------- */
+body.sheet-view .shell>.hero{display:none}
+body.sheet-view .shell{max-width:1280px;padding-top:var(--sp-4)}
+#sheetHead60[hidden]{display:none!important}
+#sheetHead60{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);align-items:center;gap:var(--sp-3) var(--sp-5);
+  margin:0 0 var(--sp-3);padding:var(--sp-3) var(--sp-4);
+  background:var(--panel,#11151d);color:var(--text,#edf2f7);
+  border:1px solid var(--line,#2a3442);border-radius:var(--shell-r,12px);
+}
+#sheetHead60 .sh-id{min-width:0}
+#sheetHead60 .sh-name{margin:0;font:700 var(--fs-xl,24px)/var(--lh-tight,1.25) var(--f-display,inherit);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sheetHead60 .sh-sub{margin:var(--sp-1) 0 0;font-size:var(--fs-sm,13px);color:color-mix(in srgb,var(--text,#edf2f7) 78%,var(--panel,#11151d))}
+#sheetHead60 .sh-res{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:var(--sp-4);margin:0;padding:0}
+#sheetHead60 .sh-m{
+  display:grid;gap:var(--sp-1);min-width:0;padding:0;border:0;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer;
+}
+#sheetHead60 .sh-top{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-2);font-size:var(--fs-xs,12px);font-weight:700;letter-spacing:.04em}
+#sheetHead60 .sh-v{font-size:var(--fs-md,15px);font-variant-numeric:tabular-nums}
+#sheetHead60 .sh-b{height:8px;border-radius:999px;overflow:hidden;background:color-mix(in srgb,var(--text,#edf2f7) 14%,transparent)}
+#sheetHead60 .sh-b i{display:block;height:100%;border-radius:inherit;min-width:2px}
+#sheetHead60 .sh-m:focus-visible{outline:2px solid var(--accent,#b7d7d5);outline-offset:4px;border-radius:4px}
+
+/* ---------- 3. abas: faixa horizontal fixa sob o topbar (sem 2ª navegação vertical) ---------- */
+html body.sheet-view .layout{grid-template-columns:minmax(0,1fr);gap:var(--sp-3)}
+html body.sheet-view .side{
+  position:sticky!important;top:var(--tb-h,56px)!important;bottom:auto!important;left:auto!important;right:auto!important;
+  z-index:35;display:flex!important;flex-direction:row!important;align-items:center;gap:var(--sp-1);
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;
+  padding:var(--sp-1) var(--sp-2)!important;margin:0;
+  border:1px solid var(--line,#2a3442)!important;border-radius:var(--shell-r,12px)!important;
+}
+html body.sheet-view .side .side-label,html body.sheet-view .side>.eyebrow{display:none!important}
+html body.sheet-view .side .navbtn{
+  flex:none;width:auto;min-height:40px;padding:0 var(--sp-3);margin:0;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:var(--sp-2);border-radius:calc(var(--shell-r,12px) - 2px);
+}
+html body.sheet-view .main{padding:0}
+
+/* ---------- 4. Visão geral: grade editorial de 2 colunas ---------- */
+body.sheet-view #tab-overview.active{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-4);align-items:start;
+}
+body.sheet-view #tab-overview>*{margin:0;min-width:0}
+body.sheet-view #tab-overview>.panel:first-child,
+body.sheet-view #tab-overview>#overviewExtra,
+body.sheet-view #tab-overview>.panel:has(#stats),
+body.sheet-view #tab-overview>.panel:has(#stageList){grid-column:1 / -1}
+body.sheet-view #tab-overview>#overviewExtra{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-4)}
+body.sheet-view #tab-overview>#overviewExtra>.panel{margin:0}
+body.sheet-view #tab-overview>.grid.two{grid-column:1 / -1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-4)}
+/* identificação: foto e token lado a lado, campos abaixo */
+body.sheet-view #tab-overview>.panel:first-child{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-4) var(--sp-5);
+}
+body.sheet-view #tab-overview>.panel:first-child>.panel-head,
+body.sheet-view #tab-overview>.panel:first-child>.grid.two{grid-column:1 / -1;margin:0}
+body.sheet-view #tab-overview>.panel:first-child>.av-edit{margin:0;border:0;padding:0}
+
+/* ---------- 5. celular ---------- */
+@media (max-width:860px){
+  body.sheet-view .shell{padding:var(--sp-2) var(--sp-2) calc(var(--bar-h,60px) + var(--sp-5))}
+  #sheetHead60{grid-template-columns:minmax(0,1fr);padding:var(--sp-3)}
+  #sheetHead60 .sh-name{font-size:var(--fs-lg,18px)}
+  #sheetHead60 .sh-res{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-3)}
+  html body.sheet-view .side .navbtn{min-height:var(--touch,44px)}
+  body.sheet-view #tab-overview.active,
+  body.sheet-view #tab-overview>#overviewExtra,
+  body.sheet-view #tab-overview>.grid.two,
+  body.sheet-view #tab-overview>.panel:first-child{grid-template-columns:minmax(0,1fr)}
+}

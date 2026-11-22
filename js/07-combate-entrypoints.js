@@ -1,0 +1,1 @@
+document.addEventListener('click',e=>{const begin=e.target.closest('#beginCombat'),npc=e.target.closest('#rollNpcReflexes');if(!begin&&!npc)return;e.preventDefault();e.stopImmediatePropagation();if(begin)window.tulpaBeginCombat?.();else window.tulpaRollNpcReflexes?.()},true);

@@ -1,0 +1,44 @@
+/* ==========================================================================
+   TULPA RPG — Onda 3 · Manual Vivo e Alterações do Sistema (estrutura)
+   Carrega DEPOIS de css/11-fichas.css. Só layout: cores/fontes vêm das
+   variáveis das estéticas. No celular (≤860px) mantém o layout de tela cheia
+   que já existia; abaixo só o desktop ganha o "espaço de trabalho".
+   ========================================================================== */
+@media (min-width:861px){
+  /* 1. os dois painéis viram área de trabalho ao lado do rail (o rail continua clicável) */
+  body.has-shell .man31,
+  body.has-shell .sys29{inset:0 0 0 var(--rail-w,64px);padding:0;justify-content:stretch;background:var(--bg,#090b10);backdrop-filter:none}
+  body.has-shell .man31 .m31-box,
+  body.has-shell .sys29 .sys29-box{width:100%;max-width:none;height:100%;max-height:none;border-radius:0;border-width:0 0 0 1px;box-shadow:none}
+
+  /* 2. cabeçalho em uma linha, busca em destaque */
+  body.has-shell .man31 .m31-top,
+  body.has-shell .sys29 .sys29-top{align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-5)}
+  body.has-shell .man31 .m31-ttl h1,
+  body.has-shell .sys29 .sys29-top h2{margin:0;font-size:var(--fs-lg,18px);line-height:var(--lh-tight,1.25);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.has-shell .man31 .m31-ttl .sub{display:none}
+  body.has-shell .man31 .m31-tools{flex:1 1 auto;display:flex;align-items:center;justify-content:flex-end;gap:var(--sp-3);min-width:0}
+  body.has-shell .man31 .m31-search{flex:1 1 280px;max-width:460px}
+  body.has-shell .man31 .m31-search input{width:100%;min-height:var(--touch,44px)}
+  body.has-shell .man31 .m31-search input:focus-visible,
+  body.has-shell .sys29 .sys29-main input.search:focus-visible{outline:2px solid var(--accent,#b7d7d5);outline-offset:2px}
+
+  /* 3. índice lateral fixo e leitura confortável */
+  body.has-shell .man31 .m31-body{grid-template-columns:300px minmax(0,1fr)}
+  body.has-shell .man31 .m31-nav{padding:var(--sp-3) var(--sp-3) var(--sp-5)}
+  body.has-shell .man31 .m31-main{padding:var(--sp-6) clamp(var(--sp-5),5vw,var(--sp-7))}
+  body.has-shell .man31 .m31-main>*{max-width:76ch;margin-inline:auto}
+  body.has-shell .man31 .m31-main p,
+  body.has-shell .man31 .m31-main li{line-height:var(--lh-body,1.55)}
+
+  /* 4. Alterações: navegação e lista alinhadas */
+  body.has-shell .sys29 .sys29-body{grid-template-columns:240px minmax(0,1fr)}
+  body.has-shell .sys29 .sys29-nav{padding:var(--sp-3)}
+  body.has-shell .sys29 .sys29-main{padding:var(--sp-5) clamp(var(--sp-5),4vw,var(--sp-7))}
+  body.has-shell .sys29 .sys29-main>*{display:block;box-sizing:border-box;width:100%;max-width:980px;margin-inline:auto}
+  body.has-shell .sys29 .sys29-head{display:flex}
+  body.has-shell .sys29 .sys29-top>div:first-child{flex:1 1 auto;min-width:0}
+  body.has-shell .sys29 .sys29-top p.sub{margin:var(--sp-1) 0 0;max-width:none}
+  body.has-shell .sys29 .sys29-list{display:grid;gap:var(--sp-2);padding:0;margin:var(--sp-3) auto 0}
+  body.has-shell .sys29 .sys29-row{margin:0}
+}

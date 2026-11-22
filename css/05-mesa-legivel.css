@@ -1,0 +1,60 @@
+/* ===== Visão de Mesa legível (fundo claro, texto escuro em destaque) ===== */
+.table-view{gap:14px}
+.table-char{background:linear-gradient(145deg,#faf3e3,#ecdfc6);border:1px solid #a58c67;border-left:5px solid #8e3e34;color:#2c2118;box-shadow:0 6px 18px #38261522;padding:16px}
+.table-char h3{color:#34211a;font-size:19px;letter-spacing:-.01em;margin:0 0 2px}
+.table-char .owner{color:#6a5742;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px}
+.table-char .sub{color:#6a5742}
+.resource-row{grid-template-columns:84px 1fr auto}
+.resource-row label{color:#4a3829;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.resource-row b{color:#2a1d14;font-size:16px}
+.resource-bar{height:11px;background:#d9cbb0;border:1px solid #bba784}
+.resource-bar span{background:linear-gradient(90deg,#3f7f7a,#6fb3a8)}
+.resource-bar.vt span{background:linear-gradient(90deg,#8c2f33,#cf5d57)}
+.resource-bar.luc span{background:linear-gradient(90deg,#5a4f9a,#9a8fd6)}
+.resource-bar.es span{background:linear-gradient(90deg,#2f6f93,#62aed0)}
+.resource-actions{gap:4px}
+.resource-actions button{width:auto;min-width:26px;height:26px;padding:0 6px;background:#efe2c9;border:1px solid #a48a65;color:#37251c;font-weight:800}
+.resource-actions button:hover{background:#e3cfa9;border-color:#8e3e34}
+.table-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.table-actions .btn{margin-top:0!important}
+.team-bonus{color:#3f6b60;background:#e6eee0;border-left:3px solid #5f9a8a;padding:5px 8px;border-radius:4px;font-size:11px;margin-top:8px}
+.scene-eye{margin:4px 0 8px}
+/* Outros pontos com texto ilegível no tema claro */
+.ritual-card{background:#f7efdf;border-color:#a58c67}
+.ritual-card h4{color:#37241b}.ritual-card p{color:#5f4d3a}
+#portal .btn.ghost{background:#ede1c9;color:#37251c;border-color:#a48a65}
+#portal .btn.ghost:hover{background:#e5d4b4;border-color:#8e3e34}
+.topbar .btn.ghost:hover{background:#604136;color:#fff1d8;border-color:#c7a564}
+.topbar .status{color:#e6cf9f}
+.topbar .pill{color:#ecd9ae;border-color:#a98447}
+/* ===== Histórico de rolagens ===== */
+.roll-history-panel{margin-top:18px;border:1px solid #a58c67;background:linear-gradient(145deg,#f6edd9,#e9dcc2);border-radius:10px;padding:16px;box-shadow:0 6px 18px #38261518}
+.roll-history-panel h3{color:#5e2f25;margin:0 0 4px}
+.roll-history-list{display:flex;flex-direction:column;gap:7px;max-height:340px;overflow:auto}
+.roll-hist-item{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.4fr) auto;gap:10px;align-items:center;background:#fbf5e8;border:1px solid #b8a27c;border-radius:8px;padding:9px 12px;color:#2c2118}
+.rh-name{display:block;font-weight:800;color:#34211a}
+.rh-skill{display:block;color:#7a3f32;font-size:12px;font-weight:700}
+.rh-dice{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.rh-die{min-width:24px;height:24px;padding:0 4px;border:1px solid #b5a078;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:800;color:#6a5742;background:#f1e6cf}
+.rh-die.best{background:#8d4a39;border-color:#73372b;color:#fff3df}
+.rh-bonus{font-size:12px;color:#5f4d3a;font-weight:700;margin-left:4px}
+.rh-total{font-size:24px;font-weight:900;color:#8e3e34;text-align:right;min-width:42px}
+.rh-meta{grid-column:1/-1;font-size:10px;color:#76604a;margin-top:-3px}
+/* ===== Pop-up de rolagem compartilhada ===== */
+#rollPopup{position:fixed;top:14%;left:50%;width:min(440px,calc(100vw - 28px));transform:translate(-50%,-18px) scale(.97);opacity:0;pointer-events:none;z-index:140;background:linear-gradient(145deg,#fbf3df,#ecdcbc);border:2px solid #8e3e34;border-radius:14px;box-shadow:0 24px 60px #1a0f0a88;padding:20px 22px;color:#2c2118;transition:opacity .25s,transform .25s;cursor:pointer;text-align:center}
+#rollPopup.show{opacity:1;transform:translate(-50%,0) scale(1);pointer-events:auto}
+#rollPopup .rp-eyebrow{font-size:10px;letter-spacing:.28em;font-weight:800;color:#92513d}
+#rollPopup .rp-title{font-size:21px;font-weight:900;color:#34211a;margin:6px 0 2px}
+#rollPopup .rp-sub{font-size:12px;color:#6a5742}
+#rollPopup .dice{justify-content:center}
+#rollPopup .bigresult{font-size:56px;line-height:1;color:#8e3e34;margin:6px 0}
+#rollPopup .bigresult.nat20{color:#a87a1d}
+#rollPopup .bigresult.nat1{color:#6d1f1a}
+#rollPopup .rp-detail{font-size:12px;color:#5f4d3a}
+#rollPopup .rp-hint{font-size:10px;color:#8b7a64;margin-top:10px}
+/* ===== Seletor de perícias da mesa ===== */
+.mesa-skill-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-height:48vh;overflow:auto}
+.mesa-skill{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:#f7efdf;border:1px solid #a58c67;color:#2c2118;border-radius:7px;padding:8px 10px}
+.mesa-skill:hover{border-color:#8e3e34;background:#fff7e8}
+.mesa-skill small{color:#76604a;font-size:10px}
+@media(max-width:650px){.mesa-skill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.roll-hist-item{grid-template-columns:1fr auto}.rh-dice{grid-column:1/-1}}
