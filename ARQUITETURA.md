@@ -15,7 +15,7 @@ Roda direto no GitHub Pages (`usuario.github.io/tulpa-rpg/`): sem bundler, sem b
 
 ## Cache (importante no GitHub Pages)
 
-O Pages manda os arquivos com cache de ~10 min. Como os arquivos agora dependem uns dos outros, um visitante poderia receber um `js/20` novo com um `js/22` antigo. Por isso todo `src`/`href` local leva `?v=20261122e`. **A cada deploy que mude qualquer arquivo, troque o token em todas as tags:**
+O Pages manda os arquivos com cache de ~10 min. Como os arquivos agora dependem uns dos outros, um visitante poderia receber um `js/20` novo com um `js/22` antigo. Por isso todo `src`/`href` local leva `?v=20261122f`. **A cada deploy que mude qualquer arquivo, troque o token em todas as tags:**
 
 ```bash
 sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
@@ -131,6 +131,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 - `css/10-app-shell.css` + `js/60b-app-shell.js` formam a camada de navegação e de layout estrutural. As estéticas (`[data-aesthetic]`) só "vestem" essa estrutura via variáveis (`--panel`, `--line`, `--text`, `--accent`, `--ae-brad`, `--f-ui`); nenhuma cor é fixa no `css/10`.
 - Classes que o `60b` coloca no `<body>`: `has-shell` (rail visível: Mesa/Fichas), `mesa-view` (tela da Mesa), `mesa-seats-off` (cartões dos jogadores recolhidos), `mesa-dock-on` (painel de combate/rolagens/chat aberto), `sheet-view` (qualquer aba da ficha). Preferências guardadas em `localStorage` (`t60b.rail`, `t60b.seats`, `t60b.dock`).
 - Breakpoint único de celular: `max-width:860px` (o mesmo do `css/07`). Abaixo dele o rail vira barra inferior de 60 px + gaveta "Mais".
+- **Manual e Alterações como aba:** enquanto `#man31` ou `#sys29` estiver aberto, o `60b` põe `body.doc-open` e o `css/12-docs.css` esconde `#portal`, `.topbar` e `.shell` (a tela de baixo some e volta igual ao fechar). O rail marca o item ativo e, ao clicar em outro destino, fecha a aba aberta (`#m31x` / `#sys29x`). O Arcade continua em tela cheia própria.
 - Para adicionar um destino novo na navegação, inclua um item no array `ITEMS` do `js/60b-app-shell.js` e um ícone em `IC`.
 
 ## Checklist de validação (usado nas Ondas 1–5)

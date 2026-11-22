@@ -36,6 +36,18 @@
   function arcOK(){try{return typeof T3.canAccessArcade==='function'?!!T3.canAccessArcade():true}catch(e){return true}}
   function press(id){var b=document.getElementById(id);if(b)b.click()}
 
+  /* Manual e Alterações são "abas": enquanto uma está aberta a tela de baixo some (body.doc-open) */
+  function docOpen(){
+    var m=document.getElementById('man31'),y=document.getElementById('sys29');
+    if(m&&!m.classList.contains('hide')&&m.offsetWidth)return 'manual';
+    if(y&&!y.classList.contains('hide')&&y.offsetWidth)return 'sistema';
+    return '';
+  }
+  function closeDocs(){
+    var m=document.getElementById('man31'),y=document.getElementById('sys29');
+    if(m&&!m.classList.contains('hide'))press('m31x');
+    if(y&&!y.classList.contains('hide'))press('sys29x');
+  }
   function ensureHub(){
     var k=viewK();
     if(k.indexOf('hub')===0)return true;
@@ -68,7 +80,14 @@
     b.title=it.label;b.setAttribute('aria-label',it.label);
     b.innerHTML='<span class="rl-ico">'+svg(it.id)+'</span><span class="rl-lbl">'+it.label+'</span>'+
       (it.short&&!inMore?'<span class="rl-sh">'+it.short+'</span>':'');
-    b.onclick=function(){closeMore();collapse();it.go()};
+    b.onclick=function(){
+      closeMore();collapse();
+      var d=docOpen();
+      if(it.id==='voltar'&&d){closeDocs();return}
+      if(d&&d===it.id)return;
+      if(d)closeDocs();
+      it.go();
+    };
     return b;
   }
   function li(el){var l=document.createElement('li');l.appendChild(el);return l}
@@ -183,7 +202,9 @@
     rail.hidden=!shell;
     if(!shell){closeMore();return}
 
-    var cur={mesa:k==='hub:table',fichas:k==='hub:chars'||k.indexOf('sheet')===0};
+    var dk=docOpen();
+    b.classList.toggle('doc-open',!!dk);
+    var cur={mesa:!dk&&k==='hub:table',fichas:!dk&&(k==='hub:chars'||k.indexOf('sheet')===0),manual:dk==='manual',sistema:dk==='sistema'};
     ITEMS.forEach(function(it){
       var show=it.vis?!!it.vis():true;
       [els[it.id],more&&more.querySelector('[data-mid="'+it.id+'"]')].forEach(function(el){
