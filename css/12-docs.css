@@ -1,53 +1,386 @@
 /* ==========================================================================
-   TULPA RPG — Onda 3 · Manual Vivo e Alterações do Sistema (estrutura)
-   Carrega DEPOIS de css/11-fichas.css. Só layout: cores/fontes vêm das
-   variáveis das estéticas. No celular (≤860px) mantém o layout de tela cheia
-   que já existia; abaixo só o desktop ganha o "espaço de trabalho".
+   TULPA RPG — Onda 3 · Manual Vivo & Alterações do Sistema (Documentação)
+   Carrega DEPOIS de css/11-fichas.css.
+   Arquitetura de documentação moderna (estilo Stripe / Notion / Linear):
+   - Zero cores fixas de tema: herda dinamicamente --bg, --panel, --panel2,
+     --line, --text, --muted, --accent, --surf-1, --border-subtle, etc.
+   - Preserva 100% da edição inline do Mestre, sincronização bidirecional e
+     impressão/PDF (.m31-print).
    ========================================================================== */
-/* Manual e Alterações como ABA: a tela de baixo some enquanto estão abertos */
+
+/* Manual e Alterações funcionam como abas limpas dentro do App Shell */
 body.doc-open #portal,
 body.doc-open .topbar,
 body.doc-open .shell{display:none!important}
-@media (max-width:860px){
-  /* no celular a barra inferior continua visível para trocar de aba */
-  body.has-shell .man31,body.has-shell .sys29{bottom:calc(var(--bar-h,60px) + env(safe-area-inset-bottom,0px))}
+
+/* Scrollbar discreta nas colunas de navegação e leitura */
+:is(#man31,#sys29) ::-webkit-scrollbar{width:6px;height:6px}
+:is(#man31,#sys29) ::-webkit-scrollbar-thumb{
+  background:color-mix(in srgb,var(--text,#edf2f7) 20%,transparent);border-radius:99px;
 }
+:is(#man31,#sys29) ::-webkit-scrollbar-track{background:transparent}
 
-@media (min-width:861px){
-  /* 1. os dois painéis viram área de trabalho ao lado do rail (o rail continua clicável) */
-  body.has-shell .man31,
-  body.has-shell .sys29{inset:0 0 0 var(--rail-w,64px);padding:0;justify-content:stretch;background:var(--bg,#090b10);backdrop-filter:none;-webkit-backdrop-filter:none}
-  body.has-shell .man31 .m31-box,
-  body.has-shell .sys29 .sys29-box{width:100%;max-width:none;height:100%;max-height:none;border-radius:0;border-width:0 0 0 1px;box-shadow:none}
+/* ---------- 1. MANUAL VIVO (#man31): Tipografia, Cards, Tabelas & Busca ---------- */
+@media screen{
+  #man31 .m31-top{
+    border-bottom:1px solid var(--border-subtle,var(--line,#2a3442));
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 95%,var(--bg,#090b10));
+  }
+  html body.t3-pal[data-ae-glass="1"] #man31 .m31-top,
+  html body.t3-pal[data-ae-glass="1"] #sys29 .sys29-top{
+    background:color-mix(in srgb,var(--panel,#11151d) 78%,transparent);
+    -webkit-backdrop-filter:blur(14px) saturate(1.4);
+    backdrop-filter:blur(14px) saturate(1.4);
+  }
 
-  /* 2. cabeçalho em uma linha, busca em destaque */
-  body.has-shell .man31 .m31-top,
-  body.has-shell .sys29 .sys29-top{align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-5)}
-  body.has-shell .man31 .m31-ttl h1,
-  body.has-shell .sys29 .sys29-top h2{margin:0;font-size:var(--fs-lg,18px);line-height:var(--lh-tight,1.25);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  body.has-shell .man31 .m31-ttl .sub{display:none}
-  body.has-shell .man31 .m31-tools{flex:1 1 auto;display:flex;align-items:center;justify-content:flex-end;gap:var(--sp-3);min-width:0}
-  body.has-shell .man31 .m31-search{flex:1 1 280px;max-width:460px}
-  body.has-shell .man31 .m31-search input{width:100%;min-height:var(--touch,44px)}
-  body.has-shell .man31 .m31-search input:focus-visible,
-  body.has-shell .sys29 .sys29-main input.search:focus-visible{outline:2px solid var(--accent,#b7d7d5);outline-offset:2px}
+  /* Busca em destaque */
+  #man31 .m31-search input{
+    border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-radius:var(--shell-r,10px);
+    padding:0 var(--sp-3);
+    font-size:var(--fs-sm,13px);
+    transition:border-color .15s ease,box-shadow .15s ease;
+  }
+  #man31 .m31-search input:focus,
+  #sys29 #sys29q:focus{
+    border-color:var(--accent,#b7d7d5);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--accent,#b7d7d5) 18%,transparent);
+    outline:none;
+  }
+  #man31 .m31-hits:not(:empty){
+    display:inline-flex;align-items:center;
+    padding:3px 9px;border-radius:999px;
+    font-size:var(--fs-2xs,11px);font-weight:700;
+    background:var(--surf-active,rgba(255,255,255,.1));
+    border:1px solid var(--border-strong,var(--line,#2a3442));
+    color:var(--text,#edf2f7);white-space:nowrap;
+  }
 
-  /* 3. índice lateral fixo e leitura confortável */
-  body.has-shell .man31 .m31-body{grid-template-columns:300px minmax(0,1fr)}
-  body.has-shell .man31 .m31-nav{padding:var(--sp-3) var(--sp-3) var(--sp-5)}
-  body.has-shell .man31 .m31-main{padding:var(--sp-6) clamp(var(--sp-5),5vw,var(--sp-7))}
-  body.has-shell .man31 .m31-main>*{max-width:76ch;margin-inline:auto}
-  body.has-shell .man31 .m31-main p,
-  body.has-shell .man31 .m31-main li{line-height:var(--lh-body,1.55)}
+  /* Sumário lateral (#m31nav) */
+  #man31 .m31-nav{
+    border-right:1px solid var(--border-subtle,var(--line,#2a3442));
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 72%,var(--bg,#090b10));
+  }
+  #man31 .m31-toc{display:flex;flex-direction:column;gap:4px;margin:0;padding:0;list-style:none}
+  #man31 .m31-toc details>summary{
+    list-style:none;cursor:pointer;
+    display:flex;align-items:center;gap:6px;
+    border-radius:var(--shell-r,8px);
+  }
+  #man31 .m31-toc details>summary::-webkit-details-marker{display:none}
+  #man31 .m31-toc a{
+    display:block;flex:1 1 auto;min-width:0;
+    padding:6px 10px;border-radius:var(--shell-r,8px);
+    font-size:var(--fs-xs,12px);line-height:1.35;
+    text-decoration:none;
+    color:var(--ink-dim,var(--muted,#8d9aaa));
+    border-left:2px solid transparent;
+    transition:background-color .14s ease,color .14s ease,border-color .14s ease;
+  }
+  #man31 .m31-toc>li>details>summary>a{
+    font-weight:700;font-size:var(--fs-sm,13px);
+    color:var(--text,#edf2f7);
+  }
+  #man31 .m31-toc ol{
+    margin:2px 0 6px 10px;padding:0 0 0 8px;
+    border-left:1px solid var(--border-subtle,var(--line,#2a3442));
+    list-style:none;display:flex;flex-direction:column;gap:2px;
+  }
+  #man31 .m31-toc a:hover{
+    color:var(--text,#edf2f7);
+    background:var(--surf-hover,rgba(255,255,255,.06));
+  }
+  #man31 .m31-toc a.on{
+    color:var(--text,#edf2f7);font-weight:700;
+    background:var(--surf-active,rgba(255,255,255,.1));
+    border-left-color:var(--accent,#b7d7d5);
+  }
 
-  /* 4. Alterações: navegação e lista alinhadas */
-  body.has-shell .sys29 .sys29-body{grid-template-columns:240px minmax(0,1fr)}
-  body.has-shell .sys29 .sys29-nav{padding:var(--sp-3)}
-  body.has-shell .sys29 .sys29-main{padding:var(--sp-5) clamp(var(--sp-5),4vw,var(--sp-7))}
-  body.has-shell .sys29 .sys29-main>*{display:block;box-sizing:border-box;width:100%;max-width:980px;margin-inline:auto}
-  body.has-shell .sys29 .sys29-head{display:flex}
-  body.has-shell .sys29 .sys29-top>div:first-child{flex:1 1 auto;min-width:0}
-  body.has-shell .sys29 .sys29-top p.sub{margin:var(--sp-1) 0 0;max-width:none}
-  body.has-shell .sys29 .sys29-list{display:grid;gap:var(--sp-2);padding:0;margin:var(--sp-3) auto 0}
-  body.has-shell .sys29 .sys29-row{margin:0}
+  /* Área de leitura (#m31main): prosa em medida confortável (72ch), grids/tabelas livres até 980px */
+  #man31 .m31-paper{width:100%;max-width:980px;margin:0 auto}
+  #man31 .m31-cover{
+    max-width:74ch;padding:var(--sp-4) 0 var(--sp-5);margin-bottom:var(--sp-5);
+    border-bottom:1px solid var(--border-subtle,var(--line,#2a3442));
+  }
+  #man31 .m31-chap{
+    margin-bottom:var(--sp-6);padding-top:var(--sp-4);
+    border-top:1px solid color-mix(in srgb,var(--line,#2a3442) 55%,transparent);
+  }
+  #man31 .m31-chap:first-child{border-top:0;padding-top:0}
+  #man31 .m31-h2{
+    margin:0 0 var(--sp-4);
+    font-size:clamp(20px,2.2vw,26px);line-height:1.2;
+    display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;
+  }
+  #man31 .m31-sec{margin-bottom:var(--sp-5)}
+  #man31 .m31-h3{
+    margin:var(--sp-4) 0 var(--sp-2);
+    font-size:var(--fs-lg,17px);line-height:1.28;
+    display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;
+  }
+
+  /* Prosa e caixas de destaque limitadas a 72ch para leitura sem fadiga */
+  #man31 .m31-blk,
+  #man31 .m31-aside,
+  #man31 .m31-glitch,
+  #man31 .m31-f,
+  #man31 .m31-edit,
+  #man31 .m31-rules,
+  #man31 .m31-subel,
+  #man31 .m31-note{max-width:74ch}
+
+  #man31 .m31-blk p,
+  #man31 .m31-blk li{
+    font-size:var(--fs-md,14.5px);
+    line-height:1.65;
+  }
+  #man31 .m31-blk p{margin:0 0 10px}
+  #man31 .m31-blk ul{margin:6px 0 12px;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+
+  #man31 .m31-aside{
+    padding:var(--sp-3) var(--sp-4);margin:var(--sp-3) 0;
+    border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-left:3px solid var(--accent,#b7d7d5);
+    border-radius:var(--shell-r,10px);
+    background:color-mix(in srgb,var(--accent,#b7d7d5) 7%,var(--surf-1,var(--panel,#11151d)));
+  }
+  #man31 .m31-aside h5{margin:0 0 6px;font-size:var(--fs-xs,12px);letter-spacing:.08em;text-transform:uppercase}
+
+  /* Tabelas vivas: rolagem horizontal segura, alinhamento numérico e bordas suaves */
+  #man31 .m31-tw{
+    width:100%;overflow-x:auto;margin:var(--sp-3) 0 var(--sp-4);
+    border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-radius:var(--surface-r,12px);
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 88%,transparent);
+  }
+  #man31 .m31-tb{width:100%;border-collapse:collapse;font-size:var(--fs-sm,13px);font-variant-numeric:tabular-nums}
+  #man31 .m31-tb th{
+    text-align:left;padding:10px 12px;
+    font-size:var(--fs-2xs,11px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-dim,var(--muted,#8d9aaa));
+    background:color-mix(in srgb,var(--text,#edf2f7) 5%,transparent);
+    border-bottom:1px solid var(--border-subtle,var(--line,#2a3442));
+    white-space:nowrap;
+  }
+  #man31 .m31-tb td{
+    padding:9px 12px;vertical-align:top;line-height:1.45;
+    border-bottom:1px solid color-mix(in srgb,var(--line,#2a3442) 45%,transparent);
+  }
+  #man31 .m31-tb tbody tr:last-child td{border-bottom:0}
+  #man31 .m31-tb tbody tr:hover td{background:var(--surf-hover,rgba(255,255,255,.04))}
+
+  /* Cards de Vocações, Bestiário, Trilhas e Rituais em grid consistente */
+  #man31 .m31-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+    gap:var(--sp-3);margin:var(--sp-3) 0;
+  }
+  #man31 .m31-card,
+  #man31 .m31-track,
+  #man31 .m31-rit{
+    padding:var(--sp-4);
+    border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-radius:var(--surface-r,12px);
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 92%,var(--bg,#090b10));
+    display:flex;flex-direction:column;gap:var(--sp-2);
+  }
+  #man31 .m31-track,
+  #man31 .m31-rit{margin:var(--sp-3) 0}
+  #man31 :is(.m31-card,.m31-track,.m31-rit)>header{
+    display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;
+    padding-bottom:var(--sp-2);
+    border-bottom:1px solid color-mix(in srgb,var(--line,#2a3442) 45%,transparent);
+  }
+  #man31 :is(.m31-card,.m31-track,.m31-rit)>header h4{
+    margin:0;font-size:var(--fs-md,15px);line-height:1.25;flex:1 1 auto;min-width:0;
+  }
+  #man31 .m31-chips,
+  #man31 .m31-meta{
+    display:flex;flex-wrap:wrap;gap:6px;margin:0;
+    font-size:var(--fs-xs,12px);
+  }
+  #man31 .m31-pot{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:var(--sp-2);margin:var(--sp-1) 0 0;
+  }
+  #man31 .m31-pot dt{
+    font-size:var(--fs-2xs,11px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--accent,#b7d7d5);margin:0 0 2px;
+  }
+  #man31 .m31-pot dd{margin:0;font-size:var(--fs-xs,12.5px);line-height:1.45}
+
+  /* Edição inline do Mestre limpa e alinhada */
+  #man31 .m31-edit{
+    padding:var(--sp-3);margin:var(--sp-2) 0;
+    border:1px solid var(--border-strong,var(--accent,#b7d7d5));
+    border-radius:var(--surface-r,12px);
+    background:var(--surf-1,var(--panel,#11151d));
+    display:flex;flex-direction:column;gap:var(--sp-2);
+  }
+  #man31 .m31-edbar{display:flex;gap:var(--sp-2);flex-wrap:wrap}
+
+  /* ---------- 2. ALTERAÇÕES DO SISTEMA (#sys29): Central de Admin Limpa ---------- */
+  #sys29 .sys29-top{
+    border-bottom:1px solid var(--border-subtle,var(--line,#2a3442));
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 95%,var(--bg,#090b10));
+  }
+  #sys29 .sys29-nav{
+    border-right:1px solid var(--border-subtle,var(--line,#2a3442));
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 72%,var(--bg,#090b10));
+    display:flex;flex-direction:column;gap:3px;
+  }
+  #sys29 .sys29-tab{
+    display:flex;align-items:center;gap:var(--sp-2);
+    width:100%;min-height:40px;padding:0 var(--sp-3);
+    border:1px solid transparent;border-radius:var(--shell-r,10px);
+    background:transparent;color:var(--ink-dim,var(--muted,#8d9aaa));
+    font:600 var(--fs-sm,13px)/1.2 var(--f-ui,inherit);
+    text-align:left;white-space:nowrap;
+    transition:background-color .14s ease,color .14s ease,border-color .14s ease;
+  }
+  #sys29 .sys29-tab:hover{
+    color:var(--text,#edf2f7);background:var(--surf-hover,rgba(255,255,255,.06));
+  }
+  #sys29 .sys29-tab.on{
+    color:var(--text,#edf2f7);
+    background:var(--surf-active,rgba(255,255,255,.1));
+    border-color:var(--border-strong,var(--accent,#b7d7d5));
+  }
+
+  #sys29 .sys29-head{
+    display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-2) var(--sp-3);
+    margin:0 0 var(--sp-3);padding-bottom:var(--sp-2);
+    border-bottom:1px solid var(--border-subtle,var(--line,#2a3442));
+  }
+  #sys29 .sys29-head h3{margin:0;font-size:var(--fs-lg,18px);line-height:1.2}
+  #sys29 .sys29-head #sys29add{margin-left:auto}
+
+  #sys29 #sys29q{
+    width:100%;min-height:42px;padding:0 var(--sp-3);
+    border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-radius:var(--shell-r,10px);
+  }
+  #sys29 .sys29-list{
+    display:grid;gap:var(--sp-2);padding:0;margin:var(--sp-3) auto 0;list-style:none;
+  }
+  #sys29 .sys29-row{
+    display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);
+    padding:10px var(--sp-3);margin:0;
+    border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-radius:var(--shell-r,10px);
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 92%,var(--bg,#090b10));
+    transition:border-color .14s ease,background-color .14s ease;
+  }
+  #sys29 .sys29-row:hover{border-color:var(--border-strong,var(--accent,#b7d7d5))}
+  #sys29 .sys29-row .grow{min-width:0;flex:1 1 auto}
+  #sys29 .sys29-row .grow b{font-size:var(--fs-md,14.5px)}
+  #sys29 .sys29-row .grow .sub{margin-top:2px;font-size:var(--fs-xs,12px)}
+  #sys29 .sys29-acts{display:flex;align-items:center;gap:6px;flex:none}
+
+  /* Formulários de edição em Alterações do Sistema */
+  #sys29 .sys29-form{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--sp-3);margin-top:var(--sp-3);
+  }
+  #sys29 .sys29-form .full,
+  #sys29 .sys29-form .sys29-3,
+  #sys29 .sys29-form .sys29-fs,
+  #sys29 .sys29-form .sys29-k,
+  #sys29 .sys29-form .sys29-save{grid-column:1 / -1}
+  #sys29 .sys29-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-3)}
+  #sys29 .sys29-k{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-3)}
+  #sys29 .sys29-fs{
+    margin:0;padding:var(--sp-3);
+    border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-radius:var(--surface-r,12px);
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-3);
+  }
+  #sys29 .sys29-fs legend{
+    padding:0 6px;font-size:var(--fs-xs,12px);font-weight:700;
+    color:var(--accent,#b7d7d5);letter-spacing:.06em;text-transform:uppercase;
+  }
+  #sys29 .sys29-save{
+    display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;
+    padding-top:var(--sp-3);margin-top:var(--sp-2);
+    border-top:1px solid var(--border-subtle,var(--line,#2a3442));
+  }
+  #sys29 .sys29-log{
+    display:flex;flex-direction:column;gap:var(--sp-2);padding:0;margin:var(--sp-3) 0 0;list-style:none;
+  }
+  #sys29 .sys29-log>li{
+    padding:var(--sp-3);border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-radius:var(--shell-r,10px);
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 92%,var(--bg,#090b10));
+  }
+
+  /* ---------- 3. DESKTOP (≥ 861px): Workspace Lado a Lado com o Rail ---------- */
+  @media (min-width:861px){
+    body.has-shell .man31,
+    body.has-shell .sys29{
+      inset:0 0 0 var(--rail-w,64px);
+      padding:0;justify-content:stretch;
+      background:var(--bg,#090b10);
+      backdrop-filter:none;-webkit-backdrop-filter:none;
+    }
+    body.has-shell .man31 .m31-box,
+    body.has-shell .sys29 .sys29-box{
+      width:100%;max-width:none;height:100%;max-height:none;
+      border-radius:0;border-width:0;box-shadow:none;
+    }
+
+    body.has-shell .man31 .m31-top,
+    body.has-shell .sys29 .sys29-top{
+      align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-5);
+    }
+    body.has-shell .man31 .m31-ttl h1,
+    body.has-shell .sys29 .sys29-top h2{
+      margin:0;font-size:var(--fs-lg,18px);line-height:var(--lh-tight,1.25);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    body.has-shell .man31 .m31-ttl .sub{display:none}
+    body.has-shell .man31 .m31-tools{
+      flex:1 1 auto;display:flex;align-items:center;justify-content:flex-end;
+      gap:var(--sp-3);min-width:0;
+    }
+    body.has-shell .man31 .m31-search{flex:1 1 280px;max-width:460px}
+    body.has-shell .man31 .m31-search input{width:100%;min-height:40px}
+
+    /* Índice lateral fixo + área de leitura com respiro */
+    body.has-shell .man31 .m31-body{grid-template-columns:288px minmax(0,1fr)}
+    body.has-shell .man31 .m31-nav{padding:var(--sp-3) var(--sp-3) var(--sp-5)}
+    body.has-shell .man31 .m31-main{padding:var(--sp-5) clamp(var(--sp-5),4.5vw,var(--sp-7)) var(--sp-7)}
+
+    /* Alterações do Sistema */
+    body.has-shell .sys29 .sys29-body{grid-template-columns:240px minmax(0,1fr)}
+    body.has-shell .sys29 .sys29-nav{padding:var(--sp-3)}
+    body.has-shell .sys29 .sys29-main{padding:var(--sp-5) clamp(var(--sp-5),4vw,var(--sp-7)) var(--sp-7)}
+    body.has-shell .sys29 .sys29-main>*{
+      box-sizing:border-box;width:100%;max-width:960px;margin-inline:auto;
+    }
+    body.has-shell .sys29 .sys29-top>div:first-child{flex:1 1 auto;min-width:0}
+    body.has-shell .sys29 .sys29-top p.sub{margin:var(--sp-1) 0 0;max-width:none}
+  }
+
+  /* ---------- 4. MOBILE (≤ 860px): Respeita Barra Inferior & Sem Overflow ---------- */
+  @media (max-width:860px){
+    body.has-shell .man31,
+    body.has-shell .sys29{
+      bottom:calc(var(--bar-h,62px) + env(safe-area-inset-bottom,0px));
+    }
+    #man31 .m31-main{padding:var(--sp-3) var(--sp-3) var(--sp-6)}
+    #man31 .m31-cards{grid-template-columns:minmax(0,1fr)}
+    #man31 .m31-pot{grid-template-columns:minmax(0,1fr)}
+    #sys29 .sys29-nav{
+      flex-direction:row;overflow-x:auto;scrollbar-width:none;
+      border-right:0;border-bottom:1px solid var(--border-subtle,var(--line,#2a3442));
+      padding:var(--sp-2);
+    }
+    #sys29 .sys29-nav::-webkit-scrollbar{display:none}
+    #sys29 .sys29-tab{width:auto;flex:none;min-height:var(--touch,44px)}
+    #sys29 .sys29-form,
+    #sys29 .sys29-3,
+    #sys29 .sys29-k,
+    #sys29 .sys29-fs{grid-template-columns:minmax(0,1fr)}
+    #sys29 .sys29-row{flex-wrap:wrap;gap:var(--sp-2)}
+  }
 }
