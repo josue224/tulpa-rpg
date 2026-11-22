@@ -1,28 +1,179 @@
 /* ==========================================================================
-   TULPA RPG — Onda 5 · Polimento (contraste e foco)
-   Carrega DEPOIS de css/13-arcade-mapa.css. Só vale com estética/paleta ativa
-   (body.t3-pal), onde o fundo vem das variáveis do tema: garante que o texto da
-   navegação das fichas e da marca do topbar acompanhe --text e não uma cor fixa
-   do tema clássico (antes ficava claro sobre fundo claro nas estéticas claras).
+   TULPA RPG — Onda 5 · Polimento Final, Contraste WCAG & Auditoria de Estéticas
+   Carrega POR ÚLTIMO (depois de css/13-arcade-mapa.css).
+
+   Objetivo:
+   1. Eliminar armadilhas de cor fixa vindas do CSS legado (01-base-layout.css)
+      quando qualquer estética/paleta está ativa (body.t3-pal), garantindo
+      leitura impecável em temas claros (Frutiger Aero, Webcore, Pergaminho)
+      e escuros (Cyberpunk, Dark Academia, VHS).
+   2. Blindar os componentes do novo App Shell contra estilos extremos de
+      estéticas (clip-path, bevel, sticker, neon) sem matar a identidade delas.
+   3. Padronizar foco de teclado (:focus-visible), estados desabilitados,
+      alto contraste (prefers-contrast: more) e redução de movimento.
    ========================================================================== */
-html body.t3-pal.sheet-view .side .navbtn{
-  color:color-mix(in srgb,var(--text,#edf2f7) 88%,var(--panel,#11151d))!important;background:transparent!important;
+
+/* ---------- 1. Contraste WCAG sob qualquer estética (body.t3-pal) ---------- */
+html body.t3-pal .topbar .brand,
+html body.t3-pal .topbar .brand small,
+html body.t3-pal .topbar .top-actions .status{
+  color:var(--text,#edf2f7)!important;
 }
-html body.t3-pal.sheet-view .side .navbtn .ico{color:inherit!important;opacity:.82}
+html body.t3-pal .topbar .sigil{
+  color:var(--accent,#b7d7d5)!important;
+  border-color:var(--accent,#b7d7d5)!important;
+}
+
+/* Navegação das fichas acompanha --text e --accent em temas claros e escuros */
+html body.t3-pal.sheet-view .side .navbtn{
+  color:color-mix(in srgb,var(--text,#edf2f7) 84%,var(--panel,#11151d))!important;
+  background:transparent!important;
+}
+html body.t3-pal.sheet-view .side .navbtn .ico{color:inherit!important;opacity:.85}
 html body.t3-pal.sheet-view .side .navbtn:hover,
 html body.t3-pal.sheet-view .side .navbtn.active{
   color:var(--text,#edf2f7)!important;
-  background:color-mix(in srgb,var(--accent,#b7d7d5) 22%,transparent)!important;
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 20%,transparent)!important;
 }
-html body.t3-pal.sheet-view .side .navbtn.active{box-shadow:inset 0 -2px 0 var(--accent,#b7d7d5)}
-html body.t3-pal .topbar .brand{color:var(--text,#edf2f7)!important}
-html body.t3-pal .topbar .brand small{color:var(--text,#edf2f7)!important}
-html body.t3-pal .topbar .sigil{color:var(--accent,#b7d7d5)!important;border-color:var(--accent,#b7d7d5)!important}
+html body.t3-pal.sheet-view .side .navbtn.active{
+  box-shadow:inset 0 -2px 0 var(--accent,#b7d7d5);
+}
 
-/* foco de teclado sempre visível nos controles novos */
-.rl-item:focus-visible,#appRail60 .rl-brand:focus-visible,
-#sheetHead60 .sh-m:focus-visible,#mbSeats60:focus-visible,#mbDock60:focus-visible,
-html body.sheet-view .side .navbtn:focus-visible{outline:2px solid var(--accent,#b7d7d5);outline-offset:2px}
+/* Textos, rótulos e cartões legados que tinham cores fixas em 01-base-layout.css */
+html body.t3-pal :is(.panel h2,.panel h3,.choice h4,.talent h4,.ritual-card h4,.modal h2,.table-char h3,.campaign-item h3){
+  color:var(--text,#edf2f7);
+}
+html body.t3-pal :is(.field label,.field-label,.stat .name,.resource-row label,.skill-attr,.choice p,.talent p,.ritual-card p,.modal p,.empty){
+  color:color-mix(in srgb,var(--text,#edf2f7) 78%,var(--panel,#11151d));
+}
+html body.t3-pal .skill-val{color:var(--accent,#b7d7d5)}
 
-/* texto de estado do topbar acompanha --text (a cor fixa quebrava o contraste em várias estéticas claras) */
-html body.t3-pal .topbar .top-actions .status{color:var(--text,#edf2f7)!important}
+/* Inputs, selects e textareas sempre legíveis (inclusive .portal-input) */
+html body.t3-pal :is(.field input,.field select,.field textarea,.search,.portal-input){
+  background:color-mix(in srgb,var(--bg,#090b10) 76%,var(--panel,#11151d));
+  color:var(--text,#edf2f7);
+  border-color:color-mix(in srgb,var(--line,#2a3442) 85%,var(--text,#edf2f7) 15%);
+}
+html body.t3-pal :is(.field input,.field select,.field textarea,.search,.portal-input)::placeholder{
+  color:color-mix(in srgb,var(--text,#edf2f7) 52%,var(--panel,#11151d));
+}
+
+/* Pílulas, tags e estágios com contraste seguro em temas claros e escuros */
+html body.t3-pal .pill{
+  color:var(--text,#edf2f7);
+  border-color:color-mix(in srgb,var(--line,#2a3442) 80%,var(--text,#edf2f7) 20%);
+  background:color-mix(in srgb,var(--text,#edf2f7) 6%,transparent);
+}
+html body.t3-pal .tag{
+  color:var(--text,#edf2f7);
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 18%,var(--panel,#11151d));
+  border-color:color-mix(in srgb,var(--accent,#b7d7d5) 48%,transparent);
+}
+html body.t3-pal .stage{
+  color:var(--text,#edf2f7);
+  background:color-mix(in srgb,var(--bg,#090b10) 45%,var(--panel,#11151d));
+  border-color:var(--border-subtle,var(--line,#2a3442));
+}
+html body.t3-pal .stage small{
+  color:color-mix(in srgb,var(--text,#edf2f7) 72%,var(--panel,#11151d));
+}
+html body.t3-pal .stage.selected{
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 22%,var(--panel,#11151d));
+  border-color:var(--accent,#b7d7d5);
+}
+
+/* Botões +/− de recursos na Mesa (antes tinham color:white fixo) */
+html body.t3-pal .resource-actions button{
+  background:var(--panel2,var(--panel,#171d27));
+  color:var(--text,#edf2f7);
+  border-color:var(--line,#2a3442);
+}
+
+/* Reforço específico para estéticas CLARAS (ex.: Frutiger Aero, Pergaminho, Webcore claro) */
+html body.t3-pal:not(.t3-dark){
+  --ink-dim:color-mix(in srgb,var(--text,#181c22) 78%,var(--panel,#f6f7f9));
+  --border-subtle:color-mix(in srgb,var(--line,#8892a0) 88%,var(--text,#181c22) 12%);
+  --surf-hover:color-mix(in srgb,var(--accent,#3f6f6a) 13%,transparent);
+  --surf-active:color-mix(in srgb,var(--accent,#3f6f6a) 22%,transparent);
+}
+html body.t3-pal:not(.t3-dark) #sheetHead60 .sh-m{
+  background:color-mix(in srgb,var(--text,#181c22) 5%,var(--panel,#ffffff));
+}
+html body.t3-pal:not(.t3-dark) #man31 .m31-tb th{
+  background:color-mix(in srgb,var(--text,#181c22) 6%,transparent);
+}
+
+/* ---------- 2. Blindagem contra Estéticas Extremas (Bevel / Sticker / Hard / Chamfer) ---------- */
+html body.t3-pal[data-ae-sh="bevel"] :is(#appRail60,#appMore60,#mesaBar,#mesaM,#sheetHead60){
+  border-radius:0!important;
+}
+html body.t3-pal[data-ae-sh="hard"] :is(#sheetHead60,#mesaBar,#mesaM){
+  border:2px solid var(--text)!important;
+  box-shadow:4px 4px 0 var(--text)!important;
+}
+html body.t3-pal[data-ae-btn="chamfer"] :is(.rl-item,.sh-chip,.sh-m,.mg-gdb,.pt-tab,.pt-chip,#mesaMobTabs60 button){
+  clip-path:none!important;
+}
+
+/* ---------- 3. Estados Claros (Disabled, Hover, Active) ---------- */
+:is(.btn,.pbtn,.rl-item,.sh-chip,.mg-gdb,.pt-tab,.pt-chip,.pt-act,.navbtn):is(:disabled,[aria-disabled="true"]){
+  opacity:.46;
+  cursor:not-allowed;
+  pointer-events:auto;
+  filter:saturate(.55);
+}
+:is(.btn,.pbtn):is(:disabled,[aria-disabled="true"]):active{transform:none!important}
+
+/* ---------- 4. Foco de Teclado Visível (WCAG 2.2) em Todas as 5 Ondas ---------- */
+:is(
+  .rl-item,
+  #appRail60 .rl-brand,
+  #appMore60 .rl-item,
+  #mbSeats60,
+  #mbDock60,
+  #mbFocus60,
+  #mesaMobTabs60 button,
+  #mesaDock [role="tab"],
+  #sheetHead60 .sh-m,
+  #sheetHead60 .sh-chip,
+  .sheet-view .side .navbtn,
+  #man31 .m31-toc a,
+  #man31 .m31-ref,
+  #man31 .m31-search input,
+  #sys29 .sys29-tab,
+  #sys29 #sys29q,
+  #mgRoot .mg-tb,
+  #mgRoot .mg-gdb,
+  #mgRoot .pt-tab,
+  #mgRoot .pt-chip,
+  #mgRoot .pt-medal,
+  #mgRoot .pt-fd,
+  #mgRoot .pt-tool,
+  #mapStage .mt-btn
+):focus-visible{
+  outline:2px solid var(--accent,#b7d7d5)!important;
+  outline-offset:2px!important;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#b7d7d5) 22%,transparent);
+}
+
+/* ---------- 5. Acessibilidade: Alto Contraste e Redução de Movimento ---------- */
+@media (prefers-contrast:more){
+  :root{
+    --border-subtle:var(--text,#fff);
+    --border-strong:var(--text,#fff);
+  }
+  html body.t3-pal[data-ae-glass="1"] :is(#appRail60,#appMore60,#mesaBar,#mesaM,#sheetHead60,.topbar,.side,#man31 .m31-top,#sys29 .sys29-top,#mgRoot .mg-top){
+    background:var(--panel,#11151d)!important;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  :focus-visible{outline-width:3px!important}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    transition-duration:.01ms!important;
+    animation-duration:.01ms!important;
+  }
+}
