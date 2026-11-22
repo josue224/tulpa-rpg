@@ -3,12 +3,11 @@
    Carrega DEPOIS de 09-visual-etapas-26-39.css.
 
    REGRA DE OURO (Desacoplamento Layout vs. Estéticas):
-   - Este arquivo define APENAS arquitetura espacial, escala de 4px/8px,
-     hierarquia, ergonomia e comportamento de painéis.
-   - ZERO cores fixas de tema: toda superfície, borda, destaque e tipografia
-     herda dinamicamente as variáveis de data-aesthetic (--bg, --panel,
-     --panel2, --line, --muted, --text, --accent, --accent2, --ae-rad,
-     --ae-brad, --f-ui, --f-display) e suporta vidro (data-ae-glass="1").
+   - Tokens dimensionais ficam em :root.
+   - Tokens semânticos derivados de cores/raios (--surf-1, --ink-dim,
+     --border-subtle, --shell-r, --surface-r) ficam em `body` (onde js/38
+     injeta as variáveis da estética ativa), evitando herdar o Pergaminho
+     de :root.
    ========================================================================== */
 
 /* ---------- 1. Tokens Estruturais (Escala 4/8px) ---------- */
@@ -37,12 +36,14 @@
   --mesa-bar-h:48px;
   --touch:44px;
 
-  --shell-r:min(var(--ae-brad,10px),12px);
-  --surface-r:min(var(--ae-rad,12px),16px);
   --shell-z:42;
   --ease-ui:cubic-bezier(.22,1,.36,1);
+}
 
-  /* Superfícies semânticas derivadas do tema ativo */
+/* Superfícies semânticas resolvidas em `body` para acompanhar a estética ativa */
+body{
+  --shell-r:min(var(--ae-brad,10px),12px);
+  --surface-r:min(var(--ae-rad,12px),16px);
   --surf-1:var(--panel,#11151d);
   --surf-2:color-mix(in srgb,var(--panel2,var(--panel,#171d27)) 92%,var(--bg,#090b10));
   --surf-hover:color-mix(in srgb,var(--accent,#b7d7d5) 11%,transparent);
@@ -98,7 +99,7 @@ html body.t3-pal[data-ae-glass="1"] #appMore60{
 /* Marca / Cabeçalho do Rail */
 #appRail60 .rl-brand{
   display:flex;align-items:center;gap:var(--sp-3);
-  min-height:var(--touch);padding:0 var(--sp-2);margin-bottom:var(--sp-1);
+  min-height:var(--touch);padding:0 9px;margin-bottom:var(--sp-1);
   border:1px solid transparent;background:transparent;color:inherit;
   border-radius:var(--shell-r);text-align:left;
   transition:background-color .15s ease,border-color .15s ease;
