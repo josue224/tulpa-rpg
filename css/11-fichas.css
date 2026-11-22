@@ -22,6 +22,10 @@ html body.t3-pal[data-ae-glass="1"].sheet-view .topbar{
 body.sheet-view .topbar .t3-back,
 body.sheet-view .topbar .t3-themewrap.in-top{display:none!important}
 body.sheet-view .topbar .top-actions{flex-wrap:wrap;gap:var(--sp-2);min-width:0}
+/* Já existem no rail (Campanhas, Alterações do Sistema): não repetir na barra */
+body.sheet-view .topbar .tb-central60,
+body.sheet-view .topbar .campaign-back,
+body.sheet-view .topbar #masterBtn{display:none!important}
 body.sheet-view .topbar .top-actions .status{
   max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   font-size:var(--fs-2xs,11px);
@@ -30,7 +34,7 @@ body.sheet-view .topbar .top-actions .status{
 /* ---------- 2. Container principal e Cabeçalho Editorial (#sheetHead60) ---------- */
 body.sheet-view .shell>.hero{display:none!important}
 body.sheet-view .shell{
-  max-width:1280px;
+  max-width:1400px;
   padding:var(--sp-4) clamp(14px,3vw,32px) var(--sp-7);
 }
 
@@ -46,7 +50,9 @@ body.sheet-view .shell{
   color:var(--text,#edf2f7);
   border:1px solid var(--border-subtle,var(--line,#2a3442));
   border-radius:var(--surface-r,var(--shell-r,12px));
+  position:sticky;top:calc(var(--tb-h,54px) - 1px);z-index:36;
 }
+@media (max-height:760px){#sheetHead60{position:relative;top:auto}}
 html body.t3-pal[data-ae-glass="1"] #sheetHead60{
   background:color-mix(in srgb,var(--panel,#11151d) 70%,transparent);
   -webkit-backdrop-filter:blur(14px) saturate(1.4);
@@ -140,14 +146,13 @@ html body.t3-pal[data-ae-glass="1"] #sheetHead60{
   transition:width .2s ease;
 }
 
-/* ---------- 3. Abas da Ficha: Faixa Horizontal Fixa (Fim da Navegação Duplicada) ---------- */
-html body.sheet-view .layout{
-  grid-template-columns:minmax(0,1fr);
-  gap:var(--sp-3);
-}
+/* ---------- 3. Abas da Ficha ----------
+   ≥1180px: coluna lateral fixa (as 13 abas cabem sem rolar).
+   <1180px: faixa horizontal rolável com esmaecido na borda. */
+html body.sheet-view .layout{grid-template-columns:minmax(0,1fr);gap:var(--sp-3);align-items:start}
 html body.sheet-view .side{
   position:sticky!important;
-  top:calc(var(--tb-h,54px) + 6px)!important;
+  top:calc(var(--tb-h,54px) + var(--sh-h,0px) + var(--sp-3))!important;
   bottom:auto!important;left:auto!important;right:auto!important;
   z-index:35;
   display:flex!important;flex-direction:row!important;align-items:center;
@@ -158,6 +163,8 @@ html body.sheet-view .side{
   border:1px solid var(--border-subtle,var(--line,#2a3442))!important;
   border-radius:var(--surface-r,var(--shell-r,12px))!important;
   box-shadow:0 8px 24px -14px rgba(0,0,0,.45);
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+  mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
 }
 html body.t3-pal[data-ae-glass="1"].sheet-view .side{
   background:color-mix(in srgb,var(--panel,#11151d) 74%,transparent)!important;
@@ -188,8 +195,23 @@ html body.sheet-view .side .navbtn.active{
   background:var(--surf-active,rgba(255,255,255,.1));
   border-color:var(--border-strong,var(--accent,#b7d7d5));
 }
-html body.sheet-view .side .navbtn .ico{width:auto;font-size:14px;opacity:.88}
+html body.sheet-view .side .navbtn .ico{width:18px;text-align:center;font-size:14px;opacity:.88}
 html body.sheet-view .side .navbtn.active .ico{opacity:1;color:var(--accent,#b7d7d5)}
+
+@media (min-width:1180px){
+  html body.sheet-view .layout{grid-template-columns:208px minmax(0,1fr);gap:var(--sp-4)}
+  html body.sheet-view .side{
+    flex-direction:column!important;align-items:stretch;gap:2px;
+    overflow-x:hidden;overflow-y:auto;padding:var(--sp-2)!important;
+    max-height:calc(100dvh - var(--tb-h,54px) - var(--sh-h,0px) - var(--sp-6));
+    -webkit-mask-image:none;mask-image:none;
+  }
+  html body.sheet-view .side .navbtn{width:100%;justify-content:flex-start}
+  html body.sheet-view .side .navbtn.active::before{
+    content:"";position:absolute;left:-9px;top:8px;bottom:8px;width:3px;
+    border-radius:0 3px 3px 0;background:var(--accent,#b7d7d5);
+  }
+}
 
 /* ---------- 4. Ritmo Editorial Unificado em Todas as Abas ---------- */
 html body.sheet-view .main{padding:0;min-width:0}
@@ -250,7 +272,11 @@ body.sheet-view #tab-overview>.panel:first-child{
 }
 body.sheet-view #tab-overview>.panel:first-child>.panel-head,
 body.sheet-view #tab-overview>.panel:first-child>.grid.two{grid-column:1 / -1;margin:0}
-body.sheet-view #tab-overview>.panel:first-child>.av-edit{margin:0;border:0;padding:0}
+body.sheet-view #tab-overview>.panel:first-child>.av-edit{margin:0;border:0;padding:0;gap:var(--sp-3);align-items:center}
+body.sheet-view #tab-overview>.panel:first-child>.av-edit .av{--s:72px}
+body.sheet-view #tab-overview>.panel:first-child>.av-edit h3{font-size:var(--fs-md,14.5px);margin:0 0 2px}
+body.sheet-view #tab-overview>.panel:first-child>.av-edit p,
+body.sheet-view #tab-overview>.panel:first-child>.av-edit .sub{font-size:var(--fs-xs,12px);margin:0 0 var(--sp-2);color:var(--ink-dim)}
 
 /* Estatísticas vitais e Progressão */
 body.sheet-view #stats{gap:var(--sp-3)}
@@ -323,6 +349,9 @@ body.sheet-view .ritual-card p{font-size:var(--fs-xs,12px);line-height:1.45}
     padding:var(--sp-2) var(--sp-2) calc(var(--bar-h,62px) + env(safe-area-inset-bottom,0px) + var(--sp-5));
   }
   body.sheet-view .topbar{padding:6px var(--sp-2)}
+  body.sheet-view #tab-overview>.panel:first-child>.av-edit p,
+  body.sheet-view #tab-overview>.panel:first-child>.av-edit .sub{display:none}
+  body.sheet-view #tab-overview>.panel:first-child>.av-edit .av{--s:56px}
   body.sheet-view .main .panel{padding:var(--sp-3)}
   #sheetHead60{padding:var(--sp-3)}
   #sheetHead60 .sh-av{width:46px;height:46px;font-size:17px}

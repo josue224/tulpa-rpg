@@ -186,27 +186,24 @@ body.has-shell .topbar{position:sticky}
 body.has-shell #campaignHub>.portal-grid{display:none!important}
 body.has-shell .t3-back-portal{display:none!important}
 
-/* ---------- 3. Mesa (VTT): Workspace Profissional de Mapa Primeiro ---------- */
-html body.mesa-view #portal{
-  padding:var(--sp-2) var(--sp-3) var(--sp-3)!important;
-  min-height:100dvh;
-}
+/* ---------- 3. Mesa (VTT): estação de trabalho com o mapa como protagonista ----------
+   Desktop: a janela inteira é do app (sem rolagem da página).
+   [barra única 44px]
+   [roster 208px | (mestre + combate em 1 linha) + MAPA | dock 336px]
+   Mestre/combate/ferramentas deixam de empilhar em cima do mapa: as ferramentas
+   viram uma paleta flutuante e a visão do Mestre um segmentado flutuante. */
+html body.mesa-view #portal{padding:var(--sp-2) var(--sp-3) var(--sp-3)!important;min-height:100dvh}
 body.mesa-view #portal .portal-wrap{max-width:none;padding:0;margin:0}
 body.mesa-view #portal .portal-brand,
 body.mesa-view #campaignHub>.hero{display:none!important}
 
-/* Elimina a "caixa dentro de caixa" vencendo a especificidade de css/08-esteticas.css */
+/* Elimina a "caixa dentro de caixa" (vence css/08-esteticas.css) */
 html body.mesa-view #tablePanel,
 html body.t3-pal[data-aesthetic].mesa-view #tablePanel,
 html body.mesa-view.t3-mobile #tablePanel{
-  background:none!important;
-  border:0!important;
-  box-shadow:none!important;
-  border-radius:0!important;
-  padding:0!important;
-  margin:0!important;
-  -webkit-backdrop-filter:none!important;
-  backdrop-filter:none!important;
+  background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;
+  padding:0!important;margin:0!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
   display:flex;flex-direction:column;gap:var(--sp-2);
 }
 body.mesa-view #tablePanel>.panel-head,
@@ -214,177 +211,250 @@ body.mesa-view #tablePanel>.sub{display:none!important}
 body.mesa-view #tablePanel>#mesaBar{order:0}
 body.mesa-view #tablePanel>#mesaWrap{order:1}
 
-/* Toolbar Superior da Mesa (Estilo Figma / Linear) */
+/* Barra superior: UMA linha. Grupos secundários vão para o popover "Mais". */
 html body.mesa-view #mesaBar{
-  display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2) var(--sp-3);
-  min-height:var(--mesa-bar-h);
-  padding:6px var(--sp-3);margin:0;
-  background:color-mix(in srgb,var(--surf-1) 92%,var(--bg,#090b10));
+  position:relative;z-index:6;
+  display:flex;flex-wrap:nowrap;align-items:center;gap:var(--sp-2);
+  height:var(--mesa-bar-h);min-height:var(--mesa-bar-h);
+  padding:0 var(--sp-2);margin:0;
+  background:color-mix(in srgb,var(--surf-1) 94%,var(--bg,#090b10));
   border:1px solid var(--border-subtle);
   border-radius:var(--surface-r);
 }
 html body.t3-pal[data-ae-glass="1"].mesa-view #mesaBar{
   background:color-mix(in srgb,var(--panel,#11151d) 70%,transparent);
-  -webkit-backdrop-filter:blur(14px) saturate(1.4);
-  backdrop-filter:blur(14px) saturate(1.4);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
 }
-body.mesa-view #mesaBar .mb-group{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2);margin:0}
-body.mesa-view #mesaBar .mb-right{margin-left:auto}
-body.mesa-view #mesaBar .mb-shell60{
-  padding-left:var(--sp-2);
-  border-left:1px solid var(--border-subtle);
-}
-body.mesa-view #mesaBar .mb-shell60 .btn[aria-pressed="true"]{
-  border-color:var(--border-strong);
-  background:var(--surf-active);
+body.mesa-view #mesaBar>.mb-group{display:flex;flex-wrap:nowrap;align-items:center;gap:var(--sp-2);margin:0;min-width:0}
+body.mesa-view #mesaBar #mbCall>.sub,
+body.mesa-view #mesaBar .mb-hand>.hand-none{display:none}
+/* Contraste: .btn.warn herdava texto claro de tema escuro */
+html body.mesa-view #mesaBar .btn.warn{
   color:var(--text,#edf2f7);
+  background:color-mix(in srgb,var(--amber,#d9902f) 20%,var(--surf-1));
+  border-color:color-mix(in srgb,var(--amber,#d9902f) 65%,var(--line,#2a3442));
+}
+body.mesa-view #mesaBar .btn,
+body.mesa-view #mesaBar .btn.small{min-height:34px;padding:0 var(--sp-3);font-size:var(--fs-xs);white-space:nowrap}
+body.mesa-view #mesaBar .mb-shell60{margin-left:auto;padding-left:0;border-left:0}
+body.mesa-view #mesaBar .mb-shell60 .btn[aria-pressed="true"],
+body.mesa-view #mesaBar #mbMoreBtn60[aria-expanded="true"]{
+  border-color:var(--border-strong);background:var(--surf-active);color:var(--text,#edf2f7);
 }
 body.mesa-view #mesaBar .mb-live60{
   display:inline-flex;align-items:center;gap:6px;
-  font-size:var(--fs-2xs);font-weight:600;color:var(--ink-dim);
-  padding:0 var(--sp-2);
+  font-size:var(--fs-2xs);font-weight:600;color:var(--ink-dim);padding:0 var(--sp-2);
 }
 body.mesa-view #mesaBar .mb-live60 i{
   width:7px;height:7px;border-radius:50%;
-  background:var(--accent,#78b9a8);
-  box-shadow:0 0 8px var(--accent,#78b9a8);
+  background:var(--accent,#78b9a8);box-shadow:0 0 8px var(--accent,#78b9a8);
 }
 
-/* Grade Principal da Mesa: [Jogadores Esq] [Palco Central + Dock] [Jogadores Dir] */
+/* Popover "Mais": música, envio de imagem, Arcade, Perseus, transmissão */
+#mbMore60{
+  position:absolute;z-index:8;top:calc(100% + var(--sp-2));right:0;width:min(360px,92vw);
+  display:flex;flex-direction:column;gap:var(--sp-3);
+  padding:var(--sp-3);
+  background:var(--surf-1);color:var(--text,#edf2f7);
+  border:1px solid var(--border-strong);border-radius:var(--surface-r);
+  box-shadow:0 18px 44px -14px rgba(0,0,0,.6);
+}
+#mbMore60[hidden]{display:none!important}
+#mbMore60>.mb-group,#mbMore60>.mb-right{
+  display:flex!important;flex-wrap:wrap;align-items:center;gap:var(--sp-2);
+  margin:0!important;padding:0;width:100%;
+}
+#mbMore60>.mb-group:not(:has(button,input)){display:none!important}
+#mbMore60>.mb-group::before{
+  flex:0 0 100%;font:600 var(--fs-2xs)/1 var(--f-ui,inherit);color:var(--ink-dim);
+  letter-spacing:.04em;
+}
+#mbMore60>.mb-right::before{content:"Música e imagens"}
+#mbMore60>.mb-arc26::before{content:"Perseus e Arcade"}
+#mbMore60>.mb-scr28::before{content:"Transmissão"}
+#mbMore60 .mb-vol{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+#mbMore60 .mb-now{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-dim)}
+#mbMore60 .btn{min-height:36px;padding:0 var(--sp-3);font-size:var(--fs-xs)}
+
+/* Grade principal: [roster] [palco] */
 body.mesa-view #mesaWrap{
-  --seat:176px;
+  --seat:216px;
   display:grid;
-  grid-template-columns:var(--seat) minmax(0,1fr) var(--seat);
-  gap:var(--sp-3);
-  align-items:start;
+  grid-template-columns:var(--seat) minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr);
+  gap:var(--sp-2);align-items:stretch;
+  height:calc(100dvh - var(--mesa-bar-h) - 3*var(--sp-3));
+  min-height:440px;
 }
 body.mesa-view.mesa-seats-off #mesaWrap,
 body.mesa-view.mesa-focus #mesaWrap,
-body.mesa-view #mesaWrap.no-seats{
-  grid-template-columns:0 minmax(0,1fr) 0;
-  column-gap:0;
+body.mesa-view #mesaWrap.no-seats{grid-template-columns:0 minmax(0,1fr);column-gap:0}
+body.mesa-view #mesaWrap>#tableCharacters{
+  display:flex;flex-direction:column;gap:var(--sp-2);
+  grid-column:1;grid-row:1;min-height:0;min-width:0;
+  overflow-y:auto;overflow-x:hidden;padding:0 2px 0 0;
 }
-body.mesa-view.mesa-seats-off #mesaWrap .table-char.seat,
-body.mesa-view.mesa-focus #mesaWrap .table-char.seat{display:none!important}
+body.mesa-view #mesaWrap>#mesaCenter{grid-column:2;grid-row:1;min-height:0}
+body.mesa-view.mesa-seats-off #mesaWrap>#tableCharacters,
+body.mesa-view.mesa-focus #mesaWrap>#tableCharacters{display:none!important}
 
-/* Cartões de Jogadores (.seat): limpos, legíveis e sem poluição */
+/* Cartões de jogadores: linha compacta; controles sob demanda (⋯) */
 body.mesa-view #mesaWrap .table-char.seat{
-  padding:var(--sp-2) 10px!important;
+  grid-column:auto;grid-row:auto;flex:none;
+  padding:var(--sp-2) var(--sp-3)!important;gap:var(--sp-1);
   border:1px solid var(--border-subtle);
-  transition:border-color .15s ease,transform .15s ease;
+  transition:border-color .15s ease;
 }
-body.mesa-view #mesaWrap .table-char.seat.mine{
-  border-color:var(--border-strong);
+body.mesa-view #mesaWrap .table-char.seat::before{height:3px}
+body.mesa-view #mesaWrap .table-char.seat.mine{border-color:var(--border-strong)}
+body.mesa-view #mesaWrap .table-char.seat.absent{opacity:.7}
+body.mesa-view .seat .tc-head{
+  flex-direction:row;align-items:center;text-align:left;
+  gap:var(--sp-2);margin:0;padding:0 38px 0 0;min-height:40px;
 }
-body.mesa-view #mesaWrap .table-char.seat.absent{opacity:.68}
-body.mesa-view #mesaWrap .table-char.seat .resource-row{margin:5px 0}
+body.mesa-view .seat .tc-head .av{--s:36px;flex:none}
+body.mesa-view .seat .tc-id{width:auto;min-width:0;flex:1 1 auto}
+body.mesa-view .seat.table-char h3{font-size:var(--fs-md);line-height:var(--lh-tight);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0}
+body.mesa-view .seat .tc-id .owner{font-size:var(--fs-2xs);letter-spacing:0;text-transform:none;margin:1px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.mesa-view .seat .tc-head .scene-eye{left:auto;right:36px;top:50%;transform:translateY(-50%);width:30px;height:30px;padding:0;display:none;place-items:center}
+body.mesa-view .seat.open .tc-head .scene-eye{display:grid}
+body.mesa-view .seat.open .tc-head{padding-right:72px}
+body.mesa-view .seat .seat-more{right:0;top:50%;transform:translateY(-50%)}
+body.mesa-view .seat:not(.open) .t3-chips{display:none}
+body.mesa-view .seat .resource-row{margin:2px 0}
+body.mesa-view .seat .resource-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-1);margin-top:var(--sp-1)}
+body.mesa-view .seat .resource-actions button{min-height:28px;padding:0;font-size:var(--fs-xs)}
+body.mesa-view .seat .resource-row .inline>.sub{display:none}
+body.mesa-view .seat:not(.open):not(.mine)>.btn,
+body.mesa-view .seat:not(.open):not(:focus-within):not(.mine)>.table-actions{display:none}
 
-/* Palco Central: [Mestre + Combate + Mapa] | [Inspector Dock Retrátil] */
+/* Palco central: [mestre | combate] / [MAPA]  +  dock à direita */
 body.mesa-view #mesaCenter{
   display:grid;
-  grid-template-columns:minmax(0,1fr) var(--dockw,0px);
-  column-gap:0;row-gap:var(--sp-2);
-  align-items:start;align-content:start;
-  min-width:0;
+  grid-template-columns:auto minmax(0,1fr) var(--dockw,0px);
+  grid-template-rows:auto minmax(0,1fr);
+  column-gap:0;row-gap:var(--sp-2);align-items:stretch;
+  min-width:0;height:100%;
 }
-body.mesa-view.mesa-dock-on:not(.mesa-focus) #mesaCenter{--dockw:min(368px,30vw)}
-body.mesa-view #mesaCenter>#mesaM,
-body.mesa-view #mesaCenter>#cbBar,
-body.mesa-view #mesaCenter>#mapStage,
-body.mesa-view #mesaCenter>#cbHud{grid-column:1;min-width:0}
-
-/* Inspector Dock Lateral */
+body.mesa-view.mesa-dock-on:not(.mesa-focus) #mesaCenter{--dockw:min(336px,28vw)}
+body.mesa-view #mesaCenter>#mesaM{grid-column:1;grid-row:1}
+body.mesa-view #mesaCenter>#cbBar{grid-column:2;grid-row:1;min-width:0}
+body.mesa-view #mesaCenter>#mapStage{grid-column:1 / 3;grid-row:2;min-width:0;min-height:0}
+body.mesa-view #mesaCenter>#cbHud{grid-column:1 / 3;grid-row:3;min-width:0}
 body.mesa-view #mesaCenter>#mesaDock{
-  grid-column:2;grid-row:1 / span 6;
-  margin-left:var(--sp-3);
-  position:sticky;top:var(--sp-2);align-self:start;
-  height:calc(100dvh - var(--mesa-bar-h) - 28px);
-  max-height:calc(100dvh - var(--mesa-bar-h) - 28px);
+  grid-column:3;grid-row:1 / -1;margin-left:var(--sp-2);
+  position:relative;top:auto;align-self:stretch;height:auto;max-height:none;
   display:flex;flex-direction:column;overflow:hidden;
-  padding:0!important;
-  border:1px solid var(--border-subtle);
+  padding:0!important;border:1px solid var(--border-subtle);
 }
 body.mesa-view:not(.mesa-dock-on) #mesaCenter>#mesaDock,
 body.mesa-view.mesa-focus #mesaCenter>#mesaDock{display:none!important}
 
+/* Dock: 6 abas em grade 3×2 (nenhuma cortada) */
 body.mesa-view #mesaCenter>#mesaDock .dock-tabs{
-  flex:none;display:flex;flex-wrap:nowrap;gap:2px;
-  padding:6px var(--sp-2) 0;
-  border-bottom:1px solid var(--border-subtle);
-  overflow-x:auto;scrollbar-width:none;
+  flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;
+  padding:var(--sp-1) var(--sp-1) 0;
+  border-bottom:1px solid var(--border-subtle);overflow:visible;
 }
-body.mesa-view #mesaCenter>#mesaDock .dock-tabs::-webkit-scrollbar{display:none}
 body.mesa-view #mesaCenter>#mesaDock .dock-tabs>[role="tab"]{
-  flex:none;border:0;border-bottom:2px solid transparent;border-radius:var(--shell-r) var(--shell-r) 0 0;
-  padding:8px 10px;background:transparent;color:var(--ink-dim);
-  font:600 var(--fs-xs)/1.2 var(--f-ui,inherit);white-space:nowrap;
+  min-width:0;border:0;border-bottom:2px solid transparent;border-radius:var(--shell-r) var(--shell-r) 0 0;
+  padding:8px 4px;background:transparent;color:var(--ink-dim);
+  font:600 var(--fs-xs)/1.2 var(--f-ui,inherit);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   transition:color .14s ease,border-color .14s ease,background-color .14s ease;
 }
-body.mesa-view #mesaCenter>#mesaDock .dock-tabs>[role="tab"]:hover{
-  color:var(--text,#edf2f7);background:var(--surf-hover);
-}
+body.mesa-view #mesaCenter>#mesaDock .dock-tabs>[role="tab"]:hover{color:var(--text,#edf2f7);background:var(--surf-hover)}
 body.mesa-view #mesaCenter>#mesaDock .dock-tabs>[role="tab"].active{
-  color:var(--text,#edf2f7);
-  border-bottom-color:var(--accent,#b7d7d5);
+  color:var(--text,#edf2f7);border-bottom-color:var(--accent,#b7d7d5);
   background:color-mix(in srgb,var(--accent,#b7d7d5) 10%,transparent);
 }
-body.mesa-view #mesaCenter>#mesaDock .dock-pane{
-  overflow:auto;min-height:0;flex:1 1 auto;
-  padding:var(--sp-3);
-}
+body.mesa-view #mesaCenter>#mesaDock .dock-pane{overflow:auto;min-height:0;flex:1 1 auto;padding:var(--sp-3)}
 
-/* Faixa do Mestre (#mesaM): compacta e sem roubar altura do mapa */
+/* Faixa do Mestre: compacta, legível, sem roubar altura */
 body.mesa-view #mesaM{
-  width:100%;align-self:stretch;
-  padding:6px var(--sp-3);margin:0;
-  display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;
-  gap:var(--sp-2) var(--sp-3);
-  background:color-mix(in srgb,var(--surf-1) 92%,var(--bg,#090b10));
-  border:1px solid var(--border-subtle);
-  border-radius:var(--surface-r);
+  width:auto;max-width:44vw;align-self:stretch;
+  padding:4px var(--sp-3);margin:0 var(--sp-2) 0 0;
+  display:flex;flex-direction:row;align-items:center;flex-wrap:nowrap;gap:var(--sp-3);
+  min-height:var(--mesa-bar-h);overflow:hidden;
+  background:color-mix(in srgb,var(--surf-1) 94%,var(--bg,#090b10));
+  border:1px solid var(--border-subtle);border-radius:var(--surface-r);
 }
 html body.t3-pal[data-ae-glass="1"].mesa-view #mesaM{
   background:color-mix(in srgb,var(--panel,#11151d) 70%,transparent);
-  -webkit-backdrop-filter:blur(12px) saturate(1.35);
-  backdrop-filter:blur(12px) saturate(1.35);
+  -webkit-backdrop-filter:blur(12px) saturate(1.35);backdrop-filter:blur(12px) saturate(1.35);
 }
 body.mesa-view.mesa-focus #mesaM{display:none!important}
-body.mesa-view #mesaM .m-main{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:var(--sp-2)}
-body.mesa-view #mesaM .m-av .av{--s:38px}
-body.mesa-view #mesaM .m-id small{font-size:var(--fs-2xs);opacity:.78;display:block;line-height:1.1}
-body.mesa-view #mesaM .m-id b{font-size:var(--fs-md);line-height:var(--lh-tight)}
-body.mesa-view #mesaM .m-cast{
-  display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;
-  max-width:100%;padding:2px 0;scrollbar-width:none;
-}
+body.mesa-view #mesaM .m-main{flex:0 0 auto;min-width:0;display:flex;align-items:center;gap:var(--sp-2)}
+body.mesa-view #mesaM .m-av .av{--s:34px}
+body.mesa-view #mesaM .m-id{min-width:0;color:var(--text,#edf2f7)}
+body.mesa-view #mesaM .m-id small{font-size:var(--fs-2xs);opacity:1;color:var(--ink-dim);display:block;line-height:1.15}
+body.mesa-view #mesaM .m-id b{font-size:var(--fs-sm);line-height:var(--lh-tight);color:var(--text,#edf2f7)}
+body.mesa-view #mesaM .m-cast{display:flex;flex-wrap:nowrap;align-items:center;overflow-x:auto;gap:6px;min-width:0;padding:2px 0;scrollbar-width:none}
 body.mesa-view #mesaM .m-cast::-webkit-scrollbar{display:none}
-body.mesa-view #mesaM .m-act{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
-body.mesa-view #cbBar{margin:0;padding-block:var(--sp-1)}
+body.mesa-view #mesaM .m-act{display:flex;flex-wrap:nowrap;gap:6px;margin-left:auto}
+body.mesa-view #mesaM .m-cast>.sub{display:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-dim)}
+@media (min-width:1500px){body.mesa-view #mesaM .m-cast>.sub{display:block}}
 
-/* Palco do Mapa (#mapStage): Protagonismo total sem bordas desperdiçadas */
+/* Combate: linha única ao lado do Mestre (sem laje escura) */
+html body.mesa-view #cbBar{
+  margin:0;padding:0;background:none!important;border:0!important;box-shadow:none!important;
+  display:flex;align-items:center;gap:var(--sp-2);min-height:var(--mesa-bar-h);
+  overflow-x:auto;scrollbar-width:none;
+}
+body.mesa-view #cbBar::-webkit-scrollbar{display:none}
+body.mesa-view #cbBar .cb-start{min-height:36px;padding:0 var(--sp-4);white-space:nowrap}
+
+/* Mapa: ocupa todo o espaço restante; ferramentas flutuam sobre ele */
 body.mesa-view #mapStage:not(:fullscreen):not(.cb-full){
-  width:100%;
-  height:calc(100dvh - 156px);
-  min-height:420px;
-  max-height:none;
-  aspect-ratio:auto;
-  margin:0;
-  border-radius:var(--surface-r);
-  border:1px solid var(--border-subtle);
-  overflow:hidden;
+  width:100%;height:100%;min-height:0;max-height:none;aspect-ratio:auto;margin:0;
+  border-radius:var(--surface-r);border:1px solid var(--border-subtle);overflow:hidden;
 }
-body.mesa-view.mesa-focus #mapStage:not(:fullscreen):not(.cb-full){
-  height:calc(100dvh - var(--mesa-bar-h) - 30px);
+body.mesa-view #mapStage #mapTools{
+  position:absolute;inset:0;width:auto;max-width:none;height:auto;margin:0;padding:0;
+  background:none;border:0;box-shadow:none;display:block;pointer-events:none;z-index:4;
 }
+body.mesa-view #mapStage #mapTools>.mt-row:not(.mt-view){
+  position:absolute;left:50%;top:var(--sp-3);transform:translateX(-50%);
+  max-width:calc(100% - 2*var(--sp-3));
+  display:flex;flex-wrap:nowrap;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:none;
+  padding:var(--sp-1);pointer-events:auto;
+  background:color-mix(in srgb,var(--surf-1) 90%,transparent);
+  border:1px solid var(--border-subtle);border-radius:var(--surface-r);
+  box-shadow:0 8px 24px -10px rgba(0,0,0,.5);
+}
+body.mesa-view #mapStage #mapTools>.mt-row:not(.mt-view)::-webkit-scrollbar{display:none}
+body.mesa-view #mapStage #mapTools .mt-btn{
+  flex:none;min-width:34px;min-height:34px;color:var(--text,#edf2f7);opacity:1;
+  background:transparent;border:1px solid transparent;border-radius:var(--shell-r);
+}
+body.mesa-view #mapStage #mapTools .mt-btn:hover{background:var(--surf-hover)}
+body.mesa-view #mapStage #mapTools .mt-btn.on,
+body.mesa-view #mapStage #mapTools .mt-btn[aria-pressed="true"]{background:var(--surf-active);border-color:var(--border-strong)}
+body.mesa-view #mapStage #mapTools .mt-btn:disabled{opacity:.45}
+body.mesa-view #mapStage #mapTools .mt-sep{flex:none;align-self:stretch;width:1px;margin:4px var(--sp-1);background:var(--border-subtle)}
+body.mesa-view #mapStage #mapTools>.mt-view{
+  position:absolute;left:50%;bottom:var(--sp-3);right:auto;top:auto;transform:translateX(-50%);
+  display:flex;flex-wrap:nowrap;gap:2px;padding:var(--sp-1);pointer-events:auto;
+  background:color-mix(in srgb,var(--surf-1) 90%,transparent);
+  border:1px solid var(--border-subtle);border-radius:var(--surface-r);
+  box-shadow:0 8px 24px -10px rgba(0,0,0,.5);
+}
+body.mesa-view #mapStage #mapTools .mt-chip{
+  flex:none;min-height:32px;padding:0 var(--sp-3);white-space:nowrap;
+  background:transparent;color:var(--ink-dim);border:1px solid transparent;border-radius:var(--shell-r);
+}
+body.mesa-view #mapStage #mapTools .mt-chip:hover{background:var(--surf-hover);color:var(--text,#edf2f7)}
+body.mesa-view #mapStage #mapTools .mt-chip.on,
+body.mesa-view #mapStage #mapTools .mt-chip[aria-checked="true"]{background:var(--surf-active);color:var(--text,#edf2f7);border-color:var(--border-strong)}
+body.mesa-view #mapStage .map-info{left:var(--sp-3);bottom:var(--sp-3);top:auto}
 
 /* Barra de abas mobile da Mesa (oculta no desktop) */
 #mesaMobTabs60{display:none}
+#mbMoreBtn60{flex:none}
 
 /* ---------- 4. Notebooks e Telas Médias (861px–1360px) ---------- */
 @media (max-width:1360px) and (min-width:861px){
-  body.mesa-view #mesaWrap{--seat:158px;gap:var(--sp-2)}
-  body.mesa-view.mesa-dock-on:not(.mesa-focus) #mesaCenter{--dockw:min(336px,34vw)}
-  body.mesa-view #mesaCenter>#mesaDock{margin-left:var(--sp-2)}
+  body.mesa-view #mesaWrap{--seat:184px}
+  body.mesa-view.mesa-dock-on:not(.mesa-focus) #mesaCenter{--dockw:min(312px,32vw)}
 }
 
 /* ---------- 5. Mobile / Janela Estreita (≤ 860px) ---------- */
@@ -451,42 +521,51 @@ body.mesa-view.mesa-focus #mapStage:not(:fullscreen):not(.cb-full){
   }
   body.has-shell .toast{bottom:calc(var(--bar-h) + env(safe-area-inset-bottom,0px) + var(--sp-4))}
 
-  /* Mesa no Mobile: Toolbar -> Mapa -> Alternador limpo (Painel / Jogadores) */
+  /* Mesa no celular: barra única rolável -> faixa do Mestre -> MAPA -> alternador (Painel / Jogadores) */
   html body.mesa-view #portal{padding:var(--sp-2) var(--sp-2) var(--sp-4)!important}
-  body.mesa-view #mesaBar{
-    padding:6px var(--sp-2);flex-wrap:nowrap;overflow-x:auto;gap:var(--sp-2);
-    scrollbar-width:none;
+  html body.mesa-view #mesaBar{
+    height:auto;padding:var(--sp-1) var(--sp-2);flex-wrap:wrap;overflow:visible;
+    row-gap:var(--sp-1);
   }
-  body.mesa-view #mesaBar::-webkit-scrollbar{display:none}
-  body.mesa-view #mesaBar .mb-group{flex:none;flex-wrap:nowrap}
-  body.mesa-view #mesaBar #mbCall .sub,
+  body.mesa-view #mesaBar>.mb-group{flex:0 1 auto;flex-wrap:wrap}
   body.mesa-view #mesaBar .mb-live60,
   body.mesa-view #mesaBar .mb-shell60{display:none!important}
-  body.mesa-view #mesaBar .mb-right{margin-left:0}
-  body.mesa-view #mesaBar .btn{min-height:38px}
+  body.mesa-view #mesaBar .btn,body.mesa-view #mesaBar .btn.small{min-height:var(--touch)}
+  #mbMoreBtn60{margin-left:auto}
+  #mbMore60{left:0;right:0;width:auto;max-height:70dvh;overflow:auto}
+  #mbMore60 .btn{min-height:var(--touch)}
 
   body.mesa-view #mesaWrap,
   body.mesa-view.mesa-seats-off #mesaWrap,
   body.mesa-view.mesa-focus #mesaWrap{
-    display:flex;flex-direction:column;gap:var(--sp-2);
+    display:flex;flex-direction:column;gap:var(--sp-2);height:auto;min-height:0;
   }
-  body.mesa-view #mesaCenter,
-  body.mesa-view.mesa-dock-on #mesaCenter{display:flex;flex-direction:column;gap:var(--sp-2);width:100%}
-  body.mesa-view #mesaM{padding:var(--sp-2);display:flex!important}
+  body.mesa-view #mesaWrap>#mesaCenter,
+  body.mesa-view.mesa-dock-on #mesaWrap>#mesaCenter{display:flex;flex-direction:column;gap:var(--sp-2);width:100%;height:auto}
+  body.mesa-view #mesaCenter>#mesaM,
+  body.mesa-view #mesaCenter>#cbBar,
+  body.mesa-view #mesaCenter>#mapStage,
+  body.mesa-view #mesaCenter>#cbHud,
+  body.mesa-view #mesaCenter>#mesaDock{grid-column:auto;grid-row:auto}
+  body.mesa-view #mesaCenter>#mesaM{
+    max-width:none;width:100%;margin:0;min-height:0;padding:var(--sp-2);display:flex!important;
+  }
+  body.mesa-view #mesaM .m-cast{flex:1 1 auto}
+  html body.mesa-view #cbBar{min-height:0}
   body.mesa-view #mapStage:not(:fullscreen):not(.cb-full){
-    width:100%;height:54dvh;min-height:280px;max-height:460px;
+    width:100%;height:60dvh;min-height:300px;max-height:540px;flex:none;
   }
-  body.mesa-view #mapStage .map-tools{max-width:calc(100% - var(--sp-3));overflow-x:auto}
-  body.mesa-view #mapStage .map-tools .mt-row{flex-wrap:nowrap}
+  body.mesa-view #mapStage #mapTools>.mt-row:not(.mt-view){max-width:calc(100% - var(--sp-3))}
+  body.mesa-view #mapStage #mapTools>.mt-view{left:var(--sp-2);right:var(--sp-2);bottom:var(--sp-2);transform:none;justify-content:space-between;overflow-x:auto}
+  body.mesa-view #mapStage .map-info{bottom:calc(var(--sp-2) + 48px)}
 
-  /* Alternador mobile entre Painel (Combate/Chat/Rolagens) e Jogadores */
   #mesaMobTabs60{
     display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-1);
     padding:4px;border-radius:var(--surface-r);
     background:var(--surf-1);border:1px solid var(--border-subtle);
   }
   #mesaMobTabs60 button{
-    min-height:38px;border:0;border-radius:var(--shell-r);
+    min-height:var(--touch);border:0;border-radius:var(--shell-r);
     background:transparent;color:var(--ink-dim);
     font:600 var(--fs-sm)/1 var(--f-ui,inherit);
   }
@@ -496,20 +575,19 @@ body.mesa-view.mesa-focus #mapStage:not(:fullscreen):not(.cb-full){
   }
 
   body.mesa-view #mesaCenter>#mesaDock{
-    position:static;height:auto;max-height:none;margin-left:0;
-    overflow:visible;
+    position:static;height:auto;max-height:none;margin-left:0;overflow:visible;
   }
   body.mesa-view[data-mob-pane="seats"] #mesaCenter>#mesaDock{display:none!important}
-  body.mesa-view[data-mob-pane="dock"] #tableCharacters{display:none!important}
+  body.mesa-view[data-mob-pane="dock"] #mesaWrap>#tableCharacters{display:none!important}
   body.mesa-view[data-mob-pane="dock"] #mesaCenter>#mesaDock{display:flex!important}
-  body.mesa-view[data-mob-pane="seats"] #tableCharacters{
-    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);
+  body.mesa-view[data-mob-pane="seats"] #mesaWrap>#tableCharacters{
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);overflow:visible;
   }
-  body.mesa-view[data-mob-pane="seats"] #mesaWrap .table-char.seat{display:block!important}
+  body.mesa-view[data-mob-pane="seats"] #mesaWrap .table-char.seat{display:flex!important}
 }
 
 @media (max-width:520px){
-  body.mesa-view[data-mob-pane="seats"] #tableCharacters{grid-template-columns:1fr}
+  body.mesa-view[data-mob-pane="seats"] #mesaWrap>#tableCharacters{grid-template-columns:1fr}
 }
 
 @media (prefers-reduced-motion:reduce){

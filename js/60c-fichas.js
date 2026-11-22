@@ -194,6 +194,19 @@
     }
   }
 
+  /* Marca o botão "← Central" (criado sem classe em js/02) para o CSS poder escondê-lo na ficha */
+  function tagTopbar(){
+    var bs=document.querySelectorAll('.topbar .top-actions>button');
+    for(var i=0;i<bs.length;i++){
+      if(!bs[i].classList.contains('tb-central60')&&/Central/.test(bs[i].textContent||'')&&!bs[i].id)bs[i].classList.add('tb-central60');
+    }
+  }
+  /* Altura do cabeçalho fixo: a coluna de abas gruda logo abaixo dele */
+  function measureHead(){
+    var h=head&&!head.hidden&&getComputedStyle(head).position==='sticky'?Math.round(head.getBoundingClientRect().height)+1:0;
+    if(document.documentElement.style.getPropertyValue('--sh-h')!==h+'px')document.documentElement.style.setProperty('--sh-h',h+'px');
+  }
+
   function keepActiveTabVisible(){
     var a=document.querySelector('.side .navbtn.active');
     var side=document.querySelector('.side');
@@ -205,7 +218,7 @@
   }
 
   function tick(){
-    try{build();update();measure();keepActiveTabVisible()}
+    try{build();update();measure();tagTopbar();measureHead();keepActiveTabVisible()}
     catch(e){console.warn('[fi60]',e)}
   }
 

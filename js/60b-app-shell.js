@@ -241,6 +241,43 @@
     try{window.dispatchEvent(new Event('resize'))}catch(e){}
   }
 
+  /* ---- Popover "Mais" da barra da Mesa ----
+     Move (não recria) os grupos secundários para dentro dele, então todos os
+     IDs e handlers dos outros arquivos continuam valendo. Grupos criados
+     depois por outros scripts são adotados no próximo sync. */
+  var MORE_SEL=['.mb-right','#mbArc26','#mbScr28'];
+  function moreOpen(){var p=document.getElementById('mbMore60');return !!(p&&!p.hidden)}
+  function moreSet(on){
+    var p=document.getElementById('mbMore60'),b=document.getElementById('mbMoreBtn60');
+    if(!p||!b)return;
+    p.hidden=!on;b.setAttribute('aria-expanded',on?'true':'false');
+  }
+  function adoptMore(){
+    var bar=document.getElementById('mesaBar');
+    if(!bar)return;
+    var pop=document.getElementById('mbMore60');
+    if(!pop){
+      pop=document.createElement('div');pop.id='mbMore60';pop.hidden=true;
+      pop.setAttribute('role','group');pop.setAttribute('aria-label','Mais ferramentas da mesa');
+      var btn=document.createElement('button');
+      btn.type='button';btn.className='btn small';btn.id='mbMoreBtn60';
+      btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-controls','mbMore60');
+      btn.title='Música, imagens, Perseus, Arcade e transmissão';btn.textContent='⋯ Mais';
+      btn.onclick=function(e){e.stopPropagation();moreSet(!moreOpen())};
+      bar.appendChild(btn);bar.appendChild(pop);
+      document.addEventListener('click',function(e){
+        if(moreOpen()&&!pop.contains(e.target)&&e.target!==btn)moreSet(false);
+      });
+      document.addEventListener('keydown',function(e){
+        if(e.key==='Escape'&&moreOpen()){moreSet(false);btn.focus()}
+      });
+    }
+    MORE_SEL.forEach(function(sel){
+      var g=bar.querySelector(':scope > '+sel);
+      if(g&&g.parentNode!==pop)pop.appendChild(g);
+    });
+  }
+
   function ensureMesaTools(){
     var bar=document.getElementById('mesaBar');
     if(bar&&!document.getElementById('mbShell60')){
@@ -270,6 +307,8 @@
       document.getElementById('mbFocus60').onclick=toggleFocus;
       applyMesa();
     }
+
+    adoptMore();
 
     /* Alternador mobile limpo (Painel vs Jogadores) logo abaixo do mapa */
     var center=document.getElementById('mesaCenter');

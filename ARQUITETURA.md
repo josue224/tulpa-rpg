@@ -15,7 +15,7 @@ Roda direto no GitHub Pages (`usuario.github.io/tulpa-rpg/`): sem bundler, sem b
 
 ## Cache (importante no GitHub Pages)
 
-O Pages manda os arquivos com cache de ~10 min. Como os arquivos agora dependem uns dos outros, um visitante poderia receber um `js/20` novo com um `js/22` antigo. Por isso todo `src`/`href` local leva `?v=20261122f`. **A cada deploy que mude qualquer arquivo, troque o token em todas as tags:**
+O Pages manda os arquivos com cache de ~10 min. Como os arquivos agora dependem uns dos outros, um visitante poderia receber um `js/20` novo com um `js/22` antigo. Por isso todo `src`/`href` local leva `?v=20261122p`. **A cada deploy que mude qualquer arquivo, troque o token em todas as tags:**
 
 ```bash
 sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
@@ -30,7 +30,7 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
 <body>   markup (portal, app, modais)  →  scripts/CSS intercalados na MESMA posição dos blocos originais:
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
          → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento)
-         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas)  → js/61   (antigo closure; 61 = inicialização, sempre por último)
+         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas) → js/60d → js/60e (filtros Arcade) → js/61   (antigo closure; 61 = inicialização, sempre por último)
 ```
 
 Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` original, para manter a cascata idêntica (inclusive em relação a estilos que o JS injeta no `<head>`).
@@ -48,10 +48,10 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 7 | `07-visual-etapas-5-24.css` | 1676–2796 | 100 KB | Acabamento visual, paletas, Visão de Mesa, chat, mini-games, combate no mapa, Arcade, Perseus (Etapa 20/22/23/24), conquistas. |
 | 8 | `08-esteticas.css` | 2797–2916 | 16 KB | Camada estrutural da Galeria de Estéticas: [data-aesthetic], botões gloss/gel, textura da tela, galeria. |
 | 9 | `09-visual-etapas-26-39.css` | 2917–3424 | 43 KB | Arcade pelo menu, Despertar, transmissão de tela, Alterações do Sistema, Óbolos, Manual Vivo, símbolos, ciclo elemental, Sub-Elementos, bestiário, Arcade 2.0. |
-| 10 | `10-app-shell.css` | novo | 9 KB | **Onda 1 · App Shell**: tokens estruturais (escala 4/8 px, tipografia), rail/barra inferior de navegação, Mesa VTT com painéis retráteis. Só estrutura: cores e fontes vêm das variáveis das estéticas. |
-| 11 | `11-fichas.css` | novo | 7 KB | **Onda 2 · Fichas**: topbar enxuta, cabeçalho compacto, faixa de abas horizontal fixa, grade editorial da Visão geral. Só vale em `body.sheet-view`. |
-| 12 | `12-docs.css` | novo | 3 KB | **Onda 3 · Manual Vivo e Alterações do Sistema**: no desktop viram área de trabalho ao lado do rail (índice lateral fixo, coluna de leitura de 76ch, busca em destaque, lista alinhada). No celular mantém a tela cheia de antes. Sem JS novo. |
-| 13 | `13-arcade-mapa.css` | novo | 3 KB | **Onda 4 · Tulpa Arcade e mapa**: vitrine do Arcade com faixa de filtros limpa, cards de mesma altura com botões alinhados, ordem mobile (filtros → salas → jogos); no celular a barra de ferramentas do mapa vira uma faixa única rolável. Não mexe nos jogos em tela cheia. Sem JS novo. |
+| 10 | `10-app-shell.css` | novo | 27 KB | **Onda 1 · App Shell + Mesa VTT (v2)**: tokens estruturais (escala 4/8 px), rail/barra inferior e a Mesa como estação de trabalho de janela inteira (barra única de 44 px, roster 216 px, mapa protagonista, dock 3×2 retrátil, ferramentas e visão do Mestre flutuando sobre o mapa). Só estrutura: cores e fontes vêm das variáveis das estéticas. |
+| 11 | `11-fichas.css` | novo | 15 KB | **Onda 2 · Fichas (v2)**: topbar sem botões repetidos do rail, cabeçalho fixo (Vital/Lucidez/Essência sempre visíveis), coluna lateral de abas ≥1180 px (faixa rolável com esmaecido abaixo disso), identificação compacta, grade editorial. Só vale em `body.sheet-view`. |
+| 12 | `12-docs.css` | novo | 3 KB | **Onda 3 · Manual Vivo e Alterações do Sistema**: no desktop viram área de trabalho ao lado do rail (índice lateral fixo, coluna de leitura de 76ch, busca em destaque, lista alinhada). No celular mantém a tela cheia de antes. Busca com ícone e contagem de resultados, campos de 44px, placeholder com contraste ≥ 5:1 nos 4 temas testados, cabeçalho do Manual em duas linhas no celular, Alterações em 2 colunas alinhadas no desktop. Sem JS novo. |
+| 13 | `13-arcade-mapa.css` | novo | 3 KB | **Onda 4 · Tulpa Arcade e mapa**: vitrine do Arcade com faixa de filtros limpa, cards de mesma altura com botões alinhados, ordem mobile (filtros → salas → jogos); no celular a barra de ferramentas do mapa vira uma faixa única rolável. Não mexe nos jogos em tela cheia. **v2:** vitrine e Quarto do Perseus herdam fundo e texto da estética (antes o fundo era fixo escuro e quebrava nos temas claros), chips de dificuldade e botão voltar com cores do tema, abas do Perseus em linha própria, no celular os jogos vêm antes de Salas e Placar, estilos da barra de filtros do `js/60e`. |
 | 14 | `14-polish.css` | novo | 2 KB | **Onda 5 · Polimento**: com estética/paleta ativa (`body.t3-pal`), o texto das abas da ficha e do topbar passa a seguir `--text` (antes usava cores fixas do tema clássico e ficava ilegível em estéticas claras); foco de teclado visível nos controles novos. |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
@@ -122,8 +122,9 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 58 | `58-arcade2-onda9.js` | 22660–22989 | 41 KB | Etapas 54–55 · Arcade 2.0 Onda 9: Arcade 2.0 Onda 9. |
 | 59 | `59-arcade2-onda10.js` | 22990–23320 | 39 KB | Etapas 56–57 · Arcade 2.0 Onda 10: Arcade 2.0 Onda 10. |
 | 60 | `60-arcade2-onda11.js` | 23321–23604 | 31 KB | Etapas 58–59 · Arcade 2.0 Onda 11: Arcade 2.0 Onda 11 (inclui Jogo da Velha 2.0). |
-| 60b | `60b-app-shell.js` | novo | 9 KB | **Onda 1 · App Shell**: monta o rail (desktop) / barra inferior (celular), destaca a tela atual e cria os botões Jogadores/Painel da Mesa. Só aciona o que já existe (`#openTable`, `T3.manualOpen`, `T3.arcGo`, `T3.petOpen`, `T3.sysOpen`, `T3.openSettings`, `T3.back`). Usa IIFE: não cria nomes globais. Roda ANTES do `61`. |
-| 60c | `60c-fichas.js` | novo | 4 KB | **Onda 2 · Fichas**: cria o cabeçalho `#sheetHead60` (Vital/Lucidez/Essência) como espelho SOMENTE LEITURA de `#stats`, mede o topbar (`--tb-h`) e mantém a aba ativa visível. IIFE; roda ANTES do `61`. |
+| 60b | `60b-app-shell.js` | novo | 9 KB | **Onda 1 · App Shell**: monta o rail (desktop) / barra inferior (celular), destaca a tela atual e cria os botões Jogadores/Painel da Mesa. Só aciona o que já existe (`#openTable`, `T3.manualOpen`, `T3.arcGo`, `T3.petOpen`, `T3.sysOpen`, `T3.openSettings`, `T3.back`). Usa IIFE: não cria nomes globais. Roda ANTES do `61`. **v2:** `adoptMore()` move (não recria) `.mb-right`, `#mbArc26` e `#mbScr28` da barra da Mesa para o popover `#mbMore60` (botão `#mbMoreBtn60`); IDs e handlers dos outros arquivos seguem valendo. |
+| 60c | `60c-fichas.js` | novo | 4 KB | **Onda 2 · Fichas**: cria o cabeçalho `#sheetHead60` (Vital/Lucidez/Essência) como espelho SOMENTE LEITURA de `#stats`, mede o topbar (`--tb-h`) e o cabeçalho fixo (`--sh-h`), marca o botão “← Central” (`.tb-central60`) e mantém a aba ativa visível. IIFE; roda ANTES do `61`. |
+| 60e | `60e-arcade-filtros.js` | novo | 4 KB | **Onda 4 · Filtros do Arcade**: barra com busca e filtros por modo (Solo, Contra o Perseus, Mesa, PvP 1v1) acima da grade de jogos. Lê o modo dos botões de cada cartão e é recriada por um `MutationObserver` a cada volta à vitrine. Filtro lembrado em `localStorage t60e.arcFilter`. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## App Shell (Onda 1)

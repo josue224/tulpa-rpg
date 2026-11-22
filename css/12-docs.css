@@ -384,3 +384,87 @@ body.doc-open .shell{display:none!important}
     #sys29 .sys29-row{flex-wrap:wrap;gap:var(--sp-2)}
   }
 }
+
+/* ==========================================================================
+   Onda 3 (v2) · Alinhamento de leitura, busca em destaque e celular
+   ========================================================================== */
+@media screen{
+  /* ---- Manual: uma única margem esquerda e uma medida de leitura (74ch) ---- */
+  #man31 .m31-cover{text-align:left;margin-inline:0;max-width:74ch}
+  #man31 .m31-cover *{text-align:left}
+  #man31 .m31-cover>*{margin-inline:0!important;max-width:none!important;padding-inline:0}
+  #man31 .m31-h2{max-width:74ch;border-bottom:0;padding-bottom:0}
+  #man31 .m31-chap{border-top:1px solid var(--border-subtle,var(--line,#2a3442))}
+  #man31 .m31-chap:first-child{border-top:0}
+
+  /* ---- Busca: protagonista da barra superior ---- */
+  #man31 .m31-search{position:relative}
+  #man31 .m31-search::before{
+    content:"⌕";position:absolute;left:13px;top:50%;transform:translateY(-54%);
+    font-size:19px;line-height:1;color:var(--ink-dim,var(--muted,#8d9aaa));pointer-events:none;z-index:1;
+  }
+  #man31 .m31-search input{
+    min-height:44px;padding-left:38px;font-size:var(--fs-md,14.5px);
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 82%,var(--bg,#090b10));
+    color:var(--text,#edf2f7);
+  }
+  html body.t3-pal #man31 .m31-search input::placeholder{color:color-mix(in oklab,currentColor 78%,transparent)!important;opacity:1!important}
+  #sys29 #sys29q{
+    min-height:44px;font-size:var(--fs-md,14.5px);
+    background:color-mix(in srgb,var(--surf-1,var(--panel,#11151d)) 82%,var(--bg,#090b10));
+    color:var(--text,#edf2f7);
+  }
+  html body.t3-pal #sys29 #sys29q::placeholder{color:color-mix(in oklab,currentColor 78%,transparent)!important;opacity:1!important}
+
+  /* Interruptor "Pré-visualizar como Player": compacto e coerente com as estéticas */
+  #man31 .m31-pvsw{
+    display:inline-flex;align-items:center;gap:var(--sp-2);
+    min-height:36px;padding:0 var(--sp-3);margin:0;
+    border:1px solid var(--border-subtle,var(--line,#2a3442));
+    border-radius:var(--shell-r,10px);
+    background:transparent;color:var(--ink-dim,var(--muted,#8d9aaa));
+    font:600 var(--fs-xs,12px)/1 var(--f-ui,inherit);white-space:nowrap;cursor:pointer;
+  }
+  #man31 .m31-pvsw:has(input:checked){
+    color:var(--text,#edf2f7);background:var(--surf-active,rgba(255,255,255,.1));
+    border-color:var(--border-strong,var(--accent,#b7d7d5));
+  }
+  #man31 .m31-pvsw input{
+    width:16px;height:16px;margin:0;flex:none;
+    accent-color:var(--accent,#b7d7d5);
+  }
+
+  @media (min-width:861px){
+    /* O índice já é fixo no desktop: o botão Sumário só serve no celular */
+    #man31 .m31-tocbtn{display:none!important}
+    /* Alterações do Sistema: tudo alinhado à esquerda, mesma coluna, lista em 2 colunas */
+    #sys29 .sys29-main>*{margin-inline:0!important;max-width:1080px!important}
+    #sys29 .sys29-list{
+      grid-template-columns:repeat(auto-fill,minmax(400px,1fr));margin:var(--sp-3) 0 0!important;
+    }
+  }
+
+  @media (max-width:860px){
+    /* Barra do Manual em 2 linhas: [Sumário · título · Fechar] / [busca · Player · PDF] */
+    #man31 .m31-top{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2);padding:var(--sp-2) var(--sp-3)}
+    #man31 .m31-tools{display:contents}
+    #man31 .m31-tocbtn{order:1}
+    #man31 .m31-ttl{order:2;flex:1 1 150px;min-width:0}
+    #man31 .m31-ttl{padding-right:76px}
+    #man31 .m31-hits{order:7;flex:none}
+    #man31 .m31-ttl h1{font-size:var(--fs-md,15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
+    #man31 .m31-ttl .sub{display:none}
+    #man31 #m31x{order:3;flex:none}
+    #man31 .m31-search{order:4;flex:1 1 120px;min-width:0}
+    #man31 .m31-search input{width:100%}
+    #man31 .m31-pvsw{order:5;flex:none;font-size:0;gap:6px;padding:0 var(--sp-2)}
+    #man31 .m31-pvsw::after{content:"👁 Player";font-size:var(--fs-xs,12px)}
+    #man31 .m31-pvsw>span{display:none}
+    #man31 #m31print{order:6;flex:none}
+    /* Abas de Alterações: borda com esmaecido indicando rolagem */
+    #sys29 .sys29-nav{
+      -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);
+      mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);
+    }
+  }
+}

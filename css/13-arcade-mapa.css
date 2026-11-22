@@ -276,13 +276,13 @@ html body.t3-pal[data-ae-glass="1"] #mgRoot .mg-top{
 
 /* ---------- 3. MOBILE (≤ 860px): Arcade, Perseus & Barra do Mapa ---------- */
 @media (max-width:860px){
-  /* Arcade mobile: filtros -> salas -> jogos */
+  /* Arcade mobile: filtros -> jogos -> salas e placar */
   #mgRoot .mg-top{padding:6px var(--sp-2,8px)}
   #mgRoot .mg-main{
     padding:var(--sp-3,12px) var(--sp-3,12px) calc(var(--sp-5,24px) + env(safe-area-inset-bottom,0px));
   }
   #mgRoot .mg-gdrow{order:-2;padding:var(--sp-3,12px)}
-  #mgRoot .mg-side{order:-1}
+  #mgRoot .mg-side{order:2}#mgRoot .mg-games{order:1}
   #mgRoot .mg-gdrow #ptHubBtn,
   #mgRoot .mg-gdrow #mgAchBtn{margin-left:0;flex:1 1 auto}
   #mgRoot .mg-grid{grid-template-columns:minmax(0,1fr)}
@@ -326,4 +326,99 @@ html body.t3-pal[data-ae-glass="1"] #mgRoot .mg-top{
 @media (prefers-reduced-motion:reduce){
   #mgRoot .mg-card,#mgRoot .pt-item{transition:none}
   #mgRoot .mg-card:hover,#mgRoot .pt-item:hover{transform:none}
+}
+
+/* ==========================================================================
+   Onda 4 (v2) · Arcade e Quarto do Perseus seguem a estética ativa
+   Antes o #mgRoot era sempre escuro (#120d18) e o texto vinha do tema:
+   em estéticas claras isso gerava texto escuro sobre cartão escuro e texto
+   claro sobre painel claro. Agora o fundo e o texto da vitrine/Perseus
+   herdam do tema. As partidas (body.mg-ov / .mg-full) continuam escuras.
+   ========================================================================== */
+@media screen{
+  html body.t3-pal:not(.mg-ov) #mgRoot:is(:has(.mg-hub),:has(.pt)){
+    background:color-mix(in srgb,var(--bg,#120d18) 90%,var(--panel,#11151d));
+    color:var(--text,#f4ead6);
+  }
+  html body.t3-pal:not(.mg-ov) #mgRoot .mg-top{color:var(--text,#f4ead6)}
+  html body.t3-pal #mgRoot .mg-card{
+    background:var(--surf-1,var(--panel,#11151d));
+    border-color:var(--border-subtle,var(--line,#2a3442));
+    color:var(--text,#f4ead6);
+  }
+  html body.t3-pal #mgRoot .mg-card p{color:color-mix(in srgb,var(--text,#f4ead6) 78%,var(--panel,#11151d))!important}
+  html body.t3-pal #mgRoot .mg-card h3{color:var(--text,#f4ead6)!important}
+  html body.t3-pal #mgRoot :is(.mg-gdrow,.pt-head,.pt-bars,.pt-panel,.mg-side>*){color:var(--text,#f4ead6)}
+  html body.t3-pal #mgRoot :is(.mg-gdrow>span:not(.sub),.pt-purse,.pt-lvl,.pt-bars *,.pt-bar *){color:inherit}
+
+  /* Chips de dificuldade e botão voltar: cores do tema, sem branco fixo */
+  html body.t3-pal #mgRoot .mg-gdrow .mg-gdb{
+    background:var(--surf-2,var(--panel,#11151d));
+    color:var(--text,#f4ead6);
+    border-color:var(--border-strong,var(--line,#2a3442));
+  }
+  html body.t3-pal #mgRoot .mg-gdrow .mg-gdb:hover{background:var(--surf-hover,rgba(255,255,255,.08))}
+  html body.t3-pal #mgRoot .mg-gdrow .mg-gdb.on,
+  html body.t3-pal #mgRoot .mg-gdrow .mg-gdb.d-pesadelo.on{
+    background:color-mix(in srgb,var(--accent,#b7d7d5) 24%,var(--panel,#11151d));
+    color:var(--text,#f4ead6);
+    border-color:var(--accent,#b7d7d5);
+    box-shadow:inset 0 0 0 1px var(--accent,#b7d7d5);
+  }
+  html body.t3-pal:not(.mg-ov) #mgRoot .mg-tb{
+    background:var(--surf-2,var(--panel,#11151d));
+    color:var(--text,#f4ead6);
+    border-color:var(--border-strong,var(--line,#2a3442));
+  }
+}
+
+/* ---------- Filtros por modo da vitrine (js/60e-arcade-filtros.js) ---------- */
+@media screen{
+  #mgRoot .af-bar{
+    display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2,8px) var(--sp-3,12px);
+    margin:0 0 var(--sp-3,12px);
+  }
+  #mgRoot .af-chips{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 auto;min-width:0}
+  #mgRoot .af-chip{
+    min-height:36px;padding:0 12px;border-radius:999px;cursor:pointer;font:inherit;
+    font-size:var(--fs-xs,12px);font-weight:700;
+    background:var(--surf-2,var(--panel,#11151d));color:var(--text,#f4ead6);
+    border:1px solid var(--border-strong,var(--line,#2a3442));
+    transition:background-color .14s ease,border-color .14s ease;
+  }
+  #mgRoot .af-chip:hover{background:var(--surf-hover,rgba(255,255,255,.08))}
+  #mgRoot .af-chip.on{
+    background:color-mix(in srgb,var(--accent,#b7d7d5) 24%,var(--panel,#11151d));
+    border-color:var(--accent,#b7d7d5);box-shadow:inset 0 0 0 1px var(--accent,#b7d7d5);
+  }
+  #mgRoot .af-chip:focus-visible,#mgRoot .af-search input:focus-visible{outline:3px solid var(--accent,#ffd36b);outline-offset:2px}
+  #mgRoot .af-n{opacity:.8;font-weight:600;margin-left:2px}
+  #mgRoot .af-search input{
+    min-height:36px;width:200px;max-width:100%;padding:0 12px;border-radius:999px;font:inherit;font-size:var(--fs-sm,13px);
+    background:var(--surf-1,var(--panel,#11151d));color:var(--text,#f4ead6);
+    border:1px solid var(--border-strong,var(--line,#2a3442));
+  }
+  html body.t3-pal #mgRoot .af-search input::placeholder{color:color-mix(in srgb,currentColor 78%,transparent)!important;opacity:1!important}
+  #mgRoot .af-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  #mgRoot .af-count{font-size:var(--fs-xs,12px);color:var(--text,#f4ead6);margin-left:auto}
+  #mgRoot .mg-card[hidden]{display:none}
+  #mgRoot .af-empty{padding:var(--sp-5,24px);text-align:center;border:1px dashed var(--border-strong,var(--line,#2a3442));border-radius:var(--surface-r,12px)}
+  #mgRoot .af-empty[hidden]{display:none}
+  #mgRoot .af-empty p{margin:0 0 var(--sp-3,12px)}
+  @media (max-width:860px){#mgRoot .af-search{flex:1 1 100%}#mgRoot .af-search input{width:100%}#mgRoot .af-count{margin-left:0}}
+}
+@media screen and (prefers-reduced-motion:no-preference){
+  #mgRoot .mg-main>*{animation:af-in .22s ease-out both}
+  @keyframes af-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+}
+
+/* Perseus: abas em linha própria, alinhadas à esquerda, sob uma divisória */
+@media screen{
+  #mgRoot .pt-head .pt-tabs{
+    order:9;flex:1 0 100%;margin-left:0;
+    padding-top:var(--sp-2,8px);
+    border-top:1px solid var(--border-subtle,var(--line,#2a3442));
+  }
+  html body.t3-pal #mgRoot .pt-tab{color:color-mix(in srgb,var(--text,#edf2f7) 82%,var(--panel,#11151d))}
+  html body.t3-pal #mgRoot .pt-tab.on{color:var(--text,#edf2f7)}
 }
