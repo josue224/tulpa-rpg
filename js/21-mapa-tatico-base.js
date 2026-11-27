@@ -218,6 +218,7 @@ function mapMenu7(t,e){
 /* ---------- desenho ---------- */
 function mapTokVisible7(t){
   const ch=charById(t.charId);if(!ch)return false;
+  if(t.npc&&t.npc.hid&&!isGM6())return false; /* NPC oculto dos jogadores */
   if(isGM6())return true;if(ch.ownerId===uid3())return true;
   if(!inScene(ch))return false;
   if(!tokVisible10(t))return false;
@@ -286,7 +287,7 @@ function mapPaint7(){
     else{let h=0;for(const c of nm(ch))h=(h*31+c.charCodeAt(0))>>>0;x.fillStyle=down?'#555':AV_C[h%AV_C.length];x.fillRect(cx-r,cy-r,r*2,r*2);x.fillStyle='#fff';x.font=`700 ${Math.max(9,r*.8)}px "Cormorant Garamond",Georgia,serif`;x.textAlign='center';x.textBaseline='middle';x.fillText((nm(ch).split(/\s+/).slice(0,2).map(w=>[...w][0]).join('')||'?').toUpperCase(),cx,cy+1)}
     x.restore();sv=0;
     const own=ch.ownerId&&ch.ownerId===uid3();
-    x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.lineWidth=Math.max(2,sz*.06);x.strokeStyle=down?'#777':gmChar6(ch)?'#c2493d':own?'#f0c85a':'#f4ead6';x.stroke();
+    x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.lineWidth=Math.max(2,sz*.06);x.strokeStyle=down?'#777':ch.npcLite?ch.npcLite.ring:gmChar6(ch)?'#c2493d':own?'#f0c85a':'#f4ead6';x.stroke();
     paintFacing10(x,t,cx,cy,r,own);
     if(cur===ch.id){x.beginPath();x.arc(cx,cy,r+4+Math.sin(now/260)*1.5,0,Math.PI*2);x.lineWidth=2.5;x.strokeStyle='rgba(240,200,90,.95)';x.stroke();again=true}
     if(MAP7.sel===t.id){x.beginPath();x.arc(cx,cy,r+3,0,Math.PI*2);x.setLineDash([5,4]);x.lineWidth=2;x.strokeStyle='#fff';x.stroke();x.setLineDash([])}

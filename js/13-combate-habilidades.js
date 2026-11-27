@@ -3,7 +3,7 @@ const CB={pending:{},seen:new Set(),log:[],promptQueue:[],prompting:false,loaded
 const TURN={key:'',actionUsed:false,talentUsed:false};
 window.T3.CB=CB;
 const chars3=()=>camp3()?.characters||[];
-const charById=id=>chars3().find(c=>c.id===id);
+const charById=id=>chars3().find(c=>c.id===id)||(typeof id==='string'&&id.charAt(0)==='n'&&window.T3&&T3.npcLiteChar?T3.npcLiteChar(id):undefined); /* 'npc:…' = NPC de mapa sem ficha (js/60w) */
 const nm=ch=>ch?.data?.name||'Personagem';
 /* onde este personagem está na rodada (null fora de combate): base da Reação e da Guarda */
 const turnOf=ch=>E.turnCtx(camp3()?.combat,ch?.id);

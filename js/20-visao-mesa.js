@@ -763,7 +763,7 @@ function renderSheetDocs6(){
 {const _rst6=T3.renderSheetTabs;T3.renderSheetTabs=function(){_rst6.apply(this,arguments);try{renderSheetDocs6()}catch(e){console.warn('[T6] documentos da ficha',e)}}}
 
 /* ---------- música (YouTube), playlist por momento e intervalo ---------- */
-const YT6={api:null,player:null,ready:null,sig:'',synth:null,blocked:false,muted:false,retried:false,alt:false,tried:{},err:null,warned:''};
+const YT6={api:null,player:null,ready:null,sig:'',synth:null,blocked:false,muted:false,retried:false,alt:false,tried:{},err:null,warned:'',chain:{},audio:null,lamb:false};
 /* o vídeo não pôde tocar neste aparelho: avisa quem quer que seja (Mestre ou jogador), uma vez por vídeo */
 function ytFail6(vid,msg){
   YT6.err={vid,msg};renderVol6();
@@ -787,6 +787,7 @@ async function ytInfo6(vid){
   return{ok:true,title:''}; /* não deu para conferir: deixa adicionar */
 }
 function applyVol6(){
+  try{if(YT6.audio){YT6.audio.volume=Math.max(0,Math.min(1,(prefs.musicVol||0)/100));YT6.audio.muted=(prefs.musicVol||0)<=0}T3.ambient?.vol()}catch(e){}
   const p=YT6.player;if(!p||typeof p.setVolume!=='function')return;
   try{p.setVolume(prefs.musicVol);if(prefs.musicVol<=0)p.mute();else if(!YT6.muted&&p.isMuted&&p.isMuted())p.unMute()}catch(e){}
 }
@@ -794,6 +795,7 @@ function applyVol6(){
 function unlockMusic6(){
   try{actx()}catch(e){}
   YT6.muted=false;YT6.blocked=false;const p=YT6.player;
+  try{if(YT6.audio&&wantMusic6()?.url&&YT6.audio.paused)YT6.audio.play().catch(()=>{})}catch(e){}
   if(p&&typeof p.unMute==='function'){try{p.unMute();applyVol6();if(p.getPlayerState()!==1&&wantMusic6()?.playing)p.playVideo()}catch(e){}}
   renderVol6();
 }
@@ -819,7 +821,7 @@ function ytPlayer6(){
       onReady:()=>{applyVol6();ok(YT6.player)},
       onStateChange:e=>{
         if(e.data===0){try{YT6.player.seekTo(0,true);YT6.player.playVideo()}catch(x){}} /* repete enquanto o Mestre não trocar */
-        if(e.data===1){YT6.retried=false;if(YT6.err){YT6.err=null;YT6.warned=''}try{const vd=YT6.player.getVideoData?.().video_id;if(vd)delete YT6.tried[vd]}catch(x){}if(isGM6()){const vv=wantMusic6()?.vid,pl0=M6.state.playlist||[];if(vv&&pl0.some(x=>x.vid===vv&&x.bad))setState6({playlist:pl0.map(x=>x.vid===vv?{...x,bad:false}:x)},{silent:true})}if(!YT6.muted)YT6.blocked=false;applyVol6();const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
+        if(e.data===1){YT6.retried=false;YT6.chain={};if(YT6.err){YT6.err=null;YT6.warned=''}try{const vd=YT6.player.getVideoData?.().video_id;if(vd)delete YT6.tried[vd]}catch(x){}if(isGM6()){const vv=wantMusic6()?.vid,pl0=M6.state.playlist||[];if(vv&&pl0.some(x=>x.vid===vv&&x.bad))setState6({playlist:pl0.map(x=>x.vid===vv?{...x,bad:false}:x)},{silent:true})}if(!YT6.muted)YT6.blocked=false;applyVol6();const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
       },
       onError:e=>{
         const c=e&&e.data,m=wantMusic6(),vid=m&&m.vid;YT6.lastErr=c;
@@ -833,6 +835,7 @@ function ytPlayer6(){
         }
         const why={2:'O link dessa música parece inválido.',100:'Esse vídeo foi removido ou está privado.',153:'O YouTube não reconheceu este site (erro 153). Desative o bloqueador de rastreio ou de “referer” para esta página.'}[c]||'O YouTube recusou tocar esse vídeo neste navegador (erro '+c+').'+(isGM6()?' Os jogadores podem estar ouvindo normalmente.':' Avise o Mestre.');
         if(vid)ytFail6(vid,why);else if(isGM6())toast(why);
+        if([100,2,101,150,153].includes(c)&&vid)ytSkip6(vid);
         if(!isGM6())return;
         if(c===100||c===2){const pl=M6.state.playlist||[];if(vid&&pl.some(x=>x.vid===vid&&!x.bad))setState6({playlist:pl.map(x=>x.vid===vid?{...x,bad:true}:x)})}
       }
@@ -846,13 +849,18 @@ function ytPlayer6(){
 function wantMusic6(){
   const st=M6.state;
   if(st.pause?.on){const w=(st.playlist||[]).find(x=>/intervalo|espera|pausa/.test(normTxt(x.moment||'')));return w?{vid:w.vid,title:w.title,playing:true,pos:0,ts:st.pause.since||Date.now(),wait:true}:{synth:true,playing:true,ts:st.pause.since||0,wait:true}}
-  return st.music&&st.music.vid?st.music:null;
+  return st.music&&(st.music.vid||st.music.url||st.music.amb)?st.music:null;
 }
 async function syncMusic6(){
-  const m=wantMusic6(),sig=m?[m.vid||'synth',m.ts,m.playing,m.pos].join('|'):'';
+  const m=wantMusic6(),sig=m?[m.vid||m.url||m.amb||'synth',m.ts,m.playing,m.pos].join('|'):'';
   if(sig===YT6.sig)return;YT6.sig=sig;
   if(!m||!m.playing||!m.synth)stopWait6();
+  if(m&&m.playing)stopLocalAmb6();
+  if(!m||!m.playing||!m.amb)try{T3.ambient?.stop('state')}catch(e){}
+  if(!m||!m.playing||!m.url)audStop6();
   if(!m||!m.playing){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}renderVol6();return}
+  if(m.amb){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}try{T3.ambient?.start(m.amb,'state')}catch(e){console.warn('[T6] ambiente',e)}renderVol6();return}
+  if(m.url){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}audPlay6(m);renderVol6();return}
   if(m.synth){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}startWait6();renderVol6();return}
   try{
     if(YT6.err&&YT6.err.vid!==m.vid){YT6.err=null;YT6.warned=''}
@@ -866,6 +874,47 @@ async function syncMusic6(){
   }catch(e){console.warn('[T6] música',e);if(m&&m.vid)ytFail6(m.vid,'Música: '+(e.message||'erro')+'. Recarregue a página ou libere o YouTube no bloqueador.');else if(isGM6())toast('Música: '+(e.message||'erro')+'.')}
   renderVol6();
 }
+/* ---- áudio direto (.mp3/.ogg/.wav/stream) por <audio>, sincronizado pelo estado da mesa; imune aos erros 101/150/153 ---- */
+const AUDIO_EXT6=/\.(mp3|ogg|oga|opus|wav|m4a|aac|flac|weba|webm)(\?|#|$)/i;
+function isAudioUrl6(u){
+  u=String(u||'').trim();if(!/^https?:\/\/[^\s]+$/i.test(u))return false;
+  if(/(^|\.)(youtube\.com|youtu\.be|youtube-nocookie\.com)\//i.test(u.replace(/^https?:\/\//i,'')))return false;
+  return true;
+}
+function audPlay6(m){
+  let a=YT6.audio;
+  if(!a){a=YT6.audio=new Audio();a.preload='auto';
+    a.addEventListener('error',()=>{const mm=wantMusic6();if(mm&&mm.url&&a.dataset.src===mm.url){YT6.err={vid:mm.url,msg:'O link de áudio não pôde ser tocado (formato, bloqueio do servidor ou link vencido).'};renderVol6();if(isGM6())toast('🎵 '+YT6.err.msg)}})}
+  const url=m.url;if(a.dataset.src!==url){a.src=url;a.dataset.src=url}
+  YT6.err=null;YT6.warned='';a.loop=m.loop!==false;a.volume=Math.max(0,Math.min(1,(prefs.musicVol||0)/100));a.muted=(prefs.musicVol||0)<=0;
+  const el=Math.max(0,(Number(m.pos)||0)+(Date.now()-(m.ts||Date.now()))/1000);
+  const seek=()=>{try{if(isFinite(a.duration)&&a.duration>0&&el>1)a.currentTime=a.loop?el%a.duration:Math.min(el,a.duration-.1)}catch(e){}};
+  if(a.readyState>=1)seek();else a.addEventListener('loadedmetadata',seek,{once:true});
+  const pr=a.play();if(pr&&pr.then)pr.then(()=>{YT6.blocked=false;renderVol6()}).catch(err=>{if(err&&err.name==='NotAllowedError'){YT6.blocked=true;renderVol6()}});
+}
+function audStop6(){try{YT6.audio&&!YT6.audio.paused&&YT6.audio.pause()}catch(e){}}
+/* erro 101/150/153/100/2 persistente: o Mestre pula sozinho para a próxima faixa da playlist (sem loop se todas falharem) */
+function ytSkip6(vid){
+  if(!isGM6())return false;
+  YT6.chain[vid]=1;
+  const pl=(M6.state.playlist||[]).filter(x=>x.vid||x.url);if(pl.length<2)return false;
+  const i=Math.max(0,pl.findIndex(x=>x.vid===vid)),order=pl.slice(i+1).concat(pl.slice(0,i));
+  const nx=order.find(x=>!x.bad&&!(x.vid&&YT6.chain[x.vid]));
+  if(!nx){toast('🎵 Nenhuma faixa da playlist toca neste navegador. Use “Ativar Ambiente” ou cole um link direto de áudio.');return false}
+  toast('🎵 Essa faixa não toca aqui. Pulando para: '+(nx.title||'próxima música')+'.');
+  setTimeout(()=>playTrack6(nx.id,true),400);return true;
+}
+function stopLocalAmb6(){if(YT6.lamb){YT6.lamb=false;try{T3.ambient?.stop('local')}catch(e){}renderVol6()}}
+function toggleLocalAmb6(){
+  if(YT6.lamb){stopLocalAmb6();return}
+  try{actx()}catch(e){}
+  const id=prefs.ambLast||'sanct';YT6.lamb=true;try{T3.ambient?.start(id,'local')}catch(e){YT6.lamb=false}renderVol6();
+}
+function playAmbient6(id){
+  if(!isGM6())return false;const it=(T3.ambient?.list||[]).find(x=>x[0]===id);if(!it)return false;
+  try{actx()}catch(e){}prefs.ambLast=id;try{savePrefs()}catch(e){}
+  setState6({music:{amb:id,title:it[1],moment:'Ambiente',playing:true,pos:0,ts:Date.now()}});return true;
+}
 /* vigia: o vídeo não começou. Com permissão de som (já houve toque na página) só insiste; o modo mudo + "Ativar som"
    fica para quando o navegador realmente bloqueou. Antes ele silenciava o player de quem tinha permissão só porque o vídeo demorou a carregar. */
 function ytWatch6(sig,p,act,n){
@@ -878,7 +927,7 @@ function ytWatch6(sig,p,act,n){
   }catch(e){}
 }
 onState6(()=>{syncMusic6();if(M6.tab==='musica')renderMusic6();renderPause6()});
-M6.hooks.leave.push(()=>{YT6.sig='';stopWait6();try{YT6.player&&YT6.player.stopVideo()}catch(e){}$('mesaPause')?.classList.remove('show')});
+M6.hooks.leave.push(()=>{YT6.sig='';stopWait6();audStop6();YT6.lamb=false;try{T3.ambient?.stop()}catch(e){}try{YT6.player&&YT6.player.stopVideo()}catch(e){}$('mesaPause')?.classList.remove('show')});
 /* musiquinha de espera feita na hora (caixinha de música), quando a playlist não tem uma faixa "Intervalo" */
 function startWait6(){
   if(YT6.synth)return;const c=actx();if(!c)return;
@@ -898,26 +947,32 @@ function renderVol6(){
   const b=$('mbMusic');if(!b)return;const m=wantMusic6(),on=!!(m&&m.playing);
   const label=on?(m.synth?'Música de espera':(m.title||'Música da mesa')):'Sem música';
   if(!b.firstChild){
-    b.innerHTML=`<button type="button" class="mb-ico" id="mbMute" aria-label="Silenciar a música"></button><input type="range" id="mbVol" min="0" max="100" step="1" aria-label="Volume da música"><span class="mb-now" id="mbNow"></span><button type="button" class="btn small primary hide" id="mbUnlock">▶ Ativar som</button>`;
+    b.innerHTML=`<button type="button" class="mb-ico" id="mbMute" aria-label="Silenciar a música"></button><input type="range" id="mbVol" min="0" max="100" step="1" aria-label="Volume da música"><span class="mb-now" id="mbNow"></span><button type="button" class="btn small primary hide" id="mbUnlock">▶ Ativar som</button><a class="btn small hide" id="mbYt" target="_blank" rel="noopener noreferrer">Abrir no YouTube ↗</a><button type="button" class="btn small hide" id="mbAmbLocal">Ativar Ambiente</button><select id="mbAmb" class="mb-amb hide" aria-label="Ambiente sintetizado para a mesa"><option value="">♬ Ambiente…</option>${(T3.ambient?.list||[]).map(a=>`<option value="${a[0]}">${a[1]}</option>`).join('')}<option value="__stop">⏹ Parar ambiente</option></select>`;
+    $('mbAmbLocal').onclick=toggleLocalAmb6;
+    $('mbAmb').onchange=e=>{const v=e.target.value;if(v==='__stop'){if(M6.state.music?.amb)stopMusic6()}else if(v)playAmbient6(v);e.target.value=''};
     $('mbVol').oninput=e=>{setVol6(e.target.value);renderVol6()};
     $('mbMute').onclick=()=>{if(prefs.musicVol>0){M6.volBack=prefs.musicVol;setVol6(0)}else setVol6(M6.volBack||60);renderVol6()};
     $('mbUnlock').onclick=()=>unlockMusic6();
   }
   $('mbVol').value=prefs.musicVol;$('mbMute').textContent=prefs.musicVol>0?'🔊':'🔇';$('mbMute').title=prefs.musicVol>0?'Silenciar a música (só para você)':'Ligar a música';
-  const bad=!!(on&&!m.synth&&YT6.err&&YT6.err.vid===m.vid);
+  const bad=!!(on&&!m.synth&&YT6.err&&YT6.err.vid===(m.vid||m.url));
   $('mbNow').textContent=(bad?'⚠ ':on?'♪ ':'')+label+(bad?' · não toca neste navegador':'');$('mbNow').classList.toggle('on',on&&!bad);$('mbNow').title=bad?YT6.err.msg:'';
   $('mbUnlock').classList.toggle('hide',!(on&&YT6.blocked));
+  const yt=$('mbYt');if(yt){const sh=!!(bad&&m.vid);yt.classList.toggle('hide',!sh);if(sh)yt.href='https://www.youtube.com/watch?v='+encodeURIComponent(m.vid)}
+  const al=$('mbAmbLocal');if(al){al.classList.toggle('hide',!(bad||YT6.lamb));al.textContent=YT6.lamb?'Parar Ambiente':'Ativar Ambiente';al.setAttribute('aria-pressed',String(!!YT6.lamb))}
+  const sa=$('mbAmb');if(sa)sa.classList.toggle('hide',!isGM6());
   const pv=$('pauseVol');if(pv)pv.value=prefs.musicVol;
 }
 /* comandos do Mestre */
-function curPos6(){try{return YT6.player&&YT6.player.getCurrentTime?YT6.player.getCurrentTime():0}catch(e){return 0}}
-function playTrack6(id){const t=(M6.state.playlist||[]).find(x=>x.id===id);if(!t||!isGM6())return false;setState6({music:{vid:t.vid,title:t.title||'',moment:t.moment||'',playing:true,pos:0,ts:Date.now()}});return true}
+function curPos6(){try{if(YT6.audio&&!YT6.audio.paused&&wantMusic6()?.url)return YT6.audio.currentTime;return YT6.player&&YT6.player.getCurrentTime?YT6.player.getCurrentTime():0}catch(e){return 0}}
+function playTrack6(id,auto){const t=(M6.state.playlist||[]).find(x=>x.id===id);if(!t||!isGM6())return false;if(!auto)YT6.chain={};setState6({music:t.url&&!t.vid?{url:t.url,loop:true,title:t.title||'',moment:t.moment||'',playing:true,pos:0,ts:Date.now()}:{vid:t.vid,title:t.title||'',moment:t.moment||'',playing:true,pos:0,ts:Date.now()}});return true}
 function pauseMusic6(){const m=M6.state.music;if(!m||!isGM6())return;setState6({music:{...m,playing:false,pos:curPos6(),ts:Date.now()}})}
 function resumeMusic6(){const m=M6.state.music;if(!m||!isGM6())return;setState6({music:{...m,playing:true,ts:Date.now()}})}
 function stopMusic6(){if(isGM6())setState6({music:null})}
 function addTrack6(url,title,moment){
-  const vid=ytId6(url);if(!vid)return null;
-  const t={id:'t'+rid(),vid,title:String(title||'').trim().slice(0,90),moment:String(moment||'').trim().slice(0,40)};
+  const vid=ytId6(url);if(!vid&&!isAudioUrl6(url))return null;
+  const u=String(url).trim().slice(0,600),t={id:'t'+rid(),title:String(title||'').trim().slice(0,90),moment:String(moment||'').trim().slice(0,40)};
+  if(vid)t.vid=vid;else{t.url=u;if(!t.title){try{t.title=decodeURIComponent(new URL(u).pathname.split('/').pop()||'').replace(AUDIO_EXT6,'').slice(0,90)}catch(e){}}}
   setState6({playlist:[...(M6.state.playlist||[]),t].slice(-80)});return t;
 }
 function findTrack6(q){
@@ -927,25 +982,28 @@ function findTrack6(q){
   pl.forEach(t=>{const hay=normTxt((t.moment||'')+' '+(t.title||''));let s=0;if(normTxt(t.moment||'')===n)s+=10;if(hay.includes(n))s+=5;words.forEach(w=>{if(w.length>2&&hay.includes(w))s+=1});if(s>bs){bs=s;best=t}});
   return bs>=1?best:null;
 }
-T3.music={add:addTrack6,play:playTrack6,pause:pauseMusic6,stop:stopMusic6,find:findTrack6,vol:setVol6};
+T3.music={ambient:playAmbient6,add:addTrack6,play:playTrack6,pause:pauseMusic6,stop:stopMusic6,find:findTrack6,vol:setVol6};
+const sameTrk6=(m,t)=>!!(m&&((t.vid&&m.vid===t.vid)||(t.url&&m.url===t.url)));
 function renderMusic6(){
   const box=$('mesaMusic');if(!box)return;const isM=isGM6(),st=M6.state,pl=st.playlist||[],m=st.music;
   const act=document.activeElement&&box.contains(document.activeElement)&&/INPUT|SELECT/.test(document.activeElement.tagName);
   if(act)return; /* não apaga o que o Mestre está digitando */
   const groups={};pl.forEach(t=>{const k=t.moment||'Sem momento';(groups[k]=groups[k]||[]).push(t)});
-  box.innerHTML=`<div class="mu-now ${m&&m.playing?'on':''}"><div><small>${m?(m.playing?'Tocando agora':'Pausada'):'Nada tocando'}</small><b>${m?esc(m.title||'Música do YouTube'):'Escolha uma música da playlist'}</b>${m&&m.moment?`<span class="pill">${esc(m.moment)}</span>`:''}</div>${isM&&m?`<div class="inline">${m.playing?'<button type="button" class="btn small" id="muPause">⏸ Pausar</button>':'<button type="button" class="btn small primary" id="muResume">▶ Retomar</button>'}<button type="button" class="btn small" id="muStop">⏹ Parar</button></div>`:''}</div>
-   ${isM?`<form class="mu-form" id="muForm"><div class="field"><label for="muUrl">Link do YouTube</label><input id="muUrl" placeholder="https://www.youtube.com/watch?v=…" inputmode="url"></div><div class="field"><label for="muTitle">Nome (opcional)</label><input id="muTitle" maxlength="90" placeholder="Ex.: Tema do porão"></div><div class="field"><label for="muMoment">Momento</label><input id="muMoment" list="muMoments" maxlength="40" placeholder="Ex.: Revelação da Sala"><datalist id="muMoments">${MOMENTS6.map(x=>`<option value="${x}">`).join('')}</datalist></div><button class="btn primary small">＋ Adicionar à playlist</button></form><p class="sub">Uma música com o momento <b>Intervalo</b> vira a música de espera do botão ⏸ Intervalo. Você também pode pedir ao Perseus: “toca a música para revelação da sala”.</p>`:'<p class="sub">O Mestre escolhe a música. O volume é só seu: use o controle no topo da mesa.</p>'}
-   ${pl.length?Object.entries(groups).map(([k,list])=>`<h4>${esc(k)}</h4><ul class="mu-list">${list.map(t=>`<li class="${m&&m.vid===t.vid?'cur':''}">${isM?`<button type="button" class="btn small ${m&&m.vid===t.vid&&m.playing?'':'primary'}" data-mplay="${t.id}" aria-label="Tocar ${esc(t.title||'música')}">▶</button>`:''}<span class="mu-t">${t.bad?'<span title="O YouTube não deixa tocar esse vídeo aqui. Tire e procure outra versão." aria-label="Não toca aqui">⚠ </span>':''}${esc(t.title||'Música do YouTube ('+t.vid+')')}</span>${isM?`<button type="button" class="bn-x" data-mdel="${t.id}" title="Tirar da playlist" aria-label="Tirar da playlist">✕</button>`:''}</li>`).join('')}</ul>`).join(''):(isM?'':'<p class="sub">A playlist ainda está vazia.</p>')}`;
+  box.innerHTML=`<div class="mu-now ${m&&m.playing?'on':''}"><div><small>${m?(m.playing?'Tocando agora':'Pausada'):'Nada tocando'}</small><b>${m?esc(m.title||(m.url?'Áudio direto':m.amb?'Ambiente':'Música do YouTube')):'Escolha uma música da playlist'}</b>${m&&m.moment?`<span class="pill">${esc(m.moment)}</span>`:''}</div>${isM&&m?`<div class="inline">${m.playing?'<button type="button" class="btn small" id="muPause">⏸ Pausar</button>':'<button type="button" class="btn small primary" id="muResume">▶ Retomar</button>'}<button type="button" class="btn small" id="muStop">⏹ Parar</button></div>`:''}</div>
+   ${isM?`<form class="mu-form" id="muForm"><div class="field"><label for="muUrl">Link do YouTube ou de áudio (.mp3, .ogg, .wav, stream)</label><input id="muUrl" placeholder="https://… (YouTube ou arquivo de áudio)" inputmode="url"></div><div class="field"><label for="muTitle">Nome (opcional)</label><input id="muTitle" maxlength="90" placeholder="Ex.: Tema do porão"></div><div class="field"><label for="muMoment">Momento</label><input id="muMoment" list="muMoments" maxlength="40" placeholder="Ex.: Revelação da Sala"><datalist id="muMoments">${MOMENTS6.map(x=>`<option value="${x}">`).join('')}</datalist></div><button class="btn primary small">＋ Adicionar à playlist</button></form><h4>Ambientes sintetizados</h4><div class="inline mu-amb">${(T3.ambient?.list||[]).map(a=>`<button type="button" class="btn small ${m&&m.amb===a[0]&&m.playing?'primary':''}" data-amb="${a[0]}">${a[1]}</button>`).join('')}</div><p class="sub">Link direto de áudio e ambientes tocam em qualquer navegador (sem YouTube, sem erro 150).</p><p class="sub">Uma música com o momento <b>Intervalo</b> vira a música de espera do botão ⏸ Intervalo. Você também pode pedir ao Perseus: “toca a música para revelação da sala”.</p>`:'<p class="sub">O Mestre escolhe a música. O volume é só seu: use o controle no topo da mesa.</p>'}
+   ${pl.length?Object.entries(groups).map(([k,list])=>`<h4>${esc(k)}</h4><ul class="mu-list">${list.map(t=>`<li class="${sameTrk6(m,t)?'cur':''}">${isM?`<button type="button" class="btn small ${sameTrk6(m,t)&&m.playing?'':'primary'}" data-mplay="${t.id}" aria-label="Tocar ${esc(t.title||'música')}">▶</button>`:''}<span class="mu-t">${t.bad?'<span title="O YouTube não deixa tocar esse vídeo aqui. Tire e procure outra versão." aria-label="Não toca aqui">⚠ </span>':''}${esc(t.title||(t.url?'Áudio direto':'Música do YouTube ('+t.vid+')'))}</span>${isM?`<button type="button" class="bn-x" data-mdel="${t.id}" title="Tirar da playlist" aria-label="Tirar da playlist">✕</button>`:''}</li>`).join('')}</ul>`).join(''):(isM?'':'<p class="sub">A playlist ainda está vazia.</p>')}`;
   const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
   on('muPause',pauseMusic6);on('muResume',resumeMusic6);on('muStop',stopMusic6);
   const f=$('muForm');if(f)f.onsubmit=async e=>{e.preventDefault();
     const url=$('muUrl').value,ttl=$('muTitle').value,mom=$('muMoment').value,vid=ytId6(url),btn=f.querySelector('button');
+    if(!vid&&isAudioUrl6(url)){const t=addTrack6(url,ttl,mom);if(t){try{f.reset()}catch(x){}fx5('confirm');toast('Áudio direto adicionado: '+(t.title||'sem nome')+'.');return}}
     if(!vid){toast(/[?&]list=/.test(url)&&!/[?&]v=/.test(url)?'Esse é o link de uma playlist inteira. Abra um vídeo dela e copie o link do vídeo.':'Não reconheci esse link. Copie o endereço do vídeo na barra do navegador ou no botão Compartilhar do YouTube.');return}
     if(btn)btn.disabled=true;
     const info=await ytInfo6(vid);
     if(!info.ok){if(btn)btn.disabled=false;toast(info.why==='embed'?'O dono desse vídeo não deixa tocar fora do YouTube. Procure outra versão da música (por exemplo, “lyric video” ou o canal “Tópico”).':'Não encontrei esse vídeo. Ele pode estar privado ou ter sido removido.');return}
     const t=addTrack6(url,ttl||info.title,mom);if(btn)btn.disabled=false;if(!t){toast('Não reconheci esse link do YouTube.');return}
     try{f.reset()}catch(x){}fx5('confirm');toast('Música adicionada: '+(t.title||'sem nome')+'.')};
+  $$('[data-amb]',box).forEach(b=>b.onclick=()=>playAmbient6(b.dataset.amb));
   $$('[data-mplay]',box).forEach(b=>b.onclick=()=>{actx();playTrack6(b.dataset.mplay)});
   $$('[data-mdel]',box).forEach(b=>b.onclick=()=>setState6({playlist:(M6.state.playlist||[]).filter(t=>t.id!==b.dataset.mdel)}));
 }

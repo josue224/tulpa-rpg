@@ -39,6 +39,7 @@ const myTurn14=()=>{const c=cur14();return!!(c&&controls(c)&&(c._sheetAvailable|
 
 /* ===================== 1. iniciativa automática ===================== */
 function reflex14(ch){
+  if(ch&&ch.npcLite){const dd=E.die(20),rf=Number(ch.npcLite.rf)||0;return{dice:[dd],bonus:rf,total:dd+rf,best:dd}} /* NPC sem ficha */
   const d=d14(ch);
   if(d&&d.attributes&&Object.keys(d.attributes).length){
     const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},'Reflexo');
