@@ -572,7 +572,7 @@ function hud14(force){
       const quickUsed=CB14.quick===TURN.key,st=stIds(d),inv=E.ensureInv(d),quickItems=inv.items.filter(i=>['cintura','bandoleira'].includes(i.loc)),hasAoe=E.quickWeapons(d).some(i=>aoe14(i.w)),re=retalOf(cur);
       const ri=E.reactionInfo(d,turnOf(cur)),counter=!!d.retalCounter;
       const riTxt=ri.forbidden?'bloqueada':ri.guard?`Guarda ${ri.left}/${ri.cap}`:ri.reactionAvailable?'disponível':'usada';
-      sig=JSON.stringify(['me',cur.id,TURN.key,left,extra,fmtM14(mleft),info.max,mv.run,TURN.talentUsed,quickUsed,re,blocked,st.join(),inv.mochila,quickItems.length,hasAoe,info.canRun,riTxt,counter]);
+      sig=JSON.stringify(['me',cur.id,TURN.key,left,extra,fmtM14(mleft),info.max,mv.run,TURN.talentUsed,quickUsed,re,blocked,st.join(),inv.mochila,quickItems.length,hasAoe,info.canRun,riTxt,counter,inv.items.some(i=>i.loc!=='vestido')]);
       const pct=info.max?mleft/info.max*100:0;
       const ra=CB14.rActor===cur.id;
       const raBan=ra?`<div class="cbh-aim"><span>↩ <b>${esc(nm(cur))}</b> tem ${counter?'um <b>Contra-Ataque</b> corpo a corpo grátis':'a <b>Retaliação</b>'} (não pode ser esquivad${counter?'o':'a'}). Pode contra-atacar ou usar outra opção; a vez de quem está jogando continua.</span><span class="cbh-btns"><button type="button" class="btn small primary" data-cbre="${cur.id}">⚔ Contra-atacar</button><button type="button" class="btn small" data-cbskip="${cur.id}">Abrir mão</button></span></div>`:'';
@@ -595,6 +595,7 @@ function hud14(force){
         ${st.includes('caido')?`<button type="button" class="btn small" data-cb="up" ${blocked||left<=0?'disabled':''}><i>⬆</i><span class="l">Levantar</span><span class="s">Levantar</span></button>`:''}
         <button type="button" class="btn small" data-cb="sut" ${blocked||left<=0?'disabled':''}><i>🩹</i><span class="l">Sutura</span><span class="s">Sutura</span></button>
         <button type="button" class="btn small" data-cb="other" ${blocked||left<=0?'disabled':''}><i>⌖</i><span class="l">Perícia</span><span class="s">Perícia</span></button>
+        ${inv.items.some(i=>i.loc!=='vestido')?'<button type="button" class="btn small" data-cb="dropitem" title="Ação livre: larga um item no mapa, ao seu lado"><i>🫳</i><span class="l">Largar item</span><span class="s">Largar</span></button>':''}
         ${inv.mochila?'<button type="button" class="btn small" data-cb="drop" title="Ação livre: solta a mochila no chão"><i>🎒</i><span class="l">Soltar mochila</span><span class="s">Mochila</span></button>':''}
         ${ra?'':'<button type="button" class="btn small danger" data-cb="end"><i>✔</i><span class="l">Concluir turno</span><span class="s">Passar</span></button>'}
       </div>${info.max===0?`<p class="cbh-note">🚫 Sem movimento: ${esc(info.why)}.</p>`:''}${blocked?'<p class="cbh-note">🚫 Você não pode agir neste estado.</p>':''}`;
@@ -639,6 +640,7 @@ function act14(k){
   if(k==='throw')return startAttack(cur,{areaOnly:true});
   if(k==='abil')return abilitiesMenu(cur);
   if(k==='man')return T3.cacMenu?.(cur);
+  if(k==='dropitem')return T3.itemDropMenu?.(cur);
   if(k==='guard')return T3.cacGuard?.(cur);
   if(k==='alert')return alertAction(cur);
   if(k==='other')return otherAction(cur);

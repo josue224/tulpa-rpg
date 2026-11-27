@@ -953,5 +953,127 @@ E.recoverAmmo=d=>{ /* (altera d) devolve quantas voltaram */
   return r.n;
 };
 
+/* ---------- Itens caídos no mapa (DroppedItem) ----------
+   O "livro" fica em M6.state.drops (só o Mestre escreve). Cada entrada é uma passagem do item:
+   st 'floor' (no chão) ou 'taken' (com `by`). `line` liga as passagens do mesmo item. A ficha é
+   sempre derivada do livro (E.dropReconcile), por isso repetir, recarregar ou concorrer não duplica. */
+E.DROP_MAX=80;            /* itens no chão ao mesmo tempo */
+E.DROP_KEEP=864e5;        /* passagens encerradas ficam 24 h (consertam cópias antigas de ficha) */
+E.dropClean=v=>{ /* cópia sem imagens: o estado da mesa só leva texto e números */
+  if(typeof v==='string')return /^\s*(data|blob):/i.test(v)?'':v.slice(0,1500);
+  if(Array.isArray(v))return v.map(E.dropClean);
+  if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,E.dropClean(x)]));
+  return v;
+};
+/* o item original inteiro, sem o que diz onde ele estava */
+E.dropItem=it=>{const c=E.dropClean(JSON.parse(JSON.stringify(it||{})));delete c.loc;delete c.equipped;delete c.from;delete c.dropPend;return c};
+E.dropVert=it=>{
+  const w=it?.w;if(!w||it.kind!=='weapon')return'';
+  if(E.isGun(w)){const c=E.gunClass(w);return c?'armasdisparo.'+c:''}
+  if(w.skill==='Arremesso')return E.isExplosive(w)?'arremesso.explosivos':'arremesso.precisao';
+  if(w.skill==='Armas Brancas'&&E.isMeleeWeapon(w))return E.isShortBlade(w)?'armasbrancas.curtas':'armasbrancas.longas';
+  return'';
+};
+E.dropIcon=it=>{
+  const n=String(it?.name||'').toLowerCase(),w=it?.w;
+  if(it?.kind==='prot')return it.p?.slot==='escudo'?'escudo':'protecao';
+  if(!w)return /muni/.test(n)?'municao':'objeto';
+  if(E.isGun(w)){const c=E.gunClass(w);return c==='arcos'?'arco':['espingardas','fuzis','precisao'].includes(c)?'rifle':'pistola'}
+  if(w.skill==='Arremesso'||w.area)return'bomba';
+  if(/machad/.test(n))return'machado';
+  if(/taco|porrete|bast[ãa]o|martelo|marreta|corrente|cano|cassetete|cabra/.test(n))return'porrete';
+  return E.isShortBlade(w)?'faca':'espada';
+};
+E.dropRecord=({id,line='',item,from,fromName='',map,x,y,at,reason='largado',feet=false})=>{
+  const home=item?.from||item?.loc||'',it=E.dropItem(item),w=it.w||null,vert=E.dropVert(it);
+  return{id,line:line||id,st:'floor',map,x,y,from,fromName,name:it.name||'Item',
+    cat:w?w.cat||'':it.kind==='prot'?'Proteção':'Equipamento',skill:w?.skill||'',vert,vertName:vert?E.vert(vert)?.name||'':'',
+    dado:w?.dado||'',critMin:w?.critMin||null,peso:it.peso||'',qty:Math.max(1,Number(it.qty)||1),
+    ammo:w&&E.isGun(w)?{controlada:!!it.useAmmo}:null,icon:E.dropIcon(it),home,item:it,reason,feet:!!feet,at,upd:at};
+};
+/* o token ocupa a célula (i,j)? (posições fracionárias contam) */
+E.cellTaken=(t,i,j)=>{
+  const s=t.s||1,rx=Math.round(t.x),ry=Math.round(t.y);
+  if(i>=rx&&i<rx+s&&j>=ry&&j<ry+s)return true;
+  return Math.max(Math.abs(i+.5-t.x-s/2),Math.abs(j+.5-t.y-s/2))<s/2-1e-6;
+};
+/* célula livre adjacente mais próxima (até 1 célula). clear(i,j) diz se não há parede ou porta
+   fechada no caminho. Sem nenhuma: o item cai aos pés de quem largou (fallback). */
+E.dropCell=({tok,cols,rows,tokens=[],drops=[],clear=()=>true})=>{
+  const s=tok.s||1,rx=Math.round(tok.x),ry=Math.round(tok.y),cx=tok.x+s/2,cy=tok.y+s/2,list=[];
+  for(let j=ry-1;j<=ry+s;j++)for(let i=rx-1;i<=rx+s;i++){
+    if(i<0||j<0||i>=cols||j>=rows||E.cellTaken(tok,i,j))continue;
+    const dx=i+.5-cx,dy=j+.5-cy;
+    if(Math.max(Math.abs(dx),Math.abs(dy))>s/2+.5+1e-6)continue;
+    if(tokens.some(t=>E.cellTaken(t,i,j))||!clear(i,j))continue;
+    list.push({x:i,y:j,n:drops.filter(d=>d.x===i&&d.y===j).length,d:Math.hypot(dx,dy)});
+  }
+  list.sort((a,b)=>a.n-b.n||a.d-b.d||a.y-b.y||a.x-b.x);
+  return list.length?{x:list[0].x,y:list[0].y,fallback:false}:{x:Math.max(0,Math.min(cols-1,rx)),y:Math.max(0,Math.min(rows-1,ry)),fallback:true};
+};
+/* o token alcança o item? (a até 1 célula, diagonal conta) */
+E.dropReach=(tok,d,folga=.35)=>{const s=tok.s||1;return Math.max(Math.abs(d.x+.5-tok.x-s/2),Math.abs(d.y+.5-tok.y-s/2))<=s/2+.5+folga+1e-6};
+/* onde o item recolhido vai ficar na ficha ('' = não há espaço) */
+E.pickPlace=(d,item,home='')=>{
+  const order=item.kind==='prot'?['maos','mochila']:item.peso==='Bolso'?['bolso','mochila','maos']:['maos',home,'cintura','bandoleira','bolso','mochila'];
+  for(const l of order){if(!l||l==='chao'||l==='vestido')continue;if(E.validPlacement(d,{...item,loc:l},l).ok)return l}
+  return'';
+};
+E.dropLast=(drops,line)=>{for(let i=drops.length-1;i>=0;i--)if(drops[i].line===line)return drops[i];return null};
+/* quem vai largar ainda tem o item? devolve a linha que a nova passagem continua */
+E.dropLineage=(drops,charId,itemId)=>{
+  for(let i=drops.length-1;i>=0;i--){
+    const e=drops[i];
+    if(!((e.by===charId&&(e.as||e.item.id)===itemId)||(e.from===charId&&e.item.id===itemId)))continue;
+    const l=E.dropLast(drops,e.line);
+    return l.st==='taken'&&l.by===charId&&(l.as||l.item.id)===itemId?{ok:true,line:e.line}:{ok:false,line:''};
+  }
+  return{ok:true,line:''};
+};
+/* o primeiro leva: só um item no chão pode ser recolhido. `as` troca o id se ele colidir */
+E.dropTake=(drops,id,by,{at=0,req='',has=false}={})=>{
+  const e=drops.find(x=>x.id===id);if(!e||e.st!=='floor')return null;
+  const k=e.item.id,involved=drops.some(x=>x.line===e.line&&(x.from===by||x.by===by));
+  const clash=drops.some(x=>x.line!==e.line&&(x.item.id===k||x.as===k))||(has&&!involved);
+  const entry={...e,st:'taken',by,req,takenAt:at,upd:at,...(clash?{as:k+'-'+e.id}:{})};
+  return{drops:drops.map(x=>x.id===id?entry:x),entry};
+};
+/* (altera d) ajusta o inventário de charId ao livro: sai o que não está com ele; entra, uma única
+   vez, o que está (a marca em d.dropsIn é gravada junto com o item, na mesma ficha). */
+E.dropReconcile=(d,drops,charId)=>{
+  const lines=new Map();drops.forEach(e=>{if(!lines.has(e.line))lines.set(e.line,[]);lines.get(e.line).push(e)});
+  let changed=false;
+  lines.forEach(list=>{
+    if(!list.some(e=>e.from===charId||e.by===charId))return;
+    const last=list[list.length-1],hold=last.st==='taken'&&last.by===charId,held=hold?last.as||last.item.id:'';
+    const gone=new Set();list.forEach(e=>{if(e.from===charId)gone.add(e.item.id);if(e.by===charId)gone.add(e.as||e.item.id)});
+    if(hold)gone.delete(held);
+    const inv=E.ensureInv(d),n=inv.items.length;
+    if(inv.items.some(i=>gone.has(i.id))){inv.items=inv.items.filter(i=>!gone.has(i.id));if(gone.has(d.armaEmUso))d.armaEmUso=''}
+    if(inv.items.length!==n)changed=true;
+    if(!hold){
+      const marks=new Set(list.map(e=>e.id));
+      if((d.dropsIn||[]).some(m=>marks.has(m))){d.dropsIn=d.dropsIn.filter(m=>!marks.has(m));changed=true}
+      return;
+    }
+    if((d.dropsIn||[]).includes(last.id))return;
+    let it=inv.items.find(i=>i.id===held);
+    if(!it){it={...JSON.parse(JSON.stringify(last.item)),id:held};it.loc=E.pickPlace(d,it,last.home)||'chao';inv.items=[...inv.items,it]}
+    else if(it.loc==='chao')it.loc=E.pickPlace(d,it,last.home)||'chao';
+    delete it.equipped;delete it.dropPend;
+    d.dropsIn=[...(d.dropsIn||[]),last.id].slice(-60);changed=true;
+  });
+  return changed;
+};
+/* faxina do Mestre: só sai o que já encerrou há mais de 24 h (e a ficha de quem pegou confirmou) */
+E.dropPrune=(drops,now,confirmed=()=>true)=>{
+  const out=drops.filter(e=>{
+    const recent=now-(e.upd||0)<E.DROP_KEEP;
+    if(E.dropLast(drops,e.line)!==e)return recent;
+    return e.st==='floor'||recent||!confirmed(e);
+  });
+  return out.length===drops.length?drops:out;
+};
+
 if(typeof module!=='undefined')module.exports=E;
 

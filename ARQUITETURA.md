@@ -29,8 +29,8 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
 <head>   css/01-base-layout.css  →  supabase-js (CDN)
 <body>   markup (portal, app, modais)  →  scripts/CSS intercalados na MESMA posição dos blocos originais:
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
-         → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Combate corpo a corpo)
-         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas) → js/60d → js/60e (filtros Arcade) → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/61   (antigo closure; 61 = inicialização, sempre por último)
+         → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Combate corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos)
+         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas) → js/60d → js/60e (filtros Arcade) → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/61   (antigo closure; 61 = inicialização, sempre por último)
 ```
 
 Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` original, para manter a cascata idêntica (inclusive em relação a estilos que o JS injeta no `<head>`).
@@ -56,6 +56,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 15 | `15-ficha-regras.css` | novo | 11 KB | **Onda 9**: benefícios dos atributos, interruptor da Blindagem de Lucidez, seletor Perícias/Especializações, contexto social e lista de vertentes (só layout; alvos de 44 px; 390 px). |
 | 16 | `16-combate-cac.css` | novo | 2 KB | **Onda 10**: marcador de Reação (área de toque de 44 px), botões de bloqueio e painel de corpo a corpo (só layout). |
 | 17 | `17-tiroteio.css` | novo | 2 KB | **Onda 11**: seletor do Tiroteio Tático, botões de resposta ao tiro e painel da ficha (só layout). |
+| 18 | `18-itens-caidos.css` | novo | 3 KB | **Onda 12**: ícones dos itens no chão, ficha do item e botão “Pegar Item” sobre o mapa (só layout; fundo escuro próprio, como a barra de combate). |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
@@ -133,6 +134,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60g | `60g-ficha-regras.js` | novo | 17 KB | **Onda 9 · Ficha**: envolve `renderAttributes`/`renderStats`/`renderMind`/`renderSkills`; expõe `T3.socialTake(perícia)` (bônus social da próxima rolagem) e `T3.renderEspecializacoes()`. Rola por `rollSkill(perícia,atributo,{vert|generalista,label})`. |
 | 60h | `60h-combate-cac.js` | novo | 23 KB | **Onda 10 · Corpo a corpo**: marcador de Reação, Guarda, manobras (linhas `man`/`manres`), agarrão, empurrão no aparelho do Mestre, painel na Mesa e na ficha; envolve `processRow`, `applyFxLocal`, `renderCombatTab`, `castRitual`, `onCombatEnd`. Gancho de desarme: `T3.disarmHooks` e evento `tulpa:disarm`. |
 | 60i | `60i-tiroteio.js` | novo | 27 KB | **Onda 11 · Tiroteio Tático**: seletor de contexto, Mergulho, 2º Disparo, supressão e Tiro Livre (linhas `sup`/`supres`/`supx`/`dive`), barulho do disparo; envolve `performAttack`, `queuePrompt`, `defendPrompt`, `processRow`, `renderCombatTab`, `onCombatEnd`, `T3.cacPanel`/`cacBind`. |
+| 60j | `60j-itens-caidos.js` | novo | 22 KB | **Onda 12 · Itens caídos**: livro `M6.state.drops`/`dropsDone` (só o Mestre grava), pedidos `dropreq`/`pickreq`/`pickres`, ajuste das fichas, camada SVG no mapa e botão contextual; envolve `paintOver10`, `mapMenu7`, `renderInventory`, `processRow`, `renderCombatUI`, `pendingMine14`. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
@@ -184,6 +186,17 @@ Transporte: `campaign_rolls`, `detail.cmb` `'man'` (quem age) e `'manres'` (quem
 | Sangue e munição | `E.applyBleed`* · `E.bleedTick`* · `E.registerRecovery`* · `E.recoverAmmo`* |
 
 Contexto do tiro (`detail.shot` na linha `atk`): `{aware,pointBlank,short,cover,sprint,aimed,rangePenalty,second,free,dist,targetId,push}`. A linha `res` leva `shot:{outcome,shot2,fellNew,itemId,w}` e `push`. `performAttack(ch,w,ids,{shot})` sem `shot` abre o seletor para armas de disparo com 1 alvo.
+
+### Itens caídos (Onda 12)
+
+| Grupo | Chamada |
+|---|---|
+| Registro | `E.dropRecord` (nome, categoria, vertente, dano, munição, `icon`, `item` inteiro sem imagens) · `E.dropClean` · `E.dropItem` · `E.dropIcon` · `E.dropVert` |
+| Mapa | `E.dropCell({tok,cols,rows,tokens,drops,clear})` → `{x,y,fallback}` · `E.dropReach(tok,item,folga)` · `E.cellTaken` |
+| Posse | `E.dropLineage` · `E.dropTake(drops,id,quem)` (só quem chega primeiro) · `E.pickPlace` · `E.dropReconcile(d,drops,charId)`* (idempotente; marca em `d.dropsIn`) · `E.dropPrune` |
+| UI | `T3.itemDrop(ch,itemId)` · `T3.itemDropMenu(ch)` · `T3.itemPick(dropId,charId)` |
+
+Entrada: `{id,line,st:'floor'|'taken',map,x,y,from,by?,as?,item,...}`. `line` liga as passagens do mesmo item; `as` troca o id se dois itens tiverem o mesmo. `M6.state.dropsDone` guarda linhas e pedidos já tratados (recarregar não repete). A ficha é ajustada por quem controla o personagem; o Mestre cobre quem está fora da mesa.
 
 ## App Shell (Onda 1)
 

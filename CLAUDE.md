@@ -52,12 +52,12 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112712`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112713`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
   ```
-- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112712'`) é só um fallback.
+- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112713'`) é só um fallback.
 
 ### Como verificar antes de commitar
 
@@ -120,6 +120,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Fogo de Supressão** (Ação Padrão, alvo em cobertura): Resistência [PRE] (Firmeza Mental) contra o ATA, empate favorece o alvo; falha = `suprimido` até o próximo turno do atirador, e sair da cobertura (>0,75 m) ou atacar dá 1 **Tiro Livre** (ATA×DF). A detecção é passiva: nunca bloqueia nem libera movimento.
 - **Especializações de disparo:** Pistolas (saca e dispara, sem desvantagem à queima-roupa), Espingardas (+2 dano à queima-roupa, empurra 1,5 m até 6 m se ATA ≥ DF), Fuzis (+1d20 na supressão, ignora a penalidade opcional de −1d20 de médio/longo alcance), Precisão (Mirar gasta o movimento, ignora Cobertura Parcial, crítico +1), Arcos (silencioso, recupera a munição no fim da cena). Fora da especialização: metade do grau.
 - **Mergulho** move o token só pelo aparelho do Mestre (linhas `dive`), como o empurrão.
+- **Itens no chão (`E.drop*`, UI em `js/60j`):** desarme vencido ou **largar** (ação livre, no próprio turno em combate) põe o item no mapa, na célula livre a até 1 célula sem parede nem porta fechada no caminho (sem nenhuma: aos pés; sem token: fica em "Largado" na ficha). **Pegar** = 1 Ação, a até 1 célula, só no próprio turno. O livro é `M6.state.drops` (**só o Mestre escreve**; o jogador pede por `dropreq`/`pickreq` em `campaign_rolls` e o primeiro pedido leva). O inventário é **derivado do livro** (`E.dropReconcile`): nunca mova um item caído mexendo só na ficha, e nunca ponha imagem no estado.
 - **Defesa:** DF = 10 + proteções + estados + **DES** (sem proteção Pesada vestida nem excesso de carga). A DES sozinha não conta como "bloqueio" (`armored`).
 - **Atributos (`js/10`, nunca somar de novo na UI):** FOR carga 3+FOR e dano CaC/arremesso (DES em armas Leves e Briga ágil, `E.damageBonus`); CON +VT máximo, redução de bloqueio e Combustão CON+2; PRE +ES máxima e blindagem do 1º dano de Lucidez por cena; INT perícias extras INT−1 e cura médica; PER DT furtiva 10+PER e Lucidez na Trégua; CAR/APA bônus sociais. Máximos sempre por `E.maxStats`/`dmax`, nunca direto de `STAGES`. Criaturas (`beastId`) não somam esses benefícios.
 - **Vertentes:** treino em `d.vertentes`; o treino antigo (`extraSkills`/`skillUpgrades`) nunca é apagado e vale cheio até virar vertente. Fora da especialização: metade do grau (`E.generalist`) mais o +V inteiro, sem efeito tático; `requiresTraining` bloqueia. Dados só em `PERICIA_DEFS`/`VERT_DEFS` (`rules.pericia`/`rules.vert`).
@@ -234,10 +235,11 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Regras, Onda 9 · Ficha (`?v=2026112710`)**: benefícios dos 8 atributos junto de cada um (`js/60g` + `css/15`), alerta de proteção pesada/sobrecarga, Blindagem de Lucidez ligada a todos os lançamentos de dano, contexto social (CAR/APA) nas rolagens da ficha e aba Especializações (treinar, escolher a vertente do treino antigo, rolar, generalista ÷2). Testado só com ficha local falsa. **Teste manual:** logado, jogador e Mestre treinam uma especialização, rolam com o histórico da mesa ligado e tiram Lucidez pela ficha e pela Mesa.
 - **Regras, Onda 10 · Corpo a corpo (`?v=2026112711`)**: marcador de Reação (barra da ordem, HUD, Mesa e ficha), Guarda Fechada, Bloqueio com os 4 desfechos e Contra-Ataque, Desarmar, Derrubar, Agarrar/Escapar/Soltar e Empurrar no mapa com alerta de colisão, condições Agarrado/Segurando e efeitos das vertentes corpo a corpo e de arremesso. Sem SQL novo. Testado só com campanha falsa (Mestre controlando os dois lados). O desarme deixa a arma em "Largado" (`equipped:false`) e dispara `T3.disarmHooks` / `tulpa:disarm` para a Onda 12. **Teste manual:** Mestre e jogador logados em aparelhos separados: bloqueio, contra-ataque, cada manobra nos dois sentidos, empurrão contra parede (o Mestre precisa estar online) e a barra de combate no celular.
 - **Regras, Onda 11 · Tiroteio Tático (`?v=2026112712`)**: seletor de contexto do tiro (detectado pelo mapa e ajustável), Mergulho com os 5 desfechos e deslocamento, 2º Disparo, Fogo de Supressão com Suprimido e Tiro Livre, Mirar, trava de movimento que sobrevive ao F5, crítico balístico com Sangrando, as 5 especializações, barulho do disparo para a IA e painel Tiroteio na ficha. Sem SQL novo. Testado só com campanha falsa (Mestre nos dois lados). **Teste manual:** Mestre e jogador em aparelhos separados com mapa: os dois lados do Mergulho (o Mestre online move o token), supressão com o alvo andando, queima-roupa com bloqueio, escopeta empurrando, arco silencioso contra inimigo em patrulha e o seletor no celular.
+- **Regras, Onda 12 · Itens caídos no mapa (`?v=2026112713`)**: desarmar e "Largar no mapa" (inventário, menu do token e HUD do combate) criam o item no chão, com ícone, ficha do item (hover, foco ou toque), névoa e visões do Mestre, botão "Pegar Item (1 Ação)" e "Devolver" para o Mestre. Sem SQL novo. Testado só com campanha falsa. **Teste manual:** Mestre e dois jogadores em aparelhos separados: desarmar um jogador, os dois pegarem juntos, largar com o Mestre fora da mesa, F5 no Mestre e conferir que nada duplicou nas fichas.
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.
-1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112712`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
+1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112713`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
 2. **Teste manual pós-login** de tudo que o teste automático não cobre: login real, mesa, mapa, call, transmissão e Arcade com carregamento sob demanda (inclusive em sala multijogador, com convidado entrando antes de o Arcade carregar).
 3. **Atualizar o Manual em PDF:** perícias começam em 0 e não existe História.
 4. **Balancear a Coleta de Essência.** A Receita 7, "Destilado do Vazio", foi a mais difícil para o bot (6 de 8 tentativas). Ajuste se os jogadores reclamarem.
