@@ -17,6 +17,7 @@
   var IC={
     mesa:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
     fichas:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+    bancada:'<path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><circle cx="11" cy="13" r="2.6"/><path d="M13 15l3 3"/>',
     manual:'<path d="M4 4h6a3 3 0 013 3v13a2 2 0 00-2-2H4z"/><path d="M20 4h-6a3 3 0 00-3 3v13a2 2 0 012-2h7z"/>',
     arcade:'<rect x="2" y="7" width="20" height="11" rx="4"/><path d="M7 10v5M4.5 12.5h5"/><circle cx="16" cy="11.5" r=".8"/><circle cx="18.5" cy="14" r=".8"/>',
     perseus:'<path d="M5 9l1-5 4 3h4l4-3 1 5v6a7 7 0 01-14 0z"/><circle cx="9.5" cy="12" r=".7"/><circle cx="14.5" cy="12" r=".7"/>',
@@ -43,12 +44,16 @@
     var m=document.getElementById('man31'),y=document.getElementById('sys29');
     if(m&&!m.classList.contains('hide')&&m.offsetWidth)return 'manual';
     if(y&&!y.classList.contains('hide')&&y.offsetWidth)return 'sistema';
+    var bn=document.getElementById('bn60r');
+    if(bn&&!bn.classList.contains('hide')&&bn.offsetWidth)return 'bancada';
     return '';
   }
   function closeDocs(){
     var m=document.getElementById('man31'),y=document.getElementById('sys29');
     if(m&&!m.classList.contains('hide'))press('m31x');
     if(y&&!y.classList.contains('hide'))press('sys29x');
+    var bn=document.getElementById('bn60r');
+    if(bn&&!bn.classList.contains('hide'))press('bn60rClose');
   }
   function ensureHub(){
     var k=viewK();
@@ -65,6 +70,7 @@
     {id:'mesa',     label:'Mesa',                 group:'a', key:'1', go:function(){if(needCamp()&&ensureHub())press('openTable')}},
     {id:'fichas',   label:'Fichas',               group:'a', key:'2', go:function(){if(needCamp()&&ensureHub())press('openCharacters')}},
     {id:'manual',   label:'Manual Vivo', short:'Manual', group:'a', key:'3', go:function(){if(needCamp()&&T3.manualOpen)T3.manualOpen()}},
+    {id:'bancada',  label:'Bancada & Investigação', short:'Bancada', group:'a', key:'5', go:function(){if(needCamp()&&T3.bancada)T3.bancada.open()}},
     {id:'arcade',   label:'Tulpa Arcade', short:'Arcade', group:'b', key:'4', go:function(){if(T3.arcGo)T3.arcGo()}, vis:arcOK},
     {id:'perseus',  label:'Perseus',              group:'b', more:1,  go:function(){if(!needCamp())return;if(T3.petOpen)T3.petOpen('room')}, vis:arcOK},
     {id:'sistema',  label:'Alterações do Sistema',group:'c', more:1,  go:function(){if(T3.sysOpen)T3.sysOpen()}, vis:isGM},
@@ -347,7 +353,8 @@
       mesa:!dk&&k==='hub:table',
       fichas:!dk&&(k==='hub:chars'||k.indexOf('sheet')===0),
       manual:dk==='manual',
-      sistema:dk==='sistema'
+      sistema:dk==='sistema',
+      bancada:dk==='bancada'
     };
     var cmb=combatOn();
     ITEMS.forEach(function(it){

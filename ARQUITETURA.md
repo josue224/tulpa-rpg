@@ -31,7 +31,7 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
          → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos) → css/19 (Manual: regras) → css/20 … css/23 → css/24 (Reconciliação do Manual)
          → js/09 → js/09b → js/10 … js/28 → js/32 → js/33 → js/35 … js/49 → js/60b (App Shell) → js/60c (Fichas) → js/60d (carregador) → js/60e (filtros Arcade)
-         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/60n (Ações das especializações) → js/60o (Barricadas) → js/60p (Reconciliação do Manual) → js/60q (Exportar PDF) → js/61   (61 = inicialização, sempre por último)
+         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/60n (Ações das especializações) → js/60o (Barricadas) → js/60p (Reconciliação do Manual) → js/60q (Exportar PDF) → js/60r (Bancada & Investigação) → js/61   (61 = inicialização, sempre por último)
 
 Sob demanda (sem <script>; QUEUE do js/60d, nesta ordem, na 1ª abertura do Arcade):
          js/60f (motor gráfico) → js/29 → js/30 → js/31 → js/34 → js/50 → js/51 → … → js/60
@@ -67,6 +67,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 22 | `22-polish-pro.css` | novo | 12 KB | **Onda 3 · Polimento profissional**: tokens `--mo-*` (em `body`), entradas só com transform/opacity, hover/foco, alvos de 44 px no celular, hierarquia de rótulos e barras, e as atmosferas por família (`--fam` em `body::after`, `#aeTex` atrás do conteúdo, grão de painel em `--ae-fill` sem vidro). |
 | 23 | `23-vertentes-acoes.css` | novo | 2 KB | **Onda 4**: cartões `.vta-*` do painel Ações das especializações e `.bar-opts`/`.bar-row` do menu de barricadas. Só estrutura (cores e raios vêm da estética). |
 | 24 | `24-manual-reconciliar.css` | novo | 3 KB | **Onda 5**: avisos de texto desatualizado do Mestre (`.rec-note`, `.rec-top`, `.rec-hist`), diferença por palavra (`.rec-d` riscado, `.rec-i` sublinhado: nunca só cor) e o aviso de Desfazer (`.rec-snack`). Só estrutura, alvo de 44 px, sem rolagem lateral em 390 px. |
+| 25 | `25-bancada.css` | novo | 9 KB | **Bancada (Onda 1)**: aba `#bn60r` (`.bn-*`), lista e detalhe em duas colunas no PC e uma no celular, selos de status (borda sólida/tracejada/pontilhada/dupla: nunca só cor), editor rico, vidro só com `data-ae-glass="1"`. |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
@@ -155,6 +156,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60o | `60o-barricadas.js` | novo | 14 KB | **Onda 4** (IIFE): barricadas no mapa. Livro `M6.state.barricades` + `barDone` (só o Mestre grava); jogador pede por `barreq` (op `set` ou `break`) e o Mestre responde `barres` em `campaign_rolls`; DT por `E.barricadeDT`; envolve `doorUse10` (porta barricada pede Força + Atletismo), `enemyDoor23` (inimigo não abre), `paintOver10` (selo "DT n"), `mapMenu7` (botão Barricar ou forçar) e `processRow`. `T3.barricadas`, `T3.barricar(ch)`. |
 | 60p | `60p-manual-reconciliar.js` | novo | 12 KB | **Onda 5** (IIFE): reconciliação do Manual Vivo. Detecta trechos que o Mestre reescreveu antes de o texto base mudar (`BASE_REV31` e `BASE_CHG31`, em `js/42`) e mostra, só para o Mestre, o aviso com Ver diferença, Atualizar para regra nova e Manter meu texto, mais o botão global (dois toques, com resumo). Histórico em `manual.hist`, dispensas em `manual.ack`. Publica `T3.manualRec`. |
 | 60q | `60q-manual-pdf.js` | novo | 11 KB | **Onda 5** (IIFE): exportador de PDF. Monta capa, sumário e capítulos com os mesmos dados vivos do Manual (`secHtml31` com `M31.pv=true`, sem controles do Mestre) e imprime num iframe com `@page` (cabeçalho e rodapé com página). Publica `T3.manualPdf` (`run`, `html`). |
+| 60r | `60r-bancada-investigacao.js` | novo | 40 KB | **Bancada (Onda 1)** (IIFE): aba "Bancada & Investigação" (destino `bancada` no `ITEMS` do `60b`, Alt+5). Dossiês com código automático, 7 categorias, selo, tags, texto rico sanitizado, imagem (URL ou upload ≤ ~60 KB), favoritos e anotações de margem privados, busca, exportar JSON e imprimir. Publica `T3.bancada` e dispara `tulpa:bancada-pin`. Veja a seção abaixo. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
@@ -263,6 +265,22 @@ Entrada: `{id,line,st:'floor'|'taken',map,x,y,from,by?,as?,item,...}`. `line` li
 | PDF | `T3.manualPdf.run()` (botão "Exportar Manual (PDF)", visível a todos) · `.html()` (documento completo, para testes) · `.parts()` |
 
 **PDF:** o documento sai dos mesmos dados vivos (nunca números fixos: edições do Mestre, `{{r:id}}` resolvido, vocações, rituais, itens, estados e todas as vertentes, inclusive as criadas pelo Mestre). Os símbolos SVG dos rituais, botões, avisos e campos são removidos. O CSS de impressão fica dentro do `js/60q` (documento autônomo, preto sobre branco, não depende da estética). Margens com cabeçalho e rodapé usam `@page` com caixas de margem (Chrome 131+; onde não há suporte, o conteúdo sai igual sem elas). O sumário tem links mas não tem número de página, porque o Chrome ainda não suporta `target-counter`. No iOS abre numa aba nova e imprime de lá. O PDF/arquivo estático antigo do Manual não existe no repo; o botão antigo "Baixar PDF Atualizado" (`print31`, `body.m31-print`) continua no código só como reserva.
+
+## Bancada & Investigação (Bancada, Onda 1)
+
+**Dois escopos.** *Bancada da Campanha*: registro `bancada` (kind `bancada`, `audience` nula) no `campaign_store` (fallback `campaign_items`/localStorage pelo `stPut6`/`stGet6`, como o resto da mesa). Valor: `{v:1, seq, docs:[doc], done:[idsDePedido]}`. Só o Mestre grava (RLS). *Caderno Pessoal*: localStorage `tulpa_banc_p_<campanha>_<uid>` (`{v:1,seq,docs}`), só neste aparelho; o Mestre o usa como rascunho e "Entregar aos Jogadores" copia o documento para a Bancada (`from:'caderno'`) e avisa a mesa (`cast6 {t:'bancada', new}`).
+
+**Documento:** `{id, n, code ('DOC-01' na Bancada, 'PES-01' no Caderno), title, cat (recorte|laudo|audio|manuscrito|foto|artefato|perfil), status ('' |verificado|suspeito|contraditorio|sigiloso), tags[≤8], html (sanitizado, ≤ 20 000), img (null | {u:url} | {d:dataUrl, só Caderno} | {b:1} = blob), by, byName, at, upd, lastReq, delivered, from}`. Imagem enviada pelo Mestre à Bancada vai para `campaign_blobs` na chave `bancada:<id>` (nunca no `campaign_store`); jogador na Bancada só usa URL.
+
+**Jogador grava por pedido** (sem SQL novo): linha em `campaign_rolls` com `detail:{cmb:'bancadareq', req, op:'add'|'edit'|'del', doc, id}`. O aparelho do Mestre aplica pelo encadeamento de `processRow` e por uma varredura (ao abrir e a cada ~48 s), confere que `roller_id` é o autor (edit/del), é idempotente por `done` e grava. O jogador vê o item como "Aguardando o Mestre" (pendências em `tulpa_banc_r_*`) até o registro refletir o pedido.
+
+**Privado por jogador (localStorage):** anotações de margem `tulpa_banc_n_*`, favoritos `tulpa_banc_f_*`, ids já vistos `tulpa_banc_s_*` (aviso discreto de pista nova + ponto no ícone do rail).
+
+**Tempo real:** o `onStoreChange6` é encadeado (chave `bancada`), mais `M6.hooks.cast` e `tulpa:sync`. O aparelho que grava nunca troca a memória por uma leitura mais velha que a própria gravação (`SH.ver`/`SH.saving`).
+
+**Segurança:** todo texto do usuário é escapado; o texto rico passa por lista branca (`b i u h3 h4 p br ul ol li blockquote`, sem atributos) na gravação e na leitura; `<img>` só com `http(s)` ou `data:image` válidos.
+
+**API para a Onda 2:** evento `window` `tulpa:bancada-pin` (cancelável; `detail.doc` = `{ref:{scope,id}, id, scope, code, title, cat, catLabel, status, tags, text, html, img, at, upd}`). Se ninguém chamar `preventDefault()`, o botão avisa "O Quadro chega na próxima atualização". `T3.bancada`: `open(scope?)`, `close()`, `isOpen()`, `list('shared'|'personal')`, `get({scope,id})`, `imageOf(ref)` (Promise da URL/data), `payload(ref)`, `sanitize(html)`, `reload()`, `categories`, `statuses`.
 
 ## App Shell (Onda 1)
 
