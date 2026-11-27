@@ -31,7 +31,7 @@ const aiOf22=id=>{const c=aiAll22()[id];return c&&c.h?c:null};
 const DT22B=12;                      /* DT da porta furtiva */
 const dtDoor22=()=>Number(AI22.dt)||DT22B;
 const SPD22={patrol:1.4,route:1.6,inv:2.6,back:1.9};  /* quadrados por segundo */
-function aiCfg22(c){c=c||{};return{h:c.h?1:0,mode:['fixed','patrol','route'].includes(c.mode)?c.mode:'fixed',fov:clamp12(Number(c.fov)||90,20,300),rng:clamp12(Number(c.rng)||10,2,60),angs:(Array.isArray(c.angs)?c.angs:[]).map(Number).filter(isFinite).slice(0,8),per:clamp12(Number(c.per)||4,1,30),r:c.r&&typeof c.r==='object'?c.r:{},st:c.st==='surr'?'surr':''}}
+function aiCfg22(c){c=c||{};return{h:c.h?1:0,mode:['fixed','patrol','route'].includes(c.mode)?c.mode:'fixed',fov:clamp12(Number(c.fov)||200,20,300),rng:clamp12(Number(c.rng)||10,2,60),angs:(Array.isArray(c.angs)?c.angs:[]).map(Number).filter(isFinite).slice(0,8),per:clamp12(Number(c.per)||4,1,30),r:c.r&&typeof c.r==='object'?c.r:{},st:c.st==='surr'?'surr':''}}
 const route22=c=>{const k=M6.state.map?.key||'~blank';return(c.r&&Array.isArray(c.r[k])?c.r[k]:[]).filter(p=>Array.isArray(p)&&isFinite(p[0])&&isFinite(p[1]))};
 const alive22=ch=>{if(!ch)return false;const st=stIds(dOf6(ch));return!st.includes('morto')&&!st.includes('agonia')&&!isDeadCh(ch)};
 const hostTok22=()=>(M6.state.tokens||[]).filter(t=>{const c=aiOf22(t.charId);return c&&c.st!=='surr'&&alive22(charById(t.charId))});

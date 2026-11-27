@@ -17,8 +17,8 @@ const TAC10={
 };
 T3.tac=TAC10;
 const TAU10=Math.PI*2;
-const FOV10=Math.PI*2/3;          /* cone de visão: 120° (NPCs e inimigos) */
-const FOV_PL10=Math.PI;           /* cone dos tokens dos jogadores: 180° (visão periférica ampliada) */
+const FOV10=Math.PI*200/180;      /* visão humana realista: ~200° (todos os tokens; a lanterna continua em 60°) */
+const FOV_PL10=FOV10;
 const fovOf10=t=>{try{const ch=charById(t.charId);return ch&&ch.ownerId&&!gmChar6(ch)?FOV_PL10:FOV10}catch(e){return FOV10}};
 const LAMP_FOV10=Math.PI/3;       /* facho da lanterna: 60° */
 const LAMP_RANGE10=8;             /* alcance da lanterna em quadrados */
