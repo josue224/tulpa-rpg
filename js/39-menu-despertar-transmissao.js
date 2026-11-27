@@ -308,13 +308,17 @@ function scPanel28(from,name,audio){
     document.body.append(p);
     p.querySelector('[data-sca="snd"]').onclick=e=>{const v=p.querySelector('video');v.muted=!v.muted;e.currentTarget.textContent=v.muted?'🔇':'🔊';e.currentTarget.setAttribute('aria-pressed',!v.muted)};
     p.querySelector('.sc28-vol').oninput=e=>{const v=p.querySelector('video');v.volume=Number(e.target.value)/100;if(v.muted&&v.volume>0){v.muted=false;const b=p.querySelector('[data-sca="snd"]');b.textContent='🔊';b.setAttribute('aria-pressed','true')}};
-    p.querySelector('[data-sca="min"]').onclick=()=>p.classList.toggle('min');
+    p.querySelector('[data-sca="min"]').onclick=e=>{
+      if(p.classList.contains('aud')){const m=p.classList.toggle('mini');try{localStorage.setItem('tulpa_aud_mini',m?'1':'0')}catch(x){}e.currentTarget.textContent=m?'▢':'▁';e.currentTarget.title=m?'Expandir':'Minimizar';e.currentTarget.setAttribute('aria-label',m?'Expandir o painel de áudio':'Minimizar o painel de áudio')}
+      else p.classList.toggle('min')};
     p.querySelector('[data-sca="full"]').onclick=()=>{const v=p.querySelector('.sc28-v');try{document.fullscreenElement?document.exitFullscreen():(v.requestFullscreen||v.webkitRequestFullscreen).call(v)}catch(e){}};
     p.querySelector('[data-sca="kill"]').onclick=()=>{if(SC28.view)scSend28({k:'kill',to:SC28.view.from});scViewClose28();toast('Transmissão encerrada pelo Mestre.')};
     p.querySelector('[data-sca="x"]').onclick=()=>{p.classList.add('hide');SC28.hidden=SC28.view?.from||true};
   }
   p.classList.remove('hide');SC28.hidden=null;
   p.classList.toggle('aud',!!audio);p.classList.toggle('min',!!audio);
+  {let mi=true;try{mi=localStorage.getItem('tulpa_aud_mini')!=='0'}catch(x){}p.classList.toggle('mini',!!audio&&mi);
+   const mb=p.querySelector('[data-sca="min"]');mb.textContent=audio&&mi?'▢':'▁';mb.title=audio&&mi?'Expandir':'Minimizar';mb.setAttribute('aria-label',audio&&mi?'Expandir o painel de áudio':'Minimizar o painel')}
   p.querySelector('.sc28-t').textContent=audio?'🎧 Áudio de '+(name||'alguém'):name==='Mestre'?'🖥️ Tela do Mestre':'🖥️ Tela de '+(name||'alguém');
   p.querySelector('[data-sca="full"]').hidden=!!audio;
   p.querySelector('.sc28-kill').hidden=!isGM6();

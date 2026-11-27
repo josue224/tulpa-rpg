@@ -510,3 +510,8 @@ body{--h-fe:#d39a26;--h-nat:#3f9a5c;--h-inx:#8270cc;--h-ilu:#c4579c;--h-ver:#3b9
 /* transmissão só de áudio: painel compacto */
 .sc28-au{display:none;padding:var(--sp-1,4px) var(--sp-3,12px);background:#14181e;color:#eef2f7}.sc28-au input{width:120px;vertical-align:middle;min-height:var(--touch,44px)}
 .sc28.aud{height:auto!important;min-height:0;width:min(360px,calc(100vw - 32px));resize:none}.sc28.aud .sc28-v{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}.sc28.aud .sc28-au{display:block}.sc28.aud .sc28-btns button{min-width:var(--touch,44px);min-height:var(--touch,44px)}
+/* áudio: começa como uma pílula pequena no canto, sem cobrir o mapa; "▢" expande o volume */
+.sc28.aud{top:auto;bottom:calc(var(--sp-4,16px) + 72px);right:var(--sp-3,12px)}
+.sc28.aud.mini{width:auto;min-width:0;border-radius:999px}.sc28.aud.mini .sc28-au{display:none}.sc28.aud.mini .sc28-t{font-size:0;width:0;overflow:hidden}.sc28.aud.mini .sc28-t::before{content:"🎧";font-size:16px}.sc28.aud.mini .sc28-h{padding:var(--sp-1,4px) var(--sp-2,8px)}.sc28.aud.mini [data-sca="x"]{display:none}
+@media(max-width:860px){.sc28.aud{bottom:calc(60px + var(--sp-4,16px));right:var(--sp-2,8px)}}
+@media (max-width:560px){.sc28.aud{left:auto;top:auto;height:auto;width:min(360px,calc(100vw - 16px))}.sc28.aud.mini{width:max-content;min-width:0;left:auto}}
