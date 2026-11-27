@@ -275,7 +275,7 @@ function coleta57(C){
       const now=Date.now();if(now<C.t0)return;
       S.dashCd=Math.max(0,S.dashCd-dt);
       if(me&&!me.out&&!(C.host?me.frz>S.t:me.frzOn)){let v=(S.kr-S.kl)*440;if(S.dash>0){S.dash-=dt;v=S.dir*1100}me.x=clamp12(me.x+v*dt,20,W-20);me.dx=me.x}
-      if(C.host){if(!S.end){hostStep(dt);const ev=S.ev.splice(0);feel(ev);if(C.net&&(now-S.snapAt>66||ev.length)){S.snapAt=now;C.send('snap',{...pack(),ev})}}}
+      if(C.host){if(!S.end){hostStep(dt);const ev=S.ev.splice(0);feel(ev);if(C.net){S.evq=(S.evq||[]).concat(ev);/* eventos saem junto, mas no máximo ~30 snapshots/s (antes era um por quadro) */if(now-S.snapAt>66||(S.evq.length&&now-S.snapAt>33)){S.snapAt=now;C.send('snap',{...pack(),ev:S.evq});S.evq=[]}}}}
       else{S.items.forEach(i=>{i.y+=i.v*(S.sl?.5:1)*dt});const k=Math.min(1,dt*12);ps.forEach(p=>{if(p!==me)p.dx+=(p.x-p.dx)*k});
         if(me&&Math.abs(me.x-S.lastX)>1&&now-S.inAt>50){S.inAt=now;S.lastX=me.x;C.send('in',{x:Math.round(me.x)})}}
       if(me){const bo=C.host?S.boss&&[0,S.boss.hp,S.boss.max]:S.bo;C.hud(`<b>${me.s}</b> pts · ${'❤'.repeat(Math.max(0,me.l))}${me.sh?' · 🛡':''}${(C.host?me.mg>S.t:me.mgOn)?' · 🧲':''}${(C.host?me.big>S.t:me.bigOn)?' · 🍯':''}${me.cb>=3?` · combo ${me.cb}`:''}${rec?` · ⏱ ${Math.max(0,Math.ceil(RC.t-S.t))} s · ${goalTxt()}`:` · 🌊 Onda ${S.wave}`}${bo?` · 👁 Colosso ${Math.max(0,bo[1])}/${bo[2]}`:''}${me.out?' · fora (assistindo)':''}`)}

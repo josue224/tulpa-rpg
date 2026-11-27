@@ -693,7 +693,12 @@ function renderSheetDocs6(){
 {const _rst6=T3.renderSheetTabs;T3.renderSheetTabs=function(){_rst6.apply(this,arguments);try{renderSheetDocs6()}catch(e){console.warn('[T6] documentos da ficha',e)}}}
 
 /* ---------- música (YouTube), playlist por momento e intervalo ---------- */
-const YT6={api:null,player:null,ready:null,sig:'',synth:null,blocked:false,muted:false,retried:false};
+const YT6={api:null,player:null,ready:null,sig:'',synth:null,blocked:false,muted:false,retried:false,alt:false,tried:{},err:null,warned:''};
+/* o vídeo não pôde tocar neste aparelho: avisa quem quer que seja (Mestre ou jogador), uma vez por vídeo */
+function ytFail6(vid,msg){
+  YT6.err={vid,msg};renderVol6();
+  const k=vid+'|'+msg;if(YT6.warned===k)return;YT6.warned=k;toast('🎵 '+msg);
+}
 if(prefs.musicVol===undefined)prefs.musicVol=60;
 const MOMENTS6=['Revelação da Sala','Investigação','Combate','Chefe','Calmaria','Tensão','Intervalo'];
 function ytId6(url){
@@ -738,21 +743,27 @@ function ytPlayer6(){
   YT6.ready=ytApi6().then(()=>new Promise(ok=>{
     let host=$('mesaYTBox');if(!host){host=document.createElement('div');host.id='mesaYTBox';host.innerHTML='<div id="mesaYT"></div>';document.body.append(host)}
     const pv={autoplay:1,controls:0,disablekb:1,playsinline:1,rel:0,modestbranding:1};
-    if(/^https?:$/.test(location.protocol))pv.origin=location.origin;
+    /* origin + widget_referrer: sem a identificação da página o YouTube responde erro 153 */
+    if(/^https?:$/.test(location.protocol)){pv.origin=location.origin;pv.widget_referrer=location.origin+location.pathname}
     const cfg={width:220,height:220,playerVars:pv,events:{
       onReady:()=>{applyVol6();ok(YT6.player)},
       onStateChange:e=>{
         if(e.data===0){try{YT6.player.seekTo(0,true);YT6.player.playVideo()}catch(x){}} /* repete enquanto o Mestre não trocar */
-        if(e.data===1){YT6.retried=false;if(isGM6()){const vv=wantMusic6()?.vid,pl0=M6.state.playlist||[];if(vv&&pl0.some(x=>x.vid===vv&&x.bad))setState6({playlist:pl0.map(x=>x.vid===vv?{...x,bad:false}:x)},{silent:true})}if(!YT6.muted)YT6.blocked=false;applyVol6();const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
+        if(e.data===1){YT6.retried=false;if(YT6.err){YT6.err=null;YT6.warned=''}try{const vd=YT6.player.getVideoData?.().video_id;if(vd)delete YT6.tried[vd]}catch(x){}if(isGM6()){const vv=wantMusic6()?.vid,pl0=M6.state.playlist||[];if(vv&&pl0.some(x=>x.vid===vv&&x.bad))setState6({playlist:pl0.map(x=>x.vid===vv?{...x,bad:false}:x)},{silent:true})}if(!YT6.muted)YT6.blocked=false;applyVol6();const t=YT6.player.getVideoData?.().title,m=M6.state.music;if(isGM6()&&t&&m&&m.vid===YT6.player.getVideoData().video_id){const pl=(M6.state.playlist||[]);const it=pl.find(x=>x.vid===m.vid&&!x.title);if(it){it.title=t;setState6({playlist:[...pl],music:{...m,title:m.title||t}},{silent:true});renderMusic6()}}renderVol6()}
       },
       onError:e=>{
         const c=e&&e.data,m=wantMusic6(),vid=m&&m.vid;YT6.lastErr=c;
         if(c===5&&!YT6.retried&&vid){YT6.retried=true;setTimeout(()=>{try{YT6.player.loadVideoById(vid)}catch(x){}},900);return} /* falha momentânea do player: tenta uma vez de novo */
-        /* recusa só neste navegador (comum com bloqueador de rastreio): tenta o domínio alternativo do YouTube uma vez */
-        if([101,150,153].includes(c)&&!YT6.alt&&vid){YT6.alt=true;YT6.ready=null;YT6.sig='';try{YT6.player.destroy()}catch(x){}YT6.player=null;const h=$('mesaYTBox');if(h)h.innerHTML='<div id="mesaYT"></div>';setTimeout(syncMusic6,200);return}
+        /* recusa só neste navegador (comum com bloqueador de rastreio): tenta o OUTRO domínio do YouTube para ESTE vídeo.
+           Antes o domínio alternativo ficava preso para a sessão toda e as músicas seguintes falhavam só neste aparelho. */
+        if([101,150,153].includes(c)&&vid){
+          const tried=YT6.tried[vid]||(YT6.tried[vid]={});tried[YT6.alt?'alt':'std']=1;
+          const other=YT6.alt?'std':'alt';
+          if(!tried[other]){YT6.alt=other==='alt';YT6.ready=null;YT6.sig='';try{YT6.player.destroy()}catch(x){}YT6.player=null;const h=$('mesaYTBox');if(h)h.innerHTML='<div id="mesaYT"></div>';setTimeout(syncMusic6,200);return}
+        }
+        const why={2:'O link dessa música parece inválido.',100:'Esse vídeo foi removido ou está privado.',153:'O YouTube não reconheceu este site (erro 153). Desative o bloqueador de rastreio ou de “referer” para esta página.'}[c]||'O YouTube recusou tocar esse vídeo neste navegador (erro '+c+').'+(isGM6()?' Os jogadores podem estar ouvindo normalmente.':' Avise o Mestre.');
+        if(vid)ytFail6(vid,why);else if(isGM6())toast(why);
         if(!isGM6())return;
-        const why={2:'O link dessa música parece inválido.',100:'Esse vídeo foi removido ou está privado.'}[c]||'O YouTube recusou tocar esse vídeo neste navegador (erro '+c+'). Os jogadores podem estar ouvindo normalmente.';
-        toast(why);
         if(c===100||c===2){const pl=M6.state.playlist||[];if(vid&&pl.some(x=>x.vid===vid&&!x.bad))setState6({playlist:pl.map(x=>x.vid===vid?{...x,bad:true}:x)})}
       }
     }};
@@ -774,15 +785,27 @@ async function syncMusic6(){
   if(!m||!m.playing){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}renderVol6();return}
   if(m.synth){try{YT6.player&&YT6.player.pauseVideo()}catch(e){}startWait6();renderVol6();return}
   try{
+    if(YT6.err&&YT6.err.vid!==m.vid){YT6.err=null;YT6.warned=''}
     const p=await ytPlayer6();if(YT6.sig!==sig)return;
     /* sem nenhum toque na página o navegador só deixa tocar mudo: começa mudo e liga o som no primeiro toque */
     const act=!!(navigator.userActivation&&navigator.userActivation.hasBeenActive);
     YT6.muted=!act;YT6.blocked=!act;YT6.retried=false;
     try{if(act)p.unMute();else p.mute()}catch(e){}
     applyVol6();p.loadVideoById({videoId:m.vid,startSeconds:Math.max(0,(Number(m.pos)||0)+(Date.now()-(m.ts||Date.now()))/1000)});
-    setTimeout(()=>{try{if(YT6.sig===sig&&![1,3].includes(p.getPlayerState())){YT6.muted=true;YT6.blocked=true;p.mute();p.playVideo();renderVol6()}}catch(e){}},3500);
-  }catch(e){console.warn('[T6] música',e);if(isGM6())toast('Música: '+(e.message||'erro')+'.')}
+    setTimeout(()=>ytWatch6(sig,p,act,1),3500);
+  }catch(e){console.warn('[T6] música',e);if(m&&m.vid)ytFail6(m.vid,'Música: '+(e.message||'erro')+'. Recarregue a página ou libere o YouTube no bloqueador.');else if(isGM6())toast('Música: '+(e.message||'erro')+'.')}
   renderVol6();
+}
+/* vigia: o vídeo não começou. Com permissão de som (já houve toque na página) só insiste; o modo mudo + "Ativar som"
+   fica para quando o navegador realmente bloqueou. Antes ele silenciava o player de quem tinha permissão só porque o vídeo demorou a carregar. */
+function ytWatch6(sig,p,act,n){
+  try{
+    if(YT6.sig!==sig)return;const s=p.getPlayerState(),m=wantMusic6();
+    if([1,3].includes(s)||!m||!m.playing)return;
+    if(YT6.err&&YT6.err.vid===m.vid)return; /* erro do YouTube já avisado: não é bloqueio de som */
+    if(n<3&&act){try{p.playVideo()}catch(e){}setTimeout(()=>ytWatch6(sig,p,act,n+1),3000);return}
+    YT6.muted=true;YT6.blocked=true;p.mute();p.playVideo();renderVol6();
+  }catch(e){}
 }
 onState6(()=>{syncMusic6();if(M6.tab==='musica')renderMusic6();renderPause6()});
 M6.hooks.leave.push(()=>{YT6.sig='';stopWait6();try{YT6.player&&YT6.player.stopVideo()}catch(e){}$('mesaPause')?.classList.remove('show')});
@@ -811,7 +834,8 @@ function renderVol6(){
     $('mbUnlock').onclick=()=>unlockMusic6();
   }
   $('mbVol').value=prefs.musicVol;$('mbMute').textContent=prefs.musicVol>0?'🔊':'🔇';$('mbMute').title=prefs.musicVol>0?'Silenciar a música (só para você)':'Ligar a música';
-  $('mbNow').textContent=(on?'♪ ':'')+label;$('mbNow').classList.toggle('on',on);
+  const bad=!!(on&&!m.synth&&YT6.err&&YT6.err.vid===m.vid);
+  $('mbNow').textContent=(bad?'⚠ ':on?'♪ ':'')+label+(bad?' · não toca neste navegador':'');$('mbNow').classList.toggle('on',on&&!bad);$('mbNow').title=bad?YT6.err.msg:'';
   $('mbUnlock').classList.toggle('hide',!(on&&YT6.blocked));
   const pv=$('pauseVol');if(pv)pv.value=prefs.musicVol;
 }

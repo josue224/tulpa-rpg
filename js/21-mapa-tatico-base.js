@@ -218,10 +218,22 @@ function mapTokVisible7(t){
   if(isGM6())return true;if(ch.ownerId===uid3())return true;
   if(!inScene(ch))return false;
   if(!tokVisible10(t))return false;
-  const f=M6.state.fog;if(f?.on){const g=mapCfg7(),p=tokPos7(t),k=Math.round(p.y)*g.cols+Math.round(p.x);if(!mapFog7().has(k))return false}
+  const f=M6.state.fog;if(f?.on){const g=mapCfg7(),p=tokPos7(t),k=Math.round(p.y)*g.cols+Math.round(p.x);if(!mapFog7().has(k)&&!fogSeen7(t))return false}
   return true;
 }
-function mapFog7(){const f=M6.state.fog||{},sig=(f.open||[]).length+':'+(f.open||[])[0]+':'+(f.open||[]).slice(-1)[0]+':'+M6.state.rev;if(MAP7.drag?.kind==='fog')return MAP7.drag.set;if(MAP7.fogSig!==sig){MAP7.fogSig=sig;MAP7.fogSet=new Set(f.open||[])}return MAP7.fogSet}
+/* névoa de guerra: o que os personagens do jogador enxergam agora (cone/luz) dissipa a névoa, mesmo nas células que o Mestre não abriu */
+function fogSeen7(t){try{const vs=view10(),[x,y]=tokCenter10(t);return vs.mine.some(m=>m.views.some(o=>inPoly10(x,y,o.poly)))}catch(e){return false}}
+function fogVision7(fx,v,isM){
+  const vs=view10();
+  if(isM){vs.gm.forEach(o=>{if(o.player)o.views.forEach(w=>lightCut10(fx,v,w,.7))});return}
+  vs.mine.forEach(m=>{
+    m.views.forEach(o=>lightCut10(fx,v,o));
+    /* o próprio token e o entorno imediato nunca ficam debaixo da névoa */
+    const R=tokR10(m.t)*1.9;lightCut10(fx,v,{poly:visPoly10(m.cx,m.cy,0,TAU10,R),ox:m.cx,oy:m.cy,r:R,soft:true});
+  });
+}
+/* a lista de células abertas é trocada inteira a cada mudança: compara a referência (a assinatura antiga por tamanho/pontas perdia mudanças no meio) */
+function mapFog7(){const f=M6.state.fog||{},o=Array.isArray(f.open)?f.open:[];if(MAP7.drag?.kind==='fog')return MAP7.drag.set;if(MAP7.fogRef!==o||MAP7.fogSig==='drag'||!MAP7.fogSet){MAP7.fogRef=o;MAP7.fogSig='';MAP7.fogSet=new Set(o)}return MAP7.fogSet}
 function mapTokImg7(ch){
   const d=dOf6(ch),src=avOk(d.tokenAvatar)?d.tokenAvatar:avOk(d.avatar)?d.avatar:'';if(!src)return null;
   const key=ch.id,sig=src.length+src.slice(-24);let e=MAP7.imgs.get(key);
@@ -281,10 +293,13 @@ function mapPaint7(){
   /* névoa de guerra: os jogadores não veem nada por baixo; o Mestre vê escurecido */
   const fog=M6.state.fog;
   if(fog?.on){
-    const open=mapFog7();x.fillStyle=isM?'rgba(8,8,12,.55)':(dark?'#07090d':'#120d0a');
+    /* pinta numa camada à parte para a visão dos personagens poder "furar" a névoa */
+    const open=mapFog7(),L=fogCanvas10();L.fillStyle=isM?'rgba(8,8,12,.55)':(dark?'#07090d':'#120d0a');
     const c0=Math.max(0,Math.floor((-v.tx/v.s-g.ox)/g.cell)),c1=Math.min(g.cols-1,Math.ceil(((v.cw-v.tx)/v.s-g.ox)/g.cell)),r0=Math.max(0,Math.floor((-v.ty/v.s-g.oy)/g.cell)),r1=Math.min(g.rows-1,Math.ceil(((v.ch-v.ty)/v.s-g.oy)/g.cell));
-    for(let r=r0;r<=r1;r++){let run=-1;for(let c=c0;c<=c1+1;c++){const hid=c<=c1&&!open.has(r*g.cols+c);if(hid&&run<0)run=c;if(!hid&&run>=0){const [fx,fy]=w2s7(v,g.ox+run*g.cell,g.oy+r*g.cell);x.fillRect(Math.floor(fx),Math.floor(fy),Math.ceil((c-run)*cs)+1,Math.ceil(cs)+1);run=-1}}}
-    if(!isM&&(g.ox>0||g.oy>0)){const [ax,ay]=w2s7(v,0,0);x.fillRect(ax,ay,mw,g.oy*v.s);x.fillRect(ax,ay,g.ox*v.s,mh)}
+    for(let r=r0;r<=r1;r++){let run=-1;for(let c=c0;c<=c1+1;c++){const hid=c<=c1&&!open.has(r*g.cols+c);if(hid&&run<0)run=c;if(!hid&&run>=0){const [fx,fy]=w2s7(v,g.ox+run*g.cell,g.oy+r*g.cell);L.fillRect(Math.floor(fx),Math.floor(fy),Math.ceil((c-run)*cs)+1,Math.ceil(cs)+1);run=-1}}}
+    if(!isM&&(g.ox>0||g.oy>0)){const [ax,ay]=w2s7(v,0,0);L.fillRect(ax,ay,mw,g.oy*v.s);L.fillRect(ax,ay,g.ox*v.s,mh)}
+    try{fogVision7(L,v,isM)}catch(e){console.warn('[T7] visão na névoa',e)}
+    x.drawImage(TAC10.fogCv,0,0,v.cw,v.ch);
   }
   paintOver10(x,v,g,isM);
   if(T3.cbPaint){try{if(T3.cbPaint(x,v,g))again=true}catch(e){console.warn('[T14] desenho',e)}}

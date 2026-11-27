@@ -37,7 +37,7 @@ function volley54(C){
   const ps=C.players.map((p,i)=>({...p,team:multi?(i%2):0,ai:false,el:multi?VBELK54[((p.c|0)%5+5)%5]:(o.el||'fe')}));
   if(!multi)ps.push({u:'~ai',n:cup?cup.n:'Perseus',c:-1,team:1,ai:true,el:cup?cup.el:VBELK54[Math.floor(Math.random()*5)]});
   else{const a=ps.filter(p=>p.team===0).length,b=ps.length-a;if(a!==b)ps.push({u:'~ai',n:'Perseus',c:-1,team:a<b?0:1,ai:true,el:'fe'})}
-  const place=()=>ps.forEach(p=>{const m=ps.filter(q=>q.team===p.team),k=m.indexOf(p),n=m.length;p.x=p.team?NX+(W-NX)*(k+1)/(n+1):NX*(k+1)/(n+1);p.y=GY-R;p.vx=0;p.vy=0;p.in=p.in||{l:0,r:0,j:0,a:0,p:0};p.dx=p.x;p.dy=p.y;p.f=p.team?-1:1;p.en=p.en||0;p.dive=0;p.spk=0;p.blk=0});
+  const place=()=>ps.forEach(p=>{const m=ps.filter(q=>q.team===p.team),k=m.indexOf(p),n=m.length;p.x=p.team?NX+(W-NX)*(k+1)/(n+1):NX*(k+1)/(n+1);p.y=GY-R;p.vx=0;p.vy=0;p.in=p.in||{l:0,r:0,j:0,a:0,p:0};p.dx=p.x;p.dy=p.y;p.f=p.team?-1:1;p.en=p.en||0;p.dive=0;p.spk=0;p.blk=0;p.tp=(p.tp|0)+1});
   place();
   const S={b:{x:200,y:120,vx:0,vy:0},sc:[0,0],sets:[0,0],setN:1,wait:1.2,acc:0,snapAt:0,hits:0,shown:0,end:false,touch:{t:-1,n:0},rally:0,maxRally:0,wind:0,windT:0,
     st:{spk:0,blk:0,ace:0,dive:0,pow:0},fire:null,ghost:0,roots:[0,0],eye:[0,0],lastHitter:null,msg:'',msgT:0,points:[]};
@@ -99,7 +99,7 @@ function volley54(C){
   function usePower(p){if(p.en<100)return;p.en=0;if(p===me)S.st.pow++;fx5('activate');C.fx?.flash(p.team?'#ff8fb1':'#7fe3ff',.18);const b=S.b;
     if(p.el==='fe'){p.fireReady=1;C.fx?.float(p.x,p.y-60,'☀ Cortada Solar!',{col:'#ffd36b',size:18})}
     else if(p.el==='nat'){S.roots[p.team]=7;C.fx?.float(p.x,p.y-60,'🌿 Muralha!',{col:'#7dffa8',size:18})}
-    else if(p.el==='ine'){const mine=p.team?b.x>NX:b.x<NX;if(mine){p.x=clamp12(b.x-p.f*10,p.team?NX+6+R:R,p.team?W-R:NX-6-R);C.fx?.burst(p.x,p.y,{n:14,col:['#c58bff','#000'],sp:160,life:.4,size:3,grav:0})}else p.en=100}
+    else if(p.el==='ine'){const mine=p.team?b.x>NX:b.x<NX;if(mine){p.x=clamp12(b.x-p.f*10,p.team?NX+6+R:R,p.team?W-R:NX-6-R);p.tp=(p.tp|0)+1;C.fx?.burst(p.x,p.y,{n:14,col:['#c58bff','#000'],sp:160,life:.4,size:3,grav:0})}else p.en=100}
     else if(p.el==='ilu'){p.ghostReady=1;C.fx?.float(p.x,p.y-60,'🌀 Bola Fantasma',{col:'#7fe3ff',size:18})}
     else if(p.el==='ver'){S.eye[p.team]=8;p.eyeAim=8;C.fx?.float(p.x,p.y-60,'👁 Olho da Verdade',{col:'#ff8fb1',size:18})}}
   function phys(h){
@@ -140,23 +140,40 @@ function volley54(C){
       S.fresh=false;p.aiTx=null;break}
     if(b.y+BR>=GY){const side2=b.x<NX?0:1;if(S.roots[side2]>0){S.roots[side2]=0;b.y=GY-BR-2;b.vy=-620;b.vx=side2?-160:160;C.fx?.float(b.x,GY-60,'🌿 Raízes!',{col:'#7dffa8',size:20});fx5('bb4');return}
       b.y=GY-BR;point(b.x<NX?1:0)}}
-  function snap(){C.send('snap',{b:[S.b.x,S.b.y,S.b.vx,S.b.vy].map(v=>Math.round(v)),p:ps.map(p=>[p.u,Math.round(p.x),Math.round(p.y),p.f,Math.round(p.en),p.dive>0?1:0]),sc:S.sc,ss:S.sets,w:S.wait>0?1:0,h:S.hits,tn:S.touch.n,tt:S.touch.t,r:S.roots.map(v=>v>0?1:0),g:S.ghost>0?1:0,fi:S.fire?S.fire.t:-1,wd:Math.round(S.wind)})}
-  function sendIn(){if(!me)return;if(C.host)me.in={...inp};else C.send('in',{...inp})}
-  let keepAt=0;
+  function snap(){C.send('snap',{b:[S.b.x,S.b.y,S.b.vx,S.b.vy].map(v=>Math.round(v)),p:ps.map(p=>[p.u,Math.round(p.x),Math.round(p.y),p.f,Math.round(p.en),p.dive>0?1:0,p.tp|0]),sc:S.sc,ss:S.sets,w:S.wait>0?1:0,h:S.hits,tn:S.touch.n,tt:S.touch.t,r:S.roots.map(v=>v>0?1:0),g:S.ghost>0?1:0,fi:S.fire?S.fire.t:-1,wd:Math.round(S.wind)})}
+  /* convidado: manda as teclas E a posição que ele mesmo calculou (o boneco responde na hora, sem esperar a ida e volta pelo servidor).
+     O anfitrião continua dono da bola, dos toques, dos pontos e do C.finish. */
+  function sendIn(){if(!me)return;if(C.host){me.in={...inp};return}sentAt=Date.now();sentX=me.x;sentY=me.y;C.send('in',{...inp,x:Math.round(me.x),y:Math.round(me.y),vy:Math.round(me.vy||0),tp:me.tp|0})}
+  /* predição local do próprio boneco (as mesmas regras de movimento do phys) */
+  function selfStep(p,h){const I=inp,prevA=p.lastA;p.lastA=I.a;const ground=p.y>=GY-R-.5;
+    if(I.a&&!prevA&&ground&&p.dive<=0&&!S.w){p.dive=.38;p.f=I.r?1:I.l?-1:p.f;fx5('mgJump')}
+    if(p.dive>0){p.dive-=h;p.vx=p.f*SP*1.9}else{p.vx=(I.r-I.l)*SP;if(p.vx)p.f=p.vx>0?1:-1}
+    if(I.j&&ground&&p.dive<=0){p.vy=JV;fx5('mgJump')}
+    p.vy+=G*h;p.x+=p.vx*h;p.y+=p.vy*h;if(p.y>GY-R){p.y=GY-R;p.vy=0}p.x=clamp12(p.x,p.team?NX+6+R:R,p.team?W-R:NX-6-R)}
+  let keepAt=0,sentAt=0,sentX=0,sentY=0,selfAcc=0;
   return{st:()=>S,ps:()=>ps,sim(sec){for(let t=0;t<sec&&!S.end;t+=1/120)phys(1/120)},aip:()=>AIP,usePower,
     reward:()=>S.rw||null,
     next(){if(multi)return null;if(cup){const won=S.sets[0]>=NEED;if(won&&cs<3)return{opt:{m:'copa',cs:String(cs+1)},label:`Copa: ${VBCUP54[cs+1].n}`};if(!won)return{opt:{m:'copa',cs:String(cs)},label:'Tentar de novo'};return null}return{opt:{},label:'Revanche'}},
     key(code,down){const v=down?1:0;if(code==='KeyA'||code==='ArrowLeft')inp.l=v;else if(code==='KeyD'||code==='ArrowRight')inp.r=v;else if(code==='KeyW'||code==='ArrowUp'||code==='Space')inp.j=v;else if(code==='KeyS'||code==='ArrowDown'||code==='KeyK')inp.a=v;else if(code==='KeyE'||code==='KeyL')inp.p=v;else return;sendIn()},
     ptr(){},
-    step(dt){const now=Date.now();if(!C.host&&now-keepAt>400){keepAt=now;sendIn()}
+    step(dt){const now=Date.now();
+      if(!C.host&&me&&now>=C.t0&&!S.end){selfAcc+=dt;while(selfAcc>=1/120){selfStep(me,1/120);selfAcc-=1/120}me.dx=me.x;me.dy=me.y;
+        /* enquanto se mexe, manda a posição ~20x/s; parado, só um "estou aqui" a cada 400 ms */
+        const moved=Math.abs(me.x-sentX)>.5||Math.abs(me.y-sentY)>.5;if((moved&&now-sentAt>=50)||now-sentAt>400){keepAt=now;sendIn()}}
+      else if(!C.host&&now-keepAt>400){keepAt=now;sendIn()}
       if(S.hits>S.shown){S.shown=S.hits;fx5('mgBall');C.fx?.burst(S.b.x,S.b.y,{n:7,col:['#ffe07a','#fff'],sp:150,life:.35,size:2.4,grav:0})}
       if(C.host){if(now<C.t0||S.end)return;S.acc+=dt;while(S.acc>=1/120){phys(1/120);S.acc-=1/120;if(S.end)break}ps.forEach(p=>{p.dx=p.x;p.dy=p.y});if(C.net&&now-S.snapAt>=50){S.snapAt=now;snap()}}
-      else{const k=Math.min(1,dt*14);ps.forEach(p=>{if(p.tx==null)return;p.dx+=(p.tx-p.dx)*k;p.dy+=(p.ty-p.dy)*k});const b=S.b;if(!S.w){b.vy+=GB*dt;b.x+=b.vx*dt;b.y+=b.vy*dt}if(S.tb){b.x+=(S.tb[0]-b.x)*k;b.y+=(S.tb[1]-b.y)*k}}
+      else{const k=Math.min(1,dt*14);ps.forEach(p=>{if(p.tx==null||p===me)return;p.dx+=(p.tx-p.dx)*k;p.dy+=(p.ty-p.dy)*k});const b=S.b;if(!S.w){b.vy+=GB*dt;b.x+=b.vx*dt;b.y+=b.vy*dt}if(S.tb){b.x+=(S.tb[0]-b.x)*k;b.y+=(S.tb[1]-b.y)*k}}
       const m=me||ps[0];C.hud(`🏐 ${SETS>1?`Set ${S.setN} · sets ${S.sets[0]}×${S.sets[1]} · `:''}${S.sc[0]} × ${S.sc[1]} · toques: ${S.touch.t===m.team?S.touch.n:0}/3 · ✨ ${Math.floor(m.en)}%${m.en>=100?` <b style="color:#ffd36b">${VBEL54[m.el].ico} PODER (E)</b>`:''}${ar!=='normal'?' · '+VBAR54[ar].ico:''}`)},
-    msg(p){if(C.host&&p.t==='in'){const q=ps.find(x=>x.u===p.from);if(q)q.in={l:p.l?1:0,r:p.r?1:0,j:p.j?1:0,a:p.a?1:0,p:p.p?1:0}}
+    msg(p){if(C.host&&p.t==='in'){const q=ps.find(x=>x.u===p.from);if(q){q.in={l:p.l?1:0,r:p.r?1:0,j:p.j?1:0,a:p.a?1:0,p:p.p?1:0};
+        /* posição calculada pelo convidado (só vale se ele já recebeu o último reposicionamento: saque de set, teleporte) */
+        if(isFinite(p.x)&&isFinite(p.y)&&(p.tp|0)===(q.tp|0)){q.x=clamp12(Number(p.x),q.team?NX+6+R:R,q.team?W-R:NX-6-R);q.y=Math.min(GY-R,Number(p.y));if(isFinite(p.vy))q.vy=Number(p.vy)}}}
       if(!C.host&&p.t==='snap'){const[x,y,vx,vy]=p.b;S.tb=[x,y];S.b.vx=vx;S.b.vy=vy;if(Math.hypot(S.b.x-x,S.b.y-y)>90){S.b.x=x;S.b.y=y}
         if(p.sc&&(p.sc[0]!==S.sc[0]||p.sc[1]!==S.sc[1])){C.fx?.shake(6,.3);C.fx?.float(S.b.x,GY-70,'PONTO!',{col:'#ffd36b',size:28})}S.sc=p.sc;S.sets=p.ss||S.sets;S.w=p.w;S.hits=Math.max(S.hits,p.h|0);S.touch={t:p.tt,n:p.tn};S.rootsV=p.r;S.ghost=p.g?1:0;S.fire=p.fi>=0?{t:p.fi}:null;S.wind=p.wd||0;
-        (p.p||[]).forEach(([u,x2,y2,f,en,dv])=>{const q=ps.find(z=>z.u===u);if(q){q.tx=x2;q.ty=y2;q.f=f;q.en=en;q.dive=dv?.1:0}})}},
+        (p.p||[]).forEach(([u,x2,y2,f,en,dv,tp])=>{const q=ps.find(z=>z.u===u);if(!q)return;q.en=en;
+          /* o próprio boneco é previsto aqui: só aceita a posição do anfitrião quando ele reposicionou (tp mudou) ou se a diferença ficou absurda */
+          if(q===me){const far=Math.hypot((q.x||0)-x2,(q.y||0)-y2)>160;if((tp!=null&&(tp|0)!==(q.tp|0))||far){q.x=q.dx=x2;q.y=q.dy=y2;q.vy=0;q.dive=0;if(tp!=null)q.tp=tp|0}return}
+          q.tx=x2;q.ty=y2;q.f=f;q.dive=dv?.1:0})}},
     left(u){const q=ps.find(p=>p.u===u);if(q){q.ai=true;q.n='Perseus';q.c=-1;q.u='~ai'+u}},
     draw(x){
       const now=performance.now(),gr=x.createLinearGradient(0,0,0,H);gr.addColorStop(0,ar==='lua'?'#0a0a24':ar==='vento'?'#12243a':ar==='pesada'?'#2a1a12':'#1b1238');gr.addColorStop(1,'#3d2a5e');x.fillStyle=gr;x.fillRect(0,0,W,H);

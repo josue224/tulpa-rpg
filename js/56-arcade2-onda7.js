@@ -190,11 +190,18 @@ function rinha50(C){
     key(code,down){const was=!!keys[code];keys[code]=down;if(down&&!was){if(PRESS[code])myCnt[PRESS[code]]=(myCnt[PRESS[code]]|0)+1;if(code==='KeyT')S.showHB=!S.showHB;if(code==='KeyQ'||code==='Escape')exitTraining()}sendInp()},
     ptr(t,px,py){if(t==='down'&&mode==='tre'&&px>W-130&&py<34)exitTraining()},
     msg(p){if(C.host&&p.t==='ri'){const i=ps.findIndex(q=>q.u===p.from);if(i>=0)S.f[i].inp=p.inp||{}}
-      if(!C.host&&p.t==='rs'&&p.from===C.room.host&&p.st){const st=p.st;st.f.forEach((g,i)=>{const f=S.f[i];if(g.hp<f.hp)f.hitT=performance.now();Object.assign(f,g)});S.ents=st.ents;S.wins=st.wins;S.round=st.round;S.t=st.t;S.msg=st.msg;S.sub=st.sub;S.over=st.over;S.freeze=st.freeze;S.frz=st.frz?{f:S.f[st.frz.i],el:st.frz.el}:null}},
+      if(!C.host&&p.t==='rs'&&p.from===C.room.host&&p.st){const st=p.st;st.f.forEach((g,i)=>{const f=S.f[i];if(g.hp<f.hp)f.hitT=performance.now();
+          /* guarda a posição como alvo e desliza até ela (antes pulava de 70 em 70 ms); salto grande (novo round) vai direto */
+          const x0=f.x,y0=f.y,had=f.tx!=null;Object.assign(f,g);f.tx=g.x;f.ty=g.y;if(had&&Math.hypot(x0-g.x,y0-g.y)<150){f.x=x0;f.y=y0}});S.ents=st.ents;S.wins=st.wins;S.round=st.round;S.t=st.t;S.msg=st.msg;S.sub=st.sub;S.over=st.over;S.freeze=st.freeze;S.frz=st.frz?{f:S.f[st.frz.i],el:st.frz.el}:null}},
     left(u){if(!C.host||S.over)return;const i=ps.findIndex(q=>q.u===u);if(i<0)return;S.f[i].hp=0;S.wins[1-i]=2;S.over=true;C.finish({title:`${ps[i].n} saiu · vitória de ${ps[1-i].n}`,rows:ps.map((p,k)=>({u:p.u,n:p.n,c:p.c<0?0:p.c,s:S.wins[k],w:k!==i}))})},
     step(dt){if(Date.now()<C.t0)return;
       if(C.host||!pvp){sim(dt);if(pvp&&Date.now()-S.sendAt>70){S.sendAt=Date.now();C.send('rs',{st:snap()})}}
-      else{S.ents.forEach(e=>{if(e.vx)e.x+=e.vx*dt})}
+      else{S.ents.forEach(e=>{if(e.vx)e.x+=e.vx*dt});
+        /* convidado: o próprio lutador anda na hora (predição); o resto desliza até a posição do anfitrião */
+        const k=Math.min(1,dt*16),mine=S.f[myI],I=inpOf()||{};
+        S.f.forEach(f=>{if(f.tx==null)return;
+          if(f===mine&&(f.st==='idle'||f.st==='walk')&&!I.b&&f.D){const mv=(I.r?1:0)-(I.l?1:0);if(mv){f.x=clamp12(f.x+mv*f.D.spd*dt*(mv===f.face?1:.8),30,W-30);if(Math.abs(f.x-f.tx)>70)f.x+=(f.tx-f.x)*k;f.y+=(f.ty-f.y)*k;return}}
+          f.x+=(f.tx-f.x)*k;f.y+=(f.ty-f.y)*k})}
       const m=S.f[myI];C.hud(`🥊 ${mode==='tor'?`Torneio ${tst+1}/5 · `:mode==='tre'?'Treino · ':''}Round <b>${S.round}</b> · ${S.wins[0]} × ${S.wins[1]} · ⏱ ${mode==='tre'?'∞':Math.max(0,Math.ceil(S.t))} · ✦ Essência <b>${Math.floor(m.meter/100)}</b>/3${m.meter>=300?' · <b style="color:#ffd36b">SUPREMO (I)</b>':m.meter>=100?' · EX (U)':''}`)},
     draw(x){
       const now=performance.now(),sh=S.shake>0?(S.shake-=1/60,Math.sin(now/15)*S.shake*20):0;
@@ -365,7 +372,7 @@ function abismo51(C){
   function foe(k,x,y){const m=1+S.fl*.3,b={traco:{r:14,hp:3,spd:95},mosca:{r:10,hp:2,spd:140,fly:1},olho:{r:16,hp:4,spd:0,cool:1.5},aranha:{r:13,hp:4,spd:0,hop:1},larva:{r:15,hp:5,spd:60},torre:{r:17,hp:8,spd:0,cool:2},fantasma:{r:14,hp:5,spd:80,fly:1}}[k];
     return{k,x,y,...b,hp:b.hp*m*EHP,max:b.hp*m*EHP,cool:(b.cool||1)+rnd()*1.5,ph:rnd()*9,vx:0,vy:0,hitT:0,slow:0,pois:0}}
   function boss(){const hp=[45,70,90,130][S.fl]*EHP;return{k:'boss',b:S.fl,x:W/2,y:150,r:[40,44,38,46][S.fl],hp,max:hp,cool:2,ph:0,vx:0,vy:0,hitT:0,slow:0,pois:0,a:0}}
-  function enter(r,from){S.room=r;S.en=[];S.eb=[];S.tears=[];S.bombs=[];S.beams=[];S.decoy=null;if(!r.seen){r.seen=true;S.roomsSeen++}
+  function enter(r,from){S.tpN=(S.tpN|0)+1;S.room=r;S.en=[];S.eb=[];S.tears=[];S.bombs=[];S.beams=[];S.decoy=null;if(!r.seen){r.seen=true;S.roomsSeen++}
     if(r.kind==='secret'&&!S.found.includes(S.fl)){S.found.push(S.fl);C.achieve?.('ab_segredo');say('✨ Sala Secreta!')}
     S.ps.forEach((p,i)=>{if(from){p.x=from[0]?(from[0]>0?WL+32:W-WL-32):W/2+(i?28:-28);p.y=from[1]?(from[1]>0?WL+32:H-WL-32):H/2+(i?28:-28)}p.inv=Math.max(p.inv,.8)});
     fillRoom(r);
@@ -492,31 +499,46 @@ function abismo51(C){
     S.eb.forEach(b=>{b.x+=b.vx*dt*spk;b.y+=b.vy*dt*spk;if(b.x<WL||b.x>W-WL||b.y<WL||b.y>H-WL||r.rocks.some(k=>Math.hypot(b.x-k.x,b.y-k.y)<k.r))b.dead=true;live.forEach(p=>{if(!b.dead&&Math.hypot(p.x-b.x,p.y-b.y)<b.r+9){b.dead=true;hurt(p)}})});S.eb=S.eb.filter(b=>!b.dead);
     if(!r.clear&&!S.en.length&&(r.kind==='fight'||r.kind==='boss'))roomCleared();
   }
-  const snap=()=>({fl:S.fl,ps:S.ps.map(p=>({u:p.u,x:Math.round(p.x),y:Math.round(p.y),hp:p.hp,max:p.max,sh:p.sh,coins:p.coins,bombs:p.bombs,keys:p.keys,dead:p.dead,rev:+p.rev.toFixed(2),inv:+p.inv.toFixed(2),muts:p.muts,act:p.act,f:p.f,beamA:p.beamT>0?p.beamA:null,beamL:p.beamL})),
+  const snap=()=>({fl:S.fl,tp:S.tpN|0,ps:S.ps.map(p=>({u:p.u,x:Math.round(p.x),y:Math.round(p.y),spd:p.spd,hp:p.hp,max:p.max,sh:p.sh,coins:p.coins,bombs:p.bombs,keys:p.keys,dead:p.dead,rev:+p.rev.toFixed(2),inv:+p.inv.toFixed(2),muts:p.muts,act:p.act,f:p.f,beamA:p.beamT>0?p.beamA:null,beamL:p.beamL})),
     en:S.en.map(e=>({k:e.k,b:e.b,x:Math.round(e.x),y:Math.round(e.y),r:e.r,hp:+e.hp.toFixed(1),max:e.max})),t:S.tears.map(b=>[Math.round(b.x),Math.round(b.y),b.r,b.col||tearCol(b.f)]),eb:S.eb.map(b=>[Math.round(b.x),Math.round(b.y),b.r]),bm:S.bombs.map(b=>[Math.round(b.x),Math.round(b.y)]),
     rx:S.room.x,ry:S.room.y,clear:S.room.clear,open:S.room.open||null,peds:S.room.peds,drops:S.room.drops,rocks:S.room.rocks,trap:S.trap,kills:S.kills,seen:S.roomsSeen,msg:S.msg,over:S.over,
     vis:Object.values(M.rooms).filter(q=>q.seen).map(q=>[q.x,q.y]),unl:Object.values(M.rooms).filter(q=>!q.hidden).map(q=>[q.x,q.y]),dec:S.decoy&&[Math.round(S.decoy.x),Math.round(S.decoy.y)]});
   function myInp(){const k=S.keys,i={l:!!k.KeyA,r:!!k.KeyD,u:!!k.KeyW,d:!!k.KeyS,f:!!k.KeyF,cnt:{...myCnt}};let ax=((k.ArrowRight?1:0)-(k.ArrowLeft?1:0)),ay=((k.ArrowDown?1:0)-(k.ArrowUp?1:0));
     if(!ax&&!ay&&S.aim){const p=myP();ax=S.aim[0]-p.x;ay=S.aim[1]-p.y}if(ax||ay){i.ax=ax;i.ay=ay}return i}
   const myCnt={};
-  function push(){const i=myInp();if(C.host||!coop)myP().inp=i;else C.send('ain',{inp:i})}
+  /* convidado: manda as teclas E a posição que ele mesmo calculou (anda na hora, sem esperar o servidor).
+     O anfitrião segue dono dos inimigos, do dano, das salas e do fim da run. */
+  let pushAt=0,pX=0,pY=0;
+  function push(){const i=myInp();if(C.host||!coop){myP().inp=i;return}const p=myP();pushAt=Date.now();pX=p.x;pY=p.y;C.send('ain',{inp:i,x:Math.round(p.x),y:Math.round(p.y),tp:S.tpN|0})}
+  /* predição local do próprio personagem (mesmo movimento do sim: velocidade, dash, paredes e pedras) */
+  function selfMove(p,dt){if(p.dead||S.over)return;const k=S.keys;S.ldT=Math.max(0,(S.ldT||0)-dt);S.ldCd=Math.max(0,(S.ldCd||0)-dt);
+    let mx=(k.KeyD?1:0)-(k.KeyA?1:0),my=(k.KeyS?1:0)-(k.KeyW?1:0);const n=Math.hypot(mx,my)||1,sp=(p.spd||0)*(S.ldT>0?2.6:1);p.r=13;p.x+=mx/n*sp*dt;p.y+=my/n*sp*dt;wallClamp(p,p.f&&p.f.ghost)}
   floor(0);
   return{st:()=>S,map:()=>M,enter,floor,fire:(ax,ay)=>fire(myP(),ax,ay),grab:pd=>grabPed(myP(),pd),explode,useActive:()=>useActive(myP()),
     reward:()=>S.rw||null,
     next(){return coop?null:{opt:{},label:'🗝 Nova run'}},
-    key(code,down){const was=!!S.keys[code];S.keys[code]=down;if(down&&!was){const m={KeyE:'B',Space:'A',ShiftLeft:'D',ShiftRight:'D'}[code];if(m)myCnt[m]=(myCnt[m]|0)+1}push()},
+    key(code,down){const was=!!S.keys[code];S.keys[code]=down;if(down&&!was){const m={KeyE:'B',Space:'A',ShiftLeft:'D',ShiftRight:'D'}[code];if(m)myCnt[m]=(myCnt[m]|0)+1;
+        if(m==='D'&&coop&&!C.host){const p=myP();if(p.f&&p.f.dash&&!(S.ldCd>0)){S.ldT=.22;S.ldCd=.9}}}push()},
     ptr(t,px,py,e){if(touch12()&&!(e&&e.pointerType==='mouse'))return;if(t==='down'||(t==='move'&&S.aim))S.aim=[px,py];if(t==='up')S.aim=null;push()},
     msg(p){
-      if(C.host&&p.t==='ain'){const pl=S.ps.find(q=>q.u===p.from);if(pl)pl.inp=p.inp||{}}
+      if(C.host&&p.t==='ain'){const pl=S.ps.find(q=>q.u===p.from);if(pl){pl.inp=p.inp||{};
+        /* posição do convidado: só vale na mesma sala (tp igual ao da última troca de sala) */
+        if(isFinite(p.x)&&isFinite(p.y)&&(p.tp|0)===(S.tpN|0)&&!pl.dead){pl.x=Number(p.x);pl.y=Number(p.y);pl.r=13;wallClamp(pl,pl.f&&pl.f.ghost)}}}
       if(!C.host&&p.t==='as'&&p.st&&p.from===C.room.host){const st=p.st;if(st.fl!==S.fl){S.fl=st.fl;M=abGen51(seed,st.fl)}
-        st.ps.forEach(g=>{const pl=S.ps.find(q=>q.u===g.u);if(pl){Object.assign(pl,g);pl.beamT=g.beamA?.1:0}});S.en=st.en;S.tV=st.t;S.ebV=st.eb;S.bmV=st.bm;
+        const newRoom=st.tp!=null&&(st.tp|0)!==(S.tpN|0);if(st.tp!=null)S.tpN=st.tp|0;
+        st.ps.forEach(g=>{const pl=S.ps.find(q=>q.u===g.u);if(!pl)return;
+          /* o próprio personagem é previsto aqui: mantém a posição local, salvo troca de sala ou diferença absurda */
+          if(g.u===C.me&&!g.dead&&!newRoom&&Math.hypot(pl.x-g.x,pl.y-g.y)<140){const x0=pl.x,y0=pl.y;Object.assign(pl,g);pl.x=x0;pl.y=y0}else Object.assign(pl,g);
+          pl.beamT=g.beamA?.1:0});S.en=st.en;S.tV=st.t;S.ebV=st.eb;S.bmV=st.bm;
         const rm=M.rooms[M.K(st.rx,st.ry)];if(rm){S.room=rm;rm.clear=st.clear;rm.open=st.open;rm.peds=st.peds;rm.drops=st.drops;rm.rocks=st.rocks;rm.seen=true}
         st.vis.forEach(([x,y])=>{const q=M.rooms[M.K(x,y)];if(q)q.seen=true});st.unl.forEach(([x,y])=>{const q=M.rooms[M.K(x,y)];if(q)q.hidden=false});
         S.trap=st.trap;S.kills=st.kills;S.roomsSeen=st.seen;if(st.msg!==S.msg){S.msg=st.msg;S.msgT=performance.now()}S.over=st.over;S.decoy=st.dec?{x:st.dec[0],y:st.dec[1]}:null}},
     left(u){if(!C.host)return;const p=S.ps.find(q=>q.u===u);if(p){p.dead=true;if(S.ps.every(q=>q.dead))end(false)}},
     step(dt){
-      if(Date.now()<C.t0)return;if(S.aim)push();
-      if(coop&&!C.host)S.ot+=dt;
+      if(Date.now()<C.t0)return;
+      /* mira com o mouse mandava uma mensagem por quadro (60/s); agora no máximo ~20/s */
+      if(coop&&!C.host){S.ot+=dt;const p=myP();selfMove(p,dt);const now=Date.now(),moved=Math.abs(p.x-pX)>.5||Math.abs(p.y-pY)>.5;if(((S.aim||moved)&&now-pushAt>=50)||now-pushAt>400)push()}
+      else if(S.aim)push();
       if(C.host||!coop){S.beams=[];sim(dt);if(coop&&Date.now()-S.sendAt>70){S.sendAt=Date.now();C.send('as',{st:snap()})}}
       const p=myP();C.hud(`🗝 ${ABF51[S.fl].n} · ${'❤'.repeat(Math.floor(p.hp/2))}${p.hp%2?'♡':''}${p.sh?' · 🛡'+p.sh:''} · 🪙 ${p.coins} · 💣 ${p.bombs} · 🔑 ${p.keys}${p.act?` · ${ACT51[p.act.k].ico} ${p.act.ch}/${ACT51[p.act.k].max}`:''} · ☠ ${S.kills}`)},
     draw(x){

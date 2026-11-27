@@ -93,11 +93,43 @@ function mgJoinCh(){
     MG.ch=ch;
   }catch(e){console.warn('[T12] canal',e)}
 }
-function mgLeaveCh(){try{if(MG.ch)sb()?.removeChannel(MG.ch)}catch(e){}MG.ch=null;MG.live=false;MG.rooms={}}
+function mgLeaveCh(){mgRoomLeave();try{if(MG.ch)sb()?.removeChannel(MG.ch)}catch(e){}MG.ch=null;MG.live=false;MG.rooms={}}
+/* ---------- canal só da sala ----------
+   Antes, os snapshots (15–20 por segundo) e as entradas dos convidados iam pelo canal da campanha inteira:
+   todo mundo conectado recebia tudo e o limite de mensagens do Realtime estourava (atraso de segundos para os convidados).
+   Agora o tráfego rápido vai por um canal só de quem está na sala. Enquanto alguém ainda não entrou nele, cai no canal geral. */
+const MG_FAST=new Set(['snap','in','pos','rs','ri','as','ain','rh','rhs','pss','pam']);
+const MGR={ch:null,id:'',live:false,peers:new Set()};
+function mgRoomLeave(){try{if(MGR.ch)sb()?.removeChannel(MGR.ch)}catch(e){}MGR.ch=null;MGR.id='';MGR.live=false;MGR.peers=new Set()}
+function mgRoomSay(t,o){try{if(MGR.ch&&MGR.live)MGR.ch.send({type:'broadcast',event:'g',payload:{...o,t,from:uid3()}})}catch(e){}}
+function mgRoomCh(){
+  const r=MG.room,want=r&&r.mode==='multi'&&MG.live?r.id:'';
+  if(MGR.id===want)return;
+  mgRoomLeave();if(!want)return;
+  const c=camp3(),s=sb();if(!c||!s||typeof s.channel!=='function')return;
+  try{
+    const ch=s.channel('tulpa-mg-'+c.id+'-'+want,{config:{broadcast:{self:false,ack:false}}});
+    ch.on('broadcast',{event:'g'},({payload})=>{
+      if(MGR.ch!==ch)return;const p=payload||{};
+      /* "rj" = entrei no canal da sala; quem já estava responde para o recém-chegado saber dele também */
+      if(p.t==='rj'){if(p.from){MGR.peers.add(p.from);if(!p.re)mgRoomSay('rj',{re:1})}return}
+      try{mgOnMsg(p)}catch(e){console.warn('[T12] mensagem da sala',e)}
+    });
+    ch.subscribe(st=>{if(MGR.ch!==ch)return;if(st==='SUBSCRIBED'){MGR.live=true;mgRoomSay('rj',{})}else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT'||st==='CLOSED'){MGR.live=false;MGR.peers=new Set()}});
+    MGR.ch=ch;MGR.id=want;
+  }catch(e){console.warn('[T12] canal da sala',e)}
+}
+/* todos os outros jogadores humanos da sala já estão ouvindo o canal da sala? */
+function mgRoomReady(id){
+  const r=MG.room;if(!MGR.live||!r||r.id!==id||MGR.id!==id)return false;const me=uid3();
+  return r.players.every(p=>p.u===me||String(p.u||'').startsWith('~')||MGR.peers.has(p.u));
+}
 /* mensagens que não podem se perder: se o limite de envio recusar, tenta de novo */
 const MG_MUST=new Set(['start','over','dead','close','join','leave','full','inv','bres','eseq','eres','eans','tstate','tmove','board','say']);
 function mgSend(t,o,tries=0){
-  try{if(!(MG.ch&&MG.live&&typeof MG.ch.send==='function'))return;
+  try{
+    if(MG_FAST.has(t)&&o&&o.id&&mgRoomReady(o.id)){mgRoomSay(t,o);return}
+    if(!(MG.ch&&MG.live&&typeof MG.ch.send==='function'))return;
     const r=MG.ch.send({type:'broadcast',event:'g',payload:{...o,t,from:uid3()}});
     if(MG_MUST.has(t)&&tries<6&&r&&typeof r.then==='function')r.then(v=>{if(v==='rate limited'||v==='error'||v==='timed out')setTimeout(()=>mgSend(t,o,tries+1),140+tries*120)}).catch(()=>{});
   }catch(e){}
@@ -226,7 +258,7 @@ function mgCreate(g,multi,diff){
   MG.room={id:'r'+rid(),g,mode:multi?'multi':(def.ai?'ai':'solo'),host:uid3(),hn:me.n,players:[me],st:'lobby',max:Math.min(MG_MAX,(multi==='pvp'?2:def.max)||MG_MAX),diff:DIFF12[diff]?diff:diffGet(),gd:gdGet()};
   if(multi){mgPublish();mgLobby()}else mgStartHost();
 }
-function mgPublish(){const r=MG.room;if(!r||r.host!==uid3()||r.mode!=='multi')return;mgSend('room',{r})}
+function mgPublish(){try{mgRoomCh()}catch(e){}const r=MG.room;if(!r||r.host!==uid3()||r.mode!=='multi')return;mgSend('room',{r})}
 function mgJoinRoom(id){
   const x=MG.rooms[id];if(!x){toast('Essa sala não existe mais.');return}
   mgLeaveRoom();MG.pend=id;mgSend('join',{id,n:mgName()});
@@ -293,6 +325,7 @@ function mgStartLocal(room,seed,t0){
     say:(txt,net=true)=>{MG.say={txt,until:Date.now()+3000};if(net&&room.mode==='multi'&&room.host===uid3())mgSend('say',{id:room.id,txt})},
     finish:res=>mgFinish(room,res),
     hud:h=>{const e=$('mgHud');if(e&&e.dataset.h!==h){e.dataset.h=h;e.innerHTML=h}}};
+  try{mgRoomCh()}catch(e){}
   MG.C=C;MG.g=def.make(C);
   const cv=$('mgCv');MG.cv=cv;MG.x=cv.getContext('2d');
   const pt=e=>{const rc=cv.getBoundingClientRect();return[(e.clientX-rc.left)*MG.W/rc.width,(e.clientY-rc.top)*MG.H/rc.height]};
@@ -363,7 +396,7 @@ function mgOnMsg(p){
   if(p.t==='bres'){boardApply(p.list,p.mid);return}
   if(p.t==='room'&&p.r&&p.r.id&&GAMES12[p.r.g]){
     const r=p.r;if(r.host!==p.from)return;MG.rooms[r.id]={r,seen:now};
-    if(MG.pend===r.id&&r.players.some(q=>q.u===me)){MG.pend=null;clearTimeout(MG.pendT);MG.room=r;MG.lastHost=now;if(MG.open)mgLobby();return}
+    if(MG.pend===r.id&&r.players.some(q=>q.u===me)){MG.pend=null;clearTimeout(MG.pendT);MG.room=r;MG.lastHost=now;try{mgRoomCh()}catch(e){}if(MG.open)mgLobby();return}
     if(MG.room&&MG.room.id===r.id&&MG.room.host!==me){
       if(!r.players.some(q=>q.u===me)){MG.room=null;toast('Você saiu da sala.');if(MG.open)mgHub();return}
       MG.lastHost=now;const was=MG.room.st;MG.room=r;if(MG.view==='lobby')mgLobby();
@@ -394,6 +427,7 @@ setInterval(()=>{
   if(r&&r.mode==='multi'&&r.host===uid3())mgPublish();
   if(r&&r.mode==='multi'&&r.host!==uid3()&&MG.lastHost&&now-MG.lastHost>12000){MG.room=null;try{MG.g?.end?.()}catch(e){}MG.g=null;MG.C=null;mgStop();toast('O anfitrião saiu. A sala foi fechada.');if(MG.open)mgHub()}
   for(const id in MG.rooms)if(now-MG.rooms[id].seen>15000)delete MG.rooms[id];
+  try{mgRoomCh()}catch(e){}
   if(MG.open&&MG.view==='hub')roomsRender();
 },2500);
 
