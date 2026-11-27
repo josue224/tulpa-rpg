@@ -64,6 +64,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 19 | `19-manual-regras.css` | novo | 2 KB | **Onda 13**: cartões das vertentes no Manual, editor de efeitos do Mestre, opção de situação na ficha e na Mesa (só layout). |
 | 20 | `20-sync-status.css` | novo | 1 KB | **Onda 1**: indicador de sincronização (`.sync60`), ponto cheio/anel/riscado conforme o estado. |
 | 21 | `21-mapa-guia.css` | novo | 1 KB | **Onda 2**: guia sobre o mapa em branco (`.map-guide20`) e altura mínima do `#mapStage`. |
+| 22 | `22-polish-pro.css` | novo | 12 KB | **Onda 3 · Polimento profissional**: tokens `--mo-*` (em `body`), entradas só com transform/opacity, hover/foco, alvos de 44 px no celular, hierarquia de rótulos e barras, e as atmosferas por família (`--fam` em `body::after`, `#aeTex` atrás do conteúdo, grão de painel em `--ae-fill` sem vidro). |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 

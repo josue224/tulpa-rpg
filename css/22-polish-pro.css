@@ -1,0 +1,223 @@
+/* ==========================================================================
+   TULPA RPG — Onda 3 · Polimento profissional (movimento, hierarquia, atmosferas)
+   Carrega DEPOIS de 21-mapa-guia.css. Só CSS: nenhum id/classe novo é usado pelo JS.
+
+   Regras desta camada
+   - Movimento só em transform/opacity (cores mudam com transição curta, nunca largura,
+     altura, top ou left). Sem will-change permanente.
+   - Tokens de movimento ficam em `body` (como as outras variáveis semânticas).
+   - Texturas e atmosferas ficam ATRÁS do conteúdo (z-index negativo, pointer-events:none),
+     então nunca cobrem o canvas do mapa, o Arcade em tela cheia nem o texto.
+   - Cores só por --bg --panel --panel2 --line --text --accent via color-mix.
+   - backdrop-filter só com body.t3-pal[data-ae-glass="1"].
+   ========================================================================== */
+
+/* ---------- 1. Tokens de movimento (em body, junto das variáveis semânticas) ---------- */
+body{
+  --mo-fast:120ms;
+  --mo-med:220ms;
+  --mo-slow:360ms;
+  --mo-ease:cubic-bezier(.22,1,.36,1);
+  --mo-ease-in:cubic-bezier(.4,0,1,1);
+  --mo-lift:-1px;
+  --ring:var(--accent,#b7d7d5);
+}
+
+@keyframes mo22-rise{from{opacity:0;transform:translate3d(0,8px,0)}}
+@keyframes mo22-pop{from{opacity:0;transform:translate3d(0,10px,0) scale(.975)}}
+@keyframes mo22-fade{from{opacity:0}}
+@keyframes mo22-side{from{opacity:0;transform:translate3d(-8px,0,0)}}
+@keyframes mo22-sheet{from{opacity:0;transform:translate3d(0,16px,0)}}
+@keyframes mo22-roll{0%{opacity:0;transform:translate3d(0,6px,0) scale(.98)}60%{opacity:1;transform:translate3d(0,-1px,0) scale(1.005)}100%{transform:none}}
+
+/* ---------- 2. Entradas: abas, telas, modais, gavetas, Manual ---------- */
+@media (prefers-reduced-motion:no-preference){
+  /* aba da ficha, painéis da Mesa, histórico de rolagens: sobem de leve */
+  .sheet-view .main .tab.active,
+  #mesaDock .dock-pane:not([hidden]),
+  #mbMore60:not([hidden]){animation:mo22-rise var(--mo-med) var(--mo-ease) backwards}
+  /* tela do hub e portal */
+  #campaignHub:not(.hide),#portalDashboard:not(.hide){animation:mo22-rise var(--mo-med) var(--mo-ease) backwards}
+  /* diálogos: fundo escurece, caixa sobe */
+  .modal-wrap.open{animation:mo22-fade var(--mo-fast) linear backwards}
+  .modal-wrap.open .modal{animation:mo22-pop var(--mo-med) var(--mo-ease) backwards}
+  /* Manual Vivo e Alterações abrem como aba */
+  #man31:not(.hide),#sys29:not(.hide){animation:mo22-rise var(--mo-med) var(--mo-ease) backwards}
+  /* rail e gaveta "Mais" */
+  #appRail60:not([hidden]){animation:mo22-side var(--mo-med) var(--mo-ease) backwards}
+  #appMore60:not([hidden]){animation:mo22-pop var(--mo-med) var(--mo-ease) backwards}
+  #appMoreBg60:not([hidden]){animation:mo22-fade var(--mo-fast) linear backwards}
+  /* aviso */
+  .toast.show{animation:mo22-rise var(--mo-med) var(--mo-ease) backwards}
+  /* rolagem de dados: o resultado novo assenta */
+  #mesaDock .roll-hist-item:first-child,#rollHistory .roll-hist-item:first-child{animation:mo22-roll var(--mo-slow) var(--mo-ease) backwards}
+}
+@media (prefers-reduced-motion:no-preference) and (max-width:860px){
+  #appMore60:not([hidden]){animation:mo22-sheet var(--mo-med) var(--mo-ease) backwards}
+}
+
+/* ---------- 3. Microinterações: hover, pressionar, foco ---------- */
+/* transições só de transform/opacity e cores (nunca layout) */
+html body :is(.btn,.pbtn,.mt-chip,.sh-chip,.pill,.ae-card,.ae-tab,.pal-card,.portal-card,.campaign-item,.rl-item,.navbtn){
+  transition:transform var(--mo-fast) var(--mo-ease),opacity var(--mo-fast) linear,
+    background-color var(--mo-fast) linear,border-color var(--mo-fast) linear,color var(--mo-fast) linear,
+    box-shadow var(--mo-med) var(--mo-ease),filter var(--mo-fast) linear;
+}
+@media (prefers-reduced-motion:no-preference) and (hover:hover){
+  html body:not([data-ae-btn="bevel"]):not([data-ae-btn="chamfer"]) :is(.btn,.pbtn):not(:disabled):not([aria-disabled="true"]):hover{transform:translate3d(0,var(--mo-lift),0)}
+  html body :is(.portal-card,.campaign-item):hover{transform:translate3d(0,-2px,0)}
+  html body :is(.rl-item):hover .rl-ico{transform:scale(1.08)}
+  html body :is(.sh-chip,.pill,.mt-chip):hover{transform:translate3d(0,var(--mo-lift),0)}
+}
+@media (prefers-reduced-motion:no-preference){
+  .rl-item .rl-ico{transition:transform var(--mo-fast) var(--mo-ease)}
+  html body :is(.btn,.pbtn,.mt-chip,.sh-chip):not(:disabled):active{transform:translate3d(0,1px,0) scale(.985);transition-duration:60ms}
+  /* contador de recurso: o número que muda dá um pulso curto */
+  .stat .value{transition:transform var(--mo-fast) var(--mo-ease)}
+}
+/* foco de teclado visível em qualquer tela, com anel duplo (claro e escuro) */
+html body :is(a,button,input,select,textarea,summary,[role="button"],[role="tab"],[tabindex]:not([tabindex="-1"])):focus-visible{
+  outline:2px solid var(--ring);outline-offset:2px;
+  box-shadow:0 0 0 5px color-mix(in oklab,var(--ring) 22%,transparent);
+}
+html body canvas:focus-visible{outline:2px solid var(--ring);outline-offset:-2px;box-shadow:none}
+/* botões só com ícone têm alvo de toque mínimo */
+html body :is(#modalX,.icon-btn,.rl-item){min-width:var(--touch);min-height:var(--touch)}
+
+/* scrim da gaveta "Mais": o blur só existe com o modo vidro */
+#appMoreBg60{-webkit-backdrop-filter:none;backdrop-filter:none}
+html body.t3-pal[data-ae-glass="1"] #appMoreBg60{-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+
+/* ---------- 4. Hierarquia e ritmo (escala 4/8) ---------- */
+/* rótulos: uma só voz em ficha, Mesa, modal e Manual */
+html body :is(.field label,.field-label,.stat .name,.resource-row label){
+  font-size:var(--fs-2xs);line-height:var(--lh-tight);letter-spacing:.08em;text-transform:uppercase;
+}
+html body .stat .value{font-size:clamp(26px,2.4vw,32px);line-height:1.05;letter-spacing:-.01em}
+html body .stat .max{font-size:var(--fs-sm);font-weight:600}
+html body .stat{display:flex;flex-direction:column;gap:var(--sp-1)}
+/* barras de recurso: trilho e preenchimento de mesma altura em todas as telas */
+html body :is(.stat .bar,.progressline){height:8px;border-radius:999px;overflow:hidden}
+html body :is(.stat .bar,.progressline) span{display:block;height:100%;border-radius:inherit;min-width:2px}
+/* cabeçalho de painel: respiro consistente e título com peso de título */
+html body .panel-head{gap:var(--sp-2) var(--sp-3);margin-bottom:var(--sp-3)}
+html body .panel-head h2,html body .panel-head h3{line-height:var(--lh-tight)}
+html body .sub{line-height:var(--lh-body)}
+html body.t3-pal :is(.sub,.muted){color:color-mix(in oklab,var(--text) 90%,var(--panel))!important}
+html body .grid{gap:var(--sp-3)}
+html body .modal{padding:var(--sp-5)}
+html body .modal-head{margin-bottom:var(--sp-4);gap:var(--sp-3)}
+/* rail: item ativo marcado por barra (transform), foco e alvo de 44 px */
+#appRail60 .rl-item{border-radius:var(--shell-r)}
+#appRail60 .rl-item[aria-current="page"],#appRail60 .rl-item.on,#appRail60 .rl-item.active{
+  background:var(--surf-active);
+}
+@media (max-width:860px){
+  html body .modal{padding:var(--sp-4)}
+  html body .shell{padding-left:var(--sp-4);padding-right:var(--sp-4)}
+  #appRail60 .rl-item{min-height:var(--touch)}
+  html body :is(.btn,.pbtn){min-height:var(--touch)}
+  html body.has-shell :is(.btn,.pbtn,.cb-start,.mt-chip){min-height:var(--touch)}
+  html body.has-shell .btn.small,html body.has-shell button.cb-start,html body.has-shell #cbStart{min-height:var(--touch)}
+  html body.has-shell :is(.mt-btn,#mapStage .mt-btn){min-width:var(--touch);min-height:var(--touch)}
+  html body.has-shell.mesa-view :is(#cbStart,.cb-start,#mapStage .mt-btn,#mapStage .mt-chip,#mesaBar .btn){min-height:var(--touch)!important}
+  html body.has-shell.mesa-view #mapStage .mt-btn{min-width:var(--touch)!important}
+  html body :is(.btn.small,.btn.ghost){padding-left:var(--sp-3);padding-right:var(--sp-3)}
+}
+
+/* ==========================================================================
+   5. TEXTURAS E ATMOSFERAS
+   Camada A: #aeTex (já existe) sai de cima do app e passa para trás do conteúdo.
+   Camada B: body::after, atmosfera por família (variável --fam em body).
+   Camada C: textura nos painéis, via --ae-fill (só sem vidro).
+   ========================================================================== */
+#aeTex{z-index:-1}
+body[data-ae-tex="scan"] #aeTex{opacity:.22}
+body[data-ae-tex="vhs"] #aeTex{opacity:.18;box-shadow:none}
+body[data-ae-tex="grid"] #aeTex{opacity:.4}
+@media (prefers-contrast:more){body::after{display:none!important}}
+
+body.t3-pal[data-aesthetic]::after,body:not(.t3-pal):not([data-aesthetic])::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--fam,none);
+}
+
+/* Família 1 · Vidro e luz — Aero, Aurora, Glacier, Neo-Aero, Seapunk, Y2K, McBling, Sonho, Solar */
+body:is([data-aesthetic="frutiger-aero"],[data-aesthetic="dark-aero"],[data-aesthetic="helvetica-aqua"],
+[data-aesthetic="frutiger-eco"],[data-aesthetic="frutiger-aurora"],[data-aesthetic="frutiger-glacier"],
+[data-aesthetic="frutiger-jolly"],[data-aesthetic="frutiger-evil"],[data-aesthetic="neo-aero"],
+[data-aesthetic="seapunk"],[data-aesthetic="y2k"],[data-aesthetic="mcbling"],[data-aesthetic="dreamcore"],
+[data-aesthetic="fairycore"],[data-aesthetic="solarpunk"]){
+  --fam:
+    radial-gradient(ellipse 60% 38% at 12% -4%,color-mix(in oklab,var(--accent) 10%,transparent),transparent 70%),
+    radial-gradient(ellipse 50% 40% at 100% 108%,color-mix(in oklab,var(--accent) 7%,transparent),transparent 70%),
+    linear-gradient(180deg,color-mix(in oklab,var(--panel) 40%,transparent),transparent 30%);
+}
+/* Família 2 · Neon e HUD — Cyberpunk, Cybercore, Synthwave, Vaporwave */
+body:is([data-aesthetic="cyberpunk"],[data-aesthetic="cybercore"],[data-aesthetic="synthwave"],[data-aesthetic="vaporwave"]){
+  --fam:
+    linear-gradient(color-mix(in oklab,var(--accent) 6%,transparent) 1px,transparent 1px) 0 0/48px 48px,
+    linear-gradient(90deg,color-mix(in oklab,var(--accent) 6%,transparent) 1px,transparent 1px) 0 0/48px 48px,
+    radial-gradient(ellipse 90% 40% at 50% 108%,color-mix(in oklab,var(--accent) 16%,transparent),transparent 72%),
+    radial-gradient(ellipse 120% 90% at 50% 40%,transparent 58%,color-mix(in oklab,var(--bg) 60%,#000) 100%);
+}
+/* Família 3 · CRT e fita — Cassette, Analog Horror, Webcore (+ Terminal clássico) */
+body:is([data-aesthetic="cassette"],[data-aesthetic="analog-horror"],[data-aesthetic="webcore"],[data-pal="terminal"]){
+  --fam:radial-gradient(ellipse 110% 85% at 50% 45%,transparent 55%,color-mix(in oklab,var(--bg) 55%,#000) 100%);
+}
+body[data-aesthetic="webcore"]{--fam:none}
+/* Família 4 · Papel e tinta — Cottage, Goblin, Academias, Steampunk, Liminal, Technozen (+ Pergaminho clássico) */
+body:is([data-aesthetic="cottagecore"],[data-aesthetic="goblincore"],[data-aesthetic="dark-academia"],
+[data-aesthetic="light-academia"],[data-aesthetic="steampunk"],[data-aesthetic="liminal"],[data-aesthetic="technozen"]),
+body:not(.t3-pal):not([data-aesthetic]){
+  --fam:
+    radial-gradient(ellipse 115% 90% at 50% 38%,transparent 60%,color-mix(in oklab,var(--text) 6%,transparent) 100%),
+    linear-gradient(180deg,color-mix(in oklab,var(--text) 5%,transparent) 0,transparent 3px);
+}
+/* Família 5 · Noir e granulação — Indie Sleaze, Weirdcore (+ Obsidiana e Sangue clássicos) */
+body:is([data-aesthetic="indie-sleaze"],[data-aesthetic="weirdcore"],[data-pal="obsidian"],[data-pal="blood"]){
+  --fam:radial-gradient(ellipse 100% 80% at 50% 42%,transparent 48%,color-mix(in oklab,var(--bg) 40%,#000) 100%);
+}
+/* Família 6 · Pop e chapado — Flat, Memphis, Kidcore, Metro, DORFic: pontos de retícula bem leves */
+body:is([data-aesthetic="flat"],[data-aesthetic="memphis"],[data-aesthetic="kidcore"],
+[data-aesthetic="frutiger-metro"],[data-aesthetic="dorfic"]){
+  --fam:radial-gradient(color-mix(in oklab,var(--text) 6%,transparent) 1px,transparent 1.6px) 0 0/16px 16px;
+}
+/* Personalizada: segue a textura escolhida, com vinheta mínima */
+body[data-aesthetic="custom"]{
+  --fam:radial-gradient(ellipse 120% 90% at 50% 40%,transparent 62%,color-mix(in oklab,var(--text) 6%,transparent) 100%);
+}
+
+/* Camada C · textura nos painéis (grão fino sobre o preenchimento; só sem vidro) */
+html body.t3-pal[data-ae-glass="0"][data-ae-tex="paper"]{
+  --ae-fill:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45 0 0 0 0 .4 0 0 0 0 .32 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.075'/></svg>"),
+    linear-gradient(165deg,color-mix(in oklab,var(--text) 5%,var(--panel)) 0%,var(--panel) 42%,color-mix(in oklab,var(--panel) 86%,var(--bg)) 100%);
+}
+html body.t3-pal[data-ae-glass="0"]:is([data-ae-tex="grain"],[data-ae-tex="noise"]){
+  --ae-fill:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='1' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.06'/></svg>"),
+    linear-gradient(165deg,color-mix(in oklab,var(--text) 5%,var(--panel)) 0%,var(--panel) 42%,color-mix(in oklab,var(--panel) 86%,var(--bg)) 100%);
+}
+html body.t3-pal[data-ae-glass="0"]:is([data-ae-tex="scan"],[data-ae-tex="vhs"]){
+  --ae-fill:
+    repeating-linear-gradient(0deg,color-mix(in oklab,var(--bg) 22%,transparent) 0 1px,transparent 1px 3px),
+    linear-gradient(165deg,color-mix(in oklab,var(--text) 5%,var(--panel)) 0%,var(--panel) 42%,color-mix(in oklab,var(--panel) 86%,var(--bg)) 100%);
+}
+html body.t3-pal[data-ae-glass="0"][data-ae-tex="grid"]{
+  --ae-fill:
+    linear-gradient(color-mix(in oklab,var(--accent) 7%,transparent) 1px,transparent 1px) 0 0/24px 24px,
+    linear-gradient(90deg,color-mix(in oklab,var(--accent) 7%,transparent) 1px,transparent 1px) 0 0/24px 24px,
+    linear-gradient(165deg,color-mix(in oklab,var(--text) 5%,var(--panel)) 0%,var(--panel) 42%,color-mix(in oklab,var(--panel) 86%,var(--bg)) 100%);
+}
+
+/* Tela cheia do Arcade e mapa: sem atmosfera por cima (elas já ficam atrás; reforço para o Arcade) */
+body:has(#mgRoot:not(.hide):not([hidden]))::after,body:has(#mgRoot:not(.hide):not([hidden])) #aeTex{display:none}
+
+/* ---------- 6. Reduzir movimento: entradas viram só fade, sem deslocamento ---------- */
+@media (prefers-reduced-motion:reduce){
+  .sheet-view .main .tab.active,#mesaDock .dock-pane:not([hidden]),#mbMore60:not([hidden]),
+  #campaignHub:not(.hide),#portalDashboard:not(.hide),.modal-wrap.open .modal,#man31:not(.hide),#sys29:not(.hide),
+  #appRail60:not([hidden]),#appMore60:not([hidden]),.toast.show{animation:mo22-fade 120ms linear backwards}
+  html body :is(.btn,.pbtn,.mt-chip,.sh-chip,.pill,.portal-card,.campaign-item):hover,
+  html body :is(.btn,.pbtn,.mt-chip,.sh-chip):active{transform:none}
+}
