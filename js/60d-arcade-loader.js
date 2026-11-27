@@ -10,7 +10,7 @@
   window.__arcLoad60d=true;
 
   /* Extrai o token ?v=... deste próprio script para manter cache-busting alinhado */
-  var VER='2026112714';
+  var VER='2026112715';
   try{
     var cs=document.currentScript||document.querySelector('script[src*="60d-arcade-loader"]');
     if(cs&&cs.src){
