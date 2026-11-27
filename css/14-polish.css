@@ -44,9 +44,11 @@ html body.t3-pal :is(.panel h2,.panel h3,.choice h4,.talent h4,.ritual-card h4,.
   color:var(--text,#edf2f7);
 }
 html body.t3-pal :is(.field label,.field-label,.stat .name,.resource-row label,.skill-attr,.choice p,.talent p,.ritual-card p,.modal p,.empty){
-  color:color-mix(in srgb,var(--text,#edf2f7) 78%,var(--panel,#11151d));
+  color:color-mix(in srgb,var(--text,#edf2f7) 86%,var(--panel,#11151d));
 }
 html body.t3-pal .skill-val{color:var(--accent,#b7d7d5)}
+html body.t3-pal.sheet-view #skillGrid .skill-attr{color:var(--text)!important;opacity:1}
+html body.t3-pal.t3-pal .campaign-item p{color:var(--ink-dim)!important;opacity:1}
 
 /* Inputs, selects e textareas sempre legíveis (inclusive .portal-input) */
 html body.t3-pal :is(.field input,.field select,.field textarea,.search,.portal-input){
@@ -54,8 +56,85 @@ html body.t3-pal :is(.field input,.field select,.field textarea,.search,.portal-
   color:var(--text,#edf2f7);
   border-color:color-mix(in srgb,var(--line,#2a3442) 85%,var(--text,#edf2f7) 15%);
 }
-html body.t3-pal :is(.field input,.field select,.field textarea,.search,.portal-input)::placeholder{
-  color:color-mix(in srgb,var(--text,#edf2f7) 52%,var(--panel,#11151d));
+/* .t3-pal repetido: o css/07 usa !important com a mesma força */
+html body.t3-pal.t3-pal input::placeholder,
+html body.t3-pal.t3-pal textarea::placeholder{
+  color:color-mix(in srgb,var(--text,#edf2f7) 80%,var(--panel,#11151d))!important;
+  opacity:1!important;
+}
+/* Em temas claros o campo é o painel clareado (antes puxava o fundo da página
+   e virava um bloco verde-azulado ilegível no Webcore) */
+html body.t3-pal.t3-pal:not(.t3-dark) :is(input:not([type="checkbox"],[type="radio"],[type="range"],[type="color"]),select,textarea,.search){
+  background:color-mix(in srgb,var(--panel) 45%,#fff)!important;
+}
+
+/* Texto escrito direto sobre o fundo da página usa --ink-bg */
+html body.t3-pal[data-aesthetic] #portal :is(.portal-brand b,.portal-brand small,.portal-hero h1,.portal-hero p,.portal-hero .eyebrow,.hero h1,.hero p,.hero .eyebrow){
+  color:var(--ink-bg,var(--text))!important;
+}
+html body.t3-pal[data-aesthetic] #portal .portal-brand .sigil{
+  color:var(--ink-bg,var(--accent))!important;border-color:var(--ink-bg,var(--accent))!important;
+}
+/* Webcore: fundo azul-petróleo pede rótulos brancos, como na área de trabalho */
+html body[data-aesthetic="webcore"]{--ink-bg:#fff}
+html body.t3-pal.t3-pal[data-aesthetic].sheet-view .topbar{background:var(--surf-1,var(--panel))!important}
+html body.t3-pal.t3-pal[data-aesthetic][data-ae-glass="1"].sheet-view .topbar{background:color-mix(in srgb,var(--panel) 86%,transparent)!important}
+html body[data-aesthetic="webcore"] .rl-item{color:var(--text)}
+/* Seapunk: o vidro claro sobre o mar apagava o texto secundário */
+html body.t3-pal.t3-pal[data-aesthetic="seapunk"] :is(.sub,.tc-id .owner,#mesaDock [role="tab"]){color:var(--text)!important}
+/* iniciais sobre as cores fixas dos avatares */
+html body .av>b{color:#fff}
+/* Tinta (Academia): o botão principal escurece um passo para o texto claro */
+html body.t3-pal.t3-pal.t3-dark[data-ae-btn="ink"] :is(.btn.primary,.t3-seg button.on){background-color:color-mix(in srgb,var(--accent2,var(--accent)) 88%,#000)!important}
+/* Personalizado: qualquer destaque escolhido fica escuro o bastante para o
+   texto claro; o matiz é mantido */
+html body.t3-pal.t3-pal[data-aesthetic="custom"]:is([data-ae-btn="soft"],[data-ae-btn="flat"],[data-ae-btn="ink"],[data-ae-btn="sticker"]) :is(.btn,.pbtn).primary{
+  background-color:color-mix(in srgb,var(--accent2,var(--accent)) 55%,#000)!important;
+  background-color:oklch(from var(--accent2,var(--accent)) min(l,.52) c h)!important;
+  color:#fff!important;
+}
+/* barra inferior em vidro precisa segurar o texto que passa por baixo */
+@media (max-width:860px){
+  html body.t3-pal[data-ae-glass="1"] #appRail60{background:color-mix(in srgb,var(--panel) 92%,transparent)}
+}
+
+/* Rótulos secundários que usavam a cor de apoio da estética (baixa leitura em
+   temas escuros como Dark Academia) */
+html body.t3-pal.t3-pal[data-aesthetic] :is(.eyebrow,.pill,.tag,.pill.sub34-pill small,.notice,#roundTurnInfo,#roundTurnInfo b,.roll,.stage small){
+  color:color-mix(in srgb,var(--text) 86%,var(--accent))!important;
+}
+html body[class][class] :is(.combatant small,.stage small){color:var(--ink-dim,var(--muted))!important}
+html body .cb-hud .cbp.off{opacity:.78}
+/* cartões de recurso e atributo claros o bastante para o rótulo pequeno */
+html body.t3-pal.t3-pal:not(.t3-dark) :is(.stat,.attr-card){background:color-mix(in srgb,var(--panel) 70%,#fff)!important}
+/* diálogo em vidro precisa ser quase opaco: a página aparecia por trás do texto */
+html body.t3-pal.t3-pal[data-aesthetic][data-ae-glass="1"] .modal{
+  background:var(--ae-orn-l),color-mix(in srgb,var(--panel) 94%,transparent)!important;
+}
+html body.t3-pal #man31 .m31-pot dt{color:color-mix(in srgb,var(--accent) 70%,var(--text))}
+html body[class] .cb-unlock26:not(.on){
+  color:var(--text);background:var(--surf-1,var(--panel));opacity:.96;
+}
+/* textos secundários do Arcade, do Quarto e do Manual: sem transparência extra */
+html body[class] #mgRoot:is(:has(.mg-hub),:has(.pt)) :is(.pt-hint,.pt-panel p,.mg-gdrow>.sub,.mg-side .sub){
+  color:var(--ink-dim,var(--muted))!important;opacity:1;
+}
+html body[class] #mgRoot .pt-act:not(.on){color:var(--text)!important}
+html body[class] #man31 .m31-coversub{opacity:1;color:var(--ink-dim,var(--muted))}
+html body[class] .ae-tab[aria-selected="true"]{
+  background:color-mix(in srgb,var(--accent) 24%,var(--panel));
+  border-color:var(--accent);color:var(--text);
+  box-shadow:inset 0 0 0 1px var(--accent);
+}
+/* Vidro, Gel, Metal e Latão: o reflexo branco apagava o texto do botão
+   principal. O destaque escurece (mais nos temas escuros) e o texto fica claro. */
+html body.t3-pal.t3-pal:is([data-ae-btn="gloss"],[data-ae-btn="gel"],[data-ae-btn="metal"],[data-ae-btn="emboss"]) :is(.btn,.pbtn).primary{
+  background-color:color-mix(in srgb,var(--accent) 72%,#000)!important;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 48%,transparent 50%,rgba(255,255,255,.08))!important;
+  color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.45);
+}
+html body.t3-pal.t3-pal.t3-dark:is([data-ae-btn="gloss"],[data-ae-btn="gel"],[data-ae-btn="metal"],[data-ae-btn="emboss"]) :is(.btn,.pbtn).primary{
+  background-color:color-mix(in srgb,var(--accent) 46%,#000)!important;
 }
 
 /* Pílulas, tags e estágios com contraste seguro em temas claros e escuros */
@@ -91,7 +170,7 @@ html body.t3-pal .resource-actions button{
 
 /* Reforço específico para estéticas CLARAS (ex.: Frutiger Aero, Pergaminho, Webcore claro) */
 html body.t3-pal:not(.t3-dark){
-  --ink-dim:color-mix(in srgb,var(--text,#181c22) 78%,var(--panel,#f6f7f9));
+  --ink-dim:color-mix(in srgb,var(--text,#181c22) 86%,var(--panel,#f6f7f9));
   --border-subtle:color-mix(in srgb,var(--line,#8892a0) 88%,var(--text,#181c22) 12%);
   --surf-hover:color-mix(in srgb,var(--accent,#3f6f6a) 13%,transparent);
   --surf-active:color-mix(in srgb,var(--accent,#3f6f6a) 22%,transparent);
@@ -102,6 +181,25 @@ html body.t3-pal:not(.t3-dark) #sheetHead60 .sh-m{
 html body.t3-pal:not(.t3-dark) #man31 .m31-tb th{
   background:color-mix(in srgb,var(--text,#181c22) 6%,transparent);
 }
+
+/* Pergaminho clássico (tema padrão, sem t3-pal): o css/11 clareou a barra da
+   ficha, mas marca, botões e status continuavam com o texto claro do escuro */
+html body:not(.t3-pal):not(.t3-dark).sheet-view .topbar :is(.brand,.brand small,.btn,.status,.pill){
+  color:var(--text)!important;
+}
+html body:not(.t3-pal):not(.t3-dark).sheet-view .topbar :is(.btn,.pill){border-color:var(--line)!important}
+html body:not(.t3-pal):not(.t3-dark).sheet-view .topbar .sigil{color:var(--accent)!important;border-color:var(--accent)!important}
+html body:not(.t3-pal):not(.t3-dark) #stats .resctl .btn.ghost{color:var(--text);border-color:var(--line)}
+html body:not(.t3-pal):not(.t3-dark) #man31 :is(.m31-eyebrow,.m31-h2){color:var(--accent)}
+html body:not(.t3-pal):not(.t3-dark) :is(#mesaDock,#man31,#sys29) .sub{color:var(--ink-dim)}
+html body:not(.t3-pal):not(.t3-dark) .sub34-pill small{color:var(--text)}
+html body:not(.t3-pal):not(.t3-dark) :is(.skill-attr,#roundBadge){color:var(--text)}
+/* o tom apagado do pergaminho ficava abaixo de 4,5:1 sobre o fundo */
+html body:not(.t3-pal):not(.t3-dark){--muted:#574734;--ink-dim:color-mix(in srgb,var(--text) 86%,var(--panel))}
+html body:not(.t3-pal):not(.t3-dark) :is(.sub,.portal-hero p,.hero p,.portal-brand small,#currentTrack){color:var(--muted)}
+html body:not(.t3-pal):not(.t3-dark) #portal :is(.eyebrow,.portal-hero .eyebrow){color:var(--accent)}
+html body:not(.t3-pal):not(.t3-dark) input::placeholder,
+html body:not(.t3-pal):not(.t3-dark) textarea::placeholder{color:var(--muted);opacity:1}
 
 /* ---------- 2. Blindagem contra Estéticas Extremas (Bevel / Sticker / Hard / Chamfer) ---------- */
 html body.t3-pal[data-ae-sh="bevel"] :is(#appRail60,#appMore60,#mesaBar,#mesaM,#sheetHead60){
@@ -156,7 +254,46 @@ html body.t3-pal[data-ae-btn="chamfer"] :is(.rl-item,.sh-chip,.sh-m,.mg-gdb,.pt-
   box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#b7d7d5) 22%,transparent);
 }
 
-/* ---------- 5. Acessibilidade: Alto Contraste e Redução de Movimento ---------- */
+/* ---------- 5. Acabamento: tipografia, profundidade, toque e movimento ---------- */
+:is(.portal-hero h1,.hero h1,.panel h2,.portal-card h2,.campaign-item h3,.modal h2,.m31-h2,.m31-h3){text-wrap:balance}
+:is(.portal-hero p,.hero p,.portal-card p,.campaign-item p,.m31-blk p,.talent p,.ritual-card p,.mg-card p){text-wrap:pretty}
+:is(.stat .value,.resource-row,.skill-val,.cbp em,.cb-ord){font-variant-numeric:tabular-nums}
+.campaign-item h3{overflow-wrap:anywhere}
+/* fontes altas (Lexend, Pacifico, Rye...) encavalavam título, rótulo e texto */
+html body[class][class] #portal :is(.portal-hero h1,.hero h1){line-height:1.26;letter-spacing:-.01em;margin-block:var(--sp-5) var(--sp-4)}
+/* cabeçalho de painel quebra em duas linhas antes de vazar da tela */
+html body #portal .panel-head{flex-wrap:wrap}
+html body.mesa-view #mesaM .m-id :is(small,b){display:block;line-height:1.35}
+html body[class] :is(.ae-n,#mgRoot .af-n){opacity:1}
+
+/* filete de luz no topo das barras fixas: separa as camadas sem cor própria */
+html body:not([data-ae-sh="bevel"]):not([data-ae-sh="hard"]) :is(#mesaBar,#mesaM,#sheetHead60){
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--text,#edf2f7) 8%,transparent),0 10px 24px -20px rgba(0,0,0,.6);
+}
+
+@media (hover:hover){
+  html body :is(.portal-panel .campaign-item,#characterList .campaign-item){transition:transform .16s var(--ease-ui,ease)}
+  html body :is(.portal-panel .campaign-item,#characterList .campaign-item):hover{transform:translateY(-2px)}
+}
+
+/* resposta ao toque nos controles que não são .btn */
+:is(.rl-item,#sheetHead60 .sh-m,.sheet-view .side .navbtn,#mesaDock [role="tab"],#mesaMobTabs60 button,#mapStage .mt-btn,#mapStage .mt-chip,.portal-card,.mg-gdb,.af-chip,.pt-tab,#sys29 .sys29-tab){
+  -webkit-tap-highlight-color:transparent;
+}
+@media (prefers-reduced-motion:no-preference){
+  :is(.rl-item,#sheetHead60 .sh-m,.sheet-view .side .navbtn,#mesaDock [role="tab"],#mesaMobTabs60 button,#mapStage .mt-btn,#mapStage .mt-chip,.portal-card,.mg-gdb,.af-chip,.pt-tab,#sys29 .sys29-tab):active{
+    transform:scale(.97);transition-duration:.06s;
+  }
+  /* a troca de aba, painel ou diálogo entra de baixo: mostra o que mudou */
+  .sheet-view .main .tab.active,
+  #mesaDock .dock-pane:not([hidden]),
+  #mbMore60:not([hidden]){animation:ui-in .18s cubic-bezier(.22,1,.36,1) backwards}
+  .modal-wrap.open .modal{animation:ui-pop .2s cubic-bezier(.22,1,.36,1) backwards}
+}
+@keyframes ui-in{from{opacity:0;transform:translateY(6px)}}
+@keyframes ui-pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+
+/* ---------- 6. Acessibilidade: Alto Contraste e Redução de Movimento ---------- */
 @media (prefers-contrast:more){
   :root{
     --border-subtle:var(--text,#fff);

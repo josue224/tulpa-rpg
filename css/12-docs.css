@@ -199,15 +199,17 @@ body.doc-open .shell{display:none!important}
     display:flex;flex-wrap:wrap;gap:6px;margin:0;
     font-size:var(--fs-xs,12px);
   }
+  /* <dl> com pares dt/dd soltos: rótulo à esquerda, texto à direita, em ordem */
   #man31 .m31-pot{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:var(--sp-2);margin:var(--sp-1) 0 0;
+    display:grid;grid-template-columns:max-content minmax(0,1fr);
+    gap:var(--sp-2) var(--sp-4);margin:var(--sp-1) 0 0;
   }
   #man31 .m31-pot dt{
     font-size:var(--fs-2xs,11px);font-weight:700;letter-spacing:.06em;text-transform:uppercase;
     color:var(--accent,#b7d7d5);margin:0 0 2px;
   }
-  #man31 .m31-pot dd{margin:0;font-size:var(--fs-xs,12.5px);line-height:1.45}
+  #man31 .m31-pot dd{margin:0;max-width:72ch;font-size:var(--fs-sm,13px);line-height:var(--lh-body,1.5)}
+  #man31 .m31-meta i{opacity:1;color:var(--ink-dim,var(--muted,#8d9aaa))}
 
   /* Edição inline do Mestre limpa e alinhada */
   #man31 .m31-edit{
@@ -437,11 +439,24 @@ body.doc-open .shell{display:none!important}
   @media (min-width:861px){
     /* O índice já é fixo no desktop: o botão Sumário só serve no celular */
     #man31 .m31-tocbtn{display:none!important}
+    /* O css/09 recolhe o índice até 900px; entre 861 e 900 ele sumia sem botão
+       para abrir e o texto ficava espremido na coluna do índice */
+    #man31 .m31-nav{position:static;width:auto;transform:none;visibility:visible;box-shadow:none}
+    #man31 #m31x{position:static}
     /* Alterações do Sistema: tudo alinhado à esquerda, mesma coluna, lista em 2 colunas */
     #sys29 .sys29-main>*{margin-inline:0!important;max-width:1080px!important}
     #sys29 .sys29-list{
       grid-template-columns:repeat(auto-fill,minmax(400px,1fr));margin:var(--sp-3) 0 0!important;
     }
+  }
+
+  /* Botões de edição do Mestre: apareciam por cima da primeira linha do texto.
+     Com espaço, ficam numa coluna à direita; sem espaço, numa linha própria. */
+  @media (min-width:1200px){
+    #man31 .m31-blk>.m31-gm{left:calc(100% + var(--sp-2));right:auto;top:0;flex-direction:column;margin:0}
+  }
+  @media (max-width:1199px){
+    #man31 .m31-blk>.m31-gm{position:static;display:flex;justify-content:flex-end;margin:0 0 var(--sp-1)}
   }
 
   @media (max-width:860px){

@@ -35,7 +35,7 @@ body.sheet-view .topbar .top-actions .status{
 body.sheet-view .shell>.hero{display:none!important}
 body.sheet-view .shell{
   max-width:1400px;
-  padding:var(--sp-4) clamp(14px,3vw,32px) var(--sp-7);
+  padding:var(--sp-4) clamp(14px,3vw,32px) 112px;
 }
 
 #sheetHead60[hidden]{display:none!important}
@@ -70,7 +70,7 @@ html body.t3-pal[data-ae-glass="1"] #sheetHead60{
   display:grid;place-items:center;
   background:color-mix(in srgb,var(--accent,#b7d7d5) 14%,transparent);
   border:1px solid var(--border-strong,var(--line,#2a3442));
-  color:var(--accent,#b7d7d5);
+  color:var(--text,#edf2f7);
   font:700 20px/1 var(--f-display,inherit);
 }
 #sheetHead60 .sh-av img{width:100%;height:100%;object-fit:cover;display:block}
@@ -163,8 +163,8 @@ html body.sheet-view .side{
   border:1px solid var(--border-subtle,var(--line,#2a3442))!important;
   border-radius:var(--surface-r,var(--shell-r,12px))!important;
   box-shadow:0 8px 24px -14px rgba(0,0,0,.45);
-  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
-  mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent);
+  mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent);
 }
 html body.t3-pal[data-ae-glass="1"].sheet-view .side{
   background:color-mix(in srgb,var(--panel,#11151d) 74%,transparent)!important;
@@ -199,6 +199,8 @@ html body.sheet-view .side .navbtn .ico{width:18px;text-align:center;font-size:1
 html body.sheet-view .side .navbtn.active .ico{opacity:1;color:var(--accent,#b7d7d5)}
 
 @media (min-width:1180px){
+  /* corredor do Perseus: o gato fixo no canto não fica em cima dos controles */
+  body.sheet-view:has(#t3PerseusRoot:not(.hide)) .shell{padding-right:104px}
   html body.sheet-view .layout{grid-template-columns:208px minmax(0,1fr);gap:var(--sp-4)}
   html body.sheet-view .side{
     flex-direction:column!important;align-items:stretch;gap:2px;
@@ -228,8 +230,11 @@ body.sheet-view .main .panel-head{
   border-bottom:1px solid color-mix(in srgb,var(--line,#2a3442) 55%,transparent);
   flex-wrap:wrap;gap:var(--sp-2);
 }
+/* título de seção lê como título: maior que o corpo, sem caixa-alta espaçada
+   (estéticas com data-ae-case="up" continuam em maiúsculas) */
 body.sheet-view .main .panel-head h2{
-  font-size:var(--fs-sm,13px);letter-spacing:.12em;
+  font-size:var(--fs-lg,17px);line-height:var(--lh-tight,1.22);
+  letter-spacing:.01em;text-transform:none;
 }
 body.sheet-view .main .grid{gap:var(--sp-3)}
 body.sheet-view .main .grid.two>.panel{margin:0}
@@ -280,7 +285,13 @@ body.sheet-view #tab-overview>.panel:first-child>.av-edit .sub{font-size:var(--f
 
 /* Estatísticas vitais e Progressão */
 body.sheet-view #stats{gap:var(--sp-3)}
-body.sheet-view #stats .stat{padding:var(--sp-3) var(--sp-4)}
+body.sheet-view #stats .stat{padding:var(--sp-3) var(--sp-4);min-width:0}
+/* −5 −1 [valor] +1 +5 Máx cabem numa linha só */
+@media (min-width:861px){
+  body.sheet-view #stats .resctl{flex-wrap:nowrap;gap:var(--sp-1)}
+  html body.sheet-view #stats .resctl .btn{flex:1 1 0;min-width:0;padding-inline:var(--sp-1)}
+  html body.sheet-view #stats .resnum{flex:0 0 48px;width:48px;min-width:0}
+}
 body.sheet-view #stageList{gap:var(--sp-2)}
 body.sheet-view #stageList .stage{
   padding:10px var(--sp-3);
@@ -346,9 +357,16 @@ body.sheet-view .ritual-card p{font-size:var(--fs-xs,12px);line-height:1.45}
 
 @media (max-width:860px){
   body.sheet-view .shell{
-    padding:var(--sp-2) var(--sp-2) calc(var(--bar-h,62px) + env(safe-area-inset-bottom,0px) + var(--sp-5));
+    padding:var(--sp-2) var(--sp-2) calc(var(--bar-h,62px) + env(safe-area-inset-bottom,0px) + 96px);
   }
-  body.sheet-view .topbar{padding:6px var(--sp-2)}
+  html body.sheet-view .topbar{padding:var(--sp-2) var(--sp-3)!important}
+  body.sheet-view .topbar .sigil{width:26px;height:26px;font-size:13px;margin-inline:var(--sp-1)}
+  /* no celular o nome ocupa até duas linhas e cada recurso empilha rótulo e valor */
+  #sheetHead60 .sh-name{
+    white-space:normal;overflow-wrap:anywhere;text-align:left;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
+  }
+  #sheetHead60 .sh-top{flex-direction:column;align-items:flex-start;gap:2px;letter-spacing:.02em}
   body.sheet-view #tab-overview>.panel:first-child>.av-edit p,
   body.sheet-view #tab-overview>.panel:first-child>.av-edit .sub{display:none}
   body.sheet-view #tab-overview>.panel:first-child>.av-edit .av{--s:56px}

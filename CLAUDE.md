@@ -51,7 +51,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112601`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112701`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
@@ -206,10 +206,14 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
   - **Música** (`js/20`): o domínio alternativo (`youtube-nocookie`) é tentado **por vídeo** e não fica mais preso para a sessão. O vigia (`ytWatch6`) só silencia quando o navegador realmente bloqueou o som. Erros 101/150/153 avisam qualquer pessoa (`ytFail6`), inclusive jogadores, com "⚠ não toca neste navegador" na barra. Adicionado `widget_referrer`.
   - **Arcade multiplayer** (`js/25`): tráfego rápido (`MG_FAST`: snap, in, pos, rs, ri, as, ain, rh, rhs, pss, pam) vai por um **canal só da sala** (`tulpa-mg-<campanha>-<sala>`, handshake `rj`), com volta ao canal geral enquanto alguém não entrou nele.
   - **Predição local do convidado:** Volley (`js/58`) e Abismo (`js/56`) movem o próprio boneco na hora e mandam a posição (contador `tp` para reposicionamentos do host); Rinha (`js/56`) prevê o andar e interpola os lutadores; Coleta (`js/59`) limita os snapshots a ~30/s. O host continua autoritativo e dono do `C.finish`.
+- **Reforma visual da interface (27/11/2026)**, só `css/10`–`14`, sem mudança de JS:
+  - auditada com Playwright e Supabase falso: 36 estéticas em 1440 e 390 px nas telas principais; Cyberpunk, Frutiger Aero, Dark Academia, Webcore e os temas clássicos em todas as telas;
+  - corrigidos: vidro borrando o mapa no celular, barra de combate sobre a navegação, rótulos de rituais embaralhados no Manual, índice do Manual ausente entre 861 e 900 px, Pergaminho com topo da ficha, Arcade e Quarto do Perseus ilegíveis, campos ilegíveis no Webcore, Perseus sobre o painel da Mesa;
+  - `--ink-bg` (em `body`) é a cor do texto escrito direto sobre o fundo da página; as regras de contraste por estética ficam no `css/14`.
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.
-1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112601`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
+1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112701`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
 2. **Teste manual pós-login** de tudo que o teste automático não cobre: login real, mesa, mapa, call, transmissão e Arcade com carregamento sob demanda (inclusive em sala multijogador, com convidado entrando antes de o Arcade carregar).
 3. **Atualizar o Manual em PDF:** perícias começam em 0 e não existe História.
 4. **Balancear a Coleta de Essência.** A Receita 7, "Destilado do Vazio", foi a mais difícil para o bot (6 de 8 tentativas). Ajuste se os jogadores reclamarem.
