@@ -434,17 +434,31 @@ function voicePaint8(){
   const mav=$q('#mAv .av');if(mav){const s=st(gm);mav.classList.toggle('speaking',!!(s.inCall&&s.speaking&&vAllowed8(gm)));mav.classList.toggle('muted',!!(s.inCall&&s.muted))}
   $('mesaM')?.classList.toggle('in-call',!!st(gm).inCall);
 }
-/* versão nova no ar: avisa para recarregar (o navegador pode guardar a página antiga por alguns minutos) */
-function updateBanner8(){
-  if($('updBanner'))return;const b=document.createElement('button');b.id='updBanner';b.type='button';b.textContent='🔄 Há uma versão nova do site. Toque aqui para atualizar.';
-  b.onclick=()=>{try{location.reload()}catch(e){}};document.body.append(b);
+/* versão nova no ar: força a atualização (o navegador pode guardar a página antiga por alguns minutos).
+   A versão = texto do <meta tulpa-build> + o token ?v= do js/61-init.js; qualquer mudança dispara. */
+const verKey8=t=>{const m=t.match(/<meta\s+name="tulpa-build"\s+content="([^"]*)"/),v=t.match(/js\/61-init\.js\?v=([\w.-]+)/);return m?((m[1]||'').trim()+'|'+(v?v[1]:'')):''};
+const localVer8=()=>{try{const sc=document.querySelector('script[src*="61-init.js"]'),v=sc&&(sc.getAttribute('src').match(/\?v=([\w.-]+)/)||[])[1];return BUILD8+'|'+(v||'')}catch(e){return BUILD8+'|'}};
+function updateBanner8(remoteKey){
+  if($('updBanner')||$('updOverlay'))return;
+  /* trava contra laço: no máximo 2 tentativas por versão nova */
+  let n=0;try{n=Number(sessionStorage.getItem('tulpa_upd_'+remoteKey)||0)}catch(e){}
+  const go=()=>{try{sessionStorage.setItem('tulpa_upd_'+remoteKey,String(n+1))}catch(e){}
+    try{if(typeof flushState6==='function'&&isGM6())flushState6()}catch(e){}
+    try{const u=new URL(location.href);u.searchParams.set('u',Date.now().toString(36));location.replace(u.toString())}catch(e){location.reload()}};
+  if(n>=2){const b=document.createElement('button');b.id='updBanner';b.type='button';b.textContent='🔄 Há uma versão nova do site. Toque aqui para atualizar.';b.onclick=go;document.body.append(b);return}
+  const o=document.createElement('div');o.id='updOverlay';o.setAttribute('role','alertdialog');o.setAttribute('aria-live','assertive');
+  o.style.cssText='position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:rgba(8,6,10,.82);padding:16px';
+  o.innerHTML='<div style="max-width:360px;width:100%;background:var(--panel,#171e28);color:var(--text,#edf2f7);border:1px solid var(--line,#2c3645);border-radius:12px;padding:24px;text-align:center"><h3 style="margin:0 0 8px">🔄 Versão nova do site</h3><p style="margin:0 0 16px">Atualizando em <b id="updCnt">8</b> s para você jogar com a versão certa.</p><button type="button" class="btn primary" id="updNow" style="min-height:44px">Atualizar agora</button></div>';
+  document.body.append(o);let c=8;const t=setInterval(()=>{c--;const e=$('updCnt');if(e)e.textContent=String(Math.max(0,c));if(c<=0){clearInterval(t);go()}},1000);
+  $('updNow').onclick=()=>{clearInterval(t);go()};
 }
 async function updateCheck8(){
   if(!/^https?:$/.test(location.protocol)||BUILD8.indexOf('__')===0)return;
-  try{const r=await fetch(location.pathname,{cache:'reload'});if(!r.ok)return;const t=await r.text();const m=t.match(/<meta\s+name="tulpa-build"\s+content="([^"]*)"/);if(m&&m[1]&&m[1].trim()!==BUILD8)updateBanner8()}catch(e){}
+  try{const r=await fetch(location.pathname,{cache:'reload'});if(!r.ok)return;const k=verKey8(await r.text());if(k&&k!==localVer8())updateBanner8(k)}catch(e){}
 }
-setTimeout(updateCheck8,15000);setInterval(updateCheck8,240000);
+setTimeout(updateCheck8,10000);setInterval(updateCheck8,60000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')updateCheck8()});
+window.addEventListener('online',()=>setTimeout(updateCheck8,1000));
 T3.build=BUILD8;
 T3.voiceBar=voiceBar8;T3.voicePaint=voicePaint8;
 M6.hooks.layout.push(()=>voicePaint8());
