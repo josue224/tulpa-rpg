@@ -214,7 +214,7 @@ console.info('[Tulpa] Etapa 27 carregada');
    Mestre transmite livremente; jogador pede permissão ao Mestre.
    Malha própria (separada do áudio da call) no canal "tulpa-screen-<campanha>".
    =================================================================== */
-const SC28={sid:Math.random().toString(36).slice(2,10),ch:null,camp:'',live:false,stream:null,sharer:null,sharerName:'',peers:new Map(),view:null,asks:{},granted:false,beat:0,lastStart:0};
+const SC28={sid:Math.random().toString(36).slice(2,10),ch:null,camp:'',live:false,stream:null,sharer:null,sharerName:'',peers:new Map(),view:null,asks:{},granted:false,beat:0,lastStart:0,audio:false,src:null,sharerAudio:false};
 T3.screen=SC28;
 const scName28=u=>{try{if(u===vGm8())return'Mestre';const ch=charOfUser6(u);return String((ch&&nm(ch))||M6.present?.[u]?.name||'Jogador').slice(0,32)}catch(e){return'Jogador'}};
 const scOk28=()=>!!navigator.mediaDevices?.getDisplayMedia&&typeof RTCPeerConnection==='function';
@@ -239,21 +239,31 @@ function scPeer28(to){
   pc.createOffer().then(o=>pc.setLocalDescription(o)).then(()=>scSend28({k:'offer',ts:to,sdp:{type:pc.localDescription.type,sdp:pc.localDescription.sdp}})).catch(e=>console.warn('[T28] oferta',e));
   return p;
 }
-async function scStart28(){
+async function scStart28(audioOnly){
   if(!scOk28()){toast('Transmitir a tela não funciona neste navegador (celulares não permitem). Use um computador. Assistir funciona normalmente.');return}
   if(!camp3()){toast('Entre numa mesa para transmitir.');return}
   if(!isGM6()&&!SC28.granted){scAsk28();return}
-  let st;try{st=await navigator.mediaDevices.getDisplayMedia({video:{cursor:'always'},audio:true})}catch(e){toast('Transmissão cancelada.');SC28.granted=false;scBar28();return}
+  let st;try{st=await navigator.mediaDevices.getDisplayMedia(audioOnly?{video:true,audio:true,systemAudio:'include'}:{video:{cursor:'always'},audio:true})}catch(e){toast('Transmissão cancelada.');SC28.granted=false;scBar28();return}
+  let out=st;
+  if(audioOnly){
+    /* só o som: a imagem capturada não é enviada a ninguém (o navegador exige escolher uma janela/aba para liberar o áudio) */
+    const at=st.getAudioTracks();
+    if(!at.length){st.getTracks().forEach(t=>{try{t.stop()}catch(e){}});toast('Nenhum áudio foi compartilhado. Escolha a ABA do YouTube e marque “Compartilhar áudio da aba” (no Chrome/Edge do computador).');scBar28();return}
+    out=new MediaStream(at);
+  }
   if(SC28.sharer&&SC28.sharer!==uid3())scViewClose28();
-  scStop28(true);SC28.stream=st;SC28.sharer=uid3();SC28.sharerName=scName28(uid3());
-  st.getVideoTracks().forEach(t=>{t.onended=()=>{if(SC28.stream===st)scStop28()}});
-  scSend28({k:'start',name:SC28.sharerName});SC28.lastStart=Date.now();
-  toast('🖥️ Sua tela está sendo transmitida para a mesa.');scBar28();
+  scStop28(true);SC28.stream=out;SC28.src=audioOnly?st:null;SC28.audio=!!audioOnly;SC28.sharer=uid3();SC28.sharerName=scName28(uid3());
+  const keep=audioOnly?st.getTracks():out.getVideoTracks();
+  keep.forEach(t=>{t.onended=()=>{if(SC28.stream===out)scStop28()}});
+  scSend28({k:'start',name:SC28.sharerName,audio:audioOnly?1:0});SC28.lastStart=Date.now();
+  toast(audioOnly?'🎧 O áudio da janela está sendo transmitido para a mesa.':'🖥️ Sua tela está sendo transmitida para a mesa.');scBar28();
 }
 function scStop28(silent){
   const mine=SC28.sharer===uid3()&&SC28.stream;
   SC28.peers.forEach(p=>{try{p.pc.close()}catch(e){}});SC28.peers.clear();
   if(SC28.stream){SC28.stream.getTracks().forEach(t=>{try{t.stop()}catch(e){}});SC28.stream=null}
+  if(SC28.src){SC28.src.getTracks().forEach(t=>{try{t.stop()}catch(e){}});SC28.src=null}
+  SC28.audio=false;
   if(mine){scSend28({k:'stop'});SC28.sharer=null;SC28.granted=false;if(!silent)toast('Transmissão encerrada.')}
   scBar28();
 }
@@ -277,26 +287,36 @@ function scView28(from,name,fs){
   let v=SC28.view;
   if(v&&(v.from!==from||v.fs!==fs)){scViewClose28();v=null}
   if(!v){
-    const pc=new RTCPeerConnection({iceServers:iceServers8()});v={from,fs,pc,name};SC28.view=v;
+    const pc=new RTCPeerConnection({iceServers:iceServers8()});v={from,fs,pc,name,audio:!!SC28.sharerAudio};SC28.view=v;
     pc.onicecandidate=e=>{if(e.candidate)scSend28({k:'ice',ts:fs,c:e.candidate.toJSON?e.candidate.toJSON():e.candidate,dir:'s'})};
-    pc.ontrack=e=>{const vid=scPanel28(from,name).querySelector('video');vid.srcObject=e.streams&&e.streams[0]?e.streams[0]:new MediaStream([e.track]);vid.play?.().catch(()=>{})};
+    pc.ontrack=e=>{const pn=scPanel28(from,name,v.audio),vid=pn.querySelector('video');vid.srcObject=e.streams&&e.streams[0]?e.streams[0]:new MediaStream([e.track]);
+      if(v.audio){
+        /* só som: tenta tocar com volume; se o navegador exigir um toque, deixa mudo e avisa */
+        const sb=pn.querySelector('[data-sca="snd"]'),vol=pn.querySelector('.sc28-vol');
+        vid.muted=false;vid.volume=Math.max(0,Math.min(1,(prefs.musicVol==null?60:prefs.musicVol)/100));if(vol)vol.value=Math.round(vid.volume*100);
+        const set=()=>{sb.textContent=vid.muted?'🔇':'🔊';sb.setAttribute('aria-pressed',String(!vid.muted))};
+        const pr=vid.play?.();if(pr&&pr.catch)pr.catch(()=>{vid.muted=true;set();vid.play?.().catch(()=>{});toast('🎧 Toque em 🔇 para ouvir o áudio transmitido.')});set();
+      }else vid.play?.().catch(()=>{})};
     pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc.connectionState))scViewClose28()};
   }
   return v;
 }
-function scPanel28(from,name){
+function scPanel28(from,name,audio){
   let p=$('sc28');
   if(!p){p=document.createElement('section');p.id='sc28';p.className='sc28';p.setAttribute('aria-label','Tela transmitida');
-    p.innerHTML=`<header class="sc28-h"><b class="sc28-t"></b><span class="sc28-btns"><button type="button" data-sca="snd" title="Ouvir o som da tela" aria-pressed="false">🔇</button><button type="button" data-sca="min" title="Minimizar">▁</button><button type="button" data-sca="full" title="Tela cheia">⛶</button><button type="button" data-sca="kill" class="sc28-kill" title="Encerrar esta transmissão">⛔</button><button type="button" data-sca="x" title="Fechar">✕</button></span></header><div class="sc28-v"><video playsinline autoplay muted></video></div>`;
+    p.innerHTML=`<header class="sc28-h"><b class="sc28-t"></b><span class="sc28-btns"><button type="button" data-sca="snd" title="Ouvir o som da tela" aria-pressed="false">🔇</button><button type="button" data-sca="min" title="Minimizar">▁</button><button type="button" data-sca="full" title="Tela cheia">⛶</button><button type="button" data-sca="kill" class="sc28-kill" title="Encerrar esta transmissão">⛔</button><button type="button" data-sca="x" title="Fechar">✕</button></span></header><div class="sc28-au"><label class="sub">Volume <input type="range" class="sc28-vol" min="0" max="100" step="1" value="60" aria-label="Volume do áudio transmitido"></label></div><div class="sc28-v"><video playsinline autoplay muted></video></div>`;
     document.body.append(p);
     p.querySelector('[data-sca="snd"]').onclick=e=>{const v=p.querySelector('video');v.muted=!v.muted;e.currentTarget.textContent=v.muted?'🔇':'🔊';e.currentTarget.setAttribute('aria-pressed',!v.muted)};
+    p.querySelector('.sc28-vol').oninput=e=>{const v=p.querySelector('video');v.volume=Number(e.target.value)/100;if(v.muted&&v.volume>0){v.muted=false;const b=p.querySelector('[data-sca="snd"]');b.textContent='🔊';b.setAttribute('aria-pressed','true')}};
     p.querySelector('[data-sca="min"]').onclick=()=>p.classList.toggle('min');
     p.querySelector('[data-sca="full"]').onclick=()=>{const v=p.querySelector('.sc28-v');try{document.fullscreenElement?document.exitFullscreen():(v.requestFullscreen||v.webkitRequestFullscreen).call(v)}catch(e){}};
     p.querySelector('[data-sca="kill"]').onclick=()=>{if(SC28.view)scSend28({k:'kill',to:SC28.view.from});scViewClose28();toast('Transmissão encerrada pelo Mestre.')};
     p.querySelector('[data-sca="x"]').onclick=()=>{p.classList.add('hide');SC28.hidden=SC28.view?.from||true};
   }
   p.classList.remove('hide');SC28.hidden=null;
-  p.querySelector('.sc28-t').textContent=name==='Mestre'?'🖥️ Tela do Mestre':'🖥️ Tela de '+(name||'alguém');
+  p.classList.toggle('aud',!!audio);p.classList.toggle('min',!!audio);
+  p.querySelector('.sc28-t').textContent=audio?'🎧 Áudio de '+(name||'alguém'):name==='Mestre'?'🖥️ Tela do Mestre':'🖥️ Tela de '+(name||'alguém');
+  p.querySelector('[data-sca="full"]').hidden=!!audio;
   p.querySelector('.sc28-kill').hidden=!isGM6();
   return p;
 }
@@ -306,10 +326,10 @@ function scMsg28(m){
   const me=uid3(),from=m.from;if(!from)return;
   if(m.to&&m.to!==me)return;if(m.ts&&m.ts!==SC28.sid)return;if(m.fs===SC28.sid)return;
   switch(m.k){
-    case'who':if(SC28.stream&&SC28.sharer===me)scSend28({k:'start',name:SC28.sharerName,ts:m.fs});break;
+    case'who':if(SC28.stream&&SC28.sharer===me)scSend28({k:'start',name:SC28.sharerName,audio:SC28.audio?1:0,ts:m.fs});break;
     case'start':
       if(SC28.stream&&SC28.sharer===me){scStop28(true);toast('Outra pessoa começou a transmitir. A sua tela parou.')}
-      SC28.sharer=from;SC28.sharerName=m.name||scName28(from);
+      SC28.sharer=from;SC28.sharerName=m.name||scName28(from);SC28.sharerAudio=!!m.audio;
       if(!SC28.view||SC28.view.fs!==m.fs){scViewClose28();SC28.sharer=from;SC28.sharerSid=m.fs;scSend28({k:'want',ts:m.fs})}
       scBar28();break;
     case'want':if(SC28.stream&&SC28.sharer===me&&m.fs){const old=SC28.peers.get(m.fs);if(old){try{old.pc.close()}catch(e){}SC28.peers.delete(m.fs)}scPeer28(m.fs)}break;
@@ -332,14 +352,16 @@ function scBar28(){
   let g=$('mbScr28');
   if(!g){g=document.createElement('div');g.id='mbScr28';g.className='mb-group mb-scr28';const after=$('mbArc26')||$('mbHand')||$('mbCall');if(after)after.after(g);else bar.append(g)}
   const me=uid3(),mine=SC28.sharer===me&&!!SC28.stream,isM=isGM6(),hid=SC28.view&&$('sc28')?.classList.contains('hide');
-  const sig=[mine,isM,SC28.granted,!!SC28.asking,SC28.sharer||'',!!hid].join('|');if(g.dataset.sig===sig)return;g.dataset.sig=sig;
+  const sig=[mine,isM,SC28.granted,!!SC28.asking,SC28.sharer||'',!!hid,SC28.audio,SC28.sharerAudio].join('|');if(g.dataset.sig===sig)return;g.dataset.sig=sig;
   let h='';
-  if(mine)h=`<button type="button" class="btn small sc28-on" id="scBtn28">⏹ Parar transmissão</button>`;
+  if(mine)h=`<button type="button" class="btn small sc28-on" id="scBtn28">⏹ ${SC28.audio?'Parar áudio':'Parar transmissão'}</button>`;
   else if(isM||SC28.granted)h=`<button type="button" class="btn small ${SC28.granted?'primary':''}" id="scBtn28">🖥️ ${SC28.granted?'Começar transmissão':'Transmitir Tela'}</button>`;
   else h=`<button type="button" class="btn small" id="scBtn28" ${SC28.asking?'disabled':''}>🖥️ ${SC28.asking?'Esperando o Mestre…':'Transmitir Tela'}</button>`;
-  if(SC28.sharer&&!mine&&hid)h+=`<button type="button" class="btn small" id="scShow28">👁 Ver tela de ${esc(SC28.sharerName||'alguém')}</button>`;
+  if(!mine&&(isM||SC28.granted)&&scOk28())h+=`<button type="button" class="btn small" id="scAud28" title="Transmite só o som de uma aba ou janela (ex.: o YouTube) para a mesa ouvir">🎧 Só áudio</button>`;
+  if(SC28.sharer&&!mine&&hid)h+=`<button type="button" class="btn small" id="scShow28">👁 ${SC28.sharerAudio?'Ver controle do áudio de':'Ver tela de'} ${esc(SC28.sharerName||'alguém')}</button>`;
   g.innerHTML=h;
   $('scBtn28').onclick=()=>mine?scStop28():scStart28();
+  const au=$('scAud28');if(au)au.onclick=()=>scStart28(true);
   const sh=$('scShow28');if(sh)sh.onclick=()=>{$('sc28')?.classList.remove('hide');SC28.hidden=null;scBar28()};
 }
 setInterval(()=>{
@@ -347,7 +369,7 @@ setInterval(()=>{
     if(camp3())scJoin28();else if(SC28.ch)scLeave28();
     scBar28();
     /* quem transmite se anuncia de tempos em tempos (para quem chegou depois) */
-    if(SC28.stream&&SC28.sharer===uid3()&&Date.now()-SC28.lastStart>6000){SC28.lastStart=Date.now();scSend28({k:'start',name:SC28.sharerName})}
+    if(SC28.stream&&SC28.sharer===uid3()&&Date.now()-SC28.lastStart>6000){SC28.lastStart=Date.now();scSend28({k:'start',name:SC28.sharerName,audio:SC28.audio?1:0})}
   }catch(e){}
 },1500);
 try{M6.hooks.leave.push(()=>scLeave28())}catch(e){}

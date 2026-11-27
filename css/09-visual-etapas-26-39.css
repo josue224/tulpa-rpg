@@ -506,3 +506,7 @@ body{--h-fe:#d39a26;--h-nat:#3f9a5c;--h-inx:#8270cc;--h-ilu:#c4579c;--h-ver:#3b9
 
 .tr45-gal{font-size:22px;letter-spacing:4px;line-height:1.5}
 
+
+/* transmissão só de áudio: painel compacto */
+.sc28-au{display:none;padding:var(--sp-1,4px) var(--sp-3,12px);background:#14181e;color:#eef2f7}.sc28-au input{width:120px;vertical-align:middle;min-height:var(--touch,44px)}
+.sc28.aud{height:auto!important;min-height:0;width:min(360px,calc(100vw - 32px));resize:none}.sc28.aud .sc28-v{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}.sc28.aud .sc28-au{display:block}.sc28.aud .sc28-btns button{min-width:var(--touch,44px);min-height:var(--touch,44px)}
