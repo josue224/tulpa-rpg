@@ -244,7 +244,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 **Bloco A (visual do Arcade, Ondas 1–7) e Bloco B (regras novas, Ondas 8–13) concluídos.** Testado só no Edge headless com campanha e Supabase falsos.
 
-### Decisões tomadas na implementação (o Mestre ainda precisa confirmar)
+### Decisões tomadas na implementação (confirmadas pelo Mestre em 27/11/2026)
 - A especificação cita **49 vertentes**, mas lista 48: nenhuma foi inventada (dá para criar pela central).
 - Generalista: metade do grau + **+V inteiro**. Treino antigo ainda sem vertente vale cheio (menos no que exige treino). Rolagem comum da perícia usa o maior grau.
 - Bloqueio: casos que as 4 condições não cobrem viram **Parcial**; 20 natural nunca vira Erro Total.
@@ -269,7 +269,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.
-1. **Confirmar as decisões** listadas acima e rodar os testes manuais do Bloco B.
+1. **Rodar os testes manuais do Bloco B** listados acima.
 2. **Teste manual pós-login** de tudo que o teste automático não cobre: login real, mesa, mapa, call, transmissão e Arcade com carregamento sob demanda (inclusive em sala multijogador, com convidado entrando antes de o Arcade carregar).
 3. **Atualizar o Manual em PDF:** perícias começam em 0 e não existe História.
 4. **Balancear a Coleta de Essência.** A Receita 7, "Destilado do Vazio", foi a mais difícil para o bot (6 de 8 tentativas). Ajuste se os jogadores reclamarem.
