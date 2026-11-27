@@ -507,13 +507,28 @@
     if(s==='shared')markSeenSoon();
   }
   function setView(v){
-    if(v!=='docs'&&v!=='quadro')return;
+    if(v!=='docs'&&v!=='quadro'&&v!=='guia')return;
+    if(v==='guia'&&!gm())return; /* Guia da Campanha: exclusivo do Mestre */
     if(S.view===v)return;
     if(S.mode==='edit'&&!confirm('Descartar o documento que você está editando?'))return;
     S.mode='view';S.draft=null;S.view=v;
     paintAll();
-    try{window.dispatchEvent(new CustomEvent('tulpa:bancada-view',{detail:{view:v,host:$r('#bnQuadro')}}))}catch(e){}
+    try{window.dispatchEvent(new CustomEvent('tulpa:bancada-view',{detail:{view:v,host:hostOf(v)}}))}catch(e){}
     if(v==='docs')markSeenSoon();
+  }
+  function hostOf(v){return v==='guia'?$r('#bnGuia'):$r('#bnQuadro')}
+  /* Onda 3: a visão "Guia da Campanha" só existe no DOM do Mestre (botão e contêiner); para jogador nada é criado */
+  function syncGuia(){
+    if(!root)return;
+    var vs=$r('.bn-views'),b=$r('[data-view="guia"]'),h=$r('#bnGuia');
+    if(gm()){
+      if(!b&&vs){b=document.createElement('button');b.type='button';b.setAttribute('data-view','guia');b.setAttribute('aria-pressed','false');b.textContent='Guia da Campanha';vs.appendChild(b)}
+      if(!h&&box){h=document.createElement('div');h.className='bn-qwrap';h.id='bnGuia';h.hidden=true;box.appendChild(h)}
+    }else{
+      if(b)b.remove();
+      if(h)h.remove();
+      if(S.view==='guia'){S.view='docs';try{window.dispatchEvent(new CustomEvent('tulpa:bancada-view',{detail:{view:'docs',host:null}}))}catch(e){}}
+    }
   }
   /* abre o dossiê de um documento (usado pelo Quadro) */
   function show(ref){
@@ -541,13 +556,16 @@
     if(!root||!S.open)return;
     var sc=root.querySelectorAll('.bn-scope button');
     for(var i=0;i<sc.length;i++)sc[i].setAttribute('aria-pressed',sc[i].dataset.scope===S.scope?'true':'false');
+    syncGuia();
     var vb=root.querySelectorAll('.bn-views button');
     for(var j=0;j<vb.length;j++)vb[j].setAttribute('aria-pressed',vb[j].dataset.view===S.view?'true':'false');
-    box.classList.toggle('bn-view-quadro',S.view==='quadro');
+    box.classList.toggle('bn-view-quadro',S.view==='quadro'||S.view==='guia');
+    box.classList.toggle('bn-view-guia',S.view==='guia');
     var qh=$r('#bnQuadro');if(qh)qh.hidden=S.view!=='quadro';
-    $r('#bnSub').textContent=S.view==='quadro'?'Quadro de Pesquisa: mural infinito da mesa, ao vivo. Fixe documentos da Bancada, ligue pistas com fios e monte teorias juntos.':subText();
+    var gh=$r('#bnGuia');if(gh)gh.hidden=S.view!=='guia';
+    $r('#bnSub').textContent=S.view==='guia'?'Guia da Campanha: apoio só seu. Nada daqui chega aos jogadores até você usar "Revelar".':S.view==='quadro'?'Quadro de Pesquisa: mural infinito da mesa, ao vivo. Fixe documentos da Bancada, ligue pistas com fios e monte teorias juntos.':subText();
     box.classList.toggle('bn-show-detail',!!S.detail);
-    if(S.view!=='quadro'){paintList();paintDetail()}
+    if(S.view==='docs'){paintList();paintDetail()}
   }
 
   function cardHtml(d){
@@ -893,6 +911,27 @@
     }).catch(function(e){say('Não consegui entregar a pista: '+((e&&e.message)||'erro')+'. Tente de novo.')}).then(function(){S.busy=false;paintAll()});
   }
 
+  /* ---------- entregar texto à Bancada (Onda 3: Revelação Seletiva do Guia do Mestre) ----------
+     spec = {title, text, cat?, tags?}. Só o Mestre. Cria um documento na Bancada compartilhada
+     pelo mesmo caminho de escrita do Mestre (saveShared) e avisa a mesa. Devolve {id, code, title}. */
+  function deliver(spec){
+    if(!gm())return Promise.reject(new Error('Só o Mestre entrega documentos.'));
+    spec=spec&&typeof spec==='object'?spec:{};
+    var paras=String(spec.text==null?'':spec.text).split(/\n+/).map(function(t){return t.trim()}).filter(Boolean);
+    var html=paras.map(function(t){return '<p>'+E(t)+'</p>'}).join('');
+    return ensureLoaded().then(function(ok){
+      if(!ok)throw new Error('a Bancada não carregou');
+      var nd=normDoc({id:rnd(),title:String(spec.title||'Sem título'),cat:spec.cat,status:'',tags:spec.tags,html:html,img:null});
+      nd.n=++SH.seq;nd.code=code('DOC',nd.n);nd.by=me();nd.byName='Mestre';nd.at=nd.upd=Date.now();nd.from='guia';
+      SH.docs.push(nd);
+      return saveShared({new:{id:nd.id,title:nd.title}}).then(function(ok2){
+        if(!ok2){SH.docs=SH.docs.filter(function(x){return x.id!==nd.id});SH.seq--;throw new Error('não consegui gravar na Bancada')}
+        try{if(S.open)paintAll()}catch(e){}
+        return{id:nd.id,code:nd.code,title:nd.title};
+      });
+    });
+  }
+
   /* ---------- Quadro (gancho da Onda 2) ---------- */
   function payload(d){
     return{ref:{scope:d._scope||S.scope,id:d.id},id:d.id,scope:d._scope||S.scope,code:d.code,title:d.title,cat:d.cat,catLabel:catOf(d.cat).label,
@@ -964,13 +1003,13 @@
     if(!cid()){say('Entre numa campanha primeiro.');return}
     build();
     if(scope==='shared'||scope==='personal')S.scope=scope;
-    var pv=S.view;if(view==='quadro'||view==='docs')S.view=view;
+    var pv=S.view;if(view==='quadro'||view==='docs'||(view==='guia'&&gm()))S.view=view;
     S.opener=document.activeElement;
     loadPersonal();
     S.open=true;S.mode='view';S.draft=null;S.detail=false;
     root.classList.remove('hide');document.body.classList.add('banc-on');
     syncFilters();paintAll();
-    if(S.view==='quadro'||pv==='quadro'){try{window.dispatchEvent(new CustomEvent('tulpa:bancada-view',{detail:{view:S.view,host:$r('#bnQuadro')}}))}catch(e){}}
+    if(S.view!=='docs'||pv!=='docs'){try{window.dispatchEvent(new CustomEvent('tulpa:bancada-view',{detail:{view:S.view,host:hostOf(S.view)}}))}catch(e){}}
     loadShared(false).then(function(){if(S.open&&S.scope==='shared'&&S.view==='docs')markSeenSoon()});
     if(gm())scanReqs();
     if(S.scope==='shared'&&SH.loaded&&S.view==='docs')markSeenSoon();
@@ -1045,6 +1084,9 @@
     view:function(){return S.view},
     setView:function(v){if(!S.open)open(undefined,v);else setView(v)},
     quadroHost:function(){build();return $r('#bnQuadro')},
+    /* Onda 3 (só Mestre): contêiner do Guia e entrega de documento à Bancada compartilhada */
+    guiaHost:function(){if(!gm())return null;build();syncGuia();return $r('#bnGuia')},
+    deliver:deliver,
     show:show,
     icons:{cat:CATS.reduce(function(m,c){m[c.id]=c.svg;return m},{}),status:STATS.reduce(function(m,c){m[c.id]=c.svg;return m},{})},
     categories:CATS.map(function(c){return{id:c.id,label:c.label}}),
