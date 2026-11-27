@@ -390,6 +390,7 @@ setInterval(wrapEnd22,1000);wrapEnd22();
 const _door22=doorUse10;
 function enemiesNear22(w,cells=12){const [mx,my]=[(w.a[0]+w.b[0])/2,(w.a[1]+w.b[1])/2],cell=mapCfg7().cell;return hostTok22().filter(t=>{const [x,y]=tokCenter10(t);return hyp10(x-mx,y-my)<=cells*cell})}
 doorUse10=function(w,t){
+  {const cd=TAC10.doorCd;if(w&&cd&&cd[w.id]&&Date.now()-cd[w.id]<DOOR_CD10){toast('⏳ A porta acabou de ser usada. Aguarde um instante.');return}}
   if(isGM6()||!t||!w?.door||(w.door.locked)||!enemiesNear22(w).length||AI22.doorSkip)return _door22.apply(this,arguments);
   const open=!doorOpen10(w),verb=open?'Abrir':'Fechar';
   openModal('PORTA',`${verb} a porta`,`<p>Há inimigos por perto. Como ${open?'abrir':'fechar'}?</p><div class="ai-door"><button type="button" class="btn" id="dr22n">🚪 ${verb} normal<br><span class="sub">rápido, faz barulho de porta</span></button><button type="button" class="btn primary" id="dr22s">🤫 ${verb} furtivamente<br><span class="sub">Destreza + Furtividade, DT ${dtDoor22()}</span></button></div>`,'Cancelar',()=>closeModal());

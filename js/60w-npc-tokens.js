@@ -269,7 +269,7 @@
   document.addEventListener('pointerup',function(e){
     if(!dn||!e.target||e.target.id!=='mapCanvas'||e.pointerId!==dn.id)return;
     var d=dn;dn=null;if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>6||Date.now()-d.t>600)return;
-    try{var p=mapPt7(e),t=mapHit7(p.wx,p.wy);if(t&&isNpc(t)&&(MAP7.tool==='move'||MAP7.tool==='ruler'&&false))openCard(t);else if(card&&(!t||!isNpc(t)))closeCard()}catch(x){}
+    try{var p=mapPt7(e),t=mapHit7(p.wx,p.wy);if(t&&MAP7.tool==='move'){MAP7.menuAt=Date.now();mapMenu7(t,e)}else if(card&&(!t||!isNpc(t)))closeCard()}catch(x){}
   },true);
   /* o menu antigo (toque duplo) abre o card no lugar */
   var _menu=mapMenu7;

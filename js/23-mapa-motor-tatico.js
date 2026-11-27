@@ -17,7 +17,9 @@ const TAC10={
 };
 T3.tac=TAC10;
 const TAU10=Math.PI*2;
-const FOV10=Math.PI*2/3;          /* cone de visão: 120° */
+const FOV10=Math.PI*2/3;          /* cone de visão: 120° (NPCs e inimigos) */
+const FOV_PL10=Math.PI;           /* cone dos tokens dos jogadores: 180° (visão periférica ampliada) */
+const fovOf10=t=>{try{const ch=charById(t.charId);return ch&&ch.ownerId&&!gmChar6(ch)?FOV_PL10:FOV10}catch(e){return FOV10}};
 const LAMP_FOV10=Math.PI/3;       /* facho da lanterna: 60° */
 const LAMP_RANGE10=8;             /* alcance da lanterna em quadrados */
 const SPEED10=3.4;                /* quadrados por segundo andando */
@@ -194,7 +196,7 @@ function tokView10(t,geo){
     if(torchOn10(t))polys.push({poly:visPoly10(fx,fy,a,LAMP_FOV10,LAMP_RANGE10*g.cell),ox:fx,oy:fy,r:LAMP_RANGE10*g.cell,lamp:true});
     return polys;
   }
-  return[{poly:visPoly10(fx,fy,a,FOV10,Infinity),ox:fx,oy:fy,r:0,cone:true}];
+  return[{poly:visPoly10(fx,fy,a,fovOf10(t),Infinity),ox:fx,oy:fy,r:0,cone:true}];
 }
 
 /* ---------- cômodos: a névoa só some enquanto o jogador está dentro (sem memória) ---------- */
@@ -226,7 +228,7 @@ function computeView10(){
   if(out.mode==='dark'){
     toks.forEach(t=>{if(mine.includes(t)||!torchOn10(t))return;const [fx,fy,a]=front10(t);out.others.push({poly:visPoly10(fx,fy,a,LAMP_FOV10,LAMP_RANGE10*mapCfg7().cell),ox:fx,oy:fy,r:LAMP_RANGE10*mapCfg7().cell})});
     if(lamps.length){
-      out.mine.forEach(m=>{const [fx,fy,a]=front10(m.t);m.clips=[visPoly10(fx,fy,a,FOV10,Infinity),m.views[0].poly]});
+      out.mine.forEach(m=>{const [fx,fy,a]=front10(m.t);m.clips=[visPoly10(fx,fy,a,fovOf10(m.t),Infinity),m.views[0].poly]});
       out.lit=lamps.map(l=>litOf10(geo,l,out.mine));
     }
   }
@@ -563,7 +565,12 @@ function interact10(){
   const r=reach10(t);if(!r){toast('Nada para interagir à frente do personagem.');return}
   if(r.kind==='sw')swUse10(r.obj,t);else doorUse10(r.obj,t);
 }
+const DOOR_CD10=2500; /* ms entre usos da mesma porta */
 function doorUse10(w,t){
+  /* tempo de espera: a mesma porta não abre e fecha sem parar */
+  const cd=TAC10.doorCd||(TAC10.doorCd={}),nowT=Date.now();
+  if(cd[w.id]&&nowT-cd[w.id]<DOOR_CD10){toast('⏳ A porta acabou de ser usada. Aguarde um instante.');return}
+  cd[w.id]=nowT;
   const key=geoKey10(),isM=isGM6();
   if(w.door.locked&&!isM){fx5('doorLocked');cast6({t:'doorlk',k:key,id:w.id,who:t?nm(charById(t.charId)):''});toast('🔒 A porta está trancada.');return}
   const open=!doorOpen10(w);
