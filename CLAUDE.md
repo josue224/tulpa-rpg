@@ -51,12 +51,12 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112707`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112708`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
   ```
-- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112707'`) é só um fallback.
+- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112708'`) é só um fallback.
 
 ### Como verificar antes de commitar
 
@@ -218,6 +218,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Arcade visual, Onda 4 · Lote 3 (`?v=2026112705`)**: UNO (mesa de feltro, cartas desenhadas com um símbolo por Elemento, relógio e diário da mesa), Defesa do Santuário (um terreno por mapa, totens por Elemento e nível, Traumas e chefes animados), Trono do Mestre (salão do trono, medidores em vitral, retratos pintados nas cartas) e Sudoku (grimório, pistas em serifa, erro marcado também com X, ferramentas com ícone) usam o `GFX60`, com HUD em chips e contagem regressiva. Só visual: regras, áreas de clique, pontuação, semente, rede e cartas ocultas iguais. No UNO, a mão revelada pela Carta de Poder agora aparece por cima do descarte. Arte em `unoArt43` (`js/52`), `sdArt44` e `trArt45` (`js/53`) e `skArt46` (`js/54`). **Teste manual:** uma partida de cada no celular, UNO em Mesa com convidado (Revelar, Troca e Delatar) e `prefers-reduced-motion` ligado.
 - **Arcade visual, Onda 5 · Lote 4 (`?v=2026112706`)**: DOOM (paredes, chão e teto texturizados por andar, Perseus corrompidos, itens e armas desenhados, HUD diegético; no aparelho lento o raycast desenha metade das colunas), Julgamento (um palco e um réu por chefe, balas e almas desenhadas, também no PvP), Rinha (uma arena por rival, lutadores animados com golpes, defesa, K.O. e Supremo) e Abismo (salas, portas, inimigos, chefes, relíquias e luz por andar) usam o `GFX60`, com HUD em chips e contagem regressiva. Só visual: regras, hitboxes, pontuação, semente, rede, predição do convidado e energia oculta do Arquiteto iguais. Arte em `dmArt48` e `juArt49` (`js/55`), `riArt50` e `abArt51` (`js/56`). **Teste manual:** uma partida de cada no celular (fluidez do DOOM), Julgamento, Rinha e Abismo em Mesa com convidado, e `prefers-reduced-motion` ligado.
 - **Arcade visual, Onda 6 · Lote 5 (`?v=2026112707`)**: Poço das Almas (poço de pedra com água espectral, pinos de alma com um desenho por tipo, lançador de bronze, balde em cálice e HUD de almas, multiplicador e poder), Teosofia Clicker (biblioteca à luz de velas, grimório animado, ícones próprios para os 14 geradores e as melhorias, placas, orbe, fenda e árvore de prestígio desenhados), Volley (quatro quadras: praia, cais em ventania, Lua e forja, com rede, torcida, bola de gomos, sombras e placar) e Voo (um céu em paralaxe, colunas, chão e clima por Céu e no Infinito, asas, morcegos, anéis e poderes desenhados). Somente visual: a predição do convidado no Volley não mudou.
+- **Arcade visual, Onda 7 · Lote 6 (`?v=2026112708`)**: Coleta de Essência (oficina alquímica com frascos, perigos, poderes e Colosso desenhados, Caldeirão e Impulso diegéticos), Eco da Memória (uma Câmara por regra, medalhões apagado/aceso/falso e painel de "observe / sua vez") e Jogo da Velha (mesa ritual, marcas talhadas, fichas dos jogadores). Botões de toque de todos os jogos com ícones SVG, ≥ 44 px e sem sobreposição (`GFX60.dressPad` envolve o `padBind`; o `data-k` não muda; estilos `.pad60` no `css/13`). Com isso os 22 jogos estão com o visual novo. Somente visual.
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.

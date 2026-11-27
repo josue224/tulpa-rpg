@@ -456,7 +456,16 @@
     sol:'M12 7a5 5 0 110 10 5 5 0 110-10zM11 1h2v4h-2zM11 19h2v4h-2zM1 11h4v2H1zM19 11h4v2h-4zM3.5 5L5 3.5l2.8 2.8-1.5 1.5zM16.2 17.7l1.5-1.5 2.8 2.8-1.5 1.5zM3.5 19l2.8-2.8 1.5 1.5L5 20.5zM16.2 6.3L19 3.5 20.5 5l-2.8 2.8z',
     espiral:'M12 2a10 10 0 11-10 10h3a7 7 0 107-7 4.5 4.5 0 000 9 3 3 0 000-6v3.4a1.6 1.6 0 110-3.2V5.9a6.1 6.1 0 110 12.2A6.6 6.6 0 0112 2z',
     seta:'M12 2l9 10h-5v10H8V12H3z',
+    lua:'M12 2a10 10 0 100 20 10 10 0 100-20zM12 4.500v15a7.500 7.500 0 010-15z',
+    brilho:'M12 1l2.600 6.500L21.500 6l-4 6 4 6-6.900-1.500L12 23l-2.600-6.500L2.500 18l4-6-4-6 6.900 1.500z',
+    mais:'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z',
+    ima:'M4 3h5v9a3 3 0 006 0V3h5v9a8 8 0 01-16 0zM4 3h5v3.500H4zM15 3h5v3.500h-5z',
+    ampulheta:'M5 2h14v3h-1.500c0 3-1.500 5-3.500 7 2 2 3.500 4 3.500 7H19v3H5v-3h1.500c0-3 1.500-5 3.500-7-2-2-3.500-4-3.500-7H5zM9 5c0 2 1.500 3.500 3 5 1.500-1.500 3-3 3-5z',
+    caldeirao:'M3 7h18v3h-1c1 6-2 10-5 10.500l1 2h-2.500l-.8-1.500h-1.400l-.8 1.500H8l1-2C6 20 3 16 4 10H3zM8 1.500a2 2 0 110 4 2 2 0 110-4zM15 2.500a1.500 1.500 0 110 3 1.500 1.500 0 110-3z',
+    ondas:'M2 7c3-3.500 6-3.500 10 0 3 2.500 6 2.500 10 0v3.500c-4 3-7 3-10 .5-4-3-7-3-10 0zM2 15c3-3.500 6-3.500 10 0 3 2.500 6 2.500 10 0v3.500c-4 3-7 3-10 .5-4-3-7-3-10 0z',
   };
+  /* sigilos dos 5 Elementos, na ordem do EL12 (Natureza, Inexistência, Ilusão, Verdade, Fé) */
+  G.sigils=['folha','lua','espiral','olho','brilho'];
   const P2D={};
   G.icons=Object.keys(ICONS);
   G.icon=(x,name,cx,cy,size=18,col='#ffd36b')=>{const d=ICONS[name];if(!d)return;const p=P2D[name]||(P2D[name]=new Path2D(d));
@@ -538,9 +547,75 @@
     MG.C=null;try{return _ov.apply(this,arguments)}finally{MG.C=C}
   }}
 
+  /* ===================== botões de toque ===================== */
+  /* Só a aparência do .mg-pad: ícones SVG no lugar de emojis, nomes
+     acessíveis e grupos que quebram linha sem sobrepor. data-k (o que cada
+     botão envia) e os ouvintes do padBind não mudam. */
+  const PI={
+    esq:'M15.5 3.5L5 12l10.5 8.5z',dir:'M8.500 3.500L19 12 8.500 20.500z',cima:'M3.500 15.500L12 5l8.500 10.500z',baixo:'M3.500 8.500L12 19l8.500-10.500z',
+    sl:'M11 3l-9 9 9 9v-5.500h11v-7H11z',sr:'M13 3l9 9-9 9v-5.500H2v-7h11z',su:'M12 2l9 9h-5.500v11h-7V11H3z',sd:'M12 22l-9-9h5.500V2h7v11H21z',
+    pular:'M12 2l8 8h-4.500v7h-7v-7H4zM4 19h16v3H4z',agachar:'M12 17l-8-8h4.500V2h7v7H20zM4 19h16v3H4z',
+    dash:'M2 4l8 8-8 8v-5l3-3-3-3zM11 4l11 8-11 8v-5l4-3-4-3z',
+    parede:'M3 4h18v4.500H3zM3 10h8.500v4.500H3zM13 10h8v4.500h-8zM3 16h18v4H3z',
+    drift:'M12 3a9 9 0 11-9 9h3.500a5.500 5.500 0 105.500-5.500V10L6 5l6-5v3z',
+    presente:'M3 8h18v4H3zM4.500 13.500H11V22H4.500zM13 13.500h6.500V22H13zM11 8C6 8 5.500 2 9 2c2 0 3 3 3 6zM13 8c5 0 5.500-6 2-6-2 0-3 3-3 6z',
+    girE:'M12 4a8 8 0 11-7.700 10.200l3-.8A5 5 0 1012 7v3.500L5 5.500 12 .5z',girD:'M12 4a8 8 0 107.700 10.200l-3-.8A5 5 0 1112 7v3.500l7-5L12 .5z',
+    passoE:'M11 4v5h11v6H11v5l-9-8z',passoD:'M13 4v5H2v6h11v5l9-8z',
+    mao:'M7 11V5.500a1.500 1.500 0 013 0V10h.8V3.500a1.500 1.500 0 013 0V10h.8V5a1.500 1.500 0 013 0v7l1.600-1.800a1.600 1.600 0 012.400 2.100L16.500 20c-1 1.400-2.300 2-4 2C9 22 7 19.500 7 16z',
+    trocar:'M7 3l-5 5 5 5V9.500h13v-3H7zM17 11v3.500H4v3h13V21l5-5z',
+    mapa:'M2 5l6-2.500v16.500L2 21.500zM9.500 2.500l5 2.500v16.500l-5-2.500zM16 5l6-2.500v16.500L16 21.500z',
+    v:'M9 16.200L4.800 12 2.500 14.300 9 20.800 21.800 8 19.500 5.700z',x:'M5.500 3L12 9.500 18.500 3 21 5.500 14.500 12l6.500 6.500-2.500 2.500-6.500-6.500L5.500 21 3 18.500 9.500 12 3 5.500z',
+    punho:'M5 8a2 2 0 013.500-1.300A2 2 0 0112 6a2 2 0 013.500.5A2 2 0 0119 8v7c0 2-1 3-2 4v3H8v-3c-2-1.500-3-3.500-3-6z',
+    golpe:'M12 1l2.500 6.500L21 4l-3 6.500 5 2.500-6 1.500 3 7-6.500-4L11 23l-1.500-6-6.500 3 3-6.500-5-2.500 6-1.500L4 3.500l6 4z',
+    faisca:'M12 1c1 7 4 10 11 11-7 1-10 4-11 11-1-7-4-10-11-11C8 11 11 8 12 1z',
+    bomba:'M10 7a8 8 0 100 16 8 8 0 100-16zM13.500 3.500h4v4h-4zM17 3l3-2.500 1.500 1.700-3 2.800z',
+    reviver:'M12 21C7 17 2.500 13.400 2.500 8.800c0-3.200 2.400-5.300 5.100-5.300 1.8 0 3.400 1 4.400 2.600 1-1.600 2.600-2.600 4.400-2.600 2.700 0 5.100 2.100 5.100 5.300C21.500 13.400 17 17 12 21zM10.500 7.500v3h-3v3h3v3h3v-3h3v-3h-3v-3z',
+    reiniciar:'M12 4a8 8 0 108 8h-3.500a4.500 4.500 0 11-4.500-4.500V11l7-5.500L12 .5z',
+  };
+  /* [ícone, nome acessível, rótulo visível (opcional)] */
+  const mv={KeyA:['esq','Esquerda'],KeyD:['dir','Direita'],KeyW:['cima','Cima'],KeyS:['baixo','Baixo']};
+  const PADS={
+    rn40:{ArrowDown:['agachar','Agachar'],KeyE:['dash','Dash'],Space:['pular','Pular','Pular']},
+    rh38:{ArrowLeft:['sl','Nota esquerda'],ArrowDown:['sd','Nota de baixo'],ArrowUp:['su','Nota de cima'],ArrowRight:['sr','Nota direita'],Space:['olho','Despertar'],Digit1:['nuvem','Neblina de Ilusão'],Digit2:['espiral','Distorção do Vazio'],Digit3:['folha','Raízes Trêmulas']},
+    fu38:{Space:['pular','Pular ou segurar','Pular / Segurar'],KeyQ:['bandeira','Encerrar'],KeyC:['bandeira','Marcar checkpoint','Marcar'],KeyX:['x','Apagar checkpoint','Apagar']},
+    sv41:{...mv,Space:['pular','Pular'],KeyJ:['dash','Dash'],KeyR:['reiniciar','Reiniciar fase']},
+    kt42:{...mv,KeyS:['baixo','Frear'],KeyK:['drift','Drift'],KeyE:['presente','Item'],KeyW:['cima','Acelerar','Acelerar']},
+    dm48:{ArrowLeft:['girE','Virar à esquerda'],KeyA:['passoE','Passo à esquerda'],KeyW:['cima','Andar'],KeyS:['baixo','Recuar'],KeyD:['passoD','Passo à direita'],ArrowRight:['girD','Virar à direita'],Space:['alvo','Atirar','Atirar'],KeyE:['mao','Usar'],KeyQ:['trocar','Trocar arma'],KeyM:['mapa','Mapa']},
+    ju49:{...mv,KeyZ:['v','Confirmar','Confirmar'],KeyX:['x','Voltar']},
+    ri50:{...mv,KeyW:['pular','Pular'],KeyS:['escudo','Defender'],KeyJ:['punho','Golpe leve'],KeyK:['golpe','Golpe pesado'],KeyL:['faisca','Especial'],KeyH:['mao','Agarrão'],Space:['dash','Dash'],KeyU:['raio','Especial EX','EX'],KeyI:['coroa','Supremo']},
+    ab51:{KeyA:['esq','Andar à esquerda'],KeyW:['cima','Andar para cima'],KeyS:['baixo','Andar para baixo'],KeyD:['dir','Andar à direita'],ArrowLeft:['sl','Atirar à esquerda'],ArrowUp:['su','Atirar para cima'],ArrowDown:['sd','Atirar para baixo'],ArrowRight:['sr','Atirar à direita'],KeyE:['bomba','Bomba'],Space:['faisca','Item ativo'],ShiftLeft:['dash','Dash'],KeyF:['reviver','Reviver']},
+    vb54:{...mv,Space:['pular','Pular'],KeyS:['golpe','Ação: cortada, bloqueio ou mergulho'],KeyE:['faisca','Poder Elemental']},
+    sa56:{...mv,Space:['estrela','Atirar estrela']},
+    co57:{...mv,ShiftLeft:['raio','Impulso','Impulso']},
+  };
+  const AIM={ArrowLeft:1,ArrowUp:1,ArrowDown:1,ArrowRight:1};
+  const padSvg=n=>{const d=PI[n]||ICONS[n];return d?`<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="${d}"/></svg>`:''};
+  function dressPad(){
+    const pad=document.getElementById('mgPad');if(!pad||pad.classList.contains('pad60'))return;
+    const id=(pad.className.match(/mg-pad-([\w-]+)/)||[])[1]||'',map=PADS[id]||mv;let total=0;
+    for(const group of pad.children){let n=0;
+      group.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k,m=map[k],wide=b.classList.contains('wide');n+=wide?2:1;total++;
+        if(!m)return;const svg=padSvg(m[0]);if(!svg)return;
+        b.innerHTML=svg+(m[2]?`<span>${m[2]}</span>`:'');b.setAttribute('aria-label',m[1]);b.title=m[1];
+        if(m[2]&&!wide)b.classList.add('rot');
+        if(id==='ab51'&&AIM[k])b.classList.add('mira')});
+      group.style.setProperty('--n',n||1)}
+    pad.classList.add('pad60');if(total>7)pad.classList.add('pad60-denso');
+  }
+  G.dressPad=dressPad;
+  if(typeof padBind==='function'){const _bind=padBind;padBind=function(){try{dressPad()}catch(e){console.warn('[GFX60] pad',e)}return _bind.apply(this,arguments)}}
+  /* o HUD e os botões podem crescer depois do primeiro ajuste: o canvas acompanha o palco */
+  let stageObs=null;
+  function watchStage(){
+    const st=document.getElementById('mgStage');if(stageObs)stageObs.disconnect();
+    if(!st||!window.ResizeObserver||typeof mgFit!=='function')return;
+    let last='';stageObs=new ResizeObserver(()=>{const r=st.getBoundingClientRect(),k=Math.round(r.width)+'x'+Math.round(r.height);if(k!==last){last=k;requestAnimationFrame(()=>{if(st.isConnected)mgFit()})}});
+    stageObs.observe(st);
+  }
+
   /* ===================== ganchos no Arcade ===================== */
   if(typeof mgLoop==='function'){const _loop=mgLoop;mgLoop=function(now){const out=_loop.apply(this,arguments);try{sample(now);present()}catch(e){console.warn('[GFX60]',e)}return out}}
-  if(typeof mgStartLocal==='function'){const _start=mgStartLocal;mgStartLocal=function(){G.reset();return _start.apply(this,arguments)}}
+  if(typeof mgStartLocal==='function'){const _start=mgStartLocal;mgStartLocal=function(){G.reset();const out=_start.apply(this,arguments);try{watchStage()}catch(e){console.warn('[GFX60] palco',e)}return out}}
   /* movimento reduzido: sem tremor de tela e com clarão suave (só visual) */
   if(typeof fxOff20==='function'){const _off=fxOff20;fxOff20=function(){return G.reduced()?[0,0]:_off.apply(this,arguments)}}
   if(typeof fx20!=='undefined'){const _flash=fx20.flash;fx20.flash=function(col,a=.35){return _flash.call(this,col,G.reduced()?Math.min(a,.12):a)}}

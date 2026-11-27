@@ -443,3 +443,50 @@ html body.t3-pal[data-ae-glass="1"] #mgRoot .mg-top{
 #mgRoot .mg-game.gfx60 #mgCv{
   box-shadow:0 0 0 1px color-mix(in srgb,var(--g60-acc,#ffd36b) 45%,transparent),0 16px 40px -18px #000,0 0 28px -10px var(--g60-acc,#ffd36b);
 }
+
+/* ---------- Botões de toque do Arcade (.pad60, vestidos por js/60f) ----------
+   Cada grupo quebra a própria linha; nenhum botão fica menor que 44px. */
+#mgRoot .mg-pad.pad60{flex:none;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:var(--sp-2,8px);min-width:0}
+#mgRoot .mg-pad.pad60>div{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2,8px);
+  flex:var(--n,1) 1 calc(var(--n,1) * 44px + (var(--n,1) - 1) * 8px);
+  width:auto;min-width:0;max-width:100%;margin:0;
+}
+#mgRoot .mg-pad.pad60>.fu38-pr:not(.on){display:none}
+#mgRoot .mg-pad.pad60>.mg-rh4{flex-basis:100%}
+#mgRoot .mg-pad.pad60 .mg-pb{
+  display:flex;align-items:center;justify-content:center;gap:var(--sp-1,4px);
+  flex:1 1 44px;width:auto;min-width:44px;height:56px;padding:0 var(--sp-1,4px);
+  color:#fff;font-size:13px;font-weight:700;line-height:1.2;
+  background:linear-gradient(180deg,#34274e,#171022);border:1px solid #ffffff59;border-radius:14px;
+  box-shadow:inset 0 1px 0 #ffffff24,0 3px 0 #0009;
+}
+#mgRoot .mg-pad.pad60 .mg-pb.wide{flex:2 1 96px}
+#mgRoot .mg-pad.pad60 .mg-pb.rot{flex-direction:column;gap:0;font-size:11px}
+#mgRoot .mg-pad.pad60 .mg-pb.mira{border-color:#ffd36bb3;color:#ffe3a3}
+#mgRoot .mg-pad.pad60 .mg-pb[hidden]{display:none}
+#mgRoot .mg-pad.pad60 .mg-pb svg{width:24px;height:24px;flex:none;fill:currentColor;pointer-events:none;filter:drop-shadow(0 1px 1px #000a)}
+#mgRoot .mg-pad.pad60 .mg-pb.rot svg{width:20px;height:20px}
+#mgRoot .mg-pad.pad60 .mg-pb span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none}
+#mgRoot .mg-pad.pad60 .mg-pb.on{color:#fff;background:linear-gradient(180deg,#8a55e0,#4d2a94);border-color:#e2d2ff;box-shadow:inset 0 2px 4px #0006;transform:translateY(2px)}
+#mgRoot .mg-pad.pad60-denso .mg-pb{height:48px}
+
+/* tela cheia e paisagem: os grupos ficam nos cantos, por cima do jogo */
+body.mg-ov #mgRoot .mg-pad.pad60{--pb:64px;pointer-events:none}
+body.mg-ov #mgRoot .mg-pad.pad60-denso{--pb:52px}
+body.mg-ov #mgRoot .mg-pad.pad60>div{flex:0 1 auto;justify-content:flex-start;pointer-events:auto}
+body.mg-ov #mgRoot .mg-pad.pad60>div:only-child{flex:1 1 100%;justify-content:space-between;pointer-events:none}
+body.mg-ov #mgRoot .mg-pad.pad60 .mg-pb{
+  flex:none;width:var(--pb);height:var(--pb);min-width:44px;border-radius:50%;pointer-events:auto;
+  opacity:.74;background:rgba(14,9,22,.46);border-color:#ffffff8c;box-shadow:none;
+}
+body.mg-ov #mgRoot .mg-pad.pad60 .mg-pb.wide{width:calc(var(--pb) * 1.7);border-radius:999px}
+body.mg-ov #mgRoot .mg-pad.pad60 .mg-pb.on{opacity:.94;background:rgba(130,80,220,.7);border-color:#e2d2ff}
+body.mg-ov #mgRoot .mg-pad.pad60.mg-pad-fu38{justify-content:flex-end}
+body.mg-ov #mgRoot .mg-pad.pad60.mg-pad-rh38>.mg-rh4{flex:0 1 auto;margin-left:auto}
+body.mg-ov #mgRoot .mg-pad.pad60.mg-pad-rh38>.mg-rhx{order:-1}
+@media (max-width:420px){
+  body.mg-ov #mgRoot .mg-pad.pad60-denso{--pb:46px}
+  body.mg-ov #mgRoot .mg-pad.pad60-denso>div{gap:6px}
+}
+@media (prefers-reduced-motion:reduce){#mgRoot .mg-pad.pad60 .mg-pb.on{transform:none}}

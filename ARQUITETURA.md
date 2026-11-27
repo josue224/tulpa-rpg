@@ -161,7 +161,8 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | Partículas | `emit(tipo,x,y,{col,amount,ang,spread,size})`, tipos `impacto explosao brilho coleta poeira rastro fumaca estilhacos folhas confete`. `C.fx.burst({kind})` ganhou `faisca brilho estilhaco fumaca onda brasa folha confete` |
 | Hit-stop | `hitstop(ms,{zoom})` (16 a 140 ms, só a imagem) · `frozen()` · `impact(x,y,{col,force})` = hit-stop + tremor + faíscas |
 | HUD no canvas | `hud.text(x,txt,X,Y,{size,col,al,bl,w,stroke,min,max})` · `hud.panel(x,X,Y,w,h,{r,acc,a})` · `hud.bar(x,X,Y,w,h,v,{col,bg,ghost,segs,label,val})` · `hud.chip(x,X,Y,{icon,text,col,size,al})` · `hud.pips(x,X,Y,n,max,{icon,size,col})` · `hud.frame(x,W,H,{acc,a})` · `hud.banner(x,W,H,titulo,{sub,k,acc,y})` |
-| Ícones | `icon(x,nome,cx,cy,tam,cor)` · `svg(nome)`. Nomes: `coracao estrela moeda raio escudo caveira relogio olho chama alvo coroa gota trofeu bandeira nota chave cadeado folha nuvem sol espiral seta` |
+| Ícones | `icon(x,nome,cx,cy,tam,cor)` · `svg(nome)`. Nomes: `coracao estrela moeda raio escudo caveira relogio olho chama alvo coroa gota trofeu bandeira nota chave cadeado folha nuvem sol espiral seta lua brilho mais ima ampulheta caldeirao ondas`. `sigils` = ícone de cada Elemento na ordem do `EL12` |
+| Botões de toque | `dressPad()` roda dentro do `padBind`: troca emoji por SVG, dá nome acessível e monta os grupos `.pad60` (`css/13`). Botão novo em um pad: acrescente o `data-k` ao mapa `PADS` do `60f`. O motor também reajusta o canvas quando o palco muda de tamanho |
 | HUD em HTML | `skin({acc})` (chame no `make`) · `C.hud(GFX60.chips([{icon,label,value,tone}]))`, `tone`: `ok`, `warn`, `bad` |
 | Texto legível | `fs(tamanho,minPx=11)` e `cssScale()` (num celular de 390 px, 1 unidade ≈ 0,45 px) |
 | Assets (opcional) | `assets.add({nome:'arquivo.webp'})` · `assets.load()` · `art(nome,reservaProcedural)`. O manifesto começa vazio: nada é requisitado |
