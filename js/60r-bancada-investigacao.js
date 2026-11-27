@@ -13,7 +13,7 @@
    Anotações de margem e favoritos são sempre privados (localStorage).
    Sem SQL novo. Texto rico sempre sanitizado (lista branca de tags, sem
    atributos) e todo texto do usuário é escapado antes de ir ao DOM.
-   Ganchos para a Onda 2 (Quadro): evento `tulpa:bancada-pin` e T3.bancada.
+   Ganchos do Quadro (Onda 2, js/60s): evento `tulpa:bancada-pin`, `tulpa:bancada-view` e T3.bancada.
    Carrega ANTES de js/61-init.js. IIFE: só publica T3.bancada.
    ========================================================================== */
 (function(){
@@ -138,7 +138,7 @@
   /* ---------- estado ---------- */
   var S={
     open:false,scope:'shared',q:'',cat:'',status:'',tag:'',fav:false,
-    sel:null,mode:'view',draft:null,detail:false,opener:null,busy:false,
+    sel:null,mode:'view',draft:null,detail:false,opener:null,busy:false,view:'docs',
     newIds:{},camp:null
   };
   var SH={ver:0,saving:0,docs:[],seq:0,done:[],loaded:false,loading:false,err:null,p:null,q:Promise.resolve(),camp:null};
@@ -409,6 +409,10 @@
       '<div class="bn-box" id="bn60rBox">'+
         '<header class="bn-top">'+
           '<div class="bn-ttl"><h1>Bancada &amp; Investigação</h1><p class="sub" id="bnSub"></p></div>'+
+          '<div class="bn-views" role="group" aria-label="Visão da Bancada">'+
+            '<button type="button" data-view="docs" aria-pressed="true">Documentos</button>'+
+            '<button type="button" data-view="quadro" aria-pressed="false">Quadro de Pesquisa</button>'+
+          '</div>'+
           '<div class="bn-scope" role="group" aria-label="Onde guardar">'+
             '<button type="button" data-scope="shared" aria-pressed="true">Bancada da Campanha</button>'+
             '<button type="button" data-scope="personal" aria-pressed="false">Caderno Pessoal</button>'+
@@ -437,6 +441,7 @@
           '</section>'+
           '<section class="bn-detail" id="bnDetail" aria-label="Documento"></section>'+
         '</div>'+
+        '<div class="bn-qwrap" id="bnQuadro" hidden></div>'+
       '</div>';
     document.body.appendChild(root);
     box=$r('#bn60rBox');
@@ -457,7 +462,7 @@
       close();return;
     }
     if(e.key==='Tab'){
-      var f=[].filter.call(root.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[contenteditable="true"],a[href]'),function(x){return x.offsetParent!==null});
+      var f=[].filter.call(root.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[contenteditable="true"],a[href],[tabindex="0"]'),function(x){return x.offsetParent!==null});
       if(!f.length)return;
       var a=f[0],z=f[f.length-1];
       if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}
@@ -466,8 +471,9 @@
   }
 
   function onClick(e){
-    var t=e.target.closest?e.target.closest('[data-act],[data-scope],[data-open],[data-tag],[data-fav]'):null;
+    var t=e.target.closest?e.target.closest('[data-act],[data-scope],[data-open],[data-tag],[data-fav],[data-view]'):null;
     if(!t||!root.contains(t))return;
+    if(t.dataset.view){setView(t.dataset.view);return}
     if(t.dataset.scope){setScope(t.dataset.scope);return}
     if(t.dataset.open){selectDoc(t.dataset.open);return}
     if(t.dataset.tag!==undefined){S.tag=S.tag===t.dataset.tag?'':t.dataset.tag;paintList();return}
@@ -495,10 +501,29 @@
   function setScope(s){
     if(s!=='shared'&&s!=='personal')return;
     if(S.mode==='edit'&&!confirm('Descartar o documento que você está editando?'))return;
-    S.mode='view';S.draft=null;S.scope=s;S.sel=null;S.detail=false;
+    S.mode='view';S.draft=null;S.scope=s;S.sel=null;S.detail=false;S.view='docs';
     if(s==='personal')loadPersonal();else{loadShared(false);}
     syncFilters();paintAll();
     if(s==='shared')markSeenSoon();
+  }
+  function setView(v){
+    if(v!=='docs'&&v!=='quadro')return;
+    if(S.view===v)return;
+    if(S.mode==='edit'&&!confirm('Descartar o documento que você está editando?'))return;
+    S.mode='view';S.draft=null;S.view=v;
+    paintAll();
+    try{window.dispatchEvent(new CustomEvent('tulpa:bancada-view',{detail:{view:v,host:$r('#bnQuadro')}}))}catch(e){}
+    if(v==='docs')markSeenSoon();
+  }
+  /* abre o dossiê de um documento (usado pelo Quadro) */
+  function show(ref){
+    var id=ref&&ref.id||ref,sc=ref&&ref.scope==='personal'?'personal':'shared';
+    if(!cid())return false;
+    open(sc,'docs');
+    if(sc==='personal')loadPersonal();
+    var d=getDoc(id);
+    if(!d){say('Esse documento não está mais disponível para você.');return false}
+    selectDoc(id);return true;
   }
   function markSeenSoon(){setTimeout(function(){if(S.open&&S.scope==='shared')markSeen()},1500)}
 
@@ -516,9 +541,13 @@
     if(!root||!S.open)return;
     var sc=root.querySelectorAll('.bn-scope button');
     for(var i=0;i<sc.length;i++)sc[i].setAttribute('aria-pressed',sc[i].dataset.scope===S.scope?'true':'false');
-    $r('#bnSub').textContent=subText();
+    var vb=root.querySelectorAll('.bn-views button');
+    for(var j=0;j<vb.length;j++)vb[j].setAttribute('aria-pressed',vb[j].dataset.view===S.view?'true':'false');
+    box.classList.toggle('bn-view-quadro',S.view==='quadro');
+    var qh=$r('#bnQuadro');if(qh)qh.hidden=S.view!=='quadro';
+    $r('#bnSub').textContent=S.view==='quadro'?'Quadro de Pesquisa: mural infinito da mesa, ao vivo. Fixe documentos da Bancada, ligue pistas com fios e monte teorias juntos.':subText();
     box.classList.toggle('bn-show-detail',!!S.detail);
-    paintList();paintDetail();
+    if(S.view!=='quadro'){paintList();paintDetail()}
   }
 
   function cardHtml(d){
@@ -931,19 +960,21 @@
   }
 
   /* ---------- abrir e fechar ---------- */
-  function open(scope){
+  function open(scope,view){
     if(!cid()){say('Entre numa campanha primeiro.');return}
     build();
     if(scope==='shared'||scope==='personal')S.scope=scope;
+    var pv=S.view;if(view==='quadro'||view==='docs')S.view=view;
     S.opener=document.activeElement;
     loadPersonal();
     S.open=true;S.mode='view';S.draft=null;S.detail=false;
     root.classList.remove('hide');document.body.classList.add('banc-on');
     syncFilters();paintAll();
-    loadShared(false).then(function(){if(S.open&&S.scope==='shared')markSeenSoon()});
+    if(S.view==='quadro'||pv==='quadro'){try{window.dispatchEvent(new CustomEvent('tulpa:bancada-view',{detail:{view:S.view,host:$r('#bnQuadro')}}))}catch(e){}}
+    loadShared(false).then(function(){if(S.open&&S.scope==='shared'&&S.view==='docs')markSeenSoon()});
     if(gm())scanReqs();
-    if(S.scope==='shared'&&SH.loaded)markSeenSoon();
-    var q=$r('#bnQ');if(q)try{q.focus({preventScroll:true})}catch(e){}
+    if(S.scope==='shared'&&SH.loaded&&S.view==='docs')markSeenSoon();
+    var q=$r('#bnQ');if(q&&S.view==='docs')try{q.focus({preventScroll:true})}catch(e){}
   }
   function close(){
     if(!root||!S.open)return;
@@ -1010,6 +1041,12 @@
     version:1,
     open:open,close:close,
     isOpen:function(){return !!S.open},
+    /* Onda 2: visão atual ('docs'|'quadro'), troca de visão, abrir um dossiê e ícones SVG (traçados 24x24) */
+    view:function(){return S.view},
+    setView:function(v){if(!S.open)open(undefined,v);else setView(v)},
+    quadroHost:function(){build();return $r('#bnQuadro')},
+    show:show,
+    icons:{cat:CATS.reduce(function(m,c){m[c.id]=c.svg;return m},{}),status:STATS.reduce(function(m,c){m[c.id]=c.svg;return m},{})},
     categories:CATS.map(function(c){return{id:c.id,label:c.label}}),
     statuses:STATS.map(function(c){return{id:c.id,label:c.label}}),
     /* lista os documentos ({scope:'shared'|'personal'}), já normalizados */
