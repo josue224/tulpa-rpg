@@ -35,10 +35,12 @@ E.tierLimits=st=>{st=Number(st)||1;return{five:(STAGES[st]||STAGES[1]).extra,ten
 /* E.skillTier, E.tierUsage, E.limitsFor e as vertentes ficam no motor (js/10) */
 E.baseSkill=()=>0; /* todas as perícias começam em 0 */
 /* attrOv: atributo escolhido para este teste (o padrão da perícia continua sendo o SKILL_ATTR) */
-/* opts.vert (id da vertente): perícia, grau, atributo e generalismo vêm de E.vertCalc */
+/* opts.vert (id da vertente): perícia, grau, atributo e generalismo vêm de E.vertCalc.
+   opts.generalista (id da perícia): "outra área" dela, via E.generalistCalc */
 function skillCalc3(ch,skill,attrOv,opts){
-  const vc=opts?.vert?E.vertCalc(ch.data||{},opts.vert,{vocList:ch.vocations||vocations,attr:attrOv}):null;
-  if(vc){skill=vc.skill;attrOv=vc.attr}
+  const vo={vocList:ch.vocations||vocations,attr:attrOv};
+  const vc=opts?.vert?E.vertCalc(ch.data||{},opts.vert,vo):opts?.generalista?E.generalistCalc(ch.data||{},opts.generalista,{...vo,skill}):null;
+  if(vc){skill=vc.skill;attrOv=vc.attr||attrOv}
   const d=ch.data||{},std=SKILL_ATTR[skill],attr=attrOv&&ATTRS.includes(attrOv)?attrOv:std,SA=attr===std?SKILL_ATTR:{...SKILL_ATTR,[skill]:attr},m=E.computeMods(d),n=E.diceFor(d,skill,SA,m);
   const vlist=(ch.vocations||vocations),v=vlist.find(x=>x.name===d.vocation);
   let voc=0;if(v&&(v.skills||[]).map(s=>s==='Percepção'?'Observação':s).includes(skill)){const y=Number(d.serviceYears)||0;voc=y>=40?15:y>=10?10:5}
@@ -56,16 +58,16 @@ function skillCalc3(ch,skill,attrOv,opts){
   const isAtk=ATTACK_SKILLS.includes(skill),isDodge=skill==='Esquiva'||skill==='Reflexo';
   const combatFlat=(isAtk?m.atk:0)+(isDodge?m.dodge:0);
   const dis=m.disadv.has('ataque')&&isAtk||m.disadvSkills.has(skill)||(m.disadv.has('ataqueDistancia')&&['Armas de Disparo','Arremesso'].includes(skill));
-  return{vert:vc,blocked:!!vc&&!vc.permitido,attr,std,SA,n,base,start,tier:extra,voc,persistent,once,onceList,team,combatFlat,dis,mods:m,bonus:base+persistent+once+team+combatFlat};
+  return{skill,vert:vc,blocked:!!vc&&!vc.permitido,attr,std,SA,n,base,start,tier:extra,voc,persistent,once,onceList,team,combatFlat,dis,mods:m,bonus:base+persistent+once+team+combatFlat};
 }
 window.tulpaSkillCalc=skillCalc3;
 /* a ficha usa os mesmos cálculos */
 currentAttr=skill=>E.diceFor(data,skill,SKILL_ATTR);
 skillBonus=skill=>{const c=skillCalc3({data,vocations,tracks},skill);return c.base+c.persistent+c.combatFlat};
 pendingTalentBonus=skill=>skillCalc3({data,vocations,tracks},skill).once;
-function doRoll(ch,skill,{label,extraBonus=0,forceDis=false,adv=false,attr}={}){
-  const c=skillCalc3(ch,skill,attr),d=ch.data;
-  const r=E.rollTest(d,skill,c.SA,{mods:c.mods,bonus:c.bonus+extraBonus,disadv:c.dis||forceDis,adv,consumeDelta:true});
+function doRoll(ch,skill,{label,extraBonus=0,forceDis=false,adv=false,attr,vert,generalista}={}){
+  const c=skillCalc3(ch,skill,attr,{vert,generalista}),d=ch.data;
+  const r=E.rollTest(d,c.skill,c.SA,{mods:c.mods,bonus:c.bonus+extraBonus,disadv:c.dis||forceDis,adv,consumeDelta:true});
   r.calc=c;return r;
 }
 /* consome efeitos "uso único" e dado extra ao rolar */
@@ -79,16 +81,22 @@ function consumeOnce(d,calc,{attack=false}={}){
   d.statuses=(d.statuses||[]).filter(s=>!(STATUS_BY_ID[s.id]?.once));
   d.activeTalents=(d.activeTalents||[]).filter(id=>d.activeEffects.some(e=>e.source===id));
 }
-function rollModal(skill,r,title){
-  const sg=n=>(n>=0?'+':'')+n,c=r.calc;
-  openModal('ROLAGEM DE APTIDÃO',`${skill}${c.attr!==c.std?' ('+c.attr+')':''} · ${r.n}d20 ${sg(r.bonus)}`,`<div class="roll-result">${c.attr!==c.std?`<div class="sub">Atributo trocado: <b>${esc(c.attr)}</b> no lugar de ${esc(c.std)}</div>`:''}<div class="sub">${r.mode==='normal'?'Maior resultado mantido':'<b>'+r.mode.toUpperCase()+'</b> — duas rolagens, vale a '+(r.mode==='desvantagem'?'pior':'melhor')}${r.delta?' · dado extra/penalidade '+sg(r.delta):''}</div><div class="dice">${r.dice.map(x=>`<span class="die ${x===r.best?'best':'discard'}">${x}</span>`).join('')}${r.alt?'<span class="sub"> | </span>'+r.alt.map(x=>`<span class="die discard">${x}</span>`).join(''):''}</div><div class="bigresult">${r.total}</div><div class="sub">Dado ${r.best} ${sg(r.bonus)} = ${r.total}</div>${c.mods.sources.length?`<div class="sub" style="margin-top:6px">Modificadores: ${c.mods.sources.map(esc).join(' · ')}</div>`:''}</div>`,'Fechar',()=>closeModal());
+function rollModal(skill,r,extra){
+  const sg=n=>(n>=0?'+':'')+n,c=r.calc,swap=c.attr!==c.std&&!c.vert;
+  openModal('ROLAGEM DE APTIDÃO',`${skill}${c.attr!==c.std||c.vert?' ('+c.attr+')':''} · ${r.n}d20 ${sg(r.bonus)}`,`<div class="roll-result">${swap?`<div class="sub">Atributo trocado: <b>${esc(c.attr)}</b> no lugar de ${esc(c.std)}</div>`:''}${extra?`<div class="sub">${esc(extra)}</div>`:''}<div class="sub">${r.mode==='normal'?'Maior resultado mantido':'<b>'+r.mode.toUpperCase()+'</b> — duas rolagens, vale a '+(r.mode==='desvantagem'?'pior':'melhor')}${r.delta?' · dado extra/penalidade '+sg(r.delta):''}</div><div class="dice">${r.dice.map(x=>`<span class="die ${x===r.best?'best':'discard'}">${x}</span>`).join('')}${r.alt?'<span class="sub"> | </span>'+r.alt.map(x=>`<span class="die discard">${x}</span>`).join(''):''}</div><div class="bigresult">${r.total}</div><div class="sub">Dado ${r.best} ${sg(r.bonus)} = ${r.total}</div>${c.mods.sources.length?`<div class="sub" style="margin-top:6px">Modificadores: ${c.mods.sources.map(esc).join(' · ')}</div>`:''}</div>`,'Fechar',()=>closeModal());
 }
-rollSkill=function(skill,attr){
-  const ch={data,vocations,tracks},r=doRoll(ch,skill,{attr});
-  consumeOnce(data,r.calc);save();renderTalents();renderSkills();rollModal(skill,r);
+/* opts: {vert} especialização · {generalista} "outra área" da perícia · {label} nome no resultado e no log.
+   O contexto social escolhido na ficha (T3.socialTake) entra como bônus. */
+rollSkill=function(skill,attr,opts={}){
+  const ch={data,vocations,tracks},pre=skillCalc3(ch,skill,attr,opts);
+  if(pre.blocked){toast('Essa especialização exige treino específico.');return null}
+  const soc=T3.socialTake?.(pre.skill),r=doRoll(ch,skill,{attr,vert:opts.vert,generalista:opts.generalista,extraBonus:soc?.bonus||0});
+  const label=opts.label||r.calc.skill;
+  consumeOnce(data,r.calc);save();renderTalents();renderSkills();rollModal(label,r,soc?.bonus?`Bônus social: +${soc.bonus} ${soc.attr} (${soc.motivo})`:'');
   window.tulpaRollFx?window.tulpaRollFx($('modalBody'),{d20:true,crit:r.best===20,fumble:r.best===1,who:[data.name]}):fx3('dice');
-  T3.shareSheetRoll?.(skill,r);
-  T3.narrateRoll?T3.narrateRoll({name:data.name,skill,dice:[r.best],total:r.total}):T3.perseusReact?.(r.best===20?'nat20':(r.best===1?'nat1':''));
+  T3.shareSheetRoll?.(label,r);
+  T3.narrateRoll?T3.narrateRoll({name:data.name,skill:label,dice:[r.best],total:r.total}):T3.perseusReact?.(r.best===20?'nat20':(r.best===1?'nat1':''));
+  return r;
 };
 
 /* ---- persistência de qualquer ficha que eu controle ---- */
@@ -122,8 +130,10 @@ const inScene=ch=>ch&&ch.inScene!==false;
 /* ---- recursos com +/− (corrige o bug dos sliders) ---- */
 function setResource(key,value,{silent=false}={}){
   const s=dmax(data),max={vital:s.vt,lucidity:s.luc,essence:s.es}[key];
-  const old=Number(data[key])||0,nv=Math.max(0,Math.min(max,Math.trunc(Number(value)||0)));
+  const old=Number(data[key])||0;let nv=Math.max(0,Math.min(max,Math.trunc(Number(value)||0)));
   if(nv===old)return;
+  /* PRE: a blindagem reduz o 1º dano de Lucidez da cena */
+  if(key==='lucidity'&&nv<old){const sh=E.lucidityShield(data,old-nv);if(sh.applied){nv=old-sh.final;if(!silent)toast(`Blindagem de Lucidez: dano ${sh.raw} → ${sh.final}. Usada nesta cena.`)}}
   data[key]=nv;
   if(key==='lucidity'&&nv<old){
     if(data.extase?.on&&!data.collapsePending){save();T3.extaseTest?.(old-nv);return}

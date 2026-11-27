@@ -1,0 +1,141 @@
+/* ==========================================================================
+   TULPA RPG — Onda 9 · Ficha: benefícios dos atributos, Blindagem de Lucidez,
+   contexto social e Especializações. Carrega DEPOIS de css/14-polish.css.
+   Só layout: cor, fonte e raio vêm das variáveis da estética.
+   ========================================================================== */
+
+/* ---------- 1. Atributos e benefícios ---------- */
+body.sheet-view #attributes.grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,232px),1fr));align-items:stretch}
+body.sheet-view #attributes .attr-card{min-width:0}
+body.sheet-view #attributes .counter button{min-width:var(--touch,44px);min-height:var(--touch,44px)}
+html body.sheet-view #attributes .attr-card .attr-roll{min-height:var(--touch,44px);margin-top:auto}
+.pv{display:flex;flex-direction:column;margin:0;padding:0}
+.pv-row{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--sp-2);
+  padding:var(--sp-2) 0;border-top:1px solid var(--border-subtle,var(--line,#2a3442));
+}
+.pv-row dt{margin:0;font-size:var(--fs-xs,12px);font-weight:700;line-height:1.3;color:var(--text,#edf2f7)}
+.pv-row dt small{display:block;margin-top:2px;font-size:var(--fs-2xs,11px);font-weight:500;line-height:1.35;color:var(--ink-dim,var(--text,#edf2f7))}
+.pv-row dd{margin:0;font-size:var(--fs-lg,17px);font-weight:800;color:var(--text,#edf2f7);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pv-row[data-tone="warn"]{
+  margin-inline:calc(var(--sp-2) * -1);padding-inline:var(--sp-2);
+  border-left:3px solid var(--amber,#d9902f);
+  background:color-mix(in srgb,var(--amber,#d9902f) 16%,transparent);
+}
+.pv-row[data-tone="warn"] strong{font-weight:800;color:var(--text,#edf2f7)}
+
+/* ---------- 2. Blindagem de Lucidez (interruptor) ---------- */
+html body .pv-shield{
+  display:flex;align-items:center;gap:var(--sp-2);width:100%;min-height:var(--touch,44px);
+  margin:var(--sp-2) 0 0;padding:var(--sp-2);text-align:left;cursor:pointer;font:inherit;
+  color:var(--text,#edf2f7);background:transparent;
+  border:1px solid var(--border-subtle,var(--line,#2a3442));border-radius:var(--shell-r,10px);
+}
+html body .pv-shield[aria-checked="true"]{border-color:var(--border-strong,var(--accent,#b7d7d5));background:var(--surf-active,rgba(255,255,255,.08))}
+html body .pv-shield:disabled{cursor:not-allowed;opacity:.7}
+.pv-shield:focus-visible{outline:2px solid var(--accent,#b7d7d5);outline-offset:2px}
+.pv-track{flex:none;position:relative;width:34px;height:20px;border-radius:99px;border:2px solid var(--text,#edf2f7)}
+.pv-track i{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--text,#edf2f7);opacity:.55;transition:transform .16s ease}
+.pv-shield[aria-checked="true"] .pv-track i{transform:translateX(14px);opacity:1}
+.pv-stxt{display:grid;min-width:0}
+.pv-stxt b{font-size:var(--fs-xs,12px);line-height:1.3}
+.pv-stxt small{font-size:var(--fs-2xs,11px);line-height:1.35;color:var(--ink-dim,var(--text,#edf2f7))}
+#mindBody>.panel>.pv-shield{max-width:360px}
+
+/* ---------- 3. Seletor Perícias × Especializações e contexto social ---------- */
+#tab-skills>.vt-top{display:flex;flex-direction:column;gap:var(--sp-2);margin:0}
+body.sheet-view #tab-skills[data-view="esp"]>.panel:not(#vtPanel,#vtSocial){display:none!important}
+body.sheet-view #tab-skills:not([data-view="esp"])>#vtPanel,
+#tab-skills:not([data-view="esp"])>#vtPanel{display:none!important}
+.vt-seg{display:flex;flex-wrap:wrap;gap:var(--sp-1)}
+html body .vt-seg button{
+  min-height:var(--touch,44px);padding:var(--sp-2) var(--sp-3);cursor:pointer;
+  font:600 var(--fs-sm,13px)/1.25 var(--f-ui,inherit);
+  color:var(--text,#edf2f7);background:var(--surf-1,var(--panel,#11151d));
+  border:1px solid var(--border-subtle,var(--line,#2a3442));border-radius:var(--shell-r,10px);
+}
+html body .vt-seg button:hover{border-color:var(--border-strong,var(--accent,#b7d7d5))}
+html body .vt-seg button[aria-pressed="true"]{
+  background:color-mix(in srgb,var(--accent,#b7d7d5) 22%,var(--surf-1,var(--panel,#11151d)));
+  border-color:var(--accent,#b7d7d5);box-shadow:inset 0 -3px 0 var(--accent,#b7d7d5);
+}
+.vt-seg button:focus-visible{outline:2px solid var(--accent,#b7d7d5);outline-offset:2px}
+.vt-views button{flex:1 1 160px}
+.vt-count{display:inline-block;margin-left:var(--sp-1);font-weight:800;font-variant-numeric:tabular-nums}
+.vt-count::before{content:"("}
+.vt-count::after{content:")"}
+.vt-alert{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--sp-2);
+  margin:0;padding:var(--sp-2) var(--sp-3);
+  font-size:var(--fs-sm,13px);line-height:var(--lh-body,1.5);color:var(--text,#edf2f7);
+  background:color-mix(in srgb,var(--amber,#d9902f) 18%,var(--surf-1,var(--panel,#11151d)));
+  border:1px solid var(--amber,#d9902f);border-radius:var(--shell-r,10px);
+}
+.vt-alert[hidden]{display:none}
+.vt-body>.vt-alert{display:block}
+html body .vt-alert .btn{min-height:var(--touch,44px)}
+.vt-social-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2) var(--sp-3)}
+.vt-social .vt-note{margin:var(--sp-2) 0 0}
+
+/* ---------- 4. Lista de especializações ---------- */
+.vt-counters{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin:var(--sp-2) 0 var(--sp-3)}
+.vt-tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--sp-3);margin-bottom:var(--sp-3)}
+.vt-search{flex:1 1 240px;margin:0}
+html body #vtPanel :is(select,input[type="search"]){width:100%;min-height:var(--touch,44px);margin:0}
+.vt-group{margin:var(--sp-4) 0 var(--sp-2);font-size:var(--fs-md,14.5px)}
+.vt-p{
+  margin:0 0 var(--sp-2);min-width:0;
+  border:1px solid var(--border-subtle,var(--line,#2a3442));border-radius:var(--shell-r,10px);
+}
+.vt-p[open]{border-color:var(--border-strong,var(--accent,#b7d7d5))}
+.vt-p>summary{
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2);
+  min-height:var(--touch,44px);padding:var(--sp-2) var(--sp-3);cursor:pointer;list-style:none;
+}
+.vt-p>summary::-webkit-details-marker{display:none}
+.vt-p>summary::before{content:"▸";flex:none;width:12px;color:var(--text,#edf2f7)}
+.vt-p[open]>summary::before{content:"▾"}
+.vt-p>summary:hover{background:var(--surf-hover,rgba(255,255,255,.05))}
+.vt-p>summary:focus-visible{outline:2px solid var(--accent,#b7d7d5);outline-offset:-2px}
+.vt-name{font-weight:800;font-size:var(--fs-md,14.5px);color:var(--text,#edf2f7)}
+.vt-chips{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--sp-1);margin-left:auto;min-width:0}
+.vt-chip,.vt-badge{
+  display:inline-block;padding:2px var(--sp-2);
+  font-size:var(--fs-2xs,11px);font-weight:700;line-height:1.45;color:var(--text,#edf2f7);
+  border:1px solid var(--border-subtle,var(--line,#2a3442));border-radius:999px;
+}
+.vt-chip.on,.vt-badge.on{border-color:var(--accent,#b7d7d5);background:color-mix(in srgb,var(--accent,#b7d7d5) 20%,transparent)}
+.vt-chip.warn,.vt-badge.vt-req{border-color:var(--amber,#d9902f);background:color-mix(in srgb,var(--amber,#d9902f) 18%,transparent)}
+.vt-badge:not(.on,.vt-req){border-style:dashed}
+.vt-body{display:flex;flex-direction:column;gap:var(--sp-2);padding:0 var(--sp-3) var(--sp-3)}
+.vt-cost{margin:0}
+.vt-row,.vt-gen{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);align-items:center;gap:var(--sp-3);
+  padding:var(--sp-3);
+  border:1px solid var(--border-subtle,var(--line,#2a3442));border-radius:var(--shell-r,10px);
+}
+.vt-row[data-st="treinado"]{border-left:3px solid var(--accent,#b7d7d5)}
+.vt-row[data-st="pendente"]{border-left:3px solid var(--amber,#d9902f)}
+.vt-gen{border-style:dashed;border-color:var(--border-strong,var(--accent,#b7d7d5))}
+.vt-info{min-width:0}
+.vt-info h4{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2);margin:0 0 var(--sp-1);font-size:var(--fs-lg,17px);line-height:1.35;color:var(--text,#edf2f7)}
+.vt-info h4 :is(.t3-tier,.vt-badge){font-family:var(--f-ui,inherit);font-size:var(--fs-2xs,11px);letter-spacing:0;text-transform:none}
+.vt-div{font-family:system-ui,sans-serif}
+.vt-info p{margin:var(--sp-1) 0 0;font-size:var(--fs-xs,12px);line-height:var(--lh-body,1.5);color:var(--ink-dim,var(--text,#edf2f7));overflow-wrap:anywhere}
+.vt-info .vt-calc{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--sp-1) var(--sp-2)}
+.vt-calc b{font-size:var(--fs-lg,17px);color:var(--text,#edf2f7);font-variant-numeric:tabular-nums;white-space:nowrap}
+.vt-ctl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:end;gap:var(--sp-2)}
+.vt-ctl .vt-f{margin:0;min-width:0}
+.vt-fixed{display:grid;gap:var(--sp-1)}
+.vt-fixed>b{display:flex;align-items:center;min-height:var(--touch,44px);font-size:var(--fs-sm,13px);color:var(--text,#edf2f7)}
+.vt-fixed>.field-label{font-size:var(--fs-2xs,11px)}
+html body #vtPanel .vt-ctl .btn{grid-column:1 / -1;min-height:var(--touch,44px);width:100%;justify-content:center;white-space:normal}
+.vt-gen .vt-ctl .vt-f{grid-column:1 / -1}
+html body #vtPanel .btn:disabled{cursor:not-allowed;opacity:.6}
+
+@media (max-width:860px){
+  .vt-row,.vt-gen{grid-template-columns:minmax(0,1fr)}
+  .vt-chips{justify-content:flex-start;margin-left:0;flex-basis:100%;padding-left:20px}
+  .vt-social-row .vt-seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+}
+@media (prefers-reduced-motion:reduce){.pv-track i{transition:none}}

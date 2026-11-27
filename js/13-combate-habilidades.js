@@ -52,7 +52,7 @@ function applyFxLocal(ch,fx){
       else if(f.t==='item'){E.autoPlace(d,{...f.item,id:rid()})}
       else if(f.t==='temp')d.vitalTemp=Math.max(Number(d.vitalTemp)||0,f.n||0);
       else if(f.t==='es')d.essence=Math.min(s.es,(Number(d.essence)||0)+(f.n||0));
-      else if(f.t==='luc')d.lucidity=Math.min(s.luc,(Number(d.lucidity)||0)+(f.n||0));
+      else if(f.t==='luc'){if(f.n<0){const r=E.applyLucidityDamage(d,-f.n);if(r.before>0&&r.after<=0)d.collapsePending=true}else d.lucidity=Math.min(s.luc,(Number(d.lucidity)||0)+(f.n||0))}
       else if(f.t==='status'){const has=d.statuses.find(x=>x.id===f.id);if(f.on&&!has)d.statuses.push({id:f.id,at:Date.now(),...(f.turns?{turnsLeft:f.turns}:{})});else if(f.on&&has&&f.turns)has.turnsLeft=Math.max(Number(has.turnsLeft)||0,f.turns);if(!f.on&&has)d.statuses=d.statuses.filter(x=>x.id!==f.id)}
     });
     if(((Number(d.vital)||0)>0||(Number(d.vitalTemp)||0)>0)&&!E.isDead(d))d.statuses=d.statuses.filter(x=>x.id!=='agonia');
@@ -609,7 +609,7 @@ async function startAttack(ch,{retal=false}={}){
   const card=(w,id,tag)=>`<button class="t3-weapon" data-w="${id}"><b>${esc(w.name)}${d.favWeaponId&&d.favWeaponId===id?' ★':''}</b><span>${esc(w.skill)} · dano <b>${esc(w.dado)}</b> · crítico ${w.critMin>=20?'20':w.critMin+'-20'}${w.area?' · área':''}</span><span class="sub">${(w.effects||[]).map(e=>(STATUS_BY_ID[e.status]?.name||e.status)+' ('+(e.when==='crit'?'no crítico':'no acerto')+')').join(' · ')||'sem estado'}${tag?' · '+tag:''}</span></button>`;
   openModal('ATACAR',nm(ch),`<p class="sub">Escolha a arma do saque rápido (mãos, cintura/coldre, bandoleira) ou ataque desarmado.</p><div class="t3-weapons">${quick.map(i=>card(i.w,i.id,LOCS[i.loc])).join('')}${card(UNARMED,'__soco','1d2 · Briga')}</div>${pack.length&&!retal?`<h4 style="margin-top:12px">Sacar da mochila (gasta a ação)</h4><div class="t3-weapons">${pack.map(i=>`<button class="t3-weapon" data-draw="${i.id}"><b>${esc(i.name)}</b><span>${esc(i.w.skill)} · ${esc(i.w.dado)} · crít. ${i.w.critMin>=20?'20':i.w.critMin+'-20'}</span><span class="sub">${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>`:''}${retal?'<div class="notice t3-alert">Contra-ataque de Retaliação: <b>não pode ser esquivado</b>.</div>':''}<label class="t3-check" style="margin-top:10px;${retal?'display:none':''}"><input type="checkbox" id="atkSurprise"> Ataque de surpresa (o alvo está desprevenido e só pode rolar Reflexo)</label>`,'Fechar',closeModal);
   $$('[data-w]').forEach(b=>b.onclick=async()=>{
-    const surprise=!!$('atkSurprise')?.checked,id=b.dataset.w;const it0=quick.find(i=>i.id===id);const w=id==='__soco'?UNARMED:(it0?{...it0.w,_itemId:it0.id,_ammo:!!it0.useAmmo}:null);closeModal();_modalResolve=null;
+    const surprise=!!$('atkSurprise')?.checked,id=b.dataset.w;const it0=quick.find(i=>i.id===id);const w=id==='__soco'?UNARMED:(it0?{peso:it0.peso,...it0.w,_itemId:it0.id,_ammo:!!it0.useAmmo}:null);closeModal();_modalResolve=null;
     if(!w)return;
     const area=w.area;
     const p=await pickTargets({title:'Alvo do ataque · '+w.name,hint:area?'Arma em área: marque todos os atingidos.':'Escolha o alvo (jogador ou NPC).',multi:area,exclude:[ch.id],skipDead:true,preset:retal&&d.retalTarget?[d.retalTarget]:[]});
@@ -836,7 +836,8 @@ adjustResource=function(charId,key,delta){
   if(!canEdit(ch)){toast('Você só pode alterar seus próprios recursos.');return}
   if(controls(ch)&&ensureActive(ch)){setResource(key,(Number(data[key])||0)+delta);renderTable();return}
   const s=dmax(ch.data),max={vital:s.vt,lucidity:s.luc,essence:s.es}[key],old=Number(ch.data[key])||0;
-  ch.data[key]=Math.max(0,Math.min(max,old+delta));
+  if(key==='lucidity'&&delta<0){const r=E.applyLucidityDamage(ch.data,-delta);if(r.applied)toast(`Blindagem de Lucidez de ${nm(ch)}: dano ${r.raw} → ${r.final}.`)}
+  else ch.data[key]=Math.max(0,Math.min(max,old+delta));
   if(key==='lucidity'&&ch.data[key]<=0&&old>0)ch.data.collapsePending=true;
   if(key==='vital'&&ch.data.vital<=0&&old>0&&!(ch.data.statuses||[]).some(x=>(x.id||x)==='agonia'))E.startDying(ch.data);
   persistRemote(ch).catch(e=>fail3('atualizar recursos',e));renderTable();

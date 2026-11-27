@@ -94,7 +94,7 @@ renderSkills=function(){
   const q=($('skillSearch').value||'').toLowerCase(),ch={data,vocations,tracks};
   data.extraSkills=data.extraSkills||[];data.skillUpgrades=data.skillUpgrades||{};
   $('skillGrid').innerHTML=BASE_SKILLS.filter(s=>s.toLowerCase().includes(q)).map(s=>{const c=skillCalc3(ch,s);
-    return `<div class="skill"><div class="skill-info"><div class="skill-name">${esc(s)}${c.tier?` <span class="t3-tier t${c.tier}">${TIER_LBL[c.tier]}</span>`:''}</div><div class="skill-attr">${esc(SKILL_ATTR[s])} · ${c.n}d20 · base +${c.start}${c.voc?' · vocação +'+c.voc:''}${c.tier?' · extra +'+c.tier:''}${c.persistent+c.once?' · talento '+sign(c.persistent+c.once):''}</div></div><div class="skill-right"><span class="skill-val">${sign(c.bonus)}</span><button class="roll" data-roll="${esc(s)}">D20</button></div></div>`}).join('');
+    return `<div class="skill"><div class="skill-info"><div class="skill-name">${esc(s)}${c.tier?` <span class="t3-tier t${c.tier}">${TIER_LBL[c.tier]}</span>`:''}</div><div class="skill-attr">${esc(SKILL_ATTR[s])} · ${c.n}d20 · base +${c.start}${c.voc?' · vocação +'+c.voc:''}${c.tier?(E.legacyTier(data,s)>=c.tier?' · extra +':' · especialização +')+c.tier:''}${c.persistent+c.once?' · talento '+sign(c.persistent+c.once):''}</div></div><div class="skill-right"><span class="skill-val">${sign(c.bonus)}</span><button class="roll" data-roll="${esc(s)}">D20</button></div></div>`}).join('');
   $$('[data-roll]',$('skillGrid')).forEach(b=>b.onclick=()=>rollSkill(b.dataset.roll));
   const L=E.limitsFor(data),U=E.tierUsage(data),free=!!data.freeMode;
   $('extraSkillsLabel').textContent=free?`Modo Livre · ${U.five} escolhas +5`:`${U.five} / ${L.five} escolhas +5${L.intExtra?` (+${L.intExtra} por Inteligência)`:''}`;
@@ -115,10 +115,10 @@ renderSkills=function(){
 $('addSkillBonus').onclick=()=>{
   const s=$('addSkillSelect').value,L=E.limitsFor(data),U=E.tierUsage(data);data.extraSkills=data.extraSkills||[];
   if(!data.freeMode&&U.five>=L.five){toast('Você já usou todas as escolhas de +5 deste estágio.');return}
-  if(E.skillTier(data,s)>=5){toast(s+' já tem bônus extra. Use ▲ para subir de grau.');return}
+  if(E.skillTier(data,s)>=5){toast(s+(E.legacyTier(data,s)?' já tem bônus extra. Use ▲ para subir de grau.':' já tem especialização treinada. Ajuste o grau em Especializações.'));return}
   data.extraSkills.push(s);save();
 };
-$('removeSkillBonus').onclick=()=>{const s=$('addSkillSelect').value;if(!E.skillTier(data,s)){toast('Essa perícia não tem bônus extra.');return}
+$('removeSkillBonus').onclick=()=>{const s=$('addSkillSelect').value;if(!E.legacyTier(data,s)){toast(E.skillTier(data,s)?'Esse treino está numa especialização: mude em Especializações.':'Essa perícia não tem bônus extra.');return}
   const ups=data.skillUpgrades||{};delete ups[s];if(data.free10===s)data.free10='';const i=(data.extraSkills||[]).lastIndexOf(s);if(i>=0)data.extraSkills.splice(i,1);save()};
 
 /* ---------- Modo Criação Livre ("Seu Personagem Teria", pág. 3) ---------- */

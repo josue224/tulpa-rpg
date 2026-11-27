@@ -460,6 +460,16 @@ E.vertCalc=(d,id,{vocList,attr}={})=>{
   return{id,def,pericia:def.pericia,skill:def.skill,status,permitido,grau,voc,bonus:permitido?grau+voc:0,attr:at,dice:Math.max(1,E.attr(d,at)),
     efeitoAtivo:status==='treinado',efeitos:status==='treinado'?(def.effects||[]):[]};
 };
+/* "Outra área" da perícia sem escolher vertente: metade do melhor grau (+V inteiro), sem efeito tático.
+   Só para quem tem ao menos 1 vertente treinada nela (senão null). Treino antigo pendente vale se for maior.
+   attr=null: quem chama usa o atributo padrão da perícia. */
+E.generalistCalc=(d,key,{skill,vocList,attr}={})=>{
+  const p=E.pericia(key);if(!p)return null;
+  const melhor=Math.max(0,...E.trainedVerts(d,p.id).map(x=>x.grau));if(!melhor)return null;
+  const half=E.generalist(melhor),pend=Math.max(0,...p.skills.map(s=>E.legacyTier(d,s)));
+  const usaPend=pend>0&&pend>=half,grau=usaPend?pend:half,voc=E.vocPlus(d,p.skills,vocList);
+  return{id:null,def:null,pericia:p.id,skill:skill||(p.skills.includes(key)?key:p.skills[0]),status:usaPend?'pendente':'generalista',permitido:true,grau,voc,bonus:grau+voc,attr:attr||null,melhor,efeitoAtivo:false,efeitos:[]};
+};
 /* efeitos táticos ativos (só vertentes treinadas). Filtros opcionais: quando, alvo, vert (só aquela) */
 E.vertEffects=(d,tipo,{quando,alvo,vert}={})=>E.trainedVerts(d).filter(x=>!vert||x.id===vert)
   .flatMap(x=>(x.def.effects||[]).filter(e=>(!tipo||e.tipo===tipo)&&(!quando||e.quando===quando)&&(!alvo||e.alvo===alvo)).map(effect=>({id:x.id,def:x.def,grau:x.grau,effect})));

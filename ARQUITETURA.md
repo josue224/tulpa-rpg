@@ -29,8 +29,8 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
 <head>   css/01-base-layout.css  →  supabase-js (CDN)
 <body>   markup (portal, app, modais)  →  scripts/CSS intercalados na MESMA posição dos blocos originais:
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
-         → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento)
-         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas) → js/60d → js/60e (filtros Arcade) → js/61   (antigo closure; 61 = inicialização, sempre por último)
+         → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras)
+         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas) → js/60d → js/60e (filtros Arcade) → js/60g (Ficha: regras) → js/61   (antigo closure; 61 = inicialização, sempre por último)
 ```
 
 Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` original, para manter a cascata idêntica (inclusive em relação a estilos que o JS injeta no `<head>`).
@@ -53,6 +53,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 12 | `12-docs.css` | novo | 3 KB | **Onda 3 · Manual Vivo e Alterações do Sistema**: no desktop viram área de trabalho ao lado do rail (índice lateral fixo, coluna de leitura de 76ch, busca em destaque, lista alinhada). No celular mantém a tela cheia de antes. Busca com ícone e contagem de resultados, campos de 44px, placeholder com contraste ≥ 5:1 nos 4 temas testados, cabeçalho do Manual em duas linhas no celular, Alterações em 2 colunas alinhadas no desktop. Sem JS novo. |
 | 13 | `13-arcade-mapa.css` | novo | 3 KB | **Onda 4 · Tulpa Arcade e mapa**: vitrine do Arcade com faixa de filtros limpa, cards de mesma altura com botões alinhados, ordem mobile (filtros → salas → jogos); no celular a barra de ferramentas do mapa vira uma faixa única rolável. Não mexe nos jogos em tela cheia. **v2:** vitrine e Quarto do Perseus herdam fundo e texto da estética (antes o fundo era fixo escuro e quebrava nos temas claros), chips de dificuldade e botão voltar com cores do tema, abas do Perseus em linha própria, no celular os jogos vêm antes de Salas e Placar, estilos da barra de filtros do `js/60e`. |
 | 14 | `14-polish.css` | novo | 2 KB | **Onda 5 · Polimento**: com estética/paleta ativa (`body.t3-pal`), o texto das abas da ficha e do topbar passa a seguir `--text` (antes usava cores fixas do tema clássico e ficava ilegível em estéticas claras); foco de teclado visível nos controles novos. |
+| 15 | `15-ficha-regras.css` | novo | 11 KB | **Onda 9**: benefícios dos atributos, interruptor da Blindagem de Lucidez, seletor Perícias/Especializações, contexto social e lista de vertentes (só layout; alvos de 44 px; 390 px). |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
@@ -127,6 +128,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60c | `60c-fichas.js` | novo | 4 KB | **Onda 2 · Fichas**: cria o cabeçalho `#sheetHead60` (Vital/Lucidez/Essência) como espelho SOMENTE LEITURA de `#stats`, mede o topbar (`--tb-h`) e o cabeçalho fixo (`--sh-h`), marca o botão “← Central” (`.tb-central60`) e mantém a aba ativa visível. IIFE; roda ANTES do `61`. |
 | 60e | `60e-arcade-filtros.js` | novo | 4 KB | **Onda 4 · Filtros do Arcade**: barra com busca e filtros por modo (Solo, Contra o Perseus, Mesa, PvP 1v1) acima da grade de jogos. Lê o modo dos botões de cada cartão e é recriada por um `MutationObserver` a cada volta à vitrine. Filtro lembrado em `localStorage t60e.arcFilter`. |
 | 60f | `60f-arcade-gfx.js` | novo | 40 KB | **Motor gráfico do Arcade** (`window.GFX60`): sprites e tilesets procedurais, paralaxe, luz/glow, partículas, hit-stop visual e HUD. Sem `<script>`: entra pela `QUEUE` do `60d`. Ver a seção própria abaixo. |
+| 60g | `60g-ficha-regras.js` | novo | 17 KB | **Onda 9 · Ficha**: envolve `renderAttributes`/`renderStats`/`renderMind`/`renderSkills`; expõe `T3.socialTake(perícia)` (bônus social da próxima rolagem) e `T3.renderEspecializacoes()`. Rola por `rollSkill(perícia,atributo,{vert|generalista,label})`. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
@@ -142,12 +144,12 @@ Tudo é `E.*`, puro (sem DOM). `d` = dados da ficha. Funções marcadas com * al
 | Máximos | `E.maxStats(d)` (= `dmax(d)`; CON no VT, PRE na ES) · `E.syncMax(d,antes)`* |
 | Bloqueio | `E.blockReduction(d,{vert,guarda})` → `{total,con,vert,guarda}` · `E.blockedDamage(dano,reducao)` · `E.GUARDA_BONUS` |
 | CON / INT / PER | `E.combustionLimit(d)` · `E.combustao(faltam,CON)` · `E.intExtraSkills(d)` · `E.limitsFor(d)` · `E.medicineBonus(d)` · `E.stealthDT(d)` · `E.restLucBonus(d)` (já no `E.restRoll`) |
-| PRE | `E.shieldReady(d)` · `E.lucidityShield(d,n,{consume})`* · `E.applyLucidityDamage(d,n,{ignoreShield})`* · `E.resetSceneFlags(d)`* (no fim da cena). Estado em `d.lucShieldUsed`. **Ainda não ligado aos botões de Lucidez (Onda 9).** |
+| PRE | `E.shieldReady(d)` · `E.lucidityShield(d,n,{consume})`* · `E.applyLucidityDamage(d,n,{ignoreShield})`* · `E.resetSceneFlags(d)`* (no fim da cena). Estado em `d.lucShieldUsed`. Ligado desde a Onda 9 (`setResource`, `adjustResource`, fx `luc`, recursos da Mesa). |
 | CAR / APA | `E.socialBonus(d,perícia,{primeira,dialogo,ancorar})` → `{bonus,attr,motivo}` |
 | Catálogo | `E.periciaDefs()` · `E.vertDefs()` · `E.vert(id)` · `E.pericia(chave)` · `E.vertsOf(chave)` · `list29/cur29('pericia'|'vert')` |
 | Treino | `E.skillTier(d,perícia)` · `E.legacyTier` · `E.trainedVerts(d,chave)` · `E.pendingVerts(d)` · `E.tierUsage(d)` |
 | Alterar treino* | `E.trainVert(d,id)` · `E.chooseVert(d,id,perícia)` · `E.setVertGrade(d,id,0|5|10|15)` · `E.checkVertGrade` · `E.removeVert(d,id)` → `{ok,msg}` |
-| Teste | `E.vertCalc(d,id,{vocList,attr})` → `{status,permitido,grau,voc,bonus,attr,dice,efeitoAtivo,efeitos}` · `E.generalist(n)` · `skillCalc3(ch,perícia,attr,{vert:id})` (com estados, talentos e Êxtase; `blocked`) |
+| Teste | `E.vertCalc(d,id,{vocList,attr})` → `{status,permitido,grau,voc,bonus,attr,dice,efeitoAtivo,efeitos}` · `E.generalist(n)` · `E.generalistCalc(d,chave,{skill,vocList,attr})` (outra área, sem escolher vertente) · `skillCalc3(ch,perícia,attr,{vert:id}|{generalista:perícia})` (com estados, talentos e Êxtase; `blocked`) |
 | Efeitos táticos | `E.vertEffects(d,tipo,{quando,alvo,vert})` · `E.vertSum(...)` (só vertentes treinadas) |
 | Ficha | `E.migrateSheet(d)`* (idempotente; `d.regrasV=8`) |
 
