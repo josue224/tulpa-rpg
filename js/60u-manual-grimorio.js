@@ -223,14 +223,15 @@
       else if(k==='End'){e.preventDefault();goPage(G.N-1,{user:true})}
     });
     /* tamanho, orientação, fontes e estética */
-    window.addEventListener('resize',function(){schedule(180)});
-    window.addEventListener('orientationchange',function(){schedule(260)});
-    if(window.ResizeObserver)safe(function(){new ResizeObserver(function(){schedule(160)}).observe(st)});
+    window.addEventListener('resize',function(){schedule(200)});
+    window.addEventListener('orientationchange',function(){schedule(300)});
+    if(window.ResizeObserver)safe(function(){new ResizeObserver(function(){if(G.mode==='grimorio'&&visible())schedule(200)}).observe(st)});
     if(document.fonts&&document.fonts.addEventListener)safe(function(){document.fonts.addEventListener('loadingdone',function(){schedule(160)})});
-    if(window.MutationObserver)safe(function(){new MutationObserver(function(){if(applyPaper()||G.mode==='grimorio')schedule(200)}).observe(document.body,{attributes:true,attributeFilter:['class','data-aesthetic','style','data-ae-glass']})});
+    if(window.MutationObserver)safe(function(){new MutationObserver(function(){if(!visible())return;if(applyPaper()||G.mode==='grimorio')schedule(200)}).observe(document.body,{attributes:true,attributeFilter:['class','data-aesthetic','style','data-ae-glass']})});
   }
 
   /* ---------- paginação ---------- */
+  function visible(){var w=$('man31');return !!(w&&!w.classList.contains('hide')&&!document.hidden)}
   function schedule(ms){clearTimeout(G.tmr);G.tmr=setTimeout(paginate,ms==null?120:ms)}
   function fontKey(){
     var m=$('grMeasure'),cs=getComputedStyle(m),b=getComputedStyle(document.body);
@@ -334,61 +335,80 @@
     }
     return {root:root,fill:fill};
   }
-  function mkUnit(root,m,meas){var w=wrapU(root);meas.appendChild(w);return {w:w,el:root,h:hOf(w),m:m}}
-  /* corta a unidade (linhas de tabela ou filhos do contêiner) para caber em `room`.
-     Devolve {first, rests[]}: `first` cabe na página atual; `rests` voltam à fila. */
-  function split(u,room,force,meas){
-    var chain=chainOf(u.el),core=chain[chain.length-1],tbl=core.tagName==='TABLE';
+  /* Medição única: as alturas dos itens de cada unidade alta saem de UM layout (com a margem entre
+     irmãos) e o corte é só aritmética. Medir a cada corte congelava a aba (cada leitura custa ms). */
+  function describe(el,H,depth){
+    var chain=chainOf(el),core=chain[chain.length-1],tbl=core.tagName==='TABLE';
     var items=tbl?Array.prototype.slice.call(core.tBodies[0].rows):kidsOf(core);
-    var f=shellOf(chain,core,tbl),fw=wrapU(f.root);meas.appendChild(fw);
-    var taken=0,deep=false;
+    var r=items.map(function(x){return x.nodeType===1?x.getBoundingClientRect():null});
+    var hs=[],sum=0;
     for(var i=0;i<items.length;i++){
-      f.fill.appendChild(items[i]);
-      if(hOf(fw)>room){
-        if(i===0&&force){
-          /* o primeiro item sozinho já passa da página: tenta quebrá-lo por dentro */
-          if(!tbl){var t=shellOf(chain,core,false);t.fill.appendChild(items[0]);
-            if(splittable(t.root)){deep=true;taken=0;break}
-            f.fill.appendChild(items[0])}
-          taken=1;
-        }else{f.fill.removeChild(items[i]);taken=i}
-        break;
-      }
-      taken=i+1;
+      var rc=r[i],nx=r[i+1],h=0;
+      if(rc)h=nx?Math.max(0,nx.top-rc.top):rc.height;
+      hs.push(h);sum+=h;
     }
-    if(u.w.parentNode)u.w.parentNode.removeChild(u.w);
+    var tot=el.getBoundingClientRect().height;
+    var subs=items.map(function(x,j){
+      if(tbl||depth>=3||hs[j]<=H||!splittable(x))return null;
+      var d=describe(x,H,depth+1);d.chain=chain.concat(d.chain);return d;
+    });
+    return {chain:chain,core:core,tbl:tbl,items:items,hs:hs,over:Math.max(0,tot-sum),subs:subs};
+  }
+  function sumTo(hs,n){var t=0;for(var i=0;i<n;i++)t+=hs[i];return t}
+  function restOf(I,k,m){
+    var r=shellOf(I.chain,I.core,I.tbl);
+    for(var j=k;j<I.items.length;j++)r.fill.appendChild(I.items[j]);
+    var hs=I.hs.slice(k);
+    return {w:wrapU(r.root),el:r.root,h:I.over+sumTo(hs,hs.length),m:m,info:{chain:I.chain,core:I.core,tbl:I.tbl,items:I.items.slice(k),hs:hs,over:I.over,subs:I.subs.slice(k)}};
+  }
+  /* corta a unidade para caber em `room`. Devolve {first, rests[]}: `first` cabe na página atual;
+     `rests` voltam à fila. Sem `first` e sem `rests`: nada coube (o chamador abre outra página). */
+  function split(u,room,force){
+    var I=u.info,items=I.items,adv=I.hs,n=items.length,over=I.over,taken=0,acc=over;
+    while(taken<n&&acc+adv[taken]<=room){acc+=adv[taken];taken++}
     var mm=contMeta(u.m),rests=[];
-    if(deep){
-      fw.remove();
-      var a=shellOf(chain,core,false);a.fill.appendChild(items[0]);rests.push(mkUnit(a.root,u.m,meas));
-      if(items.length>1){var rr=shellOf(chain,core,tbl);items.slice(1).forEach(function(x){rr.fill.appendChild(x)});rests.push(mkUnit(rr.root,mm,meas))}
-      return {first:null,rests:rests};
+    if(taken===0){
+      if(!force)return {first:null,rests:[]};
+      if(I.subs[0]){
+        /* o primeiro item sozinho passa da página: quebra-o por dentro */
+        var a=shellOf(I.chain,I.core,false);a.fill.appendChild(items[0]);
+        rests.push({w:wrapU(a.root),el:a.root,h:adv[0],m:u.m,info:I.subs[0]});
+        if(n>1)rests.push(restOf(I,1,mm));
+        return {first:null,rests:rests};
+      }
+      taken=1;
     }
-    if(taken<items.length){var r=shellOf(chain,core,tbl);items.slice(taken).forEach(function(x){r.fill.appendChild(x)});rests.push(mkUnit(r.root,mm,meas))}
-    if(taken===0){fw.remove();return {first:null,rests:rests}}
-    return {first:{w:fw,el:f.root,h:hOf(fw),m:u.m},rests:rests};
+    var f=shellOf(I.chain,I.core,I.tbl);
+    for(var j=0;j<taken;j++)f.fill.appendChild(items[j]);
+    if(taken<n)rests.push(restOf(I,taken,mm));
+    return {first:{w:wrapU(f.root),el:f.root,h:over+sumTo(adv,taken),m:u.m},rests:rests};
   }
 
+  var LIM_IT=30000,LIM_PG=1500,LIM_MS=6000;
   /* distribui as unidades (alturas reais medidas) em páginas de altura H */
   function flow(q,H,meas,onPush){
-    var pages=[],cur=null,used=0,i=0;
+    var pages=[],cur=null,used=0,i=0,guard=0,t0=Date.now();
     function np(){cur={u:[],m:null,tall:false};used=0}
     function brk(){if(cur.u.length)pages.push(cur);np()}
     function push(u){
       cur.u.push(u.w);if(!cur.m)cur.m=u.m;used+=u.h;
+      /* tira a unidade da área de medição: o layout das próximas medidas fica barato */
+      if(meas._frag&&u.w.parentNode===meas)meas._frag.appendChild(u.w);
       if(u.h>H)cur.tall=true;
       if(onPush)onPush(u,pages.length);
     }
     np();
     while(i<q.length){
+      /* travas rígidas: iterações, páginas e tempo; estouro cai no Modo Rolagem */
+      if(++guard>LIM_IT||pages.length>LIM_PG||(guard%64===0&&Date.now()-t0>LIM_MS))throw new Error('limite de paginação');
       var u=q[i++];
       if(u.m.brk&&cur.u.length)brk();
       var room=H-used,nx=q[i],need=u.h+(u.m.head&&nx?Math.min(nx.h,90):0);
       if(need<=room){push(u);continue}
       if(u.m.head&&cur.u.length&&u.h<=room){brk();i--;continue}
       if(u.h<=room){push(u);continue}
-      if(splittable(u.el)){
-        var r=split(u,room,used===0,meas);
+      if(u.info){
+        var r=split(u,room,used===0);
         if(r.first){push(r.first);if(r.rests.length){brk();q.splice.apply(q,[i,0].concat(r.rests))}continue}
         if(cur.u.length){brk();q.splice.apply(q,[i,0].concat(r.rests.length?r.rests:[u]));continue}
         if(r.rests.length){q.splice.apply(q,[i,0].concat(r.rests));continue}
@@ -431,6 +451,9 @@
       });
     });
     units.forEach(function(u){u.h=hOf(u.w)});
+    units.forEach(function(u){if(u.h>L.H&&splittable(u.el))u.info=describe(u.el,L.H,0)});
+    var frag=document.createDocumentFragment();meas._frag=frag;
+    units.forEach(function(u){frag.appendChild(u.w)});
     var ents=[],secPg={},chapPg={};
     var cpages=flow(units.slice(),L.H,meas,function(u,pi){
       var m=u.m;
@@ -455,8 +478,9 @@
       addIx(b,{cid:'__ix',sid:'__ix'});
     });
     ixq.forEach(function(u){u.h=hOf(u.w)});
+    ixq.forEach(function(u){frag.appendChild(u.w)});
     var ixpages=flow(ixq.slice(),L.H,meas,null);
-    meas.textContent='';
+    meas.textContent='';meas._frag=null;
     var off=1+ixpages.length;
     nums.forEach(function(x){var n=x.pg+off+1;x.b.querySelector('.gr-ixn').textContent=String(n);x.b.dataset.grPg=String(x.pg+off);x.b.setAttribute('aria-label',x.b.querySelector('.gr-ixt').textContent+', página '+n)});
     var P=[{kind:'cover',u:[],sid:'__cv',cid:'__cv',el:null}];
@@ -659,6 +683,8 @@
     var go2=$('grSealGo');go2.hidden=sl<0||on;if(sl>=0)go2.querySelector('.gr-bt').textContent='Ir ao lacre (p. '+(sl+1)+')';
     var el=$('grEL'),er=$('grER');el.hidden=t<=0;er.hidden=t>=G.max;
     G.anchor=curAnchor();savePos();
+    /* DOM mínimo: só o par atual (e vizinhos para a virada) fica montado; o resto é desmontado */
+    G.P.forEach(function(p,i){if(p.el&&Math.abs(i-a)>3&&!p.el.parentNode){p.el=null}});
     var af=document.activeElement;
     if(G.mode==='grimorio'&&(!af||af===document.body||!document.contains(af)))safe(function(){$('grStage').focus({preventScroll:true})});
   }

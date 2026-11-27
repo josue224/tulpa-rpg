@@ -60,7 +60,7 @@ function viewRow22(force){
   const s=$('mtViewAs');if(s)s.onchange=()=>viewSet22('player',s.value);
 }
 {const _mt22=mapTools7;mapTools7=function(){const out=_mt22.apply(this,arguments);try{viewRow22()}catch(e){console.warn('[T22] visão',e)}return out}}
-setInterval(()=>{try{if(MAP7.cv&&MAP7.cv.isConnected)viewRow22()}catch(e){}},1500);
+setInterval(()=>{try{if(MAP7.cv&&MAP7.cv.isConnected&&!document.hidden)viewRow22()}catch(e){}},1500);
 
 /* desenho conforme a visão: a tela "Players" pinta o mapa como se o Mestre fosse aquele jogador (troca a identidade só durante a pintura) */
 const _paint22=mapPaint7,_under22=paintUnder10,_over22=paintOver10,_fix22=paintFixtures10,_cfg22=mapCfg7;
@@ -452,7 +452,7 @@ function hovBind23(){
   cv.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;try{const p=mapPt7(e),t=mapHit7(p.wx,p.wy),id=t?t.id:null;if(id!==AI23.hov){AI23.hov=id;mapDraw7()}}catch(err){}});
   cv.addEventListener('pointerleave',()=>{if(AI23.hov){AI23.hov=null;mapDraw7()}});
 }
-setInterval(()=>{try{hovBind23()}catch(e){}},1000);
+setInterval(()=>{try{if(!document.hidden)hovBind23()}catch(e){}},1000);
 
 /* ---------- rolagem privada: só quem rolou vê (o Mestre vê as dos NPCs) ---------- */
 function privCard23(p){

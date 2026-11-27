@@ -65,7 +65,7 @@ window.tulpaPerseus=PerseusAnimator;T3.perseusAnim=PerseusAnimator;
 ['pointerdown','keydown','wheel'].forEach(ev=>addEventListener(ev,()=>{PA24.idleAt=Date.now();PA24.idled=false},{passive:true,capture:true}));
 setInterval(()=>{
   try{
-    if(!paOn24())return;const c=camp3();
+    if(document.hidden||!paOn24())return;const c=camp3();
     /* música começou ou trocou */
     try{const m=typeof wantMusic6==='function'?wantMusic6():null,k=m&&m.playing&&!m.synth?String(m.title||m.id||'música'):'';if(k&&k!==PA24.mus)react24('music');PA24.mus=k}catch(e){}
     if(c){

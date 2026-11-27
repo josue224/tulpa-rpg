@@ -98,7 +98,7 @@
   --text:var(--gr-ink);--panel:var(--gr-paper);--bg:var(--gr-paper2);--line:var(--gr-rule);--gold:var(--gr-gold);--accent:var(--gr-gold);
   color:var(--gr-ink);font-size:var(--gr-fs);line-height:1.58;overflow-wrap:anywhere;hyphens:auto}
 .gr-in:focus-visible{outline:2px solid var(--gr-gold);outline-offset:2px}
-.gr-measure{position:absolute;left:-99999px;top:0;height:auto;overflow:visible;visibility:hidden;pointer-events:none;box-sizing:content-box;z-index:-1;
+.gr-measure{contain:layout style;position:absolute;left:-99999px;top:0;height:auto;overflow:visible;visibility:hidden;pointer-events:none;box-sizing:content-box;z-index:-1;
   --text:var(--gr-ink);--panel:var(--gr-paper);--bg:var(--gr-paper2);--line:var(--gr-rule);--gold:var(--gr-gold);--accent:var(--gr-gold)}
 .gr-u{display:flow-root}
 .gr-in .m31-blk{font-size:inherit;line-height:1.58}

@@ -34,7 +34,7 @@ function vis26(){
 }
 T3.vis26=vis26;
 onState6(()=>{try{vis26()}catch(e){}});
-setInterval(()=>{try{bar26();vis26()}catch(e){}},1200);
+setInterval(()=>{try{if(!document.hidden){bar26();vis26()}}catch(e){}},1200);
 {const _it26=T3.initTheme;T3.initTheme=function(){const out=_it26.apply(this,arguments);try{top26()}catch(e){}return out}}
 setTimeout(top26,0);setTimeout(top26,1500);
 

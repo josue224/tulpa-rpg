@@ -162,7 +162,8 @@
  /* ---------- 4) rede de segurança: palco remontado ou com tamanho errado ---------- */
  setInterval(()=>{
   try{
-   const st=$('mapStage');if(!st)return;
+   if(document.hidden)return;
+   const st=$('mapStage');if(!st||!st.offsetParent)return;
    if(MAP7.stage!==st||!MAP7.cv||!MAP7.cv.isConnected){if(mapMount7())mapDraw7();return}
    const dpr=Math.min(2,window.devicePixelRatio||1),w=st.clientWidth,h=st.clientHeight;
    if(w>1&&h>1&&(Math.abs(MAP7.cv.width-Math.round(w*dpr))>1||Math.abs(MAP7.cv.height-Math.round(h*dpr))>1))mapSize7();

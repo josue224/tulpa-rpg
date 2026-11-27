@@ -216,17 +216,28 @@ function leaveMesa6(){
   try{if(b)sb()?.removeChannel(b)}catch(e){}
   sync6();
 }
+/* junta rajadas de eventos em um só refresh (refreshDocs6 e a lista de mapas são idempotentes) */
+const RF6={t:null,docs:false,maps:false,arrived:null};
+function refreshSoon6(docs,maps,arrivedKey){
+  if(docs)RF6.docs=true;if(maps)RF6.maps=true;if(arrivedKey)RF6.arrived=arrivedKey;
+  if(RF6.t)return;
+  RF6.t=setTimeout(()=>{
+    const d=RF6.docs,m=RF6.maps,k=RF6.arrived;RF6.t=null;RF6.docs=RF6.maps=false;RF6.arrived=null;
+    try{if(m)T3.mapRefreshList?.()}catch(e){}
+    if(d)Promise.resolve(refreshDocs6()).then(()=>{if(k)docArrived6(k)}).catch(()=>{});
+  },250);
+}
 function onStoreChange6(p){
   const row=p.new&&Object.keys(p.new).length?p.new:null,items=M6.backend!=='store';
-  if(!row){refreshDocs6();T3.mapRefreshList?.();return} /* exclusão */
+  if(!row){refreshSoon6(true,true);return} /* exclusão */
   let key=items?row.item_key:row.key;if(!key)return;
   if(items){if(!String(key).startsWith(KP6))return;key=String(key).slice(KP6.length)}
   if(String(key).startsWith('blob:'))return;
   const kind=items?row.item?.kind:row.kind,val=items?row.item?.value:row.value;
   if(key==='state'){if(val&&typeof val==='object')acceptState6(val);else stGet6('state').then(v=>acceptState6(v)).catch(()=>{});return}
-  if(kind==='doc'){refreshDocs6().then(()=>{if(p.eventType==='INSERT')docArrived6(key)});return}
-  if(kind==='map'){T3.mapRefreshList?.();return}
-  if(!kind){refreshDocs6();T3.mapRefreshList?.()}
+  if(kind==='doc'){refreshSoon6(true,false,p.eventType==='INSERT'?key:null);return}
+  if(kind==='map'){refreshSoon6(false,true);return}
+  if(!kind)refreshSoon6(true,true)
 }
 onCast6(p=>{
   if(p.t==='state'&&!isGM6()&&(p.rev||0)>(M6.state.rev||0))stGet6('state').then(v=>acceptState6(v)).catch(()=>{});
