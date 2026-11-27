@@ -7,12 +7,14 @@
 const R29={camp:'',rules:null,base:null,sec:'voc',q:'',edit:null,loadedAt:0,fetching:false,lastCast:0};
 T3.rules29=R29;
 const cl29=o=>o==null?o:JSON.parse(JSON.stringify(o));
-const defRules29=()=>({v:1,rev:0,voc:{},track:{},ritual:{},item:{},status:{},trauma:{},pericia:{},vert:{},beast:[],subel:[],table:{},log:[]});
+const defRules29=()=>({v:1,rev:0,voc:{},track:{},ritual:{},item:{},status:{},trauma:{},pericia:{},vert:{},attr:{},num:{},beast:[],subel:[],table:{},log:[]});
 const rules29=()=>R29.rules||(R29.rules=defRules29());
 const ARCH29=['Lutador','Gênio','Ritualista'];
 const PESO29=['Bolso','Leve','Médio','Pesado'];
-const SEC29=[['voc','✦','Vocações'],['track','⌁','Trilhas'],['ritual','✶','Rituais'],['item','▣','Itens e Equipamentos'],['status','☠','Estados e Condições'],['beast','👹','Bestiário'],['trauma','☾','Traumas e Colapsos'],['subel','✧','Sub-Elementos'],['table','⚖','Regras da Mesa'],['log','🕘','Histórico']];
-const KIND29={voc:'Vocação',track:'Trilha',ritual:'Ritual',item:'Item',status:'Estado',beast:'Bestiário',trauma:'Trauma',subel:'Sub-Elemento',table:'Regras da Mesa',pericia:'Perícia',vert:'Vertente'};
+const SEC29=[['voc','✦','Vocações'],['track','⌁','Trilhas'],['attr','◆','Atributos'],['pericia','▤','Perícias'],['vert','❖','Especializações'],['num','🎯','Valores de Combate'],['ritual','✶','Rituais'],['item','▣','Itens e Equipamentos'],['status','☠','Estados e Condições'],['beast','👹','Bestiário'],['trauma','☾','Traumas e Colapsos'],['subel','✧','Sub-Elementos'],['table','⚖','Regras da Mesa'],['log','🕘','Histórico']];
+const KIND29={voc:'Vocação',track:'Trilha',ritual:'Ritual',item:'Item',status:'Estado',beast:'Bestiário',trauma:'Trauma',subel:'Sub-Elemento',table:'Regras da Mesa',pericia:'Perícia',vert:'Vertente',attr:'Benefício de atributo',num:'Regra de combate'};
+/* seções sem criar/excluir: só editar e voltar ao padrão */
+const FIXED29=['attr','pericia','num'];
 
 /* ---------- conteúdo original (antes de qualquer alteração do Mestre) ---------- */
 function base29(){
@@ -23,7 +25,7 @@ function base29(){
     ritual:cl29(RITUALS.filter(r=>!/^(custom|gm)-/.test(String(r.id)))),
     weapon:cl29(WEAPONS),prot:cl29(PROTECTIONS),gear:cl29(GEAR),
     status:cl29(STATUS_DEFS),trauma:cl29(TRAUMA_DEFS),
-    pericia:cl29(PERICIA_DEFS),vert:cl29(VERT_DEFS),
+    pericia:cl29(PERICIA_DEFS),vert:cl29(VERT_DEFS),attr:cl29(ATTR_DEFS),
   };
   return R29.base;
 }
@@ -139,12 +141,29 @@ function ritSet29(x,o){
   ['name','element','cost'].forEach(k=>{if(o[k])x[k]=o[k]});
   if(Array.isArray(o.levels)){x.levels=x.levels||['','',''];o.levels.forEach((l,i)=>{if(l!=null)x.levels[i]=l});x.desc=x.levels[0]||x.desc}
 }
-/* perícias e vertentes: rules.pericia / rules.vert = {id:{campos alterados, add?, del?}} */
+/* perícias e vertentes: rules.pericia / rules.vert = {id:{campos alterados, add?, del?}}
+   Tudo o que vem salvo é conferido: valor antigo ou inválido cai no padrão do manual. */
+const EFF29=['dados','dano','danoExtra','danoAtributo','atributoAtaque','atributoManobra','rdBloqueio','cura','dt','alcance','multiplicador','empurrao','mirar','conceder','permite','ignora','bloqueia'];
+const DADO29=/^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i;
+const EFFNUM29={valor:[-20,20],metros:[0,60],alcanceMax:[0,200]};
+function eff29(e){
+  if(!e||typeof e!=='object'||!EFF29.includes(e.tipo))return null;
+  const x={tipo:e.tipo};
+  ['quando','alvo','acao','custo','limite'].forEach(k=>{const s=typeof e[k]==='string'?e[k].trim().slice(0,40):'';if(s)x[k]=s});
+  Object.entries(EFFNUM29).forEach(([k,[lo,hi]])=>{const v=e[k];if(v===''||v==null||typeof v==='boolean')return;const n=Number(v);if(Number.isFinite(n)&&n>=lo&&n<=hi)x[k]=n});
+  if(typeof e.dado==='string'&&DADO29.test(e.dado.trim()))x.dado=e.dado.trim();
+  if(ATTRS.includes(e.atributo))x.atributo=e.atributo;
+  return x;
+}
+const str29=v=>typeof v==='string'&&v.trim()!=='';
 function vertSet29(sec,x,o){
-  (sec==='vert'?['name','desc','pericia','skill']:['name','desc','grupo']).forEach(k=>{if(o[k]!=null)x[k]=o[k]});
-  if(sec==='pericia'){if(Array.isArray(o.skills)&&o.skills.length)x.skills=o.skills.slice();return x}
+  if(str29(o.name))x.name=o.name;
+  if(typeof o.desc==='string')x.desc=o.desc;
+  if(sec==='pericia'){if(str29(o.grupo))x.grupo=o.grupo;if(Array.isArray(o.skills)&&o.skills.length&&o.skills.every(str29))x.skills=o.skills.slice();return x}
+  if(str29(o.pericia)&&PERICIA_DEFS.some(p=>p.id===o.pericia))x.pericia=o.pericia;
+  if(str29(o.skill))x.skill=o.skill;
   if(Array.isArray(o.attrs)){const a=o.attrs.filter(n=>ATTRS.includes(n));if(a.length)x.attrs=a}
-  if(Array.isArray(o.effects))x.effects=cl29(o.effects.filter(e=>e&&typeof e.tipo==='string'));
+  if(Array.isArray(o.effects)){const f=o.effects.map(eff29).filter(Boolean);if(f.length||!o.effects.length)x.effects=f}
   if(o.requiresTraining!=null)x.requiresTraining=!!o.requiresTraining;
   return x;
 }
@@ -158,10 +177,32 @@ function rebuildVert29(){
   [['pericia',PERICIA_DEFS],['vert',VERT_DEFS]].forEach(([sec,arr])=>{
     const out=[];
     B[sec].forEach(b=>{const o=R[sec]?.[b.id];if(o&&o.del)return;const x=cl29(b);if(o)vertSet29(sec,x,o);out.push(x)});
-    Object.entries(R[sec]||{}).forEach(([id,o])=>{if(o&&o.add&&!o.del&&!B[sec].some(b=>b.id===id))out.push(vertNew29(sec,id,o))});
+    Object.entries(R[sec]||{}).forEach(([id,o])=>{if(o&&o.add&&!o.del&&!B[sec].some(b=>b.id===id)){const x=vertNew29(sec,id,o);if(sec==='pericia'||PERICIA_DEFS.some(p=>p.id===x.pericia))out.push(x)}});
     arr.length=0;out.forEach(x=>arr.push(x));
   });
 }
+/* benefícios dos atributos e números de combate: rules.num = {id:valor}, rules.attr = {nome:{desc}} */
+function rebuildNum29(){
+  const R=rules29(),B=base29();
+  REGRA_DEFS.forEach(r=>{const v=E.regraClean(r,R.num?.[r.id]);REGRA_NUM[r.id]=v===undefined?r.d:v});
+  B.attr.forEach(b=>{const t=ATTR_DEFS.find(a=>a.id===b.id),o=R.attr?.[b.id];if(t)t.desc=str29(o?.desc)?o.desc:b.desc});
+}
+const group29=g=>REGRA_DEFS.filter(r=>r.g===g);
+const numGroups29=()=>[...new Set(REGRA_DEFS.map(r=>r.g))].filter(g=>!ATTRS.includes(g));
+const numFmt29=v=>String(v).replace('.',',');
+/* efeito tático em uma frase curta (Manual, central e avisos) */
+const EFFLBL29={dados:'+d20 em',dano:'dano',danoExtra:'dano extra',danoAtributo:'atributo no dano',atributoAtaque:'atributo no acerto',atributoManobra:'atributo na manobra',rdBloqueio:'redução no Bloqueio',cura:'cura',dt:'DT/resistência',alcance:'alcance',multiplicador:'multiplica',empurrao:'empurrão',mirar:'mirar',conceder:'concede d20',permite:'permite',ignora:'ignora',bloqueia:'impede'};
+function effText29(e){
+  const out=[EFFLBL29[e.tipo]||e.tipo];
+  if(e.valor!=null)out.push(e.tipo==='multiplicador'?'× '+numFmt29(e.valor):(e.valor>=0?'+':'')+numFmt29(e.valor));
+  if(e.dado)out.push('+'+e.dado);if(e.atributo)out.push(e.atributo);
+  [e.quando,e.alvo,e.acao].filter(Boolean).forEach(q=>out.push(E.quandoLabel(q)));
+  if(e.metros!=null)out.push(numFmt29(e.metros)+' m');if(e.alcanceMax!=null)out.push('até '+numFmt29(e.alcanceMax)+' m');
+  if(e.custo)out.push('custo: '+(e.custo==='reacao'?'Reação':e.custo==='movimento'?'Ação de Movimento':e.custo));
+  if(e.limite)out.push('1 vez por '+e.limite);
+  return out.join(' · ');
+}
+
 /* regras da mesa: deslocamento base, DT do Arremesso e DT de Furtividade */
 T3.moveBase=()=>{const n=Number(rules29().table?.move);return n>0?n:9};
 {const _dt29=dtFor14;dtFor14=function(m){const b=Number(rules29().table?.dtThrow);return _dt29(m)+(b>0?b-12:0)};T3.cbDbg&&(T3.cbDbg.dtFor14=dtFor14)}
@@ -173,6 +214,7 @@ function rebuildAll29(){
   try{rebuildTrauma29()}catch(e){console.warn('[T29] traumas',e)}
   try{rebuildRitual29()}catch(e){console.warn('[T29] rituais',e)}
   try{rebuildVert29()}catch(e){console.warn('[T29] vertentes',e)}
+  try{rebuildNum29()}catch(e){console.warn('[T29] valores',e)}
   try{applyTable29()}catch(e){}
 }
 /* toda vez que a ficha desenha, vocações, trilhas e inventário seguem as regras da campanha */
@@ -191,10 +233,15 @@ const canEdit29=()=>{try{const ch=charById(activeCharacterId);return !ch||ch.own
 function setRules29(r,{notify=false}={}){
   const old=R29.rules;
   R29.rules={...defRules29(),...(r&&typeof r==='object'?r:{})};
-  ['voc','track','ritual','item','status','trauma','table','pericia','vert'].forEach(k=>{if(!R29.rules[k]||typeof R29.rules[k]!=='object'||Array.isArray(R29.rules[k]))R29.rules[k]={}});
+  ['voc','track','ritual','item','status','trauma','table','pericia','vert','attr','num'].forEach(k=>{if(!R29.rules[k]||typeof R29.rules[k]!=='object'||Array.isArray(R29.rules[k]))R29.rules[k]={}});
   ['beast','subel','log'].forEach(k=>{if(!Array.isArray(R29.rules[k]))R29.rules[k]=[]});
+  /* só uma mudança ao vivo (a campanha já tinha sido lida) republica a minha ficha */
+  const sig=JSON.stringify(REGRA_NUM),vivo=!!camp3()&&R29.synced===camp3().id;
   rebuildAll29();
   try{render()}catch(e){}
+  /* os números mudaram: abas abertas se redesenham e a ficha republica Defesa e máximos */
+  try{if(camp3()?.combat?.active)renderCombatUI()}catch(e){}
+  if(notify&&vivo&&sig!==JSON.stringify(REGRA_NUM)&&activeCharacterId&&charById(activeCharacterId)?.ownerId===uid3())setTimeout(()=>{try{save()}catch(e){}},80);
   try{if(typeof renderAddList==='function'&&$('addList'))renderAddList()}catch(e){}
   try{if(typeof renderStatesList==='function'&&$('stList'))renderStatesList()}catch(e){}
   try{if($('ritualCatalog'))renderRituals()}catch(e){}
@@ -210,7 +257,7 @@ async function fetchRules29(notify=true,want=0,tries=0){
   try{const v=await stGet6('rules');if(camp3()?.id!==c.id)return;
     const rev=Number(v?.rev)||0;got=rev;
     if(!(R29.rules&&rev&&rev<=(Number(R29.rules.rev)||0)&&R29.camp===c.id)){setRules29(v||defRules29(),{notify});}
-    R29.loadedAt=Date.now()}
+    R29.synced=c.id;R29.loadedAt=Date.now()}
   catch(e){console.warn('[T29] ler regras',e)}
   finally{R29.fetching=false}
   /* o aviso pode chegar antes da gravação ficar visível: tenta de novo */
@@ -257,6 +304,14 @@ function seenAll29(){const s=seen29();(rules29().log||[]).forEach(e=>s.add(e.id)
 const alertKey29=()=>'tulpa_rules_alert_'+(camp3()?.id||'x');
 function alerts29(){return lsGet6(alertKey29(),{})||{}}
 function ritTab29(){return($('ritualCatalog')?.closest('.tab')?.id||'tab-talents').slice(4)}
+const hasPer29=(d,pid)=>{const p=pid&&E.pericia(pid);return!!p&&(E.trainedVerts(d,p.id).length>0||p.skills.some(s=>E.legacyRaw(d,s)>0))};
+const affected29=(d,who)=>{
+  if(!d.attributes||d.beastId)return false;
+  if(who==='disparo')return hasPer29(d,'armasdisparo')||(d.inventory?.items||[]).some(i=>i?.w&&E.isGun(i.w));
+  if(who==='medicina')return hasPer29(d,'medicina');
+  if(who==='vertente')return E.trainedVerts(d).length>0||E.pendingVerts(d).length>0;
+  return true;
+};
 function hits29(e){
   const c=camp3();if(!c)return[];
   const mine=(c.characters||[]).filter(ch=>ch&&ch.ownerId===uid3()&&!gmChar6(ch));
@@ -269,8 +324,10 @@ function hits29(e){
     if(e.kind==='item'){const [k,n]=String(e.key).split('|');if((d.inventory?.items||[]).some(it=>it&&it.kind===k&&[n,e.label].includes(it._k29||it.name)))tab='inventory'}
     if(e.kind==='status'&&(d.statuses||[]).some(s=>s&&s.id===e.key))tab='states';
     if(e.kind==='trauma'&&(d.traumas||[]).some(s=>s&&s.id===e.key))tab='mind';
-    if(e.kind==='vert'&&d.vertentes?.[e.key])tab='skills';
-    if(e.kind==='pericia'&&((PERICIA_DEFS.find(p=>p.id===e.key)?.skills||[]).some(s=>E.skillTier(d,s)>0)))tab='skills';
+    /* quem tem a especialização; se ela é nova ou mudou a exigência de treino, quem tem a perícia */
+    if(e.kind==='vert'){const pid=(E.vert(e.key)||cur29('vert',e.key))?.pericia;if(d.vertentes?.[e.key]||((e.add||e.requer)&&hasPer29(d,pid)))tab='skills'}
+    if(e.kind==='pericia'&&hasPer29(d,e.key))tab='skills';
+    if(e.kind==='attr'||e.kind==='num'){const ids=e.ids||[],whos=ids.length?ids.map(i=>E.regraDef(i)?.who||''):[''],w=whos.find(x=>affected29(d,x));if(w!==undefined)tab=e.kind==='attr'?'attributes':w==='medicina'?'rest':w==='vertente'?'skills':'combat'}
     if(e.kind==='table')tab='combat';
     if(tab)out.push({ch,tab});
   });
@@ -355,6 +412,8 @@ function list29(sec){
     Object.entries(R.trauma).forEach(([k,o])=>{if(o&&o.add)rows.push({key:k,name:o.name||k,sub:(o.grp||'')+' · '+String(o.text||'').slice(0,80),st:st(o,false)})});
     return rows;
   }
+  if(sec==='attr')return B.attr.map(b=>{const ids=group29(b.id).map(r=>r.id),mine=ids.some(i=>R.num?.[i]!==undefined)||!!R.attr?.[b.id];return{key:b.id,name:b.id+' ('+b.sigla+')',sub:E.attrBenefits(b.id).join(' '),st:mine?'edit':'orig'}});
+  if(sec==='num')return numGroups29().map(g=>({key:g,name:g,sub:group29(g).map(r=>r.l.split(':')[0]+' '+numFmt29(E.regra(r.id))).join(' · ').slice(0,160),st:group29(g).some(r=>R.num?.[r.id]!==undefined)?'edit':'orig'}));
   if(sec==='pericia'||sec==='vert'){
     const sub=(b,o)=>sec==='vert'?((PERICIA_DEFS.find(p=>p.id===(o?.pericia||b?.pericia))?.name||'')+' · '+(o?.attrs||b?.attrs||[]).join(' ou ')):(o?.skills||b?.skills||[]).join(' · ');
     const rows=B[sec].map(b=>{const o=R[sec][b.id];return{key:b.id,name:o?.name||b.name,sub:sub(b,o),st:st(o,true)}});
@@ -378,13 +437,14 @@ function cur29(sec,key){
   if(sec==='status'){const b=B.status.find(x=>x.id===key),o=R.status[key]||{};const t=cl29(b||{id:key,name:'',group:'manual',narr:'',text:''});statusSet29(t,o);return t}
   if(sec==='trauma'){const b=B.trauma.find(x=>x.id===key),o=R.trauma[key]||{};const t=cl29(b||{id:key,name:'',grp:'Mente',text:''});['name','text','grp'].forEach(k=>{if(o[k]!=null)t[k]=o[k]});return t}
   if(sec==='pericia'||sec==='vert'){const b=B[sec].find(x=>x.id===key),o=R[sec][key]||{};return b?vertSet29(sec,cl29(b),o):vertNew29(sec,key,o)}
+  if(sec==='attr'||sec==='num'){const num=Object.fromEntries(group29(key).map(r=>[r.id,E.regra(r.id)]));return sec==='attr'?{...cl29(ATTR_DEFS.find(a=>a.id===key)),num}:{id:key,name:key,num}}
   if(sec==='beast'){const b=(typeof BEAST_BASE!=='undefined'?BEAST_BASE:[]).find(x=>x.id===key),o=(R.beast||[]).find(x=>x.id===key);return cl29(o?{...(b||{}),...o}:b||{id:key,name:'',tier:'Inimigo',el:'',vital:20,def:12,atk:'+3',dano:'1d6',skills:'',notes:'',ai:'agressivo'})}
   if(sec==='subel'){const b=String(key).startsWith('sub-')&&typeof SUBEL_BASE!=='undefined'?SUBEL_BASE.find(x=>x.id===key):null,o=(R.subel||[]).find(x=>x.id===key);
     if(b)return cl29({...b,element:`${b.a} + ${b.b}`,off:1,...(o?{desc:o.desc}:{})});
     return cl29(o||{id:key,name:'',element:'Natureza',desc:''})}
   return{};
 }
-const isNative29=(sec,key)=>{const B=base29();return sec==='voc'?B.voc.some(x=>x.name===key):sec==='track'?B.track.some(x=>tkey29(x)===key):sec==='ritual'?B.ritual.some(x=>x.id===key):sec==='item'?(()=>{const [k,n]=String(key).split('|');return(k==='weapon'?B.weapon:k==='prot'?B.prot:B.gear).some(x=>x.name===n)})():sec==='status'?B.status.some(x=>x.id===key):sec==='trauma'?B.trauma.some(x=>x.id===key):(sec==='pericia'||sec==='vert')?B[sec].some(x=>x.id===key):false};
+const isNative29=(sec,key)=>{const B=base29();return sec==='voc'?B.voc.some(x=>x.name===key):sec==='track'?B.track.some(x=>tkey29(x)===key):sec==='ritual'?B.ritual.some(x=>x.id===key):sec==='item'?(()=>{const [k,n]=String(key).split('|');return(k==='weapon'?B.weapon:k==='prot'?B.prot:B.gear).some(x=>x.name===n)})():sec==='status'?B.status.some(x=>x.id===key):sec==='trauma'?B.trauma.some(x=>x.id===key):(sec==='pericia'||sec==='vert')?B[sec].some(x=>x.id===key):sec==='attr'||sec==='num'};
 
 /* ---------- a central ---------- */
 function sysBtn29(){
@@ -393,7 +453,7 @@ function sysBtn29(){
   $('masterPanel')?.classList.remove('open');
   const grid=$q('#campaignHub .portal-grid');
   if(grid){let b=$('openSys29');
-    if(!b&&gm){b=document.createElement('button');b.className='portal-card sys29-card';b.id='openSys29';b.innerHTML='<div class="symbol">⚙️</div><h2>Alterações do Sistema</h2><p>Vocações, Trilhas, Rituais, Itens, Estados, Bestiário e regras da mesa desta campanha.</p>';b.onclick=()=>open29();grid.append(b)}
+    if(!b&&gm){b=document.createElement('button');b.className='portal-card sys29-card';b.id='openSys29';b.innerHTML='<div class="symbol">⚙️</div><h2>Alterações do Sistema</h2><p>Vocações, Trilhas, Atributos, Especializações, valores de combate, Rituais, Itens, Estados e Bestiário desta campanha.</p>';b.onclick=()=>open29();grid.append(b)}
     if(b)b.classList.toggle('hide',!gm)}
 }
 T3.sysOpen=(s,k)=>open29(s,k);
@@ -424,11 +484,11 @@ function paint29(){
   if(sec==='log')return logView29(m);
   const q=R29.q.toLowerCase(),rows=list29(sec).filter(r=>!q||(r.name+' '+r.sub).toLowerCase().includes(q));
   const counts=list29(sec).reduce((a,r)=>(a[r.st]=(a[r.st]||0)+1,a),{});
-  m.innerHTML=`<div class="sys29-head"><h3>${esc(lbl)}</h3><span class="sub">${list29(sec).length} no total${counts.edit?` · ${counts.edit} editados`:''}${counts.new&&!['beast','subel'].includes(sec)?` · ${counts.new} novos`:''}${counts.del?` · ${counts.del} removidos`:''}</span><button type="button" class="btn primary small" id="sys29add">＋ Novo</button></div>
+  m.innerHTML=`<div class="sys29-head"><h3>${esc(lbl)}</h3><span class="sub">${list29(sec).length} no total${counts.edit?` · ${counts.edit} editados`:''}${counts.new&&!['beast','subel'].includes(sec)?` · ${counts.new} novos`:''}${counts.del?` · ${counts.del} removidos`:''}</span>${FIXED29.includes(sec)?'':'<button type="button" class="btn primary small" id="sys29add">＋ Novo</button>'}</div>
     <input class="search" id="sys29q" placeholder="Buscar em ${esc(lbl.toLowerCase())}" value="${esc(R29.q)}" aria-label="Buscar">
-    <ul class="sys29-list">${rows.slice(0,400).map(r=>`<li class="sys29-row ${r.st}"><div class="grow"><b>${esc(r.name)}</b> ${stTag29[r.st]}<div class="sub">${esc(r.sub)}</div></div><div class="sys29-acts">${r.st==='del'?`<button type="button" class="btn small" data-rs29="${esc(r.key)}" title="Restaurar">↺ Restaurar</button>`:`<button type="button" class="btn small" data-e29="${esc(r.key)}" aria-label="Editar ${esc(r.name)}">✏️</button><button type="button" class="btn small danger" data-d29="${esc(r.key)}" aria-label="Excluir ${esc(r.name)}">🗑️</button>${r.st==='edit'?`<button type="button" class="btn small" data-rs29="${esc(r.key)}" title="Voltar ao original">↺</button>`:''}`}</div></li>`).join('')||'<li class="empty">Nada por aqui ainda. Use ＋ Novo.</li>'}</ul>`;
+    <ul class="sys29-list">${rows.slice(0,400).map(r=>`<li class="sys29-row ${r.st}"><div class="grow"><b>${esc(r.name)}</b> ${stTag29[r.st]}<div class="sub">${esc(r.sub)}</div></div><div class="sys29-acts">${r.st==='del'?`<button type="button" class="btn small" data-rs29="${esc(r.key)}" title="Restaurar">↺ Restaurar</button>`:`<button type="button" class="btn small" data-e29="${esc(r.key)}" aria-label="Editar ${esc(r.name)}">✏️</button>${FIXED29.includes(sec)?'':`<button type="button" class="btn small danger" data-d29="${esc(r.key)}" aria-label="Excluir ${esc(r.name)}">🗑️</button>`}${r.st==='edit'?`<button type="button" class="btn small" data-rs29="${esc(r.key)}" title="Voltar ao original">↺</button>`:''}`}</div></li>`).join('')||'<li class="empty">Nada por aqui ainda. Use ＋ Novo.</li>'}</ul>`;
   const qi=$('sys29q');qi.oninput=()=>{R29.q=qi.value;const p=qi.selectionStart;paint29();const n=$('sys29q');n.focus();try{n.setSelectionRange(p,p)}catch(e){}};
-  $('sys29add').onclick=()=>edit29(sec,null);
+  if($('sys29add'))$('sys29add').onclick=()=>{R29.newPericia='';edit29(sec,null)};
   $$('[data-e29]',m).forEach(b=>b.onclick=()=>edit29(sec,b.dataset.e29));
   $$('[data-d29]',m).forEach(b=>b.onclick=()=>del29(sec,b.dataset.d29));
   $$('[data-rs29]',m).forEach(b=>b.onclick=()=>restore29(sec,b.dataset.rs29));
@@ -460,22 +520,100 @@ function edit29(sec,key){
      +fC29('e29mv','Não pode se mover',(s.flags||[]).includes('semMover'))+fC29('e29atk','Desvantagem em ataques',(s.disadv||[]).includes('ataque'))+fC29('e29act','Perde a próxima ação',(s.flags||[]).includes('perdeAcao'))}
   if(sec==='trauma'){const t=c||{name:'',grp:'Mente',text:''};f=fI29('e29n','Nome',t.name)+fI29('e29g','Grupo',t.grp)+fT29('e29d','Efeito',t.text)}
   if(sec==='beast'){const b=c||cur29('beast',null);f=fI29('e29n','Nome',b.name)+fS29('e29tier','Tipo',b.tier||'Inimigo',['Capanga','Inimigo','Elite','Chefe','Entidade'])+`<div class="sys29-3">${fS29('e29bel','Elemento',b.el||'',['','Natureza','Inexistência','Ilusão','Verdade','Fé','Sol','Desrealização','Pofenia','Confabulação','Metáfora'])}${fS29('e29ai','Comportamento (IA)',b.ai||'agressivo',['agressivo','cacador','covarde','protetor','conjurador','emboscador','chefe'])}</div>`+`<div class="sys29-3">${fI29('e29vt','Vitalidade',b.vital,'number','min="1" max="999"')}${fI29('e29def','Defesa',b.def,'number','min="0" max="40"')}${fI29('e29atk','Ataque (bônus)',b.atk)}</div>`+fI29('e29dano','Dano',b.dano)+fT29('e29sk','Perícias e poderes',b.skills,2)+fT29('e29nt','Notas e comportamento',b.notes,3)}
+  if(sec==='attr'){f=`<p class="sub full">Hoje: ${esc(E.attrBenefits(c.name).join(' '))}</p>`+fT29('e29d','Resumo do atributo (aparece no Manual)',c.desc,2)+group29(c.name).map(r=>numField29(r,c.num[r.id])).join('')}
+  if(sec==='num'){f=group29(c.name).map(r=>numField29(r,c.num[r.id])).join('')}
+  if(sec==='pericia'){const x=c||{name:'',desc:'',skills:[]};f=fI29('e29n','Nome da perícia',x.name)+fT29('e29d','Descrição',x.desc,3)+`<p class="sub full">Perícia(s) da ficha ligadas: <b>${esc((x.skills||[]).join(', '))}</b>.</p>`}
+  if(sec==='vert'){const first=PERICIA_DEFS.find(p=>p.id===R29.newPericia)||PERICIA_DEFS[0];f=vertForm29(c||{pericia:first.id,name:'',desc:'',attrs:['Força'],effects:[],requiresTraining:false},isNew)}
   if(sec==='subel'){const s=c||cur29('subel',null);
     if(s.off)f=`<p class="sub">Sub-elemento oficial do Ciclo Elemental: <b>${esc(s.name)}</b> nasce de <b>${esc(s.a)} + ${esc(s.b)}</b>. O nome fica fixo porque os rituais dependem dele; o conceito aparece no diagrama, no Manual e na ficha.</p><input type="hidden" id="e29n" value="${esc(s.name)}">`+fT29('e29d','Conceito',s.desc,2);
     else f=fI29('e29n','Nome do sub-elemento',s.name)+fS29('e29el','Elemento de origem',s.element,elems29())+fT29('e29d','Descrição e efeitos',s.desc)}
   m.innerHTML=`<div class="sys29-head"><button type="button" class="btn small" id="e29back">← Voltar</button><h3>${isNew?'Novo':'Editar'} ${esc((lbl||'').toLowerCase())}</h3>${!isNew&&isNative29(sec,key)?'<span class="sub">Conteúdo do manual. Dá para voltar ao original depois.</span>':''}</div><form class="sys29-form" id="e29f">${f}<div class="sys29-save"><button type="submit" class="btn primary">Salvar e aplicar na mesa</button><button type="button" class="btn" id="e29cancel">Cancelar</button></div></form>`;
   const kSync=()=>{const k=isNew&&sec==='item'?gv29('e29k'):c?.kind;$$('[data-k29]',m).forEach(d=>d.classList.toggle('hide',d.dataset.k29!==k))};
   if(sec==='item'){kSync();$('e29k')&&($('e29k').onchange=kSync)}
+  if(sec==='vert')bindVert29(m);
   $('e29back').onclick=$('e29cancel').onclick=()=>{R29.edit=null;paint29()};
   $('e29f').onsubmit=async ev=>{ev.preventDefault();const ok=await submit29(sec,key,c);if(ok){R29.edit=null;paint29()}};
-  setTimeout(()=>$('e29n')?.focus(),30);
+  setTimeout(()=>($('e29n')||$q('#e29f input,#e29f textarea'))?.focus(),30);
+}
+/* ---------- formulários das regras novas ---------- */
+const numField29=(r,v)=>r.t==='dado'?fI29('e29x-'+r.id,`${r.l} (padrão ${r.d})`,v,'text','placeholder="1d4"')
+  :fI29('e29x-'+r.id,`${r.l} (padrão ${numFmt29(r.d)})`,v,'number',`min="${r.min}" max="${r.max}" step="${r.step}" inputmode="decimal"`);
+const FXF29=[['quando','Quando'],['alvo','Alvo'],['acao','Ação']];
+function fxRow29(e,i){
+  const sel=(k,l,opts)=>`<label class="field"><span class="field-label">${l}</span><select data-fx="${k}">${opts.map(([v,t])=>`<option value="${esc(v)}" ${String(e[k]||'')===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
+  const inp=(k,l,t='text',x='')=>`<label class="field"><span class="field-label">${l}</span><input data-fx="${k}" type="${t}" value="${esc(String(e[k]??''))}" ${x}></label>`;
+  const keep=(v,list)=>v&&!list.some(o=>o[0]===v)?[...list,[v,v]]:list;
+  return`<fieldset class="sys29-fs sys29-fx" data-fxrow><legend>Efeito ${i+1}</legend>${sel('tipo','Tipo',EFF29.map(t=>[t,EFFLBL29[t]+' ('+t+')']))}${FXF29.map(([k,l])=>inp(k,l,'text',`list="e29dl-${k}"`)).join('')}${inp('valor','Valor (d20, dano, multiplicador)','number','step="0.5" min="-20" max="20"')}${inp('dado','Dado (ex.: 1d4)')}${sel('atributo','Atributo',[['','—'],...ATTRS.map(a=>[a,a])])}${sel('custo','Custo',keep(e.custo,[['','—'],['reacao','Reação'],['movimento','Ação de Movimento']]))}${sel('limite','Limite',keep(e.limite,[['','—'],['cena','1 vez por cena']]))}${inp('metros','Metros','number','step="0.5" min="0" max="60"')}${inp('alcanceMax','Alcance máximo (m)','number','step="0.5" min="0" max="200"')}<button type="button" class="btn small danger" data-fxdel>Remover efeito</button></fieldset>`;
+}
+function vertForm29(v,isNew){
+  const lists=FXF29.map(([k])=>`<datalist id="e29dl-${k}">${[...new Set([...base29().vert.flatMap(x=>x.effects.map(e=>e[k])),...(k==='quando'?Object.keys(QUANDO_LABEL):[])].filter(Boolean))].sort().map(o=>`<option value="${esc(o)}">${esc(E.quandoLabel(o))}</option>`).join('')}</datalist>`).join('');
+  const per=PERICIA_DEFS.find(p=>p.id===v.pericia);
+  return(isNew?fS29('e29per','Perícia',v.pericia,PERICIA_DEFS.map(p=>[p.id,p.name])):`<p class="sub full">Perícia: <b>${esc(per?.name||v.pericia)}</b></p>`)
+    +fI29('e29n','Nome da especialização',v.name)+fT29('e29d','Benefício (texto que aparece na ficha e no Manual)',v.desc,3)
+    +`<fieldset class="sys29-fs sys29-attrs"><legend>Atributos possíveis</legend>${ATTRS.map(a=>`<label class="t3-check"><input type="checkbox" data-vattr="${a}" ${v.attrs.includes(a)?'checked':''}> ${a}</label>`).join('')}</fieldset>`
+    +fC29('e29req','Exige treino específico (não vale o generalismo)',v.requiresTraining)
+    +`<p class="sub full"><b>Efeitos táticos</b> são o que o sistema aplica sozinho nas rolagens e no combate. "+d20 em" com uma situação nova vira uma opção na hora de rolar.</p><div id="e29fx">${(v.effects||[]).map(fxRow29).join('')}</div><div><button type="button" class="btn small" id="e29fxadd">＋ Efeito</button></div>${lists}`;
+}
+function bindVert29(m){
+  const box=$('e29fx');if(!box)return;
+  const renum=()=>$$('[data-fxrow] legend',box).forEach((l,i)=>l.textContent='Efeito '+(i+1));
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-fxdel]');if(!b)return;b.closest('[data-fxrow]').remove();renum();$('e29fxadd').focus()});
+  $('e29fxadd').onclick=()=>{box.insertAdjacentHTML('beforeend',fxRow29({tipo:'dados',valor:1},box.children.length));$q('[data-fx="tipo"]',box.lastElementChild).focus()};
+}
+/* lê as linhas de efeito; devolve {err} ou {list} */
+function readFx29(){
+  const list=[];
+  for(const [i,row] of $$('#e29fx [data-fxrow]').entries()){
+    const raw={};$$('[data-fx]',row).forEach(c=>{const v=c.value.trim();if(v!=='')raw[c.dataset.fx]=v});
+    if(raw.dado&&!DADO29.test(raw.dado))return{err:`Efeito ${i+1}: dado inválido (use algo como 1d4).`};
+    for(const [k,[lo,hi]] of Object.entries(EFFNUM29))if(raw[k]!=null&&!(Number(raw[k])>=lo&&Number(raw[k])<=hi))return{err:`Efeito ${i+1}: ${k} deve ficar entre ${lo} e ${hi}.`};
+    const x=eff29(raw);if(!x)return{err:`Efeito ${i+1}: escolha o tipo.`};list.push(x);
+  }
+  return{list};
+}
+async function submitNum29(sec,key){
+  const R=rules29(),changes=[],ids=[],next={};
+  for(const r of group29(key)){
+    const v=E.regraClean(r,gv29('e29x-'+r.id));
+    if(v===undefined){toast(r.t==='dado'?`${r.l}: use um dado como 1d4.`:`${r.l}: use um número de ${r.min} a ${r.max}${r.step!==1?' (passo '+numFmt29(r.step)+')':''}.`);return false}
+    next[r.id]=v;const old=E.regra(r.id);if(v!==old){changes.push([r.l,numFmt29(old),numFmt29(v)]);ids.push(r.id)}
+  }
+  const get=id=>next[id]??E.regra(id);
+  if(get('empurraoMargem3')<=get('empurraoMargem2')){toast('Empurrar: a margem de 3 faixas precisa ser maior que a de 2.');return false}
+  if(sec==='attr'){const old=cur29('attr',key).desc,desc=gv29('e29d')||base29().attr.find(a=>a.id===key).desc;
+    if(desc!==old)changes.push(['Descrição',old,desc]);
+    if(desc===base29().attr.find(a=>a.id===key).desc)delete R.attr[key];else R.attr[key]={desc}}
+  if(!changes.length){toast('Nada mudou.');return true}
+  Object.entries(next).forEach(([id,v])=>{if(v===E.regraDef(id).d)delete R.num[id];else R.num[id]=v});
+  /* mudança só de texto avisa todo mundo que tem o atributo */
+  const ok=await saveRules29({kind:sec,key,label:key,ids:changes.length>ids.length?[]:ids,changes});
+  if(ok)toast(`${key}: atualizado. A mesa já recebeu.`);
+  return ok;
 }
 /* compara antes x depois para o aviso */
 function diff29(a,b,fields){const out=[];fields.forEach(([k,l,fmt])=>{const f=fmt||(x=>x==null?'':Array.isArray(x)?x.join(', '):String(x));const x=f(a?.[k]),y=f(b?.[k]);if(x!==y)out.push([l,x||'—',y||'—'])});return out}
 async function submit29(sec,key,c){
+  if(sec==='attr'||sec==='num')return submitNum29(sec,key);
   const R=rules29(),isNew=key==null,name=gv29('e29n');
   if(!name){toast('Dê um nome.');return false}
-  let k=key,o,after,changes=[];
+  let k=key,o,after,changes=[],extra={};
+  if(sec==='pericia'){
+    o={name,desc:gv29('e29d')};changes=diff29(c,o,[['name','Nome'],['desc','Descrição']]);if(changes.length)R.pericia[key]={...(R.pericia[key]||{}),...o};
+  }
+  if(sec==='vert'){
+    const pid=isNew?gv29('e29per'):c.pericia,attrs=$$('#e29f [data-vattr]').filter(x=>x.checked).map(x=>x.dataset.vattr),fx=readFx29();
+    if(!attrs.length){toast('Marque pelo menos um atributo.');return false}
+    if(fx.err){toast(fx.err);return false}
+    if(list29('vert').some(r=>r.key!==key&&r.st!=='del'&&r.name===name&&cur29('vert',r.key).pericia===pid)){toast('Essa perícia já tem uma especialização com esse nome.');return false}
+    /* a ordem dos atributos de antes é mantida (o 1º desempata a escolha automática) */
+    const old=c?.attrs||[],ordered=[...old.filter(a=>attrs.includes(a)),...attrs.filter(a=>!old.includes(a))];
+    o={name,desc:gv29('e29d'),attrs:ordered,requiresTraining:gv29('e29req'),effects:fx.list};
+    if(isNew){k=pid+'.gm-'+rid().slice(0,6);o.add=1;o.pericia=pid}else if(R.vert[key]?.add){o.add=1;o.pericia=R.vert[key].pericia}
+    const yes=x=>x?'sim':'não',efs=l=>(l||[]).map(effText29).join('; ')||'nenhum';
+    changes=diff29(c,o,[['name','Nome'],['attrs','Atributos'],['requiresTraining','Exige treino',yes],['effects','Efeitos',efs],['desc','Benefício']]);
+    extra.requer=!isNew&&!!c.requiresTraining!==!!o.requiresTraining?1:0;
+    if(isNew||changes.length)R.vert[k]=o;
+  }
   if(sec==='voc'){
     const skills=[0,1,2].map(i=>gv29('e29s'+i)).filter(Boolean);if(skills.length!==3||new Set(skills).size!==3){toast('Escolha três perícias diferentes.');return false}
     const talents=[0,1].map(i=>({name:gv29('e29t'+i+'n'),cost:Number(gv29('e29t'+i+'c'))||0,desc:gv29('e29t'+i+'d')}));
@@ -533,12 +671,13 @@ async function submit29(sec,key,c){
     if(i>=0)arr[i]=o;else arr.push(o);
   }
   if(!isNew&&!changes.length){toast('Nada mudou.');return true}
-  const ok=await saveRules29({kind:sec,key:k,label:name,add:isNew?1:0,changes:isNew?[]:changes});
+  const ok=await saveRules29({kind:sec,key:k,label:name,add:isNew?1:0,changes:isNew?[]:changes,...extra});
   if(ok)toast(`${KIND29[sec]} ${isNew?'criado':'atualizado'}: ${name}. A mesa já recebeu.`);
   return ok;
 }
 async function del29(sec,key){
   const R=rules29(),row=list29(sec).find(r=>r.key===key);if(!row)return;
+  if(FIXED29.includes(sec)){toast('Aqui dá para editar e voltar ao padrão, mas não excluir.');return}
   if(sec==='beast'&&String(key).startsWith('bb-')){if(!(R.beast||[]).some(x=>x.id===key)){toast('Criatura do bestiário oficial: dá para editar, mas não excluir.');return}if(!confirm(`Voltar “${row.name}” ao bestiário oficial?`))return;R.beast=R.beast.filter(x=>x.id!==key);await saveRules29({kind:sec,key,label:row.name,changes:[['Criatura','editada','oficial']]});paint29();return}
   if(sec==='subel'&&String(key).startsWith('sub-')){if(!(R.subel||[]).some(x=>x.id===key)){toast('Sub-elemento oficial: dá para editar o conceito, mas não excluir.');return}if(!confirm(`Voltar o conceito de “${row.name}” ao texto oficial?`))return;R.subel=R.subel.filter(x=>x.id!==key);await saveRules29({kind:sec,key,label:row.name,changes:[['Conceito','editado','oficial']]});paint29();return}
   if(!confirm(`Excluir “${row.name}” de ${KIND29[sec]}? ${isNative29(sec,key)?'É conteúdo do manual: dá para restaurar depois.':'Não dá para desfazer.'}`))return;
@@ -549,6 +688,10 @@ async function del29(sec,key){
 }
 async function restore29(sec,key){
   const R=rules29(),row=list29(sec).find(r=>r.key===key);if(!row)return;
+  if(sec==='attr'||sec==='num'){
+    const ids=group29(key).map(r=>r.id).filter(i=>R.num[i]!==undefined),changes=ids.map(i=>[E.regraDef(i).l,numFmt29(E.regra(i)),numFmt29(E.regraDef(i).d)]);
+    const txt=sec==='attr'&&!!R.attr[key];ids.forEach(i=>delete R.num[i]);if(sec==='attr')delete R.attr[key];
+    await saveRules29({kind:sec,key,label:key,ids:txt?[]:ids,changes:changes.length?changes:[['Descrição','editada','original do manual']]});paint29();return}
   const o=R[sec][key];if(!o)return;
   if(isNative29(sec,key)){const before=cur29(sec,key);delete R[sec][key];await saveRules29({kind:sec,key,label:row.name,changes:[['Situação',o.del?'removido':'editado','original do manual']]})}
   else{delete o.del;await saveRules29({kind:sec,key,label:row.name,changes:[['Situação','removido','ativo']]})}
@@ -579,7 +722,7 @@ const gmAdd29=(sec,l)=>`<button type="button" class="gm29-b gm29-add" data-g29a=
 function bindGm29(root){
   $$('[data-g29e]',root).forEach(b=>b.onclick=e=>{e.stopPropagation();open29(b.dataset.g29e,b.dataset.k)});
   $$('[data-g29d]',root).forEach(b=>b.onclick=e=>{e.stopPropagation();del29(b.dataset.g29d,b.dataset.k).then(()=>close29())});
-  $$('[data-g29a]',root).forEach(b=>b.onclick=e=>{e.stopPropagation();open29(b.dataset.g29a,null)});
+  $$('[data-g29a]',root).forEach(b=>b.onclick=e=>{e.stopPropagation();R29.newPericia=b.dataset.p||'';open29(b.dataset.g29a,null)});
 }
 const vocKey29=name=>{const R=rules29();const e=Object.entries(R.voc).find(([k,o])=>o&&o.name===name);return e?e[0]:name};
 const trkKey29=(arch,name)=>{const R=rules29();const e=Object.entries(R.track).find(([k,o])=>o&&o.name===name&&(o.archetype||k.split('|')[0])===arch);return e?e[0]:arch+'|'+name};

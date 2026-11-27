@@ -19,7 +19,12 @@ const GW11={m:['gd-tag m','👑 Exclusivo do Mestre'],p:['gd-tag p','🎲 Jogado
 /* Conteúdo. w = quem usa: m (só o Mestre), p (jogadores), a (todos). */
 const GUIDE11=[
  {id:'new',ico:'🆕',name:'Últimas atualizações',items:[
-  {t:'🕹 Arcade 2.0 · Onda 11: Eco da Memória e Jogo da Velha',w:'a',open:1,b:`<ul>
+  {t:'📖 Regras novas no Manual Vivo: atributos, especializações e combate',w:'a',open:1,b:`<ul>
+<li><b>Manual completo.</b> Os 8 atributos, as 18 perícias com suas especializações, Bloqueio e manobras, Tiroteio Tático, coberturas, condições e itens caídos (seções 1.7 a 1.10 e 5.12 a 5.17).</li>
+<li><b>👑 O Mestre edita tudo</b> pelo lápis no Manual ou em ⚙️ Alterações do Sistema: benefícios dos atributos, especializações (e cria novas), DTs, coberturas e efeitos. Vale na hora na ficha e no combate; só quem é afetado recebe o aviso “!”.</li>
+<li><b>Na ficha e na Mesa.</b> Marque a situação da especialização para somar o +d20, conceda +1d20 a aliados (Comando Tático e Inspiração) e role especializações e contexto social direto pela Mesa.</li>
+<li><b>Medicina.</b> Sutura, Síntese e Trégua já somam as curas das especializações.</li></ul>`},
+  {t:'🕹 Arcade 2.0 · Onda 11: Eco da Memória e Jogo da Velha',w:'a',b:`<ul>
 <li><b>🧠 Eco · Jornada.</b> 6 Câmaras com regras próprias: Clara, Veloz, Espelho (repita de trás para frente), Giratória (os Elementos trocam de lugar depois de mostrar), Intruso (luzes cinzentas falsas que você deve ignorar) e Verdade (tudo junto). Você tem 3 Ecos: errar gasta um e repete a rodada.</li>
 <li><b>Revelação e Relâmpago.</b> 👁 (ou H) mostra a sequência de novo; ganhe mais uma a cada 5 rodadas. Tocar rápido rende bônus Relâmpago. Agora dá para jogar só pelo teclado: teclas 1 a 5 a partir do topo, no sentido do relógio.</li>
 <li><b>Eco na mesa.</b> O anfitrião escolhe a regra (Clássico, Espelho, Giratório ou Intruso) e vale para todos.</li>

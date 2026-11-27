@@ -65,9 +65,9 @@ window.tulpaSkillCalc=skillCalc3;
 currentAttr=skill=>E.diceFor(data,skill,SKILL_ATTR);
 skillBonus=skill=>{const c=skillCalc3({data,vocations,tracks},skill);return c.base+c.persistent+c.combatFlat};
 pendingTalentBonus=skill=>skillCalc3({data,vocations,tracks},skill).once;
-function doRoll(ch,skill,{label,extraBonus=0,forceDis=false,adv=false,attr,vert,generalista}={}){
+function doRoll(ch,skill,{label,extraBonus=0,extraDice=0,forceDis=false,adv=false,attr,vert,generalista}={}){
   const c=skillCalc3(ch,skill,attr,{vert,generalista}),d=ch.data;
-  const r=E.rollTest(d,c.skill,c.SA,{mods:c.mods,bonus:c.bonus+extraBonus,disadv:c.dis||forceDis,adv,consumeDelta:true});
+  const r=E.rollTest(d,c.skill,c.SA,{mods:c.mods,bonus:c.bonus+extraBonus,extraDice,disadv:c.dis||forceDis,adv,consumeDelta:true});
   r.calc=c;return r;
 }
 /* consome efeitos "uso único" e dado extra ao rolar */
@@ -90,9 +90,9 @@ function rollModal(skill,r,extra){
 rollSkill=function(skill,attr,opts={}){
   const ch={data,vocations,tracks},pre=skillCalc3(ch,skill,attr,opts);
   if(pre.blocked){toast('Essa especialização exige treino específico.');return null}
-  const soc=T3.socialTake?.(pre.skill),r=doRoll(ch,skill,{attr,vert:opts.vert,generalista:opts.generalista,extraBonus:soc?.bonus||0});
+  const soc=T3.socialTake?.(pre.skill),r=doRoll(ch,skill,{attr,vert:opts.vert,generalista:opts.generalista,extraBonus:soc?.bonus||0,extraDice:opts.extraDice||0});
   const label=opts.label||r.calc.skill;
-  consumeOnce(data,r.calc);save();renderTalents();renderSkills();rollModal(label,r,soc?.bonus?`Bônus social: +${soc.bonus} ${soc.attr} (${soc.motivo})`:'');
+  consumeOnce(data,r.calc);save();renderTalents();renderSkills();rollModal(label,r,[soc?.bonus?`Bônus social: +${soc.bonus} ${soc.attr} (${soc.motivo})`:'',opts.extraDice?`Situação da especialização: +${opts.extraDice}d20`:''].filter(Boolean).join(' · '));
   window.tulpaRollFx?window.tulpaRollFx($('modalBody'),{d20:true,crit:r.best===20,fumble:r.best===1,who:[data.name]}):fx3('dice');
   T3.shareSheetRoll?.(label,r);
   T3.narrateRoll?T3.narrateRoll({name:data.name,skill:label,dice:[r.best],total:r.total}):T3.perseusReact?.(r.best===20?'nat20':(r.best===1?'nat1':''));

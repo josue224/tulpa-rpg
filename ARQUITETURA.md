@@ -15,7 +15,7 @@ Roda direto no GitHub Pages (`usuario.github.io/tulpa-rpg/`): sem bundler, sem b
 
 ## Cache (importante no GitHub Pages)
 
-O Pages manda os arquivos com cache de ~10 min. Como os arquivos agora dependem uns dos outros, um visitante poderia receber um `js/20` novo com um `js/22` antigo. Por isso todo `src`/`href` local leva `?v=20261122p`. **A cada deploy que mude qualquer arquivo, troque o token em todas as tags:**
+O Pages manda os arquivos com cache de ~10 min. Como os arquivos agora dependem uns dos outros, um visitante poderia receber um `js/20` novo com um `js/22` antigo. Por isso todo `src`/`href` local leva `?v=TOKEN` (hoje `?v=2026112714`). **A cada deploy que mude qualquer arquivo, troque o token em todas as tags:**
 
 ```bash
 sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
@@ -29,8 +29,12 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
 <head>   css/01-base-layout.css  →  supabase-js (CDN)
 <body>   markup (portal, app, modais)  →  scripts/CSS intercalados na MESMA posição dos blocos originais:
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
-         → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Combate corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos)
-         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas) → js/60d → js/60e (filtros Arcade) → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/61   (antigo closure; 61 = inicialização, sempre por último)
+         → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos) → css/19 (Manual: regras)
+         → js/09 → js/09b → js/10 … js/28 → js/32 → js/33 → js/35 … js/49 → js/60b (App Shell) → js/60c (Fichas) → js/60d (carregador) → js/60e (filtros Arcade)
+         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/61   (61 = inicialização, sempre por último)
+
+Sob demanda (sem <script>; QUEUE do js/60d, nesta ordem, na 1ª abertura do Arcade):
+         js/60f (motor gráfico) → js/29 → js/30 → js/31 → js/34 → js/50 → js/51 → … → js/60
 ```
 
 Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` original, para manter a cascata idêntica (inclusive em relação a estilos que o JS injeta no `<head>`).
@@ -57,12 +61,15 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 16 | `16-combate-cac.css` | novo | 2 KB | **Onda 10**: marcador de Reação (área de toque de 44 px), botões de bloqueio e painel de corpo a corpo (só layout). |
 | 17 | `17-tiroteio.css` | novo | 2 KB | **Onda 11**: seletor do Tiroteio Tático, botões de resposta ao tiro e painel da ficha (só layout). |
 | 18 | `18-itens-caidos.css` | novo | 3 KB | **Onda 12**: ícones dos itens no chão, ficha do item e botão “Pegar Item” sobre o mapa (só layout; fundo escuro próprio, como a barra de combate). |
+| 19 | `19-manual-regras.css` | novo | 2 KB | **Onda 13**: cartões das vertentes no Manual, editor de efeitos do Mestre, opção de situação na ficha e na Mesa (só layout). |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
 ## JavaScript (`js/`)
 
 Arquivos `01`–`08` são os scripts que já eram separados no original (cada um com seu próprio isolamento de erro). Arquivos `09`–`61` são as fatias do antigo closure.
+
+**Sem `<script>` no `index.html`** (o `60d` injeta, nesta ordem, na 1ª abertura do Arcade): `60f`, `29`, `30`, `31`, `34`, `50`, `51`, `52`, `53`, `54`, `55`, `56`, `57`, `58`, `59`, `60`.
 
 | Ordem | Arquivo | Linhas orig. | Tamanho | Conteúdo |
 |---|---|---|---|---|
@@ -75,7 +82,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 7 | `07-combate-entrypoints.js` | 1122 | 0.3 KB | Combate · pontos de entrada: Listener de clique para #beginCombat e #rollNpcReflexes. |
 | 8 | `08-mesa-rolagens.js` | 1187–1377 | 14 KB | Mesa · rolagem de perícias compartilhada: IIFE: rolagem de perícias na mesa, pop-up e histórico. |
 | 9 | `09-catalogos-manual.js` | 3428–3864 | 90 KB | Catálogos do Manual V1.2: Armas, proteções, equipamentos, vocações, trilhas, rituais e sub-elementos (dados puros). |
-| 9b | `09b-catalogo-vertentes.js` | novo | 12 KB | **Onda 8**: `PERICIA_DEFS` (18) e `VERT_DEFS` (48 vertentes: id estável, perícia, atributos, descrição, efeitos estruturados, `requiresTraining`). Listas vivas, reconstruídas pelo `js/40` com `rules.pericia`/`rules.vert`. |
+| 9b | `09b-catalogo-vertentes.js` | novo | 20 KB | **Onda 8**: `PERICIA_DEFS` (18) e `VERT_DEFS` (48 vertentes: id estável, perícia, atributos, descrição, efeitos estruturados, `requiresTraining`). Listas vivas, reconstruídas pelo `js/40` com `rules.pericia`/`rules.vert`. |
 | 10 | `10-motor-regras.js` | 3865–4163 | 20 KB | Motor de regras: Lógica pura sem DOM: carga, modificadores, rolagem, dano, defesa, morrendo, lucidez, descanso. |
 | 11 | `11-ficha-nucleo.js` | 4164–4472 | 26 KB | Núcleo da ficha: Etapa 3: T3, cálculo unificado, persistência, recursos, navegação; aparência/tema/preferências. |
 | 12 | `12-ficha-abas.js` | 4473–4757 | 43 KB | Abas da ficha: Visão geral, inventário, estados, lucidez/êxtase/trauma, combate & defesa, descanso. |
@@ -129,12 +136,14 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60 | `60-arcade2-onda11.js` | 23321–23604 | 31 KB | Etapas 58–59 · Arcade 2.0 Onda 11: Arcade 2.0 Onda 11 (inclui Jogo da Velha 2.0). |
 | 60b | `60b-app-shell.js` | novo | 9 KB | **Onda 1 · App Shell**: monta o rail (desktop) / barra inferior (celular), destaca a tela atual e cria os botões Jogadores/Painel da Mesa. Só aciona o que já existe (`#openTable`, `T3.manualOpen`, `T3.arcGo`, `T3.petOpen`, `T3.sysOpen`, `T3.openSettings`, `T3.back`). Usa IIFE: não cria nomes globais. Roda ANTES do `61`. **v2:** `adoptMore()` move (não recria) `.mb-right`, `#mbArc26` e `#mbScr28` da barra da Mesa para o popover `#mbMore60` (botão `#mbMoreBtn60`); IDs e handlers dos outros arquivos seguem valendo. |
 | 60c | `60c-fichas.js` | novo | 4 KB | **Onda 2 · Fichas**: cria o cabeçalho `#sheetHead60` (Vital/Lucidez/Essência) como espelho SOMENTE LEITURA de `#stats`, mede o topbar (`--tb-h`) e o cabeçalho fixo (`--sh-h`), marca o botão “← Central” (`.tb-central60`) e mantém a aba ativa visível. IIFE; roda ANTES do `61`. |
+| 60d | `60d-arcade-loader.js` | novo | 7 KB | Carregador sob demanda do Arcade: a `QUEUE` (acima) entra na 1ª abertura; envolve `mgOpen`, `T3.mgOpen` e `T3.arcGo`; expõe `T3.ensureArcadeLoaded()`. |
 | 60e | `60e-arcade-filtros.js` | novo | 4 KB | **Onda 4 · Filtros do Arcade**: barra com busca e filtros por modo (Solo, Contra o Perseus, Mesa, PvP 1v1) acima da grade de jogos. Lê o modo dos botões de cada cartão e é recriada por um `MutationObserver` a cada volta à vitrine. Filtro lembrado em `localStorage t60e.arcFilter`. |
 | 60f | `60f-arcade-gfx.js` | novo | 40 KB | **Motor gráfico do Arcade** (`window.GFX60`): sprites e tilesets procedurais, paralaxe, luz/glow, partículas, hit-stop visual e HUD. Sem `<script>`: entra pela `QUEUE` do `60d`. Ver a seção própria abaixo. |
 | 60g | `60g-ficha-regras.js` | novo | 17 KB | **Onda 9 · Ficha**: envolve `renderAttributes`/`renderStats`/`renderMind`/`renderSkills`; expõe `T3.socialTake(perícia)` (bônus social da próxima rolagem) e `T3.renderEspecializacoes()`. Rola por `rollSkill(perícia,atributo,{vert|generalista,label})`. |
 | 60h | `60h-combate-cac.js` | novo | 23 KB | **Onda 10 · Corpo a corpo**: marcador de Reação, Guarda, manobras (linhas `man`/`manres`), agarrão, empurrão no aparelho do Mestre, painel na Mesa e na ficha; envolve `processRow`, `applyFxLocal`, `renderCombatTab`, `castRitual`, `onCombatEnd`. Gancho de desarme: `T3.disarmHooks` e evento `tulpa:disarm`. |
 | 60i | `60i-tiroteio.js` | novo | 27 KB | **Onda 11 · Tiroteio Tático**: seletor de contexto, Mergulho, 2º Disparo, supressão e Tiro Livre (linhas `sup`/`supres`/`supx`/`dive`), barulho do disparo; envolve `performAttack`, `queuePrompt`, `defendPrompt`, `processRow`, `renderCombatTab`, `onCombatEnd`, `T3.cacPanel`/`cacBind`. |
 | 60j | `60j-itens-caidos.js` | novo | 22 KB | **Onda 12 · Itens caídos**: livro `M6.state.drops`/`dropsDone` (só o Mestre grava), pedidos `dropreq`/`pickreq`/`pickres`, ajuste das fichas, camada SVG no mapa e botão contextual; envolve `paintOver10`, `mapMenu7`, `renderInventory`, `processRow`, `renderCombatUI`, `pendingMine14`. |
+| 60k | `60k-manual-regras.js` | novo | 9 KB | **Onda 13**: componentes vivos do Manual (`LIVE31.attrs/verts/bloqueio/manobras/tiro/cobertura/condicoes`) e `T3.vertGrant` (+d20 concedido a aliados). |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
@@ -197,6 +206,17 @@ Contexto do tiro (`detail.shot` na linha `atk`): `{aware,pointBlank,short,cover,
 | UI | `T3.itemDrop(ch,itemId)` · `T3.itemDropMenu(ch)` · `T3.itemPick(dropId,charId)` |
 
 Entrada: `{id,line,st:'floor'|'taken',map,x,y,from,by?,as?,item,...}`. `line` liga as passagens do mesmo item; `as` troca o id se dois itens tiverem o mesmo. `M6.state.dropsDone` guarda linhas e pedidos já tratados (recarregar não repete). A ficha é ajustada por quem controla o personagem; o Mestre cobre quem está fora da mesa.
+
+### Dados editáveis e Manual (Onda 13)
+
+| Grupo | Chamada |
+|---|---|
+| Dados (`js/09b`) | `ATTR_DEFS` · `REGRA_DEFS` (`{id,g,l,d,min,max,step,t,who}`) · `REGRA_NUM` (valores em vigor) · `QUANDO_LABEL` · `QUANDO_AUTO` |
+| Leitura | `E.regra(id)` · `E.regraDef` · `E.regraClean(def,valor)` (undefined = inválido) · getters `E.DB`, `E.COVER`, `E.GUARDA_BONUS`, `E.GUARDA_CAP`, `E.POINT_BLANK`, `E.SHOTGUN_RANGE`, `E.DIVE_M`, `E.SPRINT_DF`, `E.PRONE_DF`, `E.PUSH_HAZARD` · `E.attrBenefits(nome)` |
+| Fora do combate | `E.situations(d,id)` · `E.grant(d,id)` · `E.useGrant`* (`d.grantUsed`, zera em `E.resetSceneFlags`) · `E.healBonus` · `E.healDice` · `E.supportBonus` · `E.quandoLabel` · `E.shieldValue` |
+| Central (`js/40`) | chaves `rules.attr={nome:{desc}}`, `rules.num={id:valor}`, `rules.pericia`, `rules.vert` · `rebuildVert29`/`rebuildNum29` (conferem tudo) · `eff29` · `effText29` · seções `attr`, `pericia`, `vert`, `num` · log com `ids`/`requer` para `hits29` |
+| Texto (`js/43`) | `{{r:id}}`, `{{carga}}`, `{{comb}}` nos blocos e tabelas do Manual |
+| Rolagem | `doRoll(..,{extraDice})` · `rollSkill(..,{extraDice})` · `T3.rollSkillAs(ch,perícia,atributo,{vert,generalista,extraDice,social})` |
 
 ## App Shell (Onda 1)
 
@@ -325,6 +345,7 @@ Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HU
 | Campanhas, personagens, sincronização das fichas | `js/06-supabase-campanhas-fichas.js`, `js/02-portal-campanhas.js` |
 | Dados do sistema (armas, itens, vocações, trilhas, rituais) | `js/01-dados-base.js`, `js/09-catalogos-manual.js` |
 | Regras puras (rolagem, dano, defesa, descanso) | `js/10-motor-regras.js`, `js/17-regras-etapa4.js` |
+| Números, atributos, perícias e vertentes (dados) | `js/09b-catalogo-vertentes.js` (edição do Mestre em `js/40`) |
 | Ficha: abas, inventário, estados, lucidez | `js/11-ficha-nucleo.js`, `js/12-ficha-abas.js` |
 | Habilidades, rituais, efeitos e combate da ficha | `js/13-combate-habilidades.js` |
 | Perseus (conhecimento, motor, IA, animações, visita) | `js/14`, `js/16`, `js/18`, `js/37`, `js/33` |
@@ -335,7 +356,7 @@ Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HU
 | Alterações do Sistema (central do Mestre) | `js/40-alteracoes-sistema.js` |
 | Óbolos | `js/41-obolos.js` |
 | Estéticas / temas | `js/38-esteticas.js` + `css/08-esteticas.css` |
-| Arcade (hub, jogos, Arcade 2.0) | `js/28`–`js/31`, `js/34`, `js/50`–`js/60` |
+| Arcade (hub, jogos, Arcade 2.0) | `js/28` (tag no `index.html`); `js/29`–`js/31`, `js/34`, `js/50`–`js/60f` (via `60d`) |
 | Mini-games de intervalo, Levantar a Mão | `js/25`, `js/26` |
 
 **Nunca precisa sincronizar (assets gigantes em base64):** `js/15`, `js/36`, `js/45`, `js/47` (~770 KB somados) — a menos que seja para trocar a imagem/arte.

@@ -2,7 +2,7 @@
 const E={};
 const _C=(typeof require!=='undefined'&&typeof CARGA==='undefined')?require('./catalog.js'):null;
 const C=_C||{CARGA,SOCIAL,MENTAL_ATTRS,AGILITY_SKILLS,ATTACK_SKILLS,STATUS_BY_ID,TRAUMA_BY_ID,EXTASE_BY_ID,UNARMED,REST_TABLE};
-E.DB=10;
+/* DB, cobertura, guarda e os demais números de regra vêm de REGRA_NUM (js/09b, editável pela chave rules) */
 E.rng=()=>{try{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296}catch(e){return Math.random()}};
 E.die=(s,r=E.rng)=>1+Math.floor(r()*s);
 E.parseDice=str=>{const m=String(str||'0').replace(/\s/g,'').match(/^(\d+)d(\d+)([+-]\d+)?$/i);if(m)return{n:+m[1],s:+m[2],mod:+(m[3]||0)};const k=Number(str);return{n:0,s:0,mod:Number.isFinite(k)?k:0}};
@@ -252,7 +252,7 @@ E.restPatamar=(d,{base=1,vigilia=false,sedacao=false,ancorado=false,autocirurgia
   return{base:b,final:cl(p),es:cl(esP),luc:cl(lucP),intTest,noLuc:vigilia,notes};
 };
 /* o "+I" da tabela de Trégua é a Percepção do personagem (benefício direto do atributo) */
-E.restRoll=(d,patamarEs,patamarLuc,{intuicao=E.restLucBonus(d)||1,stage=1,intFailed=false,noLuc=false,rng=E.rng}={})=>{
+E.restRoll=(d,patamarEs,patamarLuc,{intuicao=d?.attributes?E.restLucBonus(d):1,stage=1,intFailed=false,noLuc=false,rng=E.rng}={})=>{
   const T=C.REST_TABLE;let es=0,luc=0,det=[];
   const f=(expr)=>{const s=expr.replace('E',stage).replace('I',intuicao);const r=E.rollExpr(s.replace(/\+(\d+)\+(\d+)/,(m,a,b)=>'+'+(+a+ +b)),rng);return r};
   const dr=(expr)=>{const mm=expr.match(/^(\d+d\d+)(?:\+(E|I))?$/);if(!mm)return{total:+expr,rolls:[],mod:0};const r=E.rollExpr(mm[1],rng);const add=mm[2]==='E'?stage:mm[2]==='I'?intuicao:0;return{rolls:r.rolls,mod:add,total:r.total+add}};
@@ -264,7 +264,7 @@ E.restRoll=(d,patamarEs,patamarLuc,{intuicao=E.restLucBonus(d)||1,stage=1,intFai
 };
 
 /* ---------- Combustão Vital ---------- */
-E.combustao=(missing,vigor)=>({vtCost:missing*2,maxEsTurno:vigor+2,okTurno:missing<=vigor+2});
+E.combustao=(missing,vigor)=>{const max=E.regra('combBase')+vigor*E.regra('combPorCon');return{vtCost:missing*2,maxEsTurno:max,okTurno:missing<=max}};
 
 /* ---------- Texto de habilidades → efeitos extras ---------- */
 E.parseExtras=desc=>{
@@ -310,8 +310,43 @@ E.suggestStatus=desc=>{
    que alteram a ficha dizem isso no comentário.
    =================================================================== */
 
+/* ---------- Números das regras (editáveis pelo Mestre) ---------- */
+E.regraDefs=()=>typeof REGRA_DEFS!=='undefined'?REGRA_DEFS:(C.REGRA_DEFS||[]);
+E.regraDef=id=>E.regraDefs().find(r=>r.id===id)||null;
+/* valor aceito para a regra (número dentro da faixa, ou dado como "1d6"); undefined = inválido */
+E.regraClean=(def,raw)=>{
+  if(!def||raw===null||raw===undefined||raw===''||typeof raw==='boolean'||typeof raw==='object')return undefined;
+  if(def.t==='dado'){const s=String(raw).replace(/\s/g,'').toLowerCase(),m=s.match(/^(\d{1,2})d(\d{1,3})([+-]\d{1,3})?$/);return m&&+m[1]>0&&+m[2]>1?s:undefined}
+  const n=Number(String(raw).replace(',','.'));
+  if(!Number.isFinite(n)||n<def.min||n>def.max)return undefined;
+  const st=def.step||1;return Math.abs(n/st-Math.round(n/st))<1e-9?n:undefined;
+};
+E.regra=id=>{const def=E.regraDef(id);if(!def)return undefined;const v=E.regraClean(def,typeof REGRA_NUM!=='undefined'?REGRA_NUM[id]:undefined);return v===undefined?def.d:v};
+{const g=(k,get)=>Object.defineProperty(E,k,{get,enumerable:true,configurable:true});
+  g('DB',()=>E.regra('db'));
+  g('COVER',()=>({parcial:E.regra('coberturaParcial'),pesada:E.regra('coberturaPesada')}));
+  g('GUARDA_BONUS',()=>E.regra('guardaBonus'));g('GUARDA_CAP',()=>E.regra('guardaUsos'));
+  g('POINT_BLANK',()=>E.regra('queimaRoupa'));g('SHOTGUN_RANGE',()=>E.regra('espingardaAlcance'));
+  g('DIVE_M',()=>E.regra('mergulhoM'));g('SPRINT_DF',()=>E.regra('disparadaDF'));g('PRONE_DF',()=>E.regra('caidoDF'));
+  g('PUSH_HAZARD',()=>({parede:E.regra('colisaoDado'),borda:E.regra('quedaDado'),token:E.regra('colisaoDado')}));
+}
+/* texto do benefício direto de cada atributo, montado com os números em vigor */
+E.attrBenefits=name=>{
+  const r=E.regra,f=v=>String(v).replace('.',','),vezes=v=>v===1?'':f(v)+' × ',por=(v,s)=>`+${f(v)} por ponto de ${s}`;
+  const T={
+    'Força':()=>[`Limite de carga = ${f(r('cargaBase'))} + ${vezes(r('cargaPorFor'))}FOR (+${f(r('cargaMochila'))} com mochila).`,`Dano corpo a corpo (Armas Brancas e Briga) e de arremesso: ${por(r('danoPorFor'),'FOR')}.`],
+    'Destreza':()=>[`Defesa (DF): ${por(r('dfPorDes'),'DES')}, sem proteção Pesada e sem excesso de carga.`,`Armas corpo a corpo Leves e Briga ágil podem usar DES no dano no lugar de FOR (${por(r('danoPorDes'),'DES')}).`],
+    'Constituição':()=>[`Vital máximo: ${por(r('vtPorCon'),'CON')}.`,`Bloqueio reduz o dano em ${f(r('bloqPorCon'))} por ponto de CON (sempre passa ao menos ${f(r('bloqueioMinimo'))}).`,`Combustão Vital: até ${f(r('combBase'))} + ${vezes(r('combPorCon'))}CON de ES por turno.`],
+    'Inteligência':()=>[`Perícias treinadas (+5) extras: ${f(r('periciaPorInt'))} por ponto de INT acima de ${f(r('periciaIntBase'))}.`,`Cura de Sutura Bruta e Síntese Cirúrgica: ${por(r('curaPorInt'),'INT')}.`],
+    'Percepção':()=>[`DT contra aproximação furtiva = ${f(r('furtDTBase'))} + ${vezes(r('furtPorPer'))}PER.`,`Lucidez recuperada na Cena de Trégua: ${por(r('treguaPorPer'),'PER')}.`],
+    'Presença':()=>[`Essência máxima: ${por(r('esPorPre'),'PRE')}.`,`O 1º dano de Lucidez da cena é reduzido em ${f(r('blindPorPre'))} por ponto de PRE (sempre passa ao menos ${f(r('blindMin'))}). A blindagem volta no fim da cena.`],
+    'Carisma':()=>[`Acalmar, negociar ou liderar em diálogo contínuo (Persuasão, Liderança) e ancorar um aliado na Trégua: ${por(r('socialPorCar'),'CAR')}.`],
+    'Aparência':()=>[`Só na 1ª rolagem social contra quem acabou de ver o personagem: ${por(r('socialPorApa'),'APA')}. Depois valem CAR e a perícia.`]
+  };
+  return T[name]?T[name]():[];
+};
+
 /* ---------- Cobertura ---------- */
-E.COVER={parcial:4,pesada:6};
 E.coverBonus=kind=>E.COVER[kind]||0; /* cobertura total não tem número: bloqueia a linha de visão */
 
 /* ---------- Os 8 benefícios diretos de atributo ---------- */
@@ -322,7 +357,7 @@ E.isCreature=d=>!!d?.beastId;
 const _A=(d,n)=>E.isCreature(d)?0:E.attr(d,n);
 
 /* FOR: limite de carga = 3 + FOR (+2 com mochila) */
-E.carryLimit=d=>3+Math.max(1,E.attr(d,'Força'))+(d?.inventory?.mochila?2:0);
+E.carryLimit=d=>E.regra('cargaBase')+Math.max(1,E.attr(d,'Força'))*E.regra('cargaPorFor')+(d?.inventory?.mochila?E.regra('cargaMochila'):0);
 /* FOR/DES no dano: devolve {bonus, attr}. opts.attr='Força'|'Destreza' é o atributo escolhido para o ataque. */
 E.damageBonus=(d,w,opts={})=>{
   const none={bonus:0,attr:''};
@@ -336,8 +371,9 @@ E.damageBonus=(d,w,opts={})=>{
   /* armas brancas Leves podem usar DES; Briga usa DES se a arma for Leve, se o ataque for de DES ou com um estilo de DES treinado */
   const dexOk=!melee?dexThrow():brawl?(w.peso==='Leve'||opts.attr==='Destreza'||dexStyle()):light;
   const f=E.attr(d,'Força'),x=E.attr(d,'Destreza');
-  if(opts.attr==='Força')return{bonus:f,attr:'Força'};
-  return dexOk&&(x>f||opts.attr==='Destreza')?{bonus:x,attr:'Destreza'}:{bonus:f,attr:'Força'};
+  const fv=f*E.regra('danoPorFor'),xv=x*E.regra('danoPorDes');
+  if(opts.attr==='Força')return{bonus:fv,attr:'Força'};
+  return dexOk&&(xv>fv||opts.attr==='Destreza')?{bonus:xv,attr:'Destreza'}:{bonus:fv,attr:'Força'};
 };
 /* DES: soma na DF, menos com proteção Pesada vestida ou com excesso de carga */
 E.heavyProtection=d=>(d?.inventory?.items||[]).filter(i=>i&&i.kind==='prot'&&i.loc==='vestido'&&i.peso==='Pesado'&&Number(i.p?.def)>0);
@@ -346,14 +382,14 @@ E.defenseDex=d=>{
   if(E.isCreature(d))return{value:0,allowed:false,why:'criatura'};
   if(E.heavyProtection(d).length)return{value:0,allowed:false,why:'protecao-pesada'};
   if(E.cargaInfo(d,E.hasEffect(d,'Força do Cotidiano')).level>0)return{value:0,allowed:false,why:'sobrecarga'};
-  return{value:E.attr(d,'Destreza'),allowed:true,why:''};
+  return{value:E.attr(d,'Destreza')*E.regra('dfPorDes'),allowed:true,why:''};
 };
 /* CON / PRE: máximos = tabela do estágio + atributo. table opcional (padrão: STAGES) */
 E.maxStats=(d,table)=>{
   const T=table||(typeof STAGES!=='undefined'?STAGES:C.STAGES),row=T[d?.stage]||T[1];
   if(E.isCreature(d))return{...row};
   if(!d?.attributes||d._publico)return{...row,vt:Number(d?.vtMax)||row.vt,es:Number(d?.esMax)||row.es};
-  return{...row,vt:row.vt+E.attr(d,'Constituição'),es:row.es+E.attr(d,'Presença')};
+  return{...row,vt:row.vt+E.attr(d,'Constituição')*E.regra('vtPorCon'),es:row.es+E.attr(d,'Presença')*E.regra('esPorPre')};
 };
 /* (altera d) depois de mudar atributo ou estágio: quem estava cheio continua cheio; o resto só é limitado */
 E.syncMax=(d,before)=>{
@@ -362,31 +398,32 @@ E.syncMax=(d,before)=>{
   return now;
 };
 /* CON: redução no Bloqueio (+ efeito de vertente, ex. Boxe +2; + Guarda Fechada +2) */
-E.GUARDA_BONUS=2;
 E.blockReduction=(d,{vert,guarda=false}={})=>{
-  const con=_A(d,'Constituição');
+  const con=_A(d,'Constituição')*E.regra('bloqPorCon');
   const list=E.vertEffects(d,'rdBloqueio',{vert});
   const rd=list.length?Math.max(...list.map(x=>Number(x.effect.valor)||0)):0;
   const g=guarda?E.GUARDA_BONUS:0;
   return{total:con+rd+g,con,vert:rd,guarda:g};
 };
 /* dano que passa por um bloqueio (com Brecha ou Parcial): metade - redução, mínimo 1 */
-E.blockedDamage=(damage,reduction)=>damage>0?Math.max(1,Math.floor(damage/2)-(Number(reduction)||0)):0;
+E.blockedDamage=(damage,reduction)=>damage>0?Math.min(damage,Math.max(E.regra('bloqueioMinimo'),Math.floor(damage/E.regra('bloqueioDivisor'))-(Number(reduction)||0))):0;
 /* CON: limite da Combustão Vital (ES por turno) */
-E.combustionLimit=d=>(E.attr(d,'Constituição')||1)+2;
+E.combustionLimit=d=>E.regra('combBase')+(E.attr(d,'Constituição')||1)*E.regra('combPorCon');
 /* INT: perícias treinadas extras e cura de Sutura/Síntese */
-E.intExtraSkills=d=>Math.max(0,E.attr(d,'Inteligência')-1);
+E.intExtraSkills=d=>Math.max(0,E.attr(d,'Inteligência')-E.regra('periciaIntBase'))*E.regra('periciaPorInt');
 E.limitsFor=d=>{const base=E.tierLimits?E.tierLimits(d?.stage):{five:0,ten:0,fifteen:0,free10:0},intExtra=E.intExtraSkills(d);return{...base,five:base.five+intExtra,intExtra}};
-E.medicineBonus=d=>E.attr(d,'Inteligência');
+E.medicineBonus=d=>E.attr(d,'Inteligência')*E.regra('curaPorInt');
 /* PER: DT contra aproximação furtiva e Lucidez na Trégua */
-E.stealthDT=d=>10+E.attr(d,'Percepção');
-E.restLucBonus=d=>E.attr(d,'Percepção');
+E.stealthDT=d=>E.regra('furtDTBase')+E.attr(d,'Percepção')*E.regra('furtPorPer');
+E.restLucBonus=d=>E.attr(d,'Percepção')*E.regra('treguaPorPer');
 /* PRE: blindagem do 1º dano de Lucidez da cena (reduz PRE, mínimo 1). d.lucShieldUsed guarda o uso. */
-E.shieldReady=d=>!d?.lucShieldUsed&&_A(d,'Presença')>0;
+E.shieldValue=d=>_A(d,'Presença')*E.regra('blindPorPre');
+E.shieldReady=d=>!d?.lucShieldUsed&&E.shieldValue(d)>0;
 E.lucidityShield=(d,amount,{consume=true}={})=>{ /* (altera d quando consume) */
   const raw=Math.max(0,Math.floor(Number(amount)||0));
   if(!raw||!E.shieldReady(d))return{raw,final:raw,reduced:0,applied:false};
-  const final=Math.max(1,raw-_A(d,'Presença'));
+  /* o mínimo nunca aumenta o dano sofrido */
+  const final=Math.min(raw,Math.max(E.regra('blindMin'),raw-E.shieldValue(d)));
   if(consume)d.lucShieldUsed=true;
   return{raw,final,reduced:raw-final,applied:true};
 };
@@ -396,12 +433,12 @@ E.applyLucidityDamage=(d,amount,{ignoreShield=false}={})=>{ /* (altera d) */
   const before=Number(d.lucidity)||0;d.lucidity=Math.max(0,before-r.final);
   return{...r,before,after:d.lucidity};
 };
-E.resetSceneFlags=d=>{if(d&&d.lucShieldUsed)d.lucShieldUsed=false;return d}; /* (altera d) fim da cena */
+E.resetSceneFlags=d=>{if(d&&d.lucShieldUsed)d.lucShieldUsed=false;if(d&&d.grantUsed)delete d.grantUsed;return d}; /* (altera d) fim da cena */
 /* CAR / APA: bônus social. primeira = 1ª rolagem contra quem acabou de ver o personagem (vale APA no lugar de CAR);
    dialogo = acalmar, negociar ou liderar em conversa contínua (Persuasão ou Liderança); ancorar = ancorar aliado na Trégua */
 E.socialBonus=(d,skill,{primeira=false,dialogo=false,ancorar=false}={})=>{
-  if(primeira&&(C.SOCIAL||[]).includes(skill))return{bonus:_A(d,'Aparência'),attr:'Aparência',motivo:'Primeira impressão'};
-  if(ancorar||(dialogo&&['Persuasão','Liderança'].includes(skill)))return{bonus:_A(d,'Carisma'),attr:'Carisma',motivo:ancorar?'Ancorar aliado':'Diálogo contínuo'};
+  if(primeira&&(C.SOCIAL||[]).includes(skill))return{bonus:_A(d,'Aparência')*E.regra('socialPorApa'),attr:'Aparência',motivo:'Primeira impressão'};
+  if(ancorar||(dialogo&&['Persuasão','Liderança'].includes(skill)))return{bonus:_A(d,'Carisma')*E.regra('socialPorCar'),attr:'Carisma',motivo:ancorar?'Ancorar aliado':'Diálogo contínuo'};
   return{bonus:0,attr:'',motivo:''};
 };
 
@@ -416,7 +453,7 @@ E.vert=id=>E.vertDefs().find(v=>v.id===id)||null;
 /* aceita id da perícia ('briga'), nome ('Persuasão / Etiqueta') ou perícia da ficha ('Etiqueta') */
 E.pericia=key=>E.periciaDefs().find(p=>p.id===key||p.name===key||(p.skills||[]).includes(key))||null;
 E.vertsOf=key=>{const p=E.pericia(key);return p?E.vertDefs().filter(v=>v.pericia===p.id):[]};
-E.generalist=bonus=>Math.floor((Number(bonus)||0)/2);
+E.generalist=bonus=>Math.floor((Number(bonus)||0)/E.regra('generalistaDiv'));
 E.vertGrade=(d,id)=>{const g=Number(d?.vertentes?.[id]?.g)||0;return g>=15?15:g>=10?10:g>=5?5:0};
 E.trainedVerts=(d,key)=>{
   const p=key?E.pericia(key):null;if(key&&!p)return[];
@@ -477,6 +514,28 @@ E.generalistCalc=(d,key,{skill,vocList,attr}={})=>{
 E.vertEffects=(d,tipo,{quando,alvo,vert}={})=>E.trainedVerts(d).filter(x=>!vert||x.id===vert)
   .flatMap(x=>(x.def.effects||[]).filter(e=>(!tipo||e.tipo===tipo)&&(!quando||e.quando===quando)&&(!alvo||e.alvo===alvo)).map(effect=>({id:x.id,def:x.def,grau:x.grau,effect})));
 E.vertSum=(d,tipo,f)=>E.vertEffects(d,tipo,f).reduce((a,x)=>a+(Number(x.effect.valor)||0),0);
+
+/* ---------- Efeitos fora do combate ---------- */
+E.quandoLabel=q=>(typeof QUANDO_LABEL!=='undefined'&&QUANDO_LABEL[q])||String(q||'situação').replace(/([a-z])([A-Z])/g,'$1 $2').toLowerCase();
+/* "+dados" de uma vertente treinada que o jogador liga à mão na rolagem (não se acumulam: vale o maior) */
+E.situations=(d,id)=>{
+  const auto=typeof QUANDO_AUTO!=='undefined'?QUANDO_AUTO:[];
+  const list=E.vertEffects(d,'dados',{vert:id}).map(x=>x.effect).filter(e=>Number(e.valor)>0&&!auto.includes(e.quando));
+  return{dice:list.length?Math.max(...list.map(e=>Number(e.valor))):0,labels:list.map(e=>E.quandoLabel(e.quando))};
+};
+/* +d20 que a vertente concede a outras pessoas: efeito "conceder" (Comando Tático) ou "+dados" ao grupo */
+E.grant=(d,id)=>{
+  const list=E.vertEffects(d,null,{vert:id}).map(x=>x.effect).filter(e=>(e.tipo==='conceder'||(e.tipo==='dados'&&e.alvo==='grupo'))&&Number(e.valor)>0);
+  if(!list.length)return null;
+  const c=list.find(e=>e.tipo==='conceder');
+  return{dice:Math.max(...list.map(e=>Number(e.valor))),grupo:list.some(e=>e.alvo==='grupo'),cena:c?.limite==='cena',movimento:c?.custo==='movimento',used:!!d?.grantUsed?.[id]};
+};
+E.useGrant=(d,id)=>{d.grantUsed={...(d.grantUsed||{}),[id]:1}}; /* (altera d) volta no fim da cena */
+/* cura extra das vertentes treinadas de quem trata (alvo: 'sutura', 'criticoTregua') */
+E.healBonus=(d,alvo)=>E.vertSum(d,'cura',{alvo});
+E.healDice=(d,alvo)=>E.vertEffects(d,'cura',{alvo}).filter(x=>x.effect.dado).map(x=>({dado:x.effect.dado,nome:x.def.name}));
+/* apoio de um aliado especialista na Trégua: o valor está na própria vertente */
+E.supportBonus=()=>Math.max(0,...E.vertDefs().flatMap(v=>(v.effects||[]).filter(e=>e.tipo==='cura'&&e.alvo==='lucidez').map(e=>Number(e.valor)||0)));
 
 /* ---------- Treinar, escolher e remover (alteram d; devolvem {ok,msg}) ---------- */
 /* Perícia antiga esperando vertente na mesma perícia (prefere a perícia da própria vertente) */
@@ -580,7 +639,6 @@ E.weaponAllowed=(d,w)=>E.isTwoHanded(w)&&!E.isCreatureAttack(w)&&(E.hasStatus(d,
 /* ---------- Reação (1 por rodada) e Guarda Fechada (até 2 Bloqueios) ----------
    d.reacao={r:rodada,i:índice do turno no último gasto,n:gastos,b:bloqueios,g:guarda}
    O registro vence sozinho no início do próximo turno do dono: nenhum aparelho precisa zerar nada. */
-E.GUARDA_CAP=2;
 E.turnCtx=(combat,charId)=>{
   if(!combat?.active||combat.phase!=='active')return null;
   const o=combat.order||[];
@@ -603,7 +661,7 @@ E.useReaction=(d,t,{block=false}={})=>{ /* (altera d) bloquear cabe na Guarda; o
   const i=E.reactionInfo(d,t);
   if(i.forbidden)return{ok:false,msg:'Neste estado você não pode usar reações.'};
   if(!t)return{ok:true};
-  if(block?!i.canBlock:!i.reactionAvailable)return{ok:false,msg:i.guard?'Os 2 usos da Guarda Fechada já não permitem isso nesta rodada.':'A Reação desta rodada já foi usada.'};
+  if(block?!i.canBlock:!i.reactionAvailable)return{ok:false,msg:i.guard?'Os usos da Guarda Fechada já não permitem isso nesta rodada.':'A Reação desta rodada já foi usada.'};
   d.reacao={r:t.round,i:t.turnIndex,n:i.uses+1,b:i.blocks+(block?1:0),g:i.guard};
   return{ok:true};
 };
@@ -639,7 +697,7 @@ E.canBlock=(d,{weapon,turn=null,noDefense=false,surprise=false,pointBlank=false}
   const f=E.computeMods(d).flags;
   if(['semDefender','semAgir','semEsquivar'].some(x=>f.has(x)))return{ok:false,msg:'Você não pode se defender neste estado.'};
   const i=E.reactionInfo(d,turn);
-  if(!i.canBlock)return{ok:false,msg:i.forbidden?'Neste estado você não pode usar reações.':i.guard?'Os 2 bloqueios da Guarda Fechada já foram usados.':'A Reação desta rodada já foi usada.'};
+  if(!i.canBlock)return{ok:false,msg:i.forbidden?'Neste estado você não pode usar reações.':i.guard?`Os ${E.GUARDA_CAP} bloqueios da Guarda Fechada já foram usados.`:'A Reação desta rodada já foi usada.'};
   return{ok:true};
 };
 E.blockPlan=(d,styleId,turn=null)=>{
@@ -657,7 +715,7 @@ E.blockPlan=(d,styleId,turn=null)=>{
 E.resolveBlock=({block,ATA,DB=E.DB,damage=0,reduction=0,nat20=false})=>{
   let outcome;
   if(ATA<DB&&block>=DB)outcome=nat20?'parcial':'erro';
-  else if((block>=ATA&&ATA<DB)||block-ATA>=5)outcome='brecha';
+  else if((block>=ATA&&ATA<DB)||block-ATA>=E.regra('brechaMargem'))outcome='brecha';
   else if(block>=DB&&ATA>block)outcome='parcial';
   else if(block<DB&&ATA>=DB)outcome='quebrada';
   else outcome='parcial';
@@ -694,7 +752,7 @@ E.MANOBRAS={
   derrubar:{name:'Derrubar',skills:['Briga'],def:['Briga'],hint:'Disputa. Se vencer, o alvo fica Caído (empate favorece quem defende).'},
   agarrar:{name:'Agarrar',skills:['Briga'],def:['Briga'],hint:'Disputa. O alvo fica Agarrado; você ocupa 1 mão e anda pela metade.'},
   escapar:{name:'Escapar',skills:['Briga'],def:['Briga'],hint:'Disputa contra quem segura você.'},
-  empurrar:{name:'Empurrar',skills:['Briga'],def:[],hint:'Teste contra DT 10 + maior entre FOR e CON do alvo. Empurra até 4,5 m (teto de 1,5 m × sua FOR).'}
+  empurrar:{name:'Empurrar',skills:['Briga'],def:[],get hint(){const m=v=>String(v).replace('.',',');return`Teste contra DT ${E.regra('empurraoDT')} + maior entre FOR e CON do alvo. Empurra até ${m(3*E.regra('empurraoPasso'))} m (teto de ${m(E.regra('empurraoTeto'))} m × sua FOR).`}}
 };
 /* alvo é opcional: a ficha de outro jogador pode não estar neste aparelho (vale o que for público) */
 E.maneuverCheck=(d,m,target=null,targetId='')=>{
@@ -720,15 +778,15 @@ E.maneuverPlan=(d,m,{skill,targetTwoHanded=false}={})=>{
   let attr=sk==='Briga'?'Força':null,extraDice=0,bonus=0;
   if(m==='empurrar'){const alt=mine('atributoManobra','empurrar')[0]?.effect.atributo;if(alt&&E.attr(d,alt)>E.attr(d,'Força')){attr=alt;notes.push('Taekwondo / Karatê: Destreza para Empurrar')}}
   mine('dados',m).forEach(x=>{const n=Number(x.effect.valor)||0;extraDice+=n;notes.push(`${x.def.name}: +${n}d20`)});
-  if(m==='desarmar'&&targetTwoHanded){bonus-=2;notes.push('Alvo empunha arma de duas mãos: −2')}
+  const pen=E.regra('desarmeDuasMaos');if(m==='desarmar'&&targetTwoHanded&&pen){bonus-=pen;notes.push(`Alvo empunha arma de duas mãos: −${pen}`)}
   return{skill:sk,attr,extraDice,bonus,notes};
 };
 E.contest=(atk,def)=>({success:atk>def,margin:atk-def}); /* empate favorece quem defende */
-E.pushDT=target=>10+Math.max(1,E.attr(target,'Força'),E.attr(target,'Constituição'));
-E.pushMeters=(margin,atkFor)=>margin<0?0:Math.min((margin>=10?3:margin>=5?2:1)*1.5,1.5*Math.max(1,Number(atkFor)||1));
+E.pushDT=target=>E.regra('empurraoDT')+Math.max(1,E.attr(target,'Força'),E.attr(target,'Constituição'));
+E.pushMeters=(margin,atkFor)=>margin<0?0:Math.min((margin>=E.regra('empurraoMargem3')?3:margin>=E.regra('empurraoMargem2')?2:1)*E.regra('empurraoPasso'),E.regra('empurraoTeto')*Math.max(1,Number(atkFor)||1));
 /* resolução no lado do alvo: def = total do defensor (null = indefeso) */
 E.resolveManeuver=({m,atk,def=null,dt=0,atkFor=1,twoHanded=false})=>{
-  const total=atk+(m==='desarmar'&&twoHanded?-2:0);
+  const total=atk+(m==='desarmar'&&twoHanded?-E.regra('desarmeDuasMaos'):0);
   if(m==='empurrar'){const margin=total-dt,meters=E.pushMeters(margin,atkFor);return{success:meters>0,margin,meters,total,dt}}
   if(def===null||def===undefined)return{success:true,margin:total,meters:0,total,def:null};
   return{...E.contest(total,def),meters:0,total,def};
@@ -768,7 +826,6 @@ E.pushPath=({x,y,dx,dy,dist,radius,segments=[],circles=[],bounds=null})=>{
   }
   return{x:cx,y:cy,moved,hit,hitId};
 };
-E.PUSH_HAZARD={parede:'1d4',borda:'1d6',token:'1d4'};
 
 /* ---------- Arremesso ---------- */
 E.isExplosive=w=>w?.skill==='Arremesso'&&(!!w.area||/molotov|granada|bomba|mina|dinamite/i.test(w.name||''));
@@ -790,7 +847,7 @@ E.throwDT=(m,short=6)=>m<=short?12:m<=12?15:m<=18?18:20+2*Math.ceil(Math.max(0,m
    Contexto de um tiro: {aware, pointBlank, short, cover:''|'parcial'|'pesada',
    sprint, aimed, rangePenalty, second, free, dist}.
    =================================================================== */
-E.POINT_BLANK=1.5;E.SHOTGUN_RANGE=6;E.DIVE_M=3;E.EXPOSE_M=.75;E.SPRINT_DF=2;E.PRONE_DF=2;
+E.EXPOSE_M=.75;
 E.isGun=w=>w?.skill==='Armas de Disparo'&&!w.area;
 /* especialização que a arma pede (item da campanha: w.spec manda). '' = nenhuma: vale o generalismo */
 E.gunClass=w=>{

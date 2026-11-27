@@ -66,8 +66,8 @@ function guard(ch){
   if(E.computeMods(d).flags.has('semAgir')){toast('Neste estado você não pode agir.');return}
   const test=E.closeGuard(JSON.parse(JSON.stringify(d)),t);if(!test.ok){toast(test.msg);return}
   spend(ch);mutateChar(ch,x=>E.closeGuard(x,t));
-  logRow(ch,'Guarda Fechada',`${nm(ch)} fechou a guarda (Ação Padrão): até 2 Bloqueios nesta rodada, +${E.GUARDA_BONUS} de redução.`);
-  toast('🛡 Guarda Fechada: até 2 Bloqueios, +2 de redução, até o seu próximo turno.');refresh();
+  logRow(ch,'Guarda Fechada',`${nm(ch)} fechou a guarda (Ação Padrão): até ${E.GUARDA_CAP} Bloqueios nesta rodada, +${E.GUARDA_BONUS} de redução.`);
+  toast(`🛡 Guarda Fechada: até ${E.GUARDA_CAP} Bloqueios, +${E.GUARDA_BONUS} de redução, até o seu próximo turno.`);refresh();
 }
 
 /* ---------- agarrão: soltar ---------- */
@@ -213,13 +213,13 @@ function pushOnMap(dt){
   if(!p.hit)return;
   const other=p.hit==='token'?nm(charById(p.hitId)):'';
   const what={parede:'bateu na parede',borda:'bateu na borda do mapa (pode ser uma queda)',token:'esbarrou em '+other}[p.hit];
-  const text=`${nm(tc)} foi empurrado ${fmtM14(moved)} m de ${fmtM14(dt.meters)} m e ${what}. Colisão 1d4 ou queda 1d6 de dano, ou teste de Atletismo/Reflexo, a critério do Mestre.`;
+  const text=`${nm(tc)} foi empurrado ${fmtM14(moved)} m de ${fmtM14(dt.meters)} m e ${what}. Colisão ${E.regra('colisaoDado')} ou queda ${E.regra('quedaDado')} de dano, ou teste de Atletismo/Reflexo, a critério do Mestre.`;
   logRow(tc,'Colisão',text);collision(tc,text,E.PUSH_HAZARD[p.hit]);
 }
 function collision(tc,text,sug){
   if($('modalWrap').classList.contains('open'))return setTimeout(()=>collision(tc,text,sug),1200);
   const b=(expr,label)=>`<button type="button" class="btn ${expr===sug?'primary':''}" data-haz="${expr}" data-lb="${label}">${label}: ${expr}</button>`;
-  openModal('COLISÃO NO EMPURRÃO',nm(tc),`<div class="notice t3-alert">${esc(text)}</div><div class="inline">${b('1d4','Colisão')}${b('1d6','Queda')}</div>`,'Sem dano',closeModal);
+  openModal('COLISÃO NO EMPURRÃO',nm(tc),`<div class="notice t3-alert">${esc(text)}</div><div class="inline">${b(E.regra('colisaoDado'),'Colisão')}${b(E.regra('quedaDado'),'Queda')}</div>`,'Sem dano',closeModal);
   $$('#modalBody [data-haz]').forEach(x=>x.onclick=()=>{closeModal();const n=rollAnn(tc,x.dataset.lb+' · '+x.dataset.haz,x.dataset.haz,'COLISÃO');sendFx([tc.id],[{t:'dmg',n}],`${nm(tc)} sofreu ${n} de dano (${x.dataset.lb.toLowerCase()})`,tc)});
 }
 function onMan(row,live){
@@ -303,11 +303,11 @@ function sheetPanel(){
   const man=Object.entries(E.MANOBRAS).filter(([k])=>k!=='escapar'||E.hasStatus(d,'agarrado')).map(([k,m])=>`<button type="button" class="btn" data-cacman="${k}" ${turn&&E.maneuverCheck(d,k).ok?'':'disabled'} title="${esc(m.hint)}">${m.name}</button>`).join('');
   const el=document.createElement('div');el.className='panel';el.id='cacSheet';
   el.innerHTML=`<div class="panel-head"><h2>Corpo a corpo</h2>${fight?`<button type="button" class="btn small cac-rx" data-st="${rxState(i)}" data-cacrx="${ch.id}" aria-pressed="${!i.reactionAvailable}">${rxText(i)}</button>`:'<span class="pill">Fora de combate</span>'}</div>
-  <p class="sub">1 Reação por rodada (volta no início do seu turno). A <b>Guarda Fechada</b> gasta a Ação Padrão: até 2 Bloqueios na rodada e +2 de redução.</p>
+  <p class="sub">1 Reação por rodada (volta no início do seu turno). A <b>Guarda Fechada</b> gasta a Ação Padrão: até ${E.GUARDA_CAP} Bloqueios na rodada e +${E.GUARDA_BONUS} de redução.</p>
   <div class="inline cac-acts"><button type="button" class="btn" id="cacGuardBtn" ${fight&&turn&&!i.guard&&!i.forbidden?'':'disabled'}>🛡 Guarda Fechada</button>${man}${held.map(id=>`<button type="button" class="btn" data-cacdrop="${ch.id}|${id}">Soltar ${esc(nm(charById(id)))}</button>`).join('')}</div>
   ${by||held.length?`<div class="notice t3-alert">${by?'Você está Agarrado por <b>'+esc(nm(charById(by)))+'</b>.':''} ${held.length?'Você segura '+held.map(id=>'<b>'+esc(nm(charById(id)))+'</b>').join(' e ')+': 1 mão ocupada e metade do deslocamento.':''}</div>`:''}
   <h3>Bloquear (Reação)</h3>${blocks}<p class="sub">Dano com Brecha ou Parcial: metade do dano menos a redução (mínimo 1).${cdice?` Contra-Ataque: +${cdice}d20.`:''}</p>
-  <div class="t3-table"><div><b>Erro total</b><span>ATA &lt; 10 e Bloqueio ≥ 10: nenhum dano e 1 Contra-Ataque grátis.</span></div><div><b>Brecha</b><span>Bloqueio ≥ ATA com ATA &lt; 10, ou folga de 5 ou mais: dano reduzido e 1 Contra-Ataque grátis.</span></div><div><b>Parcial</b><span>Bloqueio ≥ 10 e ATA maior (ou bloqueio vencendo por menos de 5): dano reduzido.</span></div><div><b>Guarda quebrada</b><span>Bloqueio &lt; 10 e ATA ≥ 10: dano total.</span></div></div>`;
+  <div class="t3-table"><div><b>Erro total</b><span>ATA &lt; ${E.DB} e Bloqueio ≥ ${E.DB}: nenhum dano e 1 Contra-Ataque grátis.</span></div><div><b>Brecha</b><span>Bloqueio ≥ ATA com ATA &lt; ${E.DB}, ou folga de ${E.regra('brechaMargem')} ou mais: dano reduzido e 1 Contra-Ataque grátis.</span></div><div><b>Parcial</b><span>Bloqueio ≥ ${E.DB} e ATA maior (ou bloqueio vencendo por menos de ${E.regra('brechaMargem')}): dano reduzido.</span></div><div><b>Guarda quebrada</b><span>Bloqueio &lt; ${E.DB} e ATA ≥ ${E.DB}: dano total.</span></div></div>`;
   box.insertBefore(el,box.children[1]||null);
   bind(el);
   el.querySelector('#cacGuardBtn').onclick=()=>guard(me());

@@ -56,8 +56,15 @@ function badge31(){const n=!!camp3()&&(Number(man31().rev)||0)>seenGet31()&&M31.
 function tokens31(s){
   const mv=(()=>{try{return T3.moveBase?.()||9}catch(e){return 9}})();
   const st=(()=>{try{return Number(typeof AI23!=='undefined'&&AI23.dt)||0}catch(e){return 0}})();
-  return s.replace(/\{\{move\}\}/g,String(mv).replace('.',',')+' m')
-    .replace(/\{\{stealthDT\}\}/g,st?`**DT ${st}** (fixa da mesa)`:'**DT = 10 + Percepção do inimigo** (entre 10 e 20, ou DT fixa de mesa)');
+  return regras31(s).replace(/\{\{move\}\}/g,String(mv).replace('.',',')+' m')
+    .replace(/\{\{stealthDT\}\}/g,st?`**DT ${st}** (fixa da mesa)`:`**DT = ${E.regra('furtDTBase')} + Percepção do inimigo** (ou DT fixa de mesa)`);
+}
+/* números das regras no texto: {{r:id}} (valor em vigor), {{carga}} e {{comb}} (fórmulas) */
+function regras31(s){
+  const f=v=>String(v).replace('.',','),x=v=>v===1?'':f(v)+' × ';
+  return String(s).replace(/\{\{r:(\w+)\}\}/g,(m,id)=>{const v=E.regra(id);return v===undefined?m:f(v)})
+    .replace(/\{\{carga\}\}/g,()=>`${f(E.regra('cargaBase'))} + ${x(E.regra('cargaPorFor'))}Força (+${f(E.regra('cargaMochila'))} com Mochila ou Maleta)`)
+    .replace(/\{\{comb\}\}/g,()=>`${f(E.regra('combBase'))} + ${x(E.regra('combPorCon'))}Constituição`);
 }
 function refs31(){
   if(M31.refs&&M31.refsAt===M31.renderAt)return M31.refs;
@@ -144,7 +151,7 @@ const LIVE31={
     const mech=s=>{const a=[];const dot=s.dot?.fixed||s.dot?.dice;if(dot)a.push(`${dot} de dano por turno`);if(s.defense)a.push(`${s.defense>0?'+':''}${s.defense} na Defesa`);if(s.physDice)a.push(`${s.physDice} dado em testes físicos`);const f=new Set(s.flags||[]);if(f.has('semMover'))a.push('movimento 0');if(f.has('semAgir'))a.push('não age');if(f.has('semAtacar'))a.push('não ataca');if(f.has('semDefender'))a.push('sem defesa');if(f.has('semReacao'))a.push('sem reações');if((s.disadv||[]).length)a.push('desvantagem em ataques');return a.join(' · ')};
     return gmA31('status','Estado')+tb31(['Estado','Efeito mecânico oficial','Automação no site'],L.map(({row,v})=>tr31([`<b>${esc(v.name)}</b>${tag31(row.st)}${v.group==='sistema'?' <span class="m31-st sys">sistema</span>':''}`,esc(v.text||''),esc(mech(v))||'—'],{gm:gmB31('status',row.key,v.name),key:row.key})),'m31-status')},
   table(){let t={};try{t=rules29().table||{}}catch(e){}const st=Number(t.dtStealth)||0;
-    return`<div class="m31-rules"><h4>Regras desta mesa${gm31()?' <button type="button" class="gm29-b" data-m31tab="1" title="Editar Regras da Mesa">✏️</button>':''}</h4><ul><li>Deslocamento base: <b>${String(Number(t.move)||9).replace('.',',')} m</b> por turno</li><li>DT do Arremesso até 6 m: <b>${Number(t.dtThrow)||12}</b></li><li>DT de Furtividade dos inimigos: <b>${st?st+' (fixa)':'10 + Percepção do inimigo'}</b></li></ul></div>`},
+    return`<div class="m31-rules"><h4>Regras desta mesa${gm31()?' <button type="button" class="gm29-b" data-m31tab="1" title="Editar Regras da Mesa">✏️</button>':''}</h4><ul><li>Deslocamento base: <b>${String(Number(t.move)||9).replace('.',',')} m</b> por turno</li><li>DT do Arremesso até 6 m: <b>${Number(t.dtThrow)||12}</b></li><li>DT de Furtividade dos inimigos: <b>${st?st+' (fixa)':E.regra('furtDTBase')+' + Percepção do inimigo'}</b></li></ul></div>`},
   beast(){let L=[];try{L=rules29().beast||[]}catch(e){}
     if(!L.length&&!gm31())return'<p class="m31-note">O Bestiário desta campanha ainda está vazio.</p>';
     return`<h4 class="m31-sub">Bestiário da campanha</h4>${gmA31('beast','Criatura')}<div class="m31-cards">${L.map(b=>`<article class="m31-card m31-row" data-key="${esc(b.id)}"><header><h4>${esc(b.name)}</h4><span class="m31-chip">${esc(b.tier||'Inimigo')}</span>${gmB31('beast',b.id,b.name)}</header><p class="m31-meta"><span><i>Vitalidade:</i> ${esc(String(b.vital??'—'))}</span><span><i>Defesa:</i> ${esc(String(b.def??'—'))}</span><span><i>Ataque:</i> ${esc(String(b.atk??'—'))}</span><span><i>Dano:</i> ${esc(String(b.dano??'—'))}</span></p>${b.skills?`<p>${link31(esc(b.skills))}</p>`:''}${b.notes?`<p class="m31-desc">${esc(b.notes)}</p>`:''}</article>`).join('')}</div>`}
@@ -157,7 +164,7 @@ function gmTxt31(id,{edited=false,added=false}={}){
   if(!gm31())return'';
   return`<span class="m31-gm" role="group" aria-label="Mestre: bloco de texto"><button type="button" class="gm29-b" data-m31e="${esc(id)}" title="Editar texto" aria-label="Editar texto">✏️</button><button type="button" class="gm29-b" data-m31a="${esc(id)}" title="Adicionar parágrafo abaixo" aria-label="Adicionar parágrafo abaixo">＋</button><button type="button" class="gm29-b" data-m31d="${esc(id)}" title="Excluir" aria-label="Excluir bloco">🗑️</button>${edited&&!added?`<button type="button" class="gm29-b" data-m31r="${esc(id)}" title="Restaurar o texto original do manual" aria-label="Restaurar original">↺</button>`:''}</span>`;
 }
-function editor31(id,text){return`<div class="m31-edit" data-ed="${esc(id)}"><label class="sub" for="m31ta">Texto (use **negrito**, *itálico* e linhas começando com "- " para listas)</label><textarea id="m31ta" rows="${Math.min(14,Math.max(4,String(text).split('\n').length+2))}">${esc(text)}</textarea><div class="m31-edbar"><button type="button" class="btn small primary" data-m31save="${esc(id)}">Salvar no Manual</button><button type="button" class="btn small" data-m31cancel="1">Cancelar</button></div></div>`}
+function editor31(id,text){return`<div class="m31-edit" data-ed="${esc(id)}"><label class="sub" for="m31ta">Texto (use **negrito**, *itálico* e linhas começando com "- " para listas; trechos como {{r:db}} mostram o valor em vigor)</label><textarea id="m31ta" rows="${Math.min(14,Math.max(4,String(text).split('\n').length+2))}">${esc(text)}</textarea><div class="m31-edbar"><button type="button" class="btn small primary" data-m31save="${esc(id)}">Salvar no Manual</button><button type="button" class="btn small" data-m31cancel="1">Cancelar</button></div></div>`}
 function blockHtml31(b){
   const D=man31();
   if(b&&b.live){const f=LIVE31[b.live];let h='';try{h=f?f(b):''}catch(e){console.warn('[T31] componente',b.live,e);h='<p class="sub">Não consegui montar esta tabela agora.</p>'}return h?`<div class="m31-live" data-live="${esc(b.live)}">${h}</div>`:''}

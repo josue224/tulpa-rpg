@@ -18,7 +18,8 @@ const CB14={mini:(()=>{try{return localStorage.getItem('tulpa_cb_mini')==='1'}ca
 T3.cb14=CB14;
 const MOVE14=9;                       /* metros por turno */
 const STOP14=['agarrado','paralisado','congelado','amarrado','agonia','morto'];
-const COVER14=E.COVER.parcial;        /* cobertura parcial: +4 na defesa (a pesada, +6, entra pelo motor) */
+/* cobertura parcial em vigor (a pesada entra pelo motor); o Mestre pode mudar o valor */
+Object.defineProperty(window,'COVER14',{get:()=>E.COVER.parcial,configurable:true});
 const AREA_TALENT_M14=6;              /* raio padrão de habilidades em área */
 
 const d14=ch=>ch?(ch.id===activeCharacterId?data:(ch.data||{})):{};
@@ -90,13 +91,13 @@ function mvInfo14(ch){
   const mv=mvState14(ch);let max=base*(mv.run?2:1);
   /* depois de atacar, o movimento que sobrou trava (o Acerto Violento dá ação, não movimento) */
   const locked=TURN.actor===ch.id&&!!((CB14.atkKey&&CB14.atkKey===TURN.key)||mv.lock),lm=E.lockedMove(max,mv.used,locked);
-  if(lm<max){max=lm;why.push(mv.aim?'você mirou neste turno':'você já atacou neste turno')}
+  if(lm<max){max=lm;why.push(mv.cmd?'você usou a Ação de Movimento':mv.aim?'você mirou neste turno':'você já atacou neste turno')}
   return{max,base,why:why.join(', '),canRun,over:ci.level,locked};
 }
 /* guarda a trava no aparelho (sobrevive ao F5). aim: Mirar gasta a Ação de Movimento inteira */
-function lockMove14(ch,{aim=false}={}){
+function lockMove14(ch,{aim=false,cmd=false}={}){
   if(!ch||!inCb14()||TURN.actor!==ch.id)return;
-  CB14.atkKey=TURN.key;const mv=mvState14(ch);mv.lock=true;if(aim)mv.aim=true;mvSave14(true);
+  CB14.atkKey=TURN.key;const mv=mvState14(ch);mv.lock=true;if(aim)mv.aim=true;if(cmd)mv.cmd=true;mvSave14(true);
 }
 T3.lockMove=lockMove14;
 function mvState14(ch){
@@ -104,7 +105,7 @@ function mvState14(ch){
   if(CB14.mv.key!==k||CB14.mv.cid!==ch.id){
     let s=null;try{s=JSON.parse(sessionStorage.getItem('tulpa_mv_'+k)||'null')}catch(e){}
     const own=!!(s&&s.cid===ch.id);
-    CB14.mv={key:k,cid:ch.id,used:own?Number(s.used)||0:0,run:own&&!!s.run,lock:own&&!!s.lock,aim:own&&!!s.aim};
+    CB14.mv={key:k,cid:ch.id,used:own?Number(s.used)||0:0,run:own&&!!s.run,lock:own&&!!s.lock,aim:own&&!!s.aim,cmd:own&&!!s.cmd};
   }
   return CB14.mv;
 }
@@ -587,7 +588,7 @@ function hud14(force){
         <button type="button" class="btn small primary" data-cb="atk" ${blocked||left<=0?'disabled':''}><i>⚔</i><span class="l">Atacar</span><span class="s">Atacar</span></button>
         ${hasAoe?`<button type="button" class="btn small" data-cb="throw" ${blocked||left<=0?'disabled':''}><i>💣</i><span class="l">Arremessar</span><span class="s">Granada</span></button>`:''}
         <button type="button" class="btn small" data-cb="man" ${blocked?'disabled':''} title="Desarmar, Derrubar, Agarrar, Escapar, Empurrar ou Soltar"><i>🤼</i><span class="l">Manobras</span><span class="s">Manobras</span></button>
-        <button type="button" class="btn small" data-cb="guard" ${blocked||left<=0||ri.guard||ri.forbidden?'disabled':''} title="Gasta a Ação Padrão: até 2 Bloqueios na rodada e +2 de redução"><i>🛡</i><span class="l">Guarda Fechada</span><span class="s">Guarda</span></button>
+        <button type="button" class="btn small" data-cb="guard" ${blocked||left<=0||ri.guard||ri.forbidden?'disabled':''} title="Gasta a Ação Padrão: até ${E.GUARDA_CAP} Bloqueios na rodada e +${E.GUARDA_BONUS} de redução"><i>🛡</i><span class="l">Guarda Fechada</span><span class="s">Guarda</span></button>
         <button type="button" class="btn small" data-cb="run" ${blocked||left<=0||mv.run||!info.canRun||!info.base?'disabled':''} title="Gasta a Ação Padrão e dobra o movimento deste turno"><i>🏃</i><span class="l">Disparada</span><span class="s">Correr</span></button>
         <button type="button" class="btn small" data-cb="abil" ${blocked?'disabled':''}><i>✦</i><span class="l">Talentos / Rituais</span><span class="s">Talentos</span></button>
         <button type="button" class="btn small" data-cb="quick" ${blocked||quickUsed||!quickItems.length?'disabled':''}><i>🔁</i><span class="l">Saque rápido</span><span class="s">Sacar</span></button>

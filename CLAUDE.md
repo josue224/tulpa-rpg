@@ -14,9 +14,9 @@ Hospedado no **GitHub Pages** (`josue224/tulpa-rpg`, branch `main`), backend **S
 
 ```
 index.html                 markup + <link>/<script> na ordem de execução
-css/01…15-*.css            estilos (a ordem importa: é a cascata original)
+css/01…19-*.css            estilos (a ordem importa: é a cascata original)
 js/01…61-*.js              scripts clássicos (escopo global compartilhado)
-js/09b-catalogo-vertentes.js  18 perícias e vertentes (dados; editáveis pela chave rules)
+js/09b-catalogo-vertentes.js  18 perícias, vertentes, atributos e números das regras (dados; editáveis pela chave rules)
 supabase/functions/perseus-ai/index.ts   Edge Function da IA do Perseus (Gemini)
 supabase/migrations/tulpa-mesa.sql        campaign_store, campaign_blobs, RLS, move_campaign_token
 supabase/migrations/tulpa-mapa-tatico.sql move_campaign_token_v2, use_campaign_door, set_campaign_light
@@ -36,10 +36,10 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
    - Antes de criar um nome de topo: `grep -rn "const NOME\b\|let NOME\b\|function NOME\b\|class NOME\b" js/`.
    - Um `const` repetido derruba o arquivo inteiro, com o erro `Identifier already declared`.
 4. **`js/61-init.js` é sempre o ÚLTIMO.** Ele completa o `T3` e dispara `initTheme`, `renderSheetTabs`, `initNav`, `initPerseus` e `render`.
-   - Código novo vai num arquivo novo **antes** do 61 (ex.: `js/60g-xxx.js`), com uma `<script>` na posição certa.
+   - Código novo vai num arquivo novo **antes** do 61 (ex.: `js/60l-xxx.js`; CSS novo: `css/20-…`), com uma `<script>` na posição certa.
 5. Uma função pode chamar algo de um arquivo **posterior** só depois do carregamento (eventos, timers, cliques). Nunca no topo do arquivo.
 6. O padrão de encadeamento continua válido: `const _f=fn; fn=function(){ … _f.apply(this,arguments) … }`.
-7. Arquivos novos de camada (`60b`, `60c`, `60d`, `60e`, `60g`) usam **IIFE**, sem criar nomes globais.
+7. Arquivos novos de camada (`60b`–`60e`, `60g`–`60k`) usam **IIFE**, sem criar nomes globais.
 8. **Assets base64:** `js/15`, `js/36`, `js/45` e `js/47`. Não edite e não leia inteiros (~770 KB). Mexa neles só para trocar a arte.
 
 ### Carregamento sob demanda do Arcade (`js/60d-arcade-loader.js`)
@@ -52,12 +52,12 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112713`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112714`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
   ```
-- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112713'`) é só um fallback.
+- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112714'`) é só um fallback.
 
 ### Como verificar antes de commitar
 
@@ -106,6 +106,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Combate (`js/10` motor puro, `js/13` ficha, `js/27` mapa, `js/39` trava)
 - O motor de regras (`E.*` em `js/10`) é **lógica pura, sem DOM**. A UI só escolhe alvos e chama o motor. Não duplique regra na UI.
+- **Números editáveis:** os valores abaixo são o **padrão**. Benefícios de atributo, DB, coberturas, bloqueio, manobras, tiroteio, generalismo e DTs de medicina ficam em `REGRA_DEFS`/`REGRA_NUM` (`js/09b`), são lidos por `E.regra(id)` (ou pelos getters `E.DB`, `E.COVER`…) e o Mestre os muda pela chave `rules` (`rules.num`, `rules.attr`). Valor salvo antigo ou inválido cai no padrão. **Nunca escreva um desses números fixo** no motor, na UI ou no texto (no Manual use `{{r:id}}`). Regra nova com número: acrescente a linha em `REGRA_DEFS`.
 - **Iniciativa:** o aparelho do Mestre rola o Reflexo de todos e monta a ordem. Todos veem os dados.
 - **Economia por turno:**
   - **9 m exatos** de movimento (`MOVE14=9`);
@@ -123,6 +124,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Itens no chão (`E.drop*`, UI em `js/60j`):** desarme vencido ou **largar** (ação livre, no próprio turno em combate) põe o item no mapa, na célula livre a até 1 célula sem parede nem porta fechada no caminho (sem nenhuma: aos pés; sem token: fica em "Largado" na ficha). **Pegar** = 1 Ação, a até 1 célula, só no próprio turno. O livro é `M6.state.drops` (**só o Mestre escreve**; o jogador pede por `dropreq`/`pickreq` em `campaign_rolls` e o primeiro pedido leva). O inventário é **derivado do livro** (`E.dropReconcile`): nunca mova um item caído mexendo só na ficha, e nunca ponha imagem no estado.
 - **Defesa:** DF = 10 + proteções + estados + **DES** (sem proteção Pesada vestida nem excesso de carga). A DES sozinha não conta como "bloqueio" (`armored`).
 - **Atributos (`js/10`, nunca somar de novo na UI):** FOR carga 3+FOR e dano CaC/arremesso (DES em armas Leves e Briga ágil, `E.damageBonus`); CON +VT máximo, redução de bloqueio e Combustão CON+2; PRE +ES máxima e blindagem do 1º dano de Lucidez por cena; INT perícias extras INT−1 e cura médica; PER DT furtiva 10+PER e Lucidez na Trégua; CAR/APA bônus sociais. Máximos sempre por `E.maxStats`/`dmax`, nunca direto de `STAGES`. Criaturas (`beastId`) não somam esses benefícios.
+- **Efeitos fora do combate:** `E.situations` (+d20 que o jogador marca na ficha ou na Mesa; os de `QUANDO_AUTO` o combate aplica sozinho), `E.grant`/`T3.vertGrant` (Comando Tático 1×/cena com Ação de Movimento; Inspiração ao grupo), `E.healBonus`/`E.healDice`/`E.supportBonus` (Sutura, Síntese e Trégua).
 - **Vertentes:** treino em `d.vertentes`; o treino antigo (`extraSkills`/`skillUpgrades`) nunca é apagado e vale cheio até virar vertente. Fora da especialização: metade do grau (`E.generalist`) mais o +V inteiro, sem efeito tático; `requiresTraining` bloqueia. Dados só em `PERICIA_DEFS`/`VERT_DEFS` (`rules.pericia`/`rules.vert`).
 - **Dano de Lucidez:** todo lançamento passa por `E.lucidityShield`/`E.applyLucidityDamage` (PRE reduz o 1º da cena; uso em `d.lucShieldUsed`, interruptor na ficha, zera no fim da cena). Nunca subtraia `lucidity` direto em código novo.
 - **Área e arremesso:** DT pela distância, desvio na falha, Resistência reduz o dano à metade.
@@ -169,7 +171,9 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 ### Manual Vivo (`js/42`–`js/44`) e Alterações do Sistema (`js/40`)
 - O **Manual Vivo é a fonte única da verdade.** Vocações, trilhas, rituais, itens, estados, traumas, bestiário e regras da mesa vêm de `list29`/`cur29`, os **mesmos dados** das fichas e do combate (chave `rules`).
 - O Mestre edita inline (central ⚙️ ou o próprio Manual, que usam o mesmo editor validado). Para jogadores é somente leitura.
-- Uma mudança avisa **só os jogadores afetados**, pelo alerta "!" do Perseus.
+- Uma mudança avisa **só os jogadores afetados**, pelo alerta "!" do Perseus (`hits29`: quem tem a vertente ou a perícia; valores de tiro só para quem tem arma ou treino; medicina só para quem tem Medicina).
+- Seções da central: `attr` (benefícios), `pericia` (nome e descrição), `vert` (criar, editar, excluir; efeitos estruturados), `num` (valores de combate). `attr`, `pericia` e `num` não criam nem excluem: só editam e voltam ao padrão.
+- Textos do Manual ficam na chave `manual`; números e catálogos, na chave `rules`. As duas atualizam ao vivo, sem SQL.
 - Nunca crie uma segunda cópia de regra ou catálogo fora desse fluxo.
 
 ### Perseus (`js/14`, `js/16`, `js/18`, `js/33`, `js/37`)
@@ -236,10 +240,36 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Regras, Onda 10 · Corpo a corpo (`?v=2026112711`)**: marcador de Reação (barra da ordem, HUD, Mesa e ficha), Guarda Fechada, Bloqueio com os 4 desfechos e Contra-Ataque, Desarmar, Derrubar, Agarrar/Escapar/Soltar e Empurrar no mapa com alerta de colisão, condições Agarrado/Segurando e efeitos das vertentes corpo a corpo e de arremesso. Sem SQL novo. Testado só com campanha falsa (Mestre controlando os dois lados). O desarme deixa a arma em "Largado" (`equipped:false`) e dispara `T3.disarmHooks` / `tulpa:disarm` para a Onda 12. **Teste manual:** Mestre e jogador logados em aparelhos separados: bloqueio, contra-ataque, cada manobra nos dois sentidos, empurrão contra parede (o Mestre precisa estar online) e a barra de combate no celular.
 - **Regras, Onda 11 · Tiroteio Tático (`?v=2026112712`)**: seletor de contexto do tiro (detectado pelo mapa e ajustável), Mergulho com os 5 desfechos e deslocamento, 2º Disparo, Fogo de Supressão com Suprimido e Tiro Livre, Mirar, trava de movimento que sobrevive ao F5, crítico balístico com Sangrando, as 5 especializações, barulho do disparo para a IA e painel Tiroteio na ficha. Sem SQL novo. Testado só com campanha falsa (Mestre nos dois lados). **Teste manual:** Mestre e jogador em aparelhos separados com mapa: os dois lados do Mergulho (o Mestre online move o token), supressão com o alvo andando, queima-roupa com bloqueio, escopeta empurrando, arco silencioso contra inimigo em patrulha e o seletor no celular.
 - **Regras, Onda 12 · Itens caídos no mapa (`?v=2026112713`)**: desarmar e "Largar no mapa" (inventário, menu do token e HUD do combate) criam o item no chão, com ícone, ficha do item (hover, foco ou toque), névoa e visões do Mestre, botão "Pegar Item (1 Ação)" e "Devolver" para o Mestre. Sem SQL novo. Testado só com campanha falsa. **Teste manual:** Mestre e dois jogadores em aparelhos separados: desarmar um jogador, os dois pegarem juntos, largar com o Mestre fora da mesa, F5 no Mestre e conferir que nada duplicou nas fichas.
+- **Regras, Onda 13 · Manual Vivo e edição pelo Mestre (`?v=2026112714`)**: Manual com os 8 atributos, 18 perícias e 48 vertentes (1.7 a 1.10), Bloqueio, Manobras, Tiroteio, Coberturas, Condições e itens caídos (5.12 a 5.17), tudo lido dos dados do motor; textos antigos atualizados; central ⚙️ e lápis no Manual editam benefícios, números, perícias e vertentes (criar/excluir, com editor de efeitos); situações de vertente, +d20 concedido, curas de especialização e seletor da Mesa com vertentes e contexto CAR/APA (`js/60k` + `css/19`). Sem SQL.
+
+**Bloco A (visual do Arcade, Ondas 1–7) e Bloco B (regras novas, Ondas 8–13) concluídos.** Testado só no Edge headless com campanha e Supabase falsos.
+
+### Decisões tomadas na implementação (o Mestre ainda precisa confirmar)
+- A especificação cita **49 vertentes**, mas lista 48: nenhuma foi inventada (dá para criar pela central).
+- Generalista: metade do grau + **+V inteiro**. Treino antigo ainda sem vertente vale cheio (menos no que exige treino). Rolagem comum da perícia usa o maior grau.
+- Bloqueio: casos que as 4 condições não cobrem viram **Parcial**; 20 natural nunca vira Erro Total.
+- Agarrado: −1d20 físico (sem desvantagem extra); quem segura fica em "Segurando"; o Agarrado não é arrastado (quem se afasta solta). Retaliação e Contra-Ataque não gastam a Reação.
+- Tiro: queima-roupa dá desvantagem sem Pistolas; penalidade de médio/longo alcance é opcional (−1d20, desligada); 20 natural não derruba nem dá 2º Disparo; Caído +2 vale no 2º tiro; supressão acaba no começo do próximo turno do atirador; no mapa, 2 de 3 linhas = parcial e 1 = pesada. **Arremesso** continua somando cobertura na defesa ativa (RF), não na DF.
+- Itens: largar é ação livre; pegar custa 1 Ação a até 1 célula; sem célula livre cai aos pés; sem token fica "Largado"; o Mestre pode devolver ao dono.
+- Medicina: Sutura e Síntese continuam rolando com o maior grau de Medicina e **qualquer um** pode fazer Sutura (a exclusividade do Atendimento de Emergência não é imposta). O +2 da especialização entra só no sucesso; o +1d4 de Cirurgia (fora de combate) e o apoio psicológico na Trégua são marcados à mão.
+- +d20 de situação é marcado pelo jogador e não se acumula na mesma vertente. Comando Tático volta no fim da cena (descanso); a concessão "ao grupo" não tem limite de uso.
+- Perícias: o Mestre edita nome e descrição, mas não cria nem exclui perícia.
+- **Só texto, sem automação:** apneia e Exaustão (Fôlego), levantar sem movimento extra, +2 em barricadas, tempo de busca pela metade, trancas silenciosas, veículos, forense, "não cura Vital" da Psiquiatria e a ausência de penalidade do Karatê contra lâminas curtas.
+
+### Testes manuais pós-login (Bloco B)
+1. Ficha antiga logada: Vital/Essência cheios sobem, bônus iguais; treinar vertente e escolher a do treino antigo.
+2. Mestre e jogador em aparelhos separados: o Mestre muda um valor (ex.: Cobertura Parcial) e uma vertente; a ficha, o combate e o Manual do jogador mudam sem F5 e o "!" aparece só para quem é afetado. Conferir que o jogador não vê lápis nem a central.
+3. Criar e excluir uma especialização com efeito; o jogador treina e rola.
+4. Mesa: rolar especialização com situação e contexto social; Comando Tático em combate (gasta o movimento) e o +1d20 no próximo teste do aliado.
+5. Sutura com Atendimento de Emergência, Síntese na Trégua com Cirurgia e descanso com apoio psicológico.
+6. Corpo a corpo: Bloqueio, Contra-Ataque, cada manobra nos dois sentidos e empurrão contra parede (Mestre online).
+7. Tiroteio com mapa: os dois lados do Mergulho, supressão com o alvo andando, queima-roupa, escopeta, arco silencioso contra inimigo em patrulha e o seletor no celular.
+8. Itens no chão: dois jogadores pegando juntos, largar com o Mestre fora, F5 no Mestre sem duplicar.
+9. RLS real: jogador não consegue gravar `rules`, `manual` nem o estado da mesa.
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.
-1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112713`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
+1. **Confirmar as decisões** listadas acima e rodar os testes manuais do Bloco B.
 2. **Teste manual pós-login** de tudo que o teste automático não cobre: login real, mesa, mapa, call, transmissão e Arcade com carregamento sob demanda (inclusive em sala multijogador, com convidado entrando antes de o Arcade carregar).
 3. **Atualizar o Manual em PDF:** perícias começam em 0 e não existe História.
 4. **Balancear a Coleta de Essência.** A Receita 7, "Destilado do Vazio", foi a mais difícil para o bot (6 de 8 tentativas). Ajuste se os jogadores reclamarem.

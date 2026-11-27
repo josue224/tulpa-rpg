@@ -449,29 +449,45 @@ async function rollAttr6(ch,attr){
   T3.narrateRoll?.({name:nm(who),skill:attr,dice:r.dice,total:r.total});
   return r;
 }
-async function rollSkillAs6(ch,skill,attr){
-  const d=dOf6(ch),src={data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks};
-  const base=SKILL_ATTR[skill],use=attr&&ATTR8.includes(attr)?attr:base,c=skillCalc3(src,skill,use);
-  const r=E.rollTest(d,skill,use===base?SKILL_ATTR:{...SKILL_ATTR,[skill]:use},{mods:c.mods,bonus:c.bonus,disadv:c.dis,consumeDelta:true});
+/* opts: {vert} especialização · {generalista} "outra área" · {extraDice} situação · {social} contexto CAR/APA */
+async function rollSkillAs6(ch,skill,attr,{vert,generalista,extraDice=0,social=null}={}){
+  const d=dOf6(ch),src={data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},spec=!!(vert||generalista);
+  const pick=attr&&ATTR8.includes(attr)?attr:undefined,c=skillCalc3(src,skill,spec?pick:pick||SKILL_ATTR[skill],{vert,generalista});
+  if(c.blocked){toast('Essa especialização exige treino específico.');return null}
+  skill=c.skill;const base=SKILL_ATTR[skill],use=c.attr,soc=social?E.socialBonus(d,skill,social):null;
+  const r=E.rollTest(d,skill,c.SA,{mods:c.mods,bonus:c.bonus+(soc?.bonus||0),extraDice,disadv:c.dis,consumeDelta:true});
   mutateChar(ch,x=>consumeOnce(x,c));
-  const notes=[];if(use!==base)notes.push(`Atributo trocado: ${use} no lugar de ${base}`);if(r.mode!=='normal')notes.push(r.mode);
-  await announceRoll(ch,skill+(use!==base?` (${use})`:''),{dice:r.dice,sides:20,bonus:r.bonus,total:r.total,note:notes.join(' · ')});
-  T3.narrateRoll?.({name:nm(ch),skill,dice:r.dice,total:r.total});
+  const name=vert?E.vert(vert)?.name:generalista?'generalista ÷'+E.regra('generalistaDiv'):'';
+  const notes=[];if(use!==base&&!vert)notes.push(`Atributo trocado: ${use} no lugar de ${base}`);if(extraDice)notes.push(`situação da especialização: +${extraDice}d20`);if(soc?.bonus)notes.push(`${soc.motivo}: +${soc.bonus} ${soc.attr}`);if(r.mode!=='normal')notes.push(r.mode);
+  const label=skill+(name?' · '+name:'')+(use!==base?` (${use})`:'');
+  await announceRoll(ch,label,{dice:r.dice,sides:20,bonus:r.bonus,total:r.total,note:notes.join(' · ')});
+  T3.narrateRoll?.({name:nm(ch),skill:label,dice:r.dice,total:r.total});
   return r;
 }
 T3.rollAttr=rollAttr6;T3.rollSkillAs=rollSkillAs6;
+const SOC6={primeira:{primeira:true},dialogo:{dialogo:true},ancorar:{ancorar:true}};
 function openRollPicker6(ch){
   if(!ch||!(isGM6()||ch.ownerId===uid3())){toast('Você só pode rolar pelo seu próprio personagem.');return}
-  const d=dOf6(ch),m=E.computeMods(d),src={data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks};
+  const d=dOf6(ch),m=E.computeMods(d),src={data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},div=E.regra('generalistaDiv');
   openModal('ROLAGEM NA MESA',nm(ch),`<h4 class="rp6-h">Atributo puro</h4><p class="sub">Rola só o atributo, sem perícia: vale o maior dado.</p><div class="rp6-attrs">${ATTR8.map(a=>`<button type="button" class="mesa-skill" data-pure="${a}"><b>${a}</b><small>${attrDice6(d,a,m)}d20</small></button>`).join('')}</div>
-   <h4 class="rp6-h">Perícia</h4><div class="rp6-row"><div class="field"><label for="rp6Attr">Rolar a perícia com qual atributo?</label><select id="rp6Attr"><option value="">O atributo padrão de cada perícia</option>${ATTR8.map(a=>`<option>${a}</option>`).join('')}</select></div><div class="field"><label for="rp6Search">Buscar</label><input class="search" id="rp6Search" placeholder="Nome da perícia"></div></div><div class="mesa-skill-grid" id="rp6Grid"></div>`,'Fechar',()=>closeModal());
+   <h4 class="rp6-h">Perícia ou especialização</h4><div class="rp6-row"><div class="field"><label for="rp6Attr">Rolar com qual atributo?</label><select id="rp6Attr"><option value="">O atributo padrão (ou o melhor da especialização)</option>${ATTR8.map(a=>`<option>${a}</option>`).join('')}</select></div><div class="field"><label for="rp6Soc">Contexto social</label><select id="rp6Soc"><option value="">Nenhum</option><option value="primeira">1ª impressão (Aparência)</option><option value="dialogo">Diálogo contínuo (Carisma)</option><option value="ancorar">Ancorar aliado (Carisma)</option></select></div><div class="field"><label for="rp6Search">Buscar</label><input class="search" id="rp6Search" placeholder="Perícia ou especialização"></div></div>
+   <label class="t3-check rp6-sit"><input type="checkbox" id="rp6Sit"> A situação da especialização se aplica (o botão mostra qual e quantos d20)</label>
+   <div id="rp6VBox"><h4 class="rp6-h">Especializações treinadas</h4><div class="mesa-skill-grid" id="rp6Verts"></div></div><h4 class="rp6-h">Perícias</h4><div class="mesa-skill-grid" id="rp6Grid"></div>`,'Fechar',()=>closeModal());
   const draw=()=>{
-    const q=normTxt($('rp6Search').value||''),at=$('rp6Attr').value;
+    const q=normTxt($('rp6Search').value||''),at=$('rp6Attr').value,soc=SOC6[$('rp6Soc').value]||null,sit=$('rp6Sit').checked;
+    const sb6=s=>soc?E.socialBonus(d,s,soc).bonus:0;
+    const verts=E.trainedVerts(d).map(x=>{const k=skillCalc3(src,x.def.skill,at||undefined,{vert:x.id}),s=E.situations(d,x.id),on=sit&&s.dice;
+      return{key:k.skill+' '+x.def.name,html:`<button type="button" class="mesa-skill" data-vert="${esc(x.id)}" data-skill="${esc(k.skill)}" data-dice="${on?s.dice:0}"><b>${esc(x.def.name)}</b><small>${esc(k.skill)} · ${esc(k.attr)} · ${k.n+(on?s.dice:0)}d20 · ${sign(k.bonus+sb6(k.skill))}${s.dice?` · +${s.dice}d20 se: ${esc(s.labels.join(', '))}`:''}</small></button>`}});
+    const gens=[...new Set(E.trainedVerts(d).map(x=>x.def.pericia))].map(pid=>{const p=E.pericia(pid),sk=p.skills[0],k=skillCalc3(src,sk,at||undefined,{generalista:pid});
+      return{key:p.name+' generalista outra área',html:`<button type="button" class="mesa-skill" data-gen="${esc(pid)}" data-skill="${esc(sk)}"><b>Outra área de ${esc(p.name)}</b><small>generalista ÷${div} · ${esc(k.attr)} · ${k.n}d20 · ${sign(k.bonus+sb6(sk))}</small></button>`}});
+    const spec=verts.concat(gens);
+    $('rp6VBox').hidden=!spec.length;$q('.rp6-sit').hidden=!E.trainedVerts(d).some(x=>E.situations(d,x.id).dice);
+    $('rp6Verts').innerHTML=spec.filter(x=>normTxt(x.key).includes(q)).map(x=>x.html).join('')||'<div class="empty" style="grid-column:1/-1">Nenhuma especialização encontrada.</div>';
     const list=BASE_SKILLS.slice().sort((a,b)=>a.localeCompare(b,'pt-BR')).filter(s=>normTxt(s).includes(q));
-    $('rp6Grid').innerHTML=list.map(s=>{const k=skillCalc3(src,s,at||undefined);return `<button type="button" class="mesa-skill" data-skill="${esc(s)}"><b>${esc(s)}</b><small>${esc(at||k.attr)} · ${k.n}d20 · ${sign(k.bonus)}</small></button>`}).join('')||'<div class="empty" style="grid-column:1/-1">Nenhuma perícia encontrada.</div>';
-    $$('#rp6Grid [data-skill]').forEach(b=>b.onclick=()=>{closeModal();rollSkillAs6(ch,b.dataset.skill,at).catch(e=>fail3('rolagem',e))});
+    $('rp6Grid').innerHTML=list.map(s=>{const k=skillCalc3(src,s,at||undefined);return `<button type="button" class="mesa-skill" data-skill="${esc(s)}"><b>${esc(s)}</b><small>${esc(at||k.attr)} · ${k.n}d20 · ${sign(k.bonus+sb6(s))}</small></button>`}).join('')||'<div class="empty" style="grid-column:1/-1">Nenhuma perícia encontrada.</div>';
+    $$('#rp6Grid [data-skill],#rp6Verts [data-skill]').forEach(b=>b.onclick=()=>{closeModal();rollSkillAs6(ch,b.dataset.skill,at,{vert:b.dataset.vert,generalista:b.dataset.gen,extraDice:Number(b.dataset.dice)||0,social:soc}).catch(e=>fail3('rolagem',e))});
   };
-  $('rp6Search').oninput=draw;$('rp6Attr').onchange=draw;draw();
+  $('rp6Search').oninput=draw;$('rp6Attr').onchange=$('rp6Soc').onchange=$('rp6Sit').onchange=draw;draw();
   $$('#modalBody [data-pure]').forEach(b=>b.onclick=()=>{closeModal();rollAttr6(ch,b.dataset.pure).catch(e=>fail3('rolagem',e))});
 }
 T3.openRollPicker=openRollPicker6;

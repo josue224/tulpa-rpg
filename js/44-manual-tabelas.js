@@ -22,11 +22,11 @@ const TBMAP31={};
 MAN31.forEach(c=>(c.secs||[]).forEach(s=>{let t=0,f=0;(s.b||[]).forEach(b=>{if(!b||Array.isArray(b))return;if(b.tb){b.id=b.id||s.id+'.t'+(++t);TBMAP31[b.id]=b}else if(b.f!=null){b.id=b.id||s.id+'.f'+(++f)}})}));
 const TURN31={head:['Recurso','Quantidade','Aplicação'],rows:[
   ['Movimento','{{move}} por turno','Gastos em metros reais no seu turno (configurável de 1 a 60 m por mesa).'],
-  ['Ação Padrão','1 por turno','Atacar, arremessar, conjurar ritual, Sutura Bruta, Síntese Cirúrgica, usar perícia ("Outra ação"), Estado de Alerta, levantar-se (Caído), sacar da mochila ou Disparada. (+1 ação por Acerto Violento).'],
+  ['Ação Padrão','1 por turno','Atacar, arremessar, conjurar ritual, manobra corpo a corpo, Guarda Fechada, Fogo de Supressão, pegar item do chão, Sutura Bruta, Síntese Cirúrgica, usar perícia ("Outra ação"), Estado de Alerta, levantar-se (Caído), sacar da mochila ou Disparada. (+1 ação por Acerto Violento).'],
   ['Talento','1 por turno','Não gasta Ação Padrão.'],
   ['Saque Rápido','1 por turno','Livre: move arma da cintura/coldre ou bandoleira para as mãos.'],
   ['Ações livres de cena','Livre','Descarte de Emergência (soltar mochila), ligar/desligar lanterna, abrir/fechar porta destrancada, acionar interruptor, declarar Combustão Vital.'],
-  ['Reação','Fora do turno','Retaliação (1×/turno) e talentos ou rituais de reação.']]};
+  ['Reação','1 por rodada','Bloqueio, Mergulho ou ritual de reação; volta no início do seu turno. Retaliação (1×/turno) e Contra-Ataque são ações extras à parte.']]};
 const DOORS31={head:['Modo','Teste exigido','Onda sonora gerada'],rows:[
   ['Normal','Nenhum','5 quadrados (7,5 m).'],
   ['Furtiva','Destreza + Furtividade (DT {{doorDT}})','Sucesso: 1,2 quadrado (~1,8 m). Falha: rangido de 6 + (0,9 × margem da falha) quadrados (máx. 22 quadrados / 33 m).']]};
@@ -67,7 +67,7 @@ M6.hooks.leave.push(()=>{M31.tg=null;try{applyTbl31(true)}catch(e){}TB31.sig=''}
 
 /* ---------- células e tabelas de texto ---------- */
 const cellTok31=s=>{let dt=12;try{dt=dtDoor22()}catch(e){}const mv=(()=>{try{return T3.moveBase?.()||9}catch(e){return 9}})();
-  return String(s).replace(/\{\{move\}\}/g,String(mv).replace('.',',')+' m').replace(/\{\{doorDT\}\}/g,String(dt))};
+  return regras31(s).replace(/\{\{move\}\}/g,String(mv).replace('.',',')+' m').replace(/\{\{doorDT\}\}/g,String(dt))};
 const rowsHtml31=rows=>rows.map(r=>tr31(r.map((c,i)=>i===0?`<b>${esc(cellTok31(c))}</b>`:link31(esc(cellTok31(c))))));
 const bar31=(kind,over,extra='')=>gm31()?`<div class="m31-addrow m31-gm m31-tbbar"><button type="button" class="gm29-b gm29-add" data-g="open:${esc(kind)}">✏️ Editar tabela</button>${over?'<span class="m31-st edit" title="Alterada pelo Mestre nesta campanha">editada</span>':''}${extra}</div>`:'';
 const ovTb31=id=>(tbl31().tb||{})[id];

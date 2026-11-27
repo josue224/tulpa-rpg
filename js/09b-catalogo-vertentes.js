@@ -167,3 +167,97 @@ const VERT_DEFS=(()=>{
 
   return out;
 })();
+
+/* ===================================================================
+   ONDA 13 — Números das regras e textos dos atributos (só dados).
+   O Mestre ajusta pela chave "rules" (rules.num e rules.attr); o js/40
+   reaplica em REGRA_NUM e ATTR_DEFS. O motor lê por E.regra(id) e cai no
+   padrão (d) quando o valor salvo é antigo ou inválido.
+   =================================================================== */
+const ATTR_DEFS=[
+  ['Força','FOR','Potência física: carga e golpes.'],
+  ['Destreza','DES','Agilidade e precisão: esquiva, Defesa e armas leves.'],
+  ['Constituição','CON','Vigor do corpo: Vital, bloqueio e Combustão Vital.'],
+  ['Inteligência','INT','Estudo e raciocínio: perícias e medicina.'],
+  ['Percepção','PER','Atenção: notar quem se aproxima e se recompor na Trégua.'],
+  ['Presença','PRE','Força de espírito: Essência e blindagem da mente.'],
+  ['Carisma','CAR','Condução de conversas e liderança.'],
+  ['Aparência','APA','A primeira impressão.']
+].map(([id,sigla,desc])=>({id,name:id,sigla,desc}));
+
+/* g = nome do atributo ou área. who = quem recebe o aviso quando muda ('' = todos) */
+const REGRA_DEFS=(()=>{
+  const out=[];
+  const R=(id,g,l,d,min,max,extra)=>out.push({id,g,l,d,min,max,step:1,...extra});
+  R('cargaBase','Força','Limite de carga: base',3,0,20);
+  R('cargaPorFor','Força','Limite de carga: por ponto de FOR',1,0,5);
+  R('cargaMochila','Força','Limite de carga: extra com mochila ou maleta',2,0,10);
+  R('danoPorFor','Força','Dano corpo a corpo e arremesso: por ponto de FOR',1,0,5);
+  R('danoPorDes','Destreza','Dano com arma leve ou ágil: por ponto de DES',1,0,5);
+  R('dfPorDes','Destreza','Defesa (DF): por ponto de DES (sem proteção Pesada nem excesso de carga)',1,0,5);
+  R('vtPorCon','Constituição','Vital máximo: por ponto de CON',1,0,10);
+  R('bloqPorCon','Constituição','Redução de dano no Bloqueio: por ponto de CON',1,0,5);
+  R('combBase','Constituição','Combustão Vital: ES por turno, base',2,0,20);
+  R('combPorCon','Constituição','Combustão Vital: ES por turno por ponto de CON',1,0,5);
+  R('periciaIntBase','Inteligência','Perícias extras: contam os pontos de INT acima de',1,0,10);
+  R('periciaPorInt','Inteligência','Perícias extras (+5) por ponto acima disso',1,0,5);
+  R('curaPorInt','Inteligência','Cura de Sutura Bruta e Síntese: por ponto de INT',1,0,5);
+  R('furtDTBase','Percepção','DT contra aproximação furtiva: base',10,0,30);
+  R('furtPorPer','Percepção','DT contra aproximação furtiva: por ponto de PER',1,0,5);
+  R('treguaPorPer','Percepção','Lucidez recuperada na Trégua: por ponto de PER',1,0,5);
+  R('esPorPre','Presença','Essência máxima: por ponto de PRE',1,0,10);
+  R('blindPorPre','Presença','1º dano de Lucidez da cena: redução por ponto de PRE',1,0,5);
+  R('blindMin','Presença','Dano de Lucidez que sempre passa pela blindagem',1,0,10);
+  R('socialPorCar','Carisma','Diálogo contínuo: bônus por ponto de CAR',1,0,10);
+  R('socialPorApa','Aparência','1ª rolagem social: bônus por ponto de APA',1,0,10);
+
+  R('db','Defesa e Coberturas','Defesa Base (DB)',10,1,30);
+  R('coberturaParcial','Defesa e Coberturas','Cobertura Parcial: bônus na DF',4,0,20);
+  R('coberturaPesada','Defesa e Coberturas','Cobertura Pesada: bônus na DF',6,0,30);
+  R('disparadaDF','Defesa e Coberturas','Alvo em Disparada: bônus na DF contra tiros',2,0,20);
+  R('caidoDF','Defesa e Coberturas','Alvo Caído: bônus na DF contra disparos',2,0,20);
+
+  R('bloqueioDivisor','Bloqueio e Reação','Dano bloqueado é dividido por',2,1,10);
+  R('bloqueioMinimo','Bloqueio e Reação','Dano mínimo que passa no Bloqueio',1,0,10);
+  R('brechaMargem','Bloqueio e Reação','Brecha: folga do Bloqueio sobre o ataque',5,1,30);
+  R('guardaBonus','Bloqueio e Reação','Guarda Fechada: redução extra',2,0,20);
+  R('guardaUsos','Bloqueio e Reação','Guarda Fechada: Bloqueios por rodada',2,1,6);
+
+  R('empurraoDT','Manobras','Empurrar: DT base (soma o maior entre FOR e CON do alvo)',10,0,30);
+  R('empurraoPasso','Manobras','Empurrar: metros por faixa de margem',1.5,0.5,6,{step:0.5});
+  R('empurraoMargem2','Manobras','Empurrar: margem para 2 faixas',5,1,30);
+  R('empurraoMargem3','Manobras','Empurrar: margem para 3 faixas',10,2,40);
+  R('empurraoTeto','Manobras','Empurrar: teto em metros por ponto de FOR do atacante',1.5,0.5,6,{step:0.5});
+  R('desarmeDuasMaos','Manobras','Desarmar arma de duas mãos: penalidade do atacante',2,0,20);
+  R('colisaoDado','Manobras','Dano de colisão no empurrão','1d4',0,0,{t:'dado'});
+  R('quedaDado','Manobras','Dano de queda no empurrão','1d6',0,0,{t:'dado'});
+
+  R('queimaRoupa','Tiroteio Tático','Queima-roupa: distância máxima (m)',1.5,0.5,6,{step:0.5,who:'disparo'});
+  R('espingardaAlcance','Tiroteio Tático','Espingardas: alcance curto (m) quando a especialização não define outro',6,1.5,30,{step:0.5,who:'disparo'});
+  R('mergulhoM','Tiroteio Tático','Mergulho: deslocamento máximo (m)',3,0,12,{step:0.5});
+
+  R('generalistaDiv','Perícias','Generalista (fora da especialização): o grau é dividido por',2,1,5,{who:'vertente'});
+
+  R('suturaDT','Medicina de Campo','Sutura Bruta: DT',15,1,40,{who:'medicina'});
+  R('sinteseDT','Medicina de Campo','Síntese Cirúrgica: DT',15,1,40,{who:'medicina'});
+  R('sinteseDTGrave','Medicina de Campo','Síntese em Ferida Exposta ou caído a 0 VT: DT',18,1,40,{who:'medicina'});
+  return out;
+})();
+const REGRA_NUM=Object.fromEntries(REGRA_DEFS.map(r=>[r.id,r.d]));
+
+/* situações dos efeitos "+dados": nome para a tela. As de QUANDO_AUTO o combate aplica sozinho;
+   as outras (e as que o Mestre criar) viram a opção "a situação da especialização se aplica". */
+const QUANDO_LABEL={
+  contraAtaque:'Contra-Ataque',desarmar:'Desarmar',empurrar:'Empurrar',derrubar:'Derrubar',agarrar:'Agarrar',escapar:'Escapar',
+  furtivo:'ataque furtivo',desprevenido:'alvo desprevenido',supressao:'Fogo de Supressão',armaImprovisada:'arma improvisada',
+  bloqueioArma:'Bloqueio com arma',ocultarArma:'ocultar a arma',quebrarObjetos:'quebrar objetos ou portas',
+  atravessarObstaculo:'atravessar obstáculo',levantar:'levantar-se',cruzarRegistros:'cruzar registros',fraude:'achar fraude',
+  conexoes:'ligar conexões',desarmarArmadilha:'desarmar armadilha mecânica',manobraEvasiva:'manobra evasiva',
+  perseguicao:'perseguição',coberturaMovel:'cobertura móvel',armadoOuVantagemFisica:'armado ou em vantagem física',
+  detectarMentira:'detectar mentira',intencaoOuArmaOculta:'intenção ou arma oculta',resistirMedo:'resistir ao medo',
+  negociacaoColetiva:'negociação coletiva',elite:'autoridades e elite',
+  desarmado:'desarmado',queimaRoupa:'queima-roupa',alcanceMedioLongo:'médio e longo alcance',superaDF:'ao superar a DF',
+  corpoACorpo:'corpo a corpo',arremesso:'arremesso',alvoAgarradoCaido:'alvo Agarrado e Caído',
+  contraArmaBrancaCurta:'contra armas brancas curtas',privacaoSevera:'privação severa'
+};
+const QUANDO_AUTO=['contraAtaque','desarmar','empurrar','derrubar','agarrar','escapar','supressao','armaImprovisada','bloqueioArma'];

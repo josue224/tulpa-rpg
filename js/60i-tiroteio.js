@@ -86,7 +86,7 @@ function ready(ch,w){
 }
 
 /* ---------- seletor de contexto ---------- */
-const COVERS=[['','Sem cobertura'],['parcial','Parcial +4'],['pesada','Pesada +6']];
+const covers=()=>[['','Sem cobertura'],['parcial','Parcial +'+E.COVER.parcial],['pesada','Pesada +'+E.COVER.pesada]];
 function selector(ch,w,tid,o){
   const tc=charById(tid),det=autoCtx(ch,tid,{surprise:o.surprise}),ctx=det.ctx,d=sheet(ch);
   const onTurn=inCombat()&&TURN.actor===ch.id,mv=onTurn?mvState14(ch):{used:0,run:false};
@@ -97,8 +97,8 @@ function selector(ch,w,tid,o){
   openModal('TIRO TÁTICO',`${w.name} → ${nm(tc)}`,`<div class="tiro">
     <p class="sub">${det.map?`Detectado pelo mapa: <b>${fm(ctx.dist)} m</b>${det.blocked?' · <b>sem linha de visão</b>':''}. Ajuste se a mesa decidir diferente.`:'Sem os dois tokens no mapa: marque o contexto à mão.'}</p>
     <fieldset><legend>O alvo</legend><div class="tiro-row">${opt('radio','tAw','1','Ciente',ctx.aware)}${opt('radio','tAw','0','Desprevenido',!ctx.aware)}</div></fieldset>
-    <fieldset><legend>Cobertura</legend><div class="tiro-row">${COVERS.map(([v,l])=>opt('radio','tCov',v,l,ctx.cover===v)).join('')}</div></fieldset>
-    <fieldset><legend>Situação</legend><div class="tiro-row">${opt('checkbox','tPb','1','Queima-Roupa ≤ 1,5 m',ctx.pointBlank)}${opt('checkbox','tRun','1','Em Disparada +2',ctx.sprint)}${opt('checkbox','tAim','1','Mirar (gasta o movimento)',false,!aim.ok)}${shotgun?opt('checkbox','tShort','1','Alcance curto ≤ 6 m',ctx.short):''}${opt('checkbox','tFar','1','Penalidade de médio/longo alcance −1d20',false)}</div>${!aim.ok&&base.canAim?`<p class="sub">${esc(aim.msg)}</p>`:''}</fieldset>
+    <fieldset><legend>Cobertura</legend><div class="tiro-row">${covers().map(([v,l])=>opt('radio','tCov',v,l,ctx.cover===v)).join('')}</div></fieldset>
+    <fieldset><legend>Situação</legend><div class="tiro-row">${opt('checkbox','tPb','1',`Queima-Roupa ≤ ${fm(E.POINT_BLANK)} m`,ctx.pointBlank)}${opt('checkbox','tRun','1',`Em Disparada +${E.SPRINT_DF}`,ctx.sprint)}${opt('checkbox','tAim','1','Mirar (gasta o movimento)',false,!aim.ok)}${shotgun?opt('checkbox','tShort','1',`Alcance curto ≤ ${fm(E.SHOTGUN_RANGE)} m`,ctx.short):''}${opt('checkbox','tFar','1','Penalidade de médio/longo alcance −1d20',false)}</div>${!aim.ok&&base.canAim?`<p class="sub">${esc(aim.msg)}</p>`:''}</fieldset>
     <div class="notice tiro-sum" id="tiroSum" role="status" aria-live="polite"></div>
     <button type="button" class="btn tiro-sup" id="tiroSup">▥ Fogo de Supressão (1 Ação Padrão)</button><p class="sub" id="tiroSupWhy"></p></div>`,'Disparar',()=>{const c=read();closeModal();fire(ch,w,tid,o,c)});
   const val=n=>$q(`#modalBody input[name="${n}"]:checked`)?.value,on=n=>!!$q(`#modalBody input[name="${n}"]:checked`);
@@ -111,7 +111,7 @@ function selector(ch,w,tid,o){
     const c=read(),fx=E.shotEffects(sheet(ch),w,c),k=calc(ch,w.skill,undefined,fx.spec.calc||undefined),n=Math.max(1,k.n+fx.extraDice);
     const td=sheet(tc),df=E.shotDF(td,c),opts=c.aware?E.shotOptions(td,c,{turn:turnOf(tc),weapon:w}):null;
     const how=fx.spec.status==='generalista'?'fora da especialização (metade)':fx.spec.trained?fx.spec.name:fx.spec.status==='pendente'?'treino antigo (escolha a vertente)':'';
-    const resp=!c.aware?'Desprevenido: tiro direto ATA × DF, sem Mergulho.':opts.direct?'O alvo não pode reagir agora: ATA × DF.':`O alvo pode ${[opts.dive.ok?'mergulhar (RF contra a Defesa Base 10)':'',opts.dodge?'esquivar':'',opts.block?'bloquear':''].filter(Boolean).join(', ')} ou ficar firme (ATA × DF).`;
+    const resp=!c.aware?'Desprevenido: tiro direto ATA × DF, sem Mergulho.':opts.direct?'O alvo não pode reagir agora: ATA × DF.':`O alvo pode ${[opts.dive.ok?`mergulhar (RF contra a Defesa Base ${E.DB})`:'',opts.dodge?'esquivar':'',opts.block?'bloquear':''].filter(Boolean).join(', ')} ou ficar firme (ATA × DF).`;
     $('tiroSum').innerHTML=`<div><b>Ataque</b> ${n}d20 ${sign(k.bonus)}${fx.disadv||k.dis?' · desvantagem':''} · crítico ${fx.critMin>=20?'20':fx.critMin+'–20'}${how?' · '+esc(how):''}</div>
       <div><b>Defesa do alvo</b> ${seeDF?`DF ${df.DF}${df.parts.length?` (${df.base}${df.parts.map(p=>` + ${p.v} ${p.label.toLowerCase()}`).join('')})`:''}`:'oculta pelo Mestre'}${df.ignored?' · a mira ignora a Cobertura Parcial':''}</div>
       <div>${resp}</div>${fx.notes.length?`<div class="sub">${fx.notes.map(esc).join(' · ')}</div>`:''}`;
@@ -169,11 +169,11 @@ defendPrompt=async function(aid,tid){
     ${tags.length?`<div class="inline">${tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`:''}
     <p class="sub">Defesa contra este tiro: <b>DF ${df.DF}</b>${df.parts.length?` (${df.base}${df.parts.map(p=>` + ${p.v} ${p.label.toLowerCase()}`).join('')})`:''}.${sh.pointBlank?'':' À distância não há Esquiva nem Bloqueio.'}</p>
     <div class="tiro-acts">
-      ${o.dive.ok?`<button type="button" class="btn primary" id="tiroDive">🤸 Mergulhar · Reflexo ${rf.n}d20 ${sign(rf.bonus)} (gasta a Reação, até 3 m)</button>`:`<p class="sub">🤸 Mergulho indisponível: ${esc(o.dive.msg)}</p>`}
+      ${o.dive.ok?`<button type="button" class="btn primary" id="tiroDive">🤸 Mergulhar · Reflexo ${rf.n}d20 ${sign(rf.bonus)} (gasta a Reação, até ${fm(E.DIVE_M)} m)</button>`:`<p class="sub">🤸 Mergulho indisponível: ${esc(o.dive.msg)}</p>`}
       ${o.dodge?'<button type="button" class="btn" id="tiroDodge">🎲 Esquiva (queima-roupa)</button>':''}
       ${blocks.map(b=>`<button type="button" class="btn" data-tblk="${b.pl.id}">🛡 ${esc(b.pl.label)} · ${b.n}d20 ${sign(b.bonus)} · reduz ${b.pl.reduction}</button>`).join('')}
     </div>
-    <p class="sub">Mergulho: RF contra a Defesa Base 10. Passando, nenhum dano. Falhando, você cai; se o ataque também chegou a 10, é Acerto Violento e vem um 2º Disparo.</p>
+    <p class="sub">Mergulho: RF contra a Defesa Base ${E.DB}. Passando, nenhum dano. Falhando, você cai; se o ataque também chegou a 10, é Acerto Violento e vem um 2º Disparo.</p>
     ${react.length?`<div class="field"><label for="defReact">Reação ritual (opcional, no lugar do Mergulho)</label><select id="defReact"><option value="">Nenhuma</option>${react.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.cost} ES · ${esc(x.hint)}</option>`).join('')}</select></div>`:''}`;
   const rv=()=>$('defReact')?.value||'';
   const go=mode=>{const x=rv();closeModal();doDefense(aid,tid,mode,byMaster,mode.startsWith('block:')?'':x)};
@@ -194,7 +194,7 @@ function pump(){
 function diveStart(dt){
   const tc=who(dt.targetId);if(!tc||!mine(tc))return;
   if(tok14(tc.id)&&tok14(dt.attackerId)&&mapReady14(tc)&&canAct(sheet(tc))){
-    toast('🤸 Mergulho: escolha no mapa onde parar (até 3 m).');
+    toast(`🤸 Mergulho: escolha no mapa onde parar (até ${fm(E.DIVE_M)} m).`);
     startAim14({kind:'dive',ch:tc,m:E.DIVE_M,done:pt=>diveChoose(dt,pt)});
   }else diveChoose(dt,null);
 }
@@ -228,7 +228,7 @@ function diveMove(dt){
   const t=tok14(dt.targetId);if(!t)return;
   const [cx,cy]=center11(t),dx=dt.to[0]-cx,dy=dt.to[1]-cy,len=Math.hypot(dx,dy),m=px2m14(len);
   if(!(m>.05))return;
-  if(m>E.DIVE_M+.15){toast(`Mergulho recusado: ${fm(m)} m passa dos 3 m.`);return}
+  if(m>E.DIVE_M+.15){toast(`Mergulho recusado: ${fm(m)} m passa dos ${fm(E.DIVE_M)} m.`);return}
   const segments=blockers10().map(s=>({...s,edge:!s.id}));
   const circles=(M6.state.tokens||[]).filter(q=>{const c=charById(q.charId);return q.id!==t.id&&(!c||!isDeadCh(c))}).map(q=>{const [x,y]=center11(q);return{x,y,r:tokR10(q),id:q.charId}});
   const p=E.pushPath({x:cx,y:cy,dx,dy,dist:len,radius:tokR10(t),segments,circles,bounds:mapWorld7()});
@@ -433,7 +433,7 @@ function sheetPanel(){
   const rf=calc(ch,'Reflexo','Destreza'),el=document.createElement('div');el.className='panel';el.id='tiroSheet';
   el.innerHTML=`<div class="panel-head"><h2>Tiroteio</h2><span class="pill">Mergulho ${rf.n}d20 ${sign(rf.bonus)}</span></div>
   ${rows||'<p class="sub">Nenhuma arma de disparo no inventário.</p>'}
-  <details><summary>Como o tiro é resolvido</summary><div class="t3-table"><div><b>20 natural</b><span>Crítico garantido: o Mergulho não adianta.</span></div><div><b>Erro e recuperação</b><span>ATA &lt; 10 e Mergulho ≥ 10: sem dano, de pé.</span></div><div><b>Mergulho</b><span>ATA ≥ 10 e Mergulho ≥ 10: sem dano, Caído ou abrigado.</span></div><div><b>Acerto violento</b><span>ATA ≥ 10 e Mergulho &lt; 10: acerta, o alvo cai e há um 2º Disparo (ATA × DF).</span></div><div><b>Erro e queda</b><span>ATA &lt; 10 e Mergulho &lt; 10: sem dano, Caído.</span></div><div><b>Sem Mergulho</b><span>Desprevenido, sem Reação ou ficando firme: ATA ≥ DF acerta. Cobertura +4 ou +6, Disparada +2, Caído +2.</span></div></div></details>`;
+  <details><summary>Como o tiro é resolvido</summary><div class="t3-table"><div><b>20 natural</b><span>Crítico garantido: o Mergulho não adianta.</span></div><div><b>Erro e recuperação</b><span>ATA &lt; ${E.DB} e Mergulho ≥ ${E.DB}: sem dano, de pé.</span></div><div><b>Mergulho</b><span>ATA ≥ ${E.DB} e Mergulho ≥ ${E.DB}: sem dano, Caído ou abrigado.</span></div><div><b>Acerto violento</b><span>ATA ≥ ${E.DB} e Mergulho &lt; ${E.DB}: acerta, o alvo cai e há um 2º Disparo (ATA × DF).</span></div><div><b>Erro e queda</b><span>ATA &lt; ${E.DB} e Mergulho &lt; ${E.DB}: sem dano, Caído.</span></div><div><b>Sem Mergulho</b><span>Desprevenido, sem Reação ou ficando firme: ATA ≥ DF acerta. Cobertura +${E.COVER.parcial} ou +${E.COVER.pesada}, Disparada +${E.SPRINT_DF}, Caído +${E.PRONE_DF}.</span></div></div></details>`;
   box.insertBefore(el,box.querySelector('#cacSheet')?.nextSibling||box.children[1]||null);
 }
 const _rct11=renderCombatTab;

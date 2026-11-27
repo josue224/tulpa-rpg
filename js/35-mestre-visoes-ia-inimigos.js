@@ -479,7 +479,7 @@ function showPriv23(ch,payload){
   privCard23(payload);
 }
 /* DT de perceber alguém: 10 + Percepção do inimigo (entre 10 e 20) */
-const percDT23=ech=>Number(AI23.dt)||clamp12(10+(Number(dOf6(ech)?.attributes?.['Percepção'])||0),10,20);
+const percDT23=ech=>Number(AI23.dt)||clamp12(E.regra('furtDTBase')+(Number(dOf6(ech)?.attributes?.['Percepção'])||0)*E.regra('furtPorPer'),5,30);
 /* raio de audição do inimigo, em quadrados */
 const hearR23=c=>clamp12(c.rng/mapCfg7().mpc*.45,2,5);
 
