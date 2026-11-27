@@ -202,6 +202,16 @@
     const a=x.globalAlpha;x.globalAlpha=a*alpha;x.fillStyle=p;x.fillRect(X,Y,W,H);x.globalAlpha=a;
   };
 
+  /* peça de qualquer tamanho: ladrilho + chanfro + aresta (plataformas, paredes) */
+  G.slab=(x,tile,X,Y,w,h,{acc='#ffd36b',r=5,ox=0,oy=0,dim=0}={})=>{
+    if(w<=0||h<=0)return;x.save();rr(x,X,Y,w,h,r);x.clip();
+    if(tile)G.fillTile(x,tile,X,Y,w,h,{ox,oy});else{x.fillStyle='#241a3a';x.fillRect(X,Y,w,h)}
+    if(dim){x.fillStyle=`rgba(6,3,14,${dim})`;x.fillRect(X,Y,w,h)}
+    x.fillStyle='rgba(255,255,255,.2)';x.fillRect(X,Y,w,3);x.fillStyle='rgba(255,255,255,.1)';x.fillRect(X,Y,3,h);
+    x.fillStyle='rgba(0,0,0,.42)';x.fillRect(X,Y+h-4,w,4);x.fillRect(X+w-3,Y,3,h);
+    x.restore();rr(x,X+.75,Y+.75,w-1.5,h-1.5,r);x.strokeStyle=acc;x.lineWidth=1.5;x.stroke();
+  };
+
   /* ===================== assets opcionais (assets/arcade/) ===================== */
   let VER='';try{VER=(document.currentScript.src.match(/[?&]v=([^&]+)/)||[])[1]||''}catch(e){}
   /* o manifesto começa vazio: nada é requisitado (sem 404) */
@@ -435,6 +445,14 @@
     gota:'M12 2c-3 5-7 8.800-7 13a7 7 0 0014 0c0-4.200-4-8-7-13z',
     trofeu:'M6 3h12v2h3v3c0 2.500-1.800 4.300-4.100 4.500-.8 1.800-2.200 3-3.9 3.400V18h3v3H8v-3h3v-2.100c-1.700-.4-3.1-1.6-3.9-3.4C4.800 12.300 3 10.500 3 8V5h3z',
     bandeira:'M5 2h2v20H5zM8 3h11l-3 4.500 3 4.500H8z',
+    nota:'M9 3l12-2v14.5a3.5 3.5 0 11-2-3.2V5.3L11 6.7v11.8a3.5 3.5 0 11-2-3.2z',
+    chave:'M8 2a6 6 0 105.2 9H14v3h3v3h3v3h3v-5l-8.2-8.2A6 6 0 008 2zM6.5 5.5a2.2 2.2 0 110 4.4 2.2 2.2 0 110-4.4z',
+    cadeado:'M12 2a5.5 5.5 0 00-5.5 5.5V10H5v12h14V10h-1.5V7.5A5.5 5.5 0 0012 2zM12 4.5a3 3 0 013 3V10H9V7.5a3 3 0 013-3zM12 13.5a2 2 0 011 3.7v2.3h-2v-2.3a2 2 0 011-3.7z',
+    folha:'M20 3C10 3 4 8 4 15c0 1.5.3 2.8.8 4L3 21l1.5 1.2 1.8-2c1.2.8 2.7 1.3 4.2 1.3C18 21.5 21 13 20 3zM7 18c2-5 5.5-8 10-10-3.5 3-6.5 6-8.5 11z',
+    nuvem:'M7 19a5 5 0 01-.6-10A6.5 6.5 0 0119 10.5 4.3 4.3 0 0118 19z',
+    sol:'M12 7a5 5 0 110 10 5 5 0 110-10zM11 1h2v4h-2zM11 19h2v4h-2zM1 11h4v2H1zM19 11h4v2h-4zM3.5 5L5 3.5l2.8 2.8-1.5 1.5zM16.2 17.7l1.5-1.5 2.8 2.8-1.5 1.5zM3.5 19l2.8-2.8 1.5 1.5L5 20.5zM16.2 6.3L19 3.5 20.5 5l-2.8 2.8z',
+    espiral:'M12 2a10 10 0 11-10 10h3a7 7 0 107-7 4.5 4.5 0 000 9 3 3 0 000-6v3.4a1.6 1.6 0 110-3.2V5.9a6.1 6.1 0 110 12.2A6.6 6.6 0 0112 2z',
+    seta:'M12 2l9 10h-5v10H8V12H3z',
   };
   const P2D={};
   G.icons=Object.keys(ICONS);

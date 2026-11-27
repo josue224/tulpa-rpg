@@ -148,6 +148,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | Cor | `rgba(cor,a)` · `mix(a,b,k)` · `shade(cor,k)` · `pal.{fe,natureza,inexistencia,ilusao,verdade,ink,bg,acc,perigo}` · `rng(seed)` |
 | Cache | `bake(chave,w,h,pintar(ctx,w,h,rnd),{s})` → canvas com `.lw/.lh` · `clear(prefixo)` (teto de 16 MP, LRU) |
 | Sprites | `draw(x,img,cx,cy,{w,h,rot,flip,alpha,sx,sy,ax,ay,add})` · `sheet(chave,n,w,h,pintar(ctx,i,n,rnd,w,h))` → quadros · `anim(quadros,t,fps,loop)` · `pix(chave,linhas,paleta,{p})` · `tint(img,cor,a)` |
+| Placas | `slab(x,ladrilho,X,Y,w,h,{acc,r,ox,oy,dim})`: peça de qualquer tamanho com chanfro e aresta |
 | Peças | `prop.orb(cor,r)` · `prop.block(cor,tam,estilo)` (`chanfro`, `pedra`, `vidro`) · `prop.gem(cor,tam,lados)` · `prop.crystal(cor,w,h)` · `prop.coin(r,cor)` |
 | Tilesets | `tile(tipo,{size,a,b,seed})` · `fillTile(x,ladrilho,X,Y,W,H,{ox,oy,alpha})`. Tipos: `pedra tijolo madeira grama terra areia metal cristal agua feltro pergaminho runa` |
 | Cenário | `scene(nome,W,H,{seed})` → `.draw(x,camX,camY,t,{from,to})`. Nomes: `fe natureza inexistencia ilusao verdade espaco cripta` |
@@ -160,7 +161,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | Partículas | `emit(tipo,x,y,{col,amount,ang,spread,size})`, tipos `impacto explosao brilho coleta poeira rastro fumaca estilhacos folhas confete`. `C.fx.burst({kind})` ganhou `faisca brilho estilhaco fumaca onda brasa folha confete` |
 | Hit-stop | `hitstop(ms,{zoom})` (16 a 140 ms, só a imagem) · `frozen()` · `impact(x,y,{col,force})` = hit-stop + tremor + faíscas |
 | HUD no canvas | `hud.text(x,txt,X,Y,{size,col,al,bl,w,stroke,min,max})` · `hud.panel(x,X,Y,w,h,{r,acc,a})` · `hud.bar(x,X,Y,w,h,v,{col,bg,ghost,segs,label,val})` · `hud.chip(x,X,Y,{icon,text,col,size,al})` · `hud.pips(x,X,Y,n,max,{icon,size,col})` · `hud.frame(x,W,H,{acc,a})` · `hud.banner(x,W,H,titulo,{sub,k,acc,y})` |
-| Ícones | `icon(x,nome,cx,cy,tam,cor)` · `svg(nome)`. Nomes: `coracao estrela moeda raio escudo caveira relogio olho chama alvo coroa gota trofeu bandeira` |
+| Ícones | `icon(x,nome,cx,cy,tam,cor)` · `svg(nome)`. Nomes: `coracao estrela moeda raio escudo caveira relogio olho chama alvo coroa gota trofeu bandeira nota chave cadeado folha nuvem sol espiral seta` |
 | HUD em HTML | `skin({acc})` (chame no `make`) · `C.hud(GFX60.chips([{icon,label,value,tone}]))`, `tone`: `ok`, `warn`, `bad` |
 | Texto legível | `fs(tamanho,minPx=11)` e `cssScale()` (num celular de 390 px, 1 unidade ≈ 0,45 px) |
 | Assets (opcional) | `assets.add({nome:'arquivo.webp'})` · `assets.load()` · `art(nome,reservaProcedural)`. O manifesto começa vazio: nada é requisitado |
@@ -212,7 +213,7 @@ Automático com `prefers-reduced-motion`: sem hit-stop, sem tremor, clarão frac
 
 ### Onde cada jogo desenha
 
-Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HUD (`C.hud`), nos botões de toque, na preparação e no resultado. As versões antigas em `js/26` e `js/28` a `js/34` estão sobrescritas: edite a versão abaixo (linhas de 27/11/2026). Os da Onda 2 já usam o motor, com a arte em `rnArt40` (`js/51`), `saArt56` (`js/59`) e `bbArt47` (`js/54`), no mesmo arquivo.
+Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HUD (`C.hud`), nos botões de toque, na preparação e no resultado. As versões antigas em `js/26` e `js/28` a `js/34` estão sobrescritas: edite a versão abaixo (linhas de 27/11/2026). Os das Ondas 2 e 3 já usam o motor, com a arte no mesmo arquivo: `rnArt40` (`js/51`), `saArt56` (`js/59`), `bbArt47` (`js/54`), `rhArt38` e `fuArt38` (`js/50`; o Infinito da Fuga, em `js/29`, usa `fuArt38(6)`), `svArt41` (`js/51`) e `ktArt42` (`js/52`). As linhas da tabela abaixo são de antes dessas mudanças: procure pelo nome da função.
 
 | Onda | Jogo (`id`) | Arquivo · função de desenho (linha) | W×H |
 |---|---|---|---|
