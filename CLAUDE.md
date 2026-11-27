@@ -35,7 +35,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
    - Antes de criar um nome de topo: `grep -rn "const NOME\b\|let NOME\b\|function NOME\b\|class NOME\b" js/`.
    - Um `const` repetido derruba o arquivo inteiro, com o erro `Identifier already declared`.
 4. **`js/61-init.js` é sempre o ÚLTIMO.** Ele completa o `T3` e dispara `initTheme`, `renderSheetTabs`, `initNav`, `initPerseus` e `render`.
-   - Código novo vai num arquivo novo **antes** do 61 (ex.: `js/60f-xxx.js`), com uma `<script>` na posição certa.
+   - Código novo vai num arquivo novo **antes** do 61 (ex.: `js/60g-xxx.js`), com uma `<script>` na posição certa.
 5. Uma função pode chamar algo de um arquivo **posterior** só depois do carregamento (eventos, timers, cliques). Nunca no topo do arquivo.
 6. O padrão de encadeamento continua válido: `const _f=fn; fn=function(){ … _f.apply(this,arguments) … }`.
 7. Arquivos novos de camada (`60b`, `60c`, `60d`, `60e`) usam **IIFE**, sem criar nomes globais.
@@ -43,7 +43,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Carregamento sob demanda do Arcade (`js/60d-arcade-loader.js`)
 
-- Os arquivos `js/29`, `js/30`, `js/31`, `js/34` e `js/50`–`js/60` **não têm `<script>` no `index.html`**. O `60d` os injeta, na ordem exata, na primeira abertura do Arcade.
+- Os arquivos `js/29`, `js/30`, `js/31`, `js/34`, `js/50`–`js/60` e `js/60f` (motor gráfico) **não têm `<script>` no `index.html`**. O `60d` os injeta, na ordem exata, na primeira abertura do Arcade.
   - Ele faz isso envolvendo `mgOpen`, `T3.mgOpen` e `T3.arcGo`, e expõe `T3.ensureArcadeLoaded()`.
 - Jogo novo do Arcade: crie o arquivo e **acrescente-o à `QUEUE` do `60d`**, não ao `index.html`.
 - Enquanto o Arcade não abrir, nada desses arquivos existe (jogos, `prog38`, conquistas do Arcade 2.0).
@@ -51,12 +51,12 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112701`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112702`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
   ```
-- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'20261122g'`) é só um fallback.
+- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112702'`) é só um fallback.
 
 ### Como verificar antes de commitar
 
@@ -182,6 +182,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Conquistas:** 125 no total, 27 secretas. Atualize a contagem ao criar novas.
 - **Óbolos** (`js/41`) são moeda fora das regras do RPG. A **aposta amistosa começa em 0**.
 - Jogo novo ou nova versão também ganha uma entrada no guia de novidades (`js/24`).
+- **Visual dos jogos:** use o motor `GFX60` (`js/60f`, documentado no `ARQUITETURA.md`). Ele é **somente visual**: hit-stop, partículas e cenário nunca mudam `step`, timers, rede, RNG, pontuação ou `C.finish`, e respeitam `prefers-reduced-motion`. É o único arquivo de camada que expõe um global.
 
 ---
 
@@ -210,6 +211,8 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
   - auditada com Playwright e Supabase falso: 36 estéticas em 1440 e 390 px nas telas principais; Cyberpunk, Frutiger Aero, Dark Academia, Webcore e os temas clássicos em todas as telas;
   - corrigidos: vidro borrando o mapa no celular, barra de combate sobre a navegação, rótulos de rituais embaralhados no Manual, índice do Manual ausente entre 861 e 900 px, Pergaminho com topo da ficha, Arcade e Quarto do Perseus ilegíveis, campos ilegíveis no Webcore, Perseus sobre o painel da Mesa;
   - `--ink-bg` (em `body`) é a cor do texto escrito direto sobre o fundo da página; as regras de contraste por estética ficam no `css/14`.
+
+- **Arcade visual, Onda 1 · Motor gráfico (`?v=2026112702`)**: novo `js/60f-arcade-gfx.js` (`GFX60`) no início da `QUEUE` do `60d`, com sprites/tilesets procedurais em cache, paralaxe, luz, sombras, partículas, hit-stop só visual e HUD (estilos no fim do `css/13`). Nenhum jogo usa a camada ainda (Ondas 2–7); a única diferença visível é que, com movimento reduzido, o tremor de tela some e o clarão fica fraco.
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.

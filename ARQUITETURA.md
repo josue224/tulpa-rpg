@@ -125,6 +125,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60b | `60b-app-shell.js` | novo | 9 KB | **Onda 1 · App Shell**: monta o rail (desktop) / barra inferior (celular), destaca a tela atual e cria os botões Jogadores/Painel da Mesa. Só aciona o que já existe (`#openTable`, `T3.manualOpen`, `T3.arcGo`, `T3.petOpen`, `T3.sysOpen`, `T3.openSettings`, `T3.back`). Usa IIFE: não cria nomes globais. Roda ANTES do `61`. **v2:** `adoptMore()` move (não recria) `.mb-right`, `#mbArc26` e `#mbScr28` da barra da Mesa para o popover `#mbMore60` (botão `#mbMoreBtn60`); IDs e handlers dos outros arquivos seguem valendo. |
 | 60c | `60c-fichas.js` | novo | 4 KB | **Onda 2 · Fichas**: cria o cabeçalho `#sheetHead60` (Vital/Lucidez/Essência) como espelho SOMENTE LEITURA de `#stats`, mede o topbar (`--tb-h`) e o cabeçalho fixo (`--sh-h`), marca o botão “← Central” (`.tb-central60`) e mantém a aba ativa visível. IIFE; roda ANTES do `61`. |
 | 60e | `60e-arcade-filtros.js` | novo | 4 KB | **Onda 4 · Filtros do Arcade**: barra com busca e filtros por modo (Solo, Contra o Perseus, Mesa, PvP 1v1) acima da grade de jogos. Lê o modo dos botões de cada cartão e é recriada por um `MutationObserver` a cada volta à vitrine. Filtro lembrado em `localStorage t60e.arcFilter`. |
+| 60f | `60f-arcade-gfx.js` | novo | 40 KB | **Motor gráfico do Arcade** (`window.GFX60`): sprites e tilesets procedurais, paralaxe, luz/glow, partículas, hit-stop visual e HUD. Sem `<script>`: entra pela `QUEUE` do `60d`. Ver a seção própria abaixo. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## App Shell (Onda 1)
@@ -134,6 +135,107 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 - Breakpoint único de celular: `max-width:860px` (o mesmo do `css/07`). Abaixo dele o rail vira barra inferior de 60 px + gaveta "Mais".
 - **Manual e Alterações como aba:** enquanto `#man31` ou `#sys29` estiver aberto, o `60b` põe `body.doc-open` e o `css/12-docs.css` esconde `#portal`, `.topbar` e `.shell` (a tela de baixo some e volta igual ao fechar). O rail marca o item ativo e, ao clicar em outro destino, fecha a aba aberta (`#m31x` / `#sys29x`). O Arcade continua em tela cheia própria.
 - Para adicionar um destino novo na navegação, inclua um item no array `ITEMS` do `js/60b-app-shell.js` e um ícone em `IC`.
+
+## Motor gráfico do Arcade (GFX60)
+
+`js/60f-arcade-gfx.js` é uma camada **somente visual**: nunca mexe em regras, física, pontuação, dificuldade, apostas, rede, `defineArcadeGame` ou `C.finish`. É o primeiro item da `QUEUE` do `60d`, então só existe depois que o Arcade abre. Único global: `window.GFX60`. Os estilos do HUD em HTML ficam no fim do `css/13`.
+
+### Assinaturas
+
+| Grupo | Chamada |
+|---|---|
+| Estado | `reduced()` · `low()` (aparelho lento) · `stats()` · `force.reduced` / `force.low` (testes) |
+| Cor | `rgba(cor,a)` · `mix(a,b,k)` · `shade(cor,k)` · `pal.{fe,natureza,inexistencia,ilusao,verdade,ink,bg,acc,perigo}` · `rng(seed)` |
+| Cache | `bake(chave,w,h,pintar(ctx,w,h,rnd),{s})` → canvas com `.lw/.lh` · `clear(prefixo)` (teto de 16 MP, LRU) |
+| Sprites | `draw(x,img,cx,cy,{w,h,rot,flip,alpha,sx,sy,ax,ay,add})` · `sheet(chave,n,w,h,pintar(ctx,i,n,rnd,w,h))` → quadros · `anim(quadros,t,fps,loop)` · `pix(chave,linhas,paleta,{p})` · `tint(img,cor,a)` |
+| Peças | `prop.orb(cor,r)` · `prop.block(cor,tam,estilo)` (`chanfro`, `pedra`, `vidro`) · `prop.gem(cor,tam,lados)` · `prop.crystal(cor,w,h)` · `prop.coin(r,cor)` |
+| Tilesets | `tile(tipo,{size,a,b,seed})` · `fillTile(x,ladrilho,X,Y,W,H,{ox,oy,alpha})`. Tipos: `pedra tijolo madeira grama terra areia metal cristal agua feltro pergaminho runa` |
+| Cenário | `scene(nome,W,H,{seed})` → `.draw(x,camX,camY,t,{from,to})`. Nomes: `fe natureza inexistencia ilusao verdade espaco cripta` |
+| Paralaxe própria | `parallax(id,W,H,[{paint,speed,vy,drift,alpha,y,w,h,s}])`; pintores `paint.sky(cores)` e `paint.{stars,ridge,spires,trees,pillars,nebula,clouds,fog}({...})` |
+| Ambiente | `ambient(tipo,{W,H,n,col,seed})` → `.draw(x,t,camX)`. Tipos: `poeira brasas folhas neve chuva motes vagalumes` |
+| Luz | `glow(x,cx,cy,r,cor,a,{add,sy})` · `lights(W,H,{dark,color})` → `.begin(dark).add(x,y,r,cor,i).apply(x,{glow})` · `rays(x,cx,cy,{n,len,width,col,a,t,from,spread})` |
+| Acabamento | `shadow(x,cx,chaoY,largura,{alt,alpha,h})` · `vignette(x,W,H,{a,col})` · `scanlines(x,W,H,a)` |
+| Partículas | `emit(tipo,x,y,{col,amount,ang,spread,size})`, tipos `impacto explosao brilho coleta poeira rastro fumaca estilhacos folhas confete`. `C.fx.burst({kind})` ganhou `faisca brilho estilhaco fumaca onda brasa folha confete` |
+| Hit-stop | `hitstop(ms,{zoom})` (16 a 140 ms, só a imagem) · `frozen()` · `impact(x,y,{col,force})` = hit-stop + tremor + faíscas |
+| HUD no canvas | `hud.text(x,txt,X,Y,{size,col,al,bl,w,stroke,min,max})` · `hud.panel(x,X,Y,w,h,{r,acc,a})` · `hud.bar(x,X,Y,w,h,v,{col,bg,ghost,segs,label,val})` · `hud.chip(x,X,Y,{icon,text,col,size,al})` · `hud.pips(x,X,Y,n,max,{icon,size,col})` · `hud.frame(x,W,H,{acc,a})` · `hud.banner(x,W,H,titulo,{sub,k,acc,y})` |
+| Ícones | `icon(x,nome,cx,cy,tam,cor)` · `svg(nome)`. Nomes: `coracao estrela moeda raio escudo caveira relogio olho chama alvo coroa gota trofeu bandeira` |
+| HUD em HTML | `skin({acc})` (chame no `make`) · `C.hud(GFX60.chips([{icon,label,value,tone}]))`, `tone`: `ok`, `warn`, `bad` |
+| Texto legível | `fs(tamanho,minPx=11)` e `cssScale()` (num celular de 390 px, 1 unidade ≈ 0,45 px) |
+| Assets (opcional) | `assets.add({nome:'arquivo.webp'})` · `assets.load()` · `art(nome,reservaProcedural)`. O manifesto começa vazio: nada é requisitado |
+
+### Exemplo dentro de um `make(C)`
+
+```js
+function meuJogo(C){
+  const W=800,H=450,GY=390,G=GFX60;
+  const fundo=G.scene('inexistencia',W,H,{seed:1}),motes=G.ambient('motes',{W,H});
+  const luz=G.lights(W,H,{dark:.4}),chao=G.tile('pedra'),gema=G.prop.gem('#ffd36b',32);
+  const S={cam:0,x:200,y:300,pts:0};
+  G.skin({acc:'#b9a6ff'});
+  return{
+    step(dt){
+      /* regras de sempre; efeitos só em EVENTOS:
+         G.impact(S.x,S.y,{col:'#ffd36b'});  G.emit('coleta',S.x,S.y); */
+      C.hud(G.chips([{icon:'moeda',label:'Pontos',value:S.pts}]));
+    },
+    draw(x){
+      const t=performance.now()/1000;
+      fundo.draw(x,S.cam,0,t); motes.draw(x,t,S.cam);
+      G.fillTile(x,chao,0,GY,W,H-GY,{ox:-S.cam});
+      G.shadow(x,S.x,GY,44,{alt:GY-S.y});
+      G.draw(x,gema,S.x,S.y); G.glow(x,S.x,S.y,40,'#ffd36b',.4);
+      luz.begin().add(S.x,S.y,180,'#ffd36b').apply(x);
+      G.vignette(x,W,H); G.hud.frame(x,W,H,{acc:'#b9a6ff'});
+    },
+    ptr(){},key(){}
+  };
+}
+```
+
+### Ordem de desenho recomendada
+
+fundo (`scene`/`parallax`, camadas distantes) → ambiente de trás → chão e tiles → sombras de contato → objetos e personagens (`mgCat` continua sendo o Perseus, com pelagem e chapéu) → glow aditivo → `lights.apply` → camadas da frente (`{from:n}`) → `vignette`/`scanlines` → HUD no canvas e moldura. As partículas, números e clarão do `FX20`, a contagem regressiva e o balão do Perseus são desenhados **depois** do `draw`, pelo próprio laço.
+
+### Movimento reduzido
+
+Automático com `prefers-reduced-motion`: sem hit-stop, sem tremor, clarão fraco, paralaxe parada (camadas com `speed<1`), sem `drift`, ambiente congelado, animação em laço no 1º quadro, menos partículas e sem ondas de choque. Pulsos, balanços e piscadas que o próprio jogo desenhar devem checar `GFX60.reduced()`. Nunca use essa checagem para mudar regra ou tempo.
+
+### Orçamento de performance (60 fps no celular)
+
+- `draw` até ~6 ms. Crie cenário, luzes e peças no `make`; o que for caro vai para `bake` e é desenhado com `drawImage`.
+- Sem `shadowBlur` nem `ctx.filter` em massa: use `glow` e `tint`. Sem gradiente novo por objeto a cada quadro.
+- Chaves e cores de cache **fixas**. Cor que muda a cada quadro (dia/noite) = duas camadas prontas com `alpha` cruzado.
+- Até ~8 camadas de tela cheia, 1 `lights.apply` e ~40 `glow` por quadro. O `FX20` para em 420 partículas. Com `low()` o motor já reduz partículas, ambiente e luzes.
+- Hit-stop só congela a imagem: `step`, timers, rede e RNG continuam. Chame em eventos, nunca em todo quadro.
+
+### Onde cada jogo desenha
+
+Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HUD (`C.hud`), nos botões de toque, na preparação e no resultado. As versões antigas em `js/26` e `js/28` a `js/34` estão sobrescritas: edite a versão abaixo (linhas de 27/11/2026).
+
+| Onda | Jogo (`id`) | Arquivo · função de desenho (linha) | W×H |
+|---|---|---|---|
+| 2 | Corredor do Vazio (`runner`) | `js/51` · `runner40().draw` (167) | 800×320 |
+| 2 | Salto Astral (`salto`) | `js/59` · `salto56().draw` (111) | 480×640 |
+| 2 | Block Blast Astral (`blast`) | `js/54` · `blast47().draw` (328); `drawBlock` (294), `drawMark`, `drawPiece` | 480×720 |
+| 3 | Rhythm (`rhythm`) | `js/50` · `rhythm38().draw` (442); `drawNote` (381) | 800×450 |
+| 3 | Fuga (`fuga`) | `js/50` · `fuga38().draw` (740) | 800×450 |
+| 3 | Salto Vazio (`vazio`) | `js/51` · `vazio41().draw` (440) | 800×450 |
+| 3 | Corrida (`corrida`) | `js/52` · `corrida42().draw` (229); pista pré-pintada em `paintTrack` (116) | 800×450 |
+| 4 | UNO (`uno`) | `js/52` · `uno43().draw` (436); `cardDraw` (393) | 800×450 |
+| 4 | Defesa (`santuario`) | `js/53` · `sanctuary44().draw` (194) | 800×450 |
+| 4 | Trono (`trono`) | `js/53` · `trono45().draw` (402) | 480×640 |
+| 4 | Sudoku (`sudoku`) | `js/54` · `sudoku46().draw` (125) | 480×720 |
+| 5 | DOOM (`doom`) | `js/55` · `doom48().draw` (219), raycaster por colunas | 640×400 |
+| 5 | Julgamento (`julgamento`) | `js/55` · `julgamento49().draw` (535); PvP `juPvp49().draw` (622); arena `juArena49` → `A.draw` (450) | 600×450 |
+| 5 | Rinha (`rinha`) | `js/56` · `rinha50().draw` (206) | 800×450 |
+| 5 | Abismo (`abismo`) | `js/56` · `abismo51().draw` (544) | 800×450 |
+| 6 | Poço (`poco`) | `js/57` · `poco52().draw` (161) | 480×640 |
+| 6 | Clicker (`clicker`) | `js/57` · `clicker53().draw` (322) | 800×450 |
+| 6 | Volley (`volley`) | `js/58` · `volley54().draw` (178) | 800×450 |
+| 6 | Voo (`voo`) | `js/58` · `voo55().draw` (311) | 480×640 |
+| 7 | Coleta (`coleta`) | `js/59` · `coleta57().draw` (290) | 480×640 |
+| 7 | Eco (`eco`) | `js/60` · `eco58().draw` (111) | 480×560 |
+| 7 | Velha (`velha`) | `js/60` · `velha59().draw` (248) | 480×600 |
 
 ## Checklist de validação (usado nas Ondas 1–5)
 

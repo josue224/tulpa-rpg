@@ -10,7 +10,7 @@
   window.__arcLoad60d=true;
 
   /* Extrai o token ?v=... deste próprio script para manter cache-busting alinhado */
-  var VER='20261122g';
+  var VER='2026112702';
   try{
     var cs=document.currentScript||document.querySelector('script[src*="60d-arcade-loader"]');
     if(cs&&cs.src){
@@ -19,8 +19,10 @@
     }
   }catch(e){}
 
-  /* Ordem EXATA de execução original dos 15 scripts de jogos e Arcade 2.0 */
+  /* Motor gráfico (60f) primeiro, para existir antes de qualquer jogo;
+     depois, a ordem EXATA original dos 15 scripts de jogos e Arcade 2.0 */
   var QUEUE=[
+    'js/60f-arcade-gfx.js',
     'js/29-arcade-jogos-a.js',
     'js/30-arcade-jogos-b.js',
     'js/31-arcade-jogos-c.js',
