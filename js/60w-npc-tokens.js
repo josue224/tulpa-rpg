@@ -15,7 +15,7 @@
     informant:{l:'Informante',c:'#4aa3d6',i:'🗣'}
   };
   var COLORS=['#7a4fa3','#2f7d8c','#a8553a','#4f7a3f','#8a6d2f','#3b5b9a','#9a3b5b','#555b66'];
-  var IMG={},GEN={},PEND={},CH={},SEC={},secLoaded='',card=null,cardId=null,secT=0;
+  var IMG={},GEN={},PEND={},CH={},SEC={},LIB={},secLoaded='',card=null,cardId=null,secT=0,libT=0;
   function $(s,r){return (r||document).querySelector(s)}
   function esc2(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function toks(){return (M6.state&&M6.state.tokens)||[]}
@@ -69,7 +69,15 @@
   function loadSec(){
     if(!isGM6()||!camp3())return;var k=secKey();if(secLoaded===k)return;secLoaded=k;
     try{SEC=JSON.parse(localStorage.getItem(k)||'{}')||{}}catch(e){SEC={}}
+    try{LIB=JSON.parse(localStorage.getItem(libKey())||'{}')||{}}catch(e){LIB={}}
+    if(M6.backend==='store')Promise.resolve(stGet6('npclib')).then(function(v){if(v&&typeof v==='object'){LIB=Object.assign({},v,LIB);refreshLib()}}).catch(function(){});
     if(M6.backend==='store')Promise.resolve(stGet6('npcsec')).then(function(v){if(v&&typeof v==='object'){SEC=Object.assign({},v,SEC);if(card)renderCard()}}).catch(function(){});
+  }
+  function libKey(){var c=camp3();return 'tulpa_npclib_'+(c&&c.id)+'_'+uid3()}
+  function saveLib(){
+    try{localStorage.setItem(libKey(),JSON.stringify(LIB))}catch(e){}
+    if(M6.backend!=='store')return;
+    clearTimeout(libT);libT=setTimeout(function(){stPut6('npclib','npclib',Object.assign({},LIB),[uid3()]).catch(function(e){console.warn('[npc] biblioteca',e)})},800);
   }
   function saveSec(){
     try{localStorage.setItem(secKey(),JSON.stringify(SEC))}catch(e){}
@@ -89,7 +97,7 @@
   function openForm(t){
     if(!isGM6())return;loadSec();
     var edit=isNpc(t)?t:null,n=edit?edit.npc:{},nid=edit?nidOf(edit.charId):'n'+rid();
-    var f={n:n.n||'',g:n.g||'',c:n.c||COLORS[0],r:n.r||'neutral',s:edit?(edit.s||1):1,vm:n.vm||10,vt:edit?n.vt:10,df:n.df!=null?n.df:10,rf:n.rf||0,pub:n.pub||'',hid:!!n.hid,photo:edit?(IMG[nid]||null):null,photoChanged:false,sec:edit?(SEC[nid]||''):''};
+    var f={n:n.n||'',g:n.g||'',c:n.c||COLORS[0],r:n.r||'neutral',s:edit?(edit.s||1):1,vm:n.vm||10,vt:edit?n.vt:10,df:n.df!=null?n.df:10,rf:n.rf||0,pub:n.pub||'',hid:!!n.hid,photo:edit?(IMG[nid]||(n.im?(imgFor(nid,n),IMG[nid]||null):null)):null,photoChanged:false,sec:edit?(SEC[nid]||''):''};
     var wrap=document.createElement('div');wrap.className='npc-wrap';wrap.setAttribute('role','dialog');wrap.setAttribute('aria-modal','true');wrap.setAttribute('aria-label',edit?'Editar token NPC':'Novo token NPC');
     var chips=function(name,items,cur){return items.map(function(it){return '<label class="npc-chip'+(String(cur)===String(it[0])?' on':'')+'"><input type="radio" name="'+name+'" value="'+it[0]+'"'+(String(cur)===String(it[0])?' checked':'')+'>'+it[1]+'</label>'}).join('')};
     wrap.innerHTML='<form class="npc-box" novalidate><h3 class="npc-t">'+(edit?'Editar token NPC':'＋ Novo Token NPC')+'</h3>'+
@@ -145,9 +153,11 @@
       pr.then(function(){
         if(secret)SEC[nid]=secret;else delete SEC[nid];saveSec();
         delete CH['npc:'+nid];
-        if(edit){setState6({tokens:toks().map(function(q){return q.id===edit.id?Object.assign({},q,{s:size,npc:npc}):q})})}
-        else{var c=freeCell();setState6({tokens:toks().concat([{id:'k'+rid(),charId:'npc:'+nid,x:c.x,y:c.y,s:size,a:Math.PI/2,npc:npc}])})}
-        fx5('confirm');toast(edit?'Token atualizado.':'Token de '+npc.n+' criado no mapa.');close();try{mapDraw7()}catch(e2){}
+        LIB[nid]=Object.assign({},npc,{s:size});saveLib();
+        var tk=toks().find(function(q){return q.charId==='npc:'+nid});
+        if(tk){setState6({tokens:toks().map(function(q){return q.id===tk.id?Object.assign({},q,{s:size,npc:Object.assign({},npc,{vt:edit&&!edit.lib?npc.vt:tk.npc.vt})}):q})})}
+        else if(!edit){var c=freeCell();setState6({tokens:toks().concat([{id:'k'+rid(),charId:'npc:'+nid,x:c.x,y:c.y,s:size,a:Math.PI/2,npc:npc}])})}
+        fx5('confirm');toast(edit?'NPC atualizado.':'Token de '+npc.n+' criado no mapa e salvo na biblioteca.');close();try{mapDraw7()}catch(e2){}refreshLib();
       }).catch(function(err){btn.disabled=false;toast('Não consegui salvar a foto do NPC: '+(err&&err.message||'erro')+'.')});
     });
   }
@@ -161,20 +171,59 @@
     if(typeof cbAdd22==='function')cbAdd22([t.charId]);
   }
   function removeTok(t){
-    var nid=nidOf(t.charId),c=camp3(),cm=c&&c.combat;
+    var c=camp3(),cm=c&&c.combat;
     setState6({tokens:toks().filter(function(q){return q.id!==t.id})});
     if(cm&&cm.active&&(cm.order||[]).some(function(o){return o.characterId===t.charId})&&window.tulpaSaveCombatState){
       var idx=cm.order.findIndex(function(o){return o.characterId===t.charId}),order=cm.order.filter(function(o){return o.characterId!==t.charId});
       var ti=Number(cm.turnIndex)||0;if(idx<ti)ti--;ti=Math.max(0,Math.min(ti,Math.max(0,order.length-1)));
       Promise.resolve(window.tulpaSaveCombatState(Object.assign({},cm,{order:order,participants:(cm.participants||[]).filter(function(p){return p.characterId!==t.charId}),turnIndex:ti}))).catch(function(){});
     }
-    delete SEC[nid];saveSec();delete IMG[nid];delete CH[t.charId];blobDel6('npcimg:'+nid);
-    MAP7.sel=null;closeCard();try{mapDraw7()}catch(e){}
+    delete CH[t.charId];
+    MAP7.sel=null;closeCard();try{mapDraw7()}catch(e){}refreshLib();toast('Tirado do mapa. O NPC continua salvo em Tokens.');
   }
+
+  /* ---------- biblioteca de NPCs (janela Tokens) ---------- */
+  function addFromLib(nid){
+    var e=LIB[nid];if(!e)return;
+    if(toks().some(function(t){return t.charId==='npc:'+nid})){toast(e.n+' já está no mapa.');return}
+    var c=freeCell(),npc=Object.assign({},e);delete npc.s;npc.vt=npc.vm;
+    setState6({tokens:toks().concat([{id:'k'+rid(),charId:'npc:'+nid,x:c.x,y:c.y,s:e.s||1,a:Math.PI/2,npc:npc}])});delete CH['npc:'+nid];
+    toast(e.n+' entrou no mapa.');refreshLib();try{mapDraw7()}catch(x){}
+  }
+  function dupLib(nid){
+    var e=LIB[nid];if(!e)return;var id2='n'+rid();LIB[id2]=Object.assign({},e,{n:(e.n+' (cópia)').slice(0,40)});
+    if(SEC[nid])SEC[id2]=SEC[nid];if(IMG[nid]&&e.im)IMG[id2]=IMG[nid],blobPut6('npcimg:'+id2,IMG[nid]).catch(function(){});
+    saveLib();saveSec();refreshLib();
+  }
+  function deleteNpc(nid){
+    var tk=toks().find(function(t){return t.charId==='npc:'+nid});if(tk)removeTok(tk);
+    delete LIB[nid];delete SEC[nid];delete IMG[nid];delete PEND[nid];delete CH['npc:'+nid];blobDel6('npcimg:'+nid);saveLib();saveSec();refreshLib();
+  }
+  function refreshLib(){
+    var box=$('#npcLibBox');if(!box)return;
+    var ids=Object.keys(LIB),on=new Set(toks().map(function(t){return t.charId}));
+    box.innerHTML='<h4>NPCs salvos <small class="sub">(sem ficha)</small></h4><div class="inline"><button type="button" class="btn small primary" id="npcNew">＋ Novo Token NPC</button></div>'+
+      (ids.length?'<ul class="mu-list tk-list">'+ids.map(function(id){var e=LIB[id],r=ROLES[e.r]||ROLES.neutral,inMap=on.has('npc:'+id);
+        return '<li><img class="npc-prev" style="width:36px;height:36px" alt="" src="'+imgFor(id,e)+'"><span class="mu-t">'+esc2(e.n)+' <small>'+r.l+' · '+(e.s||1)+'×'+(e.s||1)+(e.hid?' · oculto':'')+'</small></span>'+
+          (inMap?'<span class="sub">no mapa</span>':'<button type="button" class="btn small" data-lib="add" data-id="'+id+'">Adicionar ao mapa</button>')+
+          '<button type="button" class="btn small" data-lib="edit" data-id="'+id+'">Editar</button><button type="button" class="btn small" data-lib="dup" data-id="'+id+'">Duplicar</button><button type="button" class="btn small danger" data-lib="del" data-id="'+id+'">Excluir</button></li>'}).join('')+'</ul>':'<p class="sub">Nenhum NPC salvo ainda. Crie um: ele fica guardado aqui para você colocar no mapa quando quiser.</p>');
+    $('#npcNew',box).onclick=function(){openForm()};
+    Array.prototype.forEach.call(box.querySelectorAll('[data-lib]'),function(b){var armed=false;b.onclick=function(){
+      var id=b.dataset.id,a=b.dataset.lib;
+      if(a==='add')addFromLib(id);else if(a==='dup')dupLib(id);
+      else if(a==='edit'){var e=LIB[id];openForm({id:null,lib:true,charId:'npc:'+id,s:e.s||1,npc:e})}
+      else if(a==='del'){if(!armed){armed=true;b.textContent='Excluir mesmo?';setTimeout(function(){armed=false;if(b.isConnected)b.textContent='Excluir'},3000)}else deleteNpc(id)}
+    }});
+  }
+  var _tm=mapTokensModal7;
+  mapTokensModal7=function(){
+    _tm.apply(this,arguments);
+    try{loadSec();var l=$('#tkList');if(l&&!$('#npcLibBox')){var b=document.createElement('div');b.id='npcLibBox';l.after(b);refreshLib()}}catch(e){console.warn('[npc] biblioteca',e)}
+  };
 
   /* ---------- card flutuante ---------- */
   function closeCard(){if(card){card.remove();card=null}cardId=null}
-  function openCard(t){cardId=t.id;renderCard()}
+  function openCard(t){cardId=t.id;try{if(isGM6()&&!LIB[nidOf(t.charId)]){loadSec();LIB[nidOf(t.charId)]=Object.assign({},t.npc,{s:t.s||1});saveLib()}}catch(e){}renderCard()}
   function renderCard(){
     var t=toks().find(function(q){return q.id===cardId});
     if(!t||!isNpc(t)||!MAP7.stage||(t.npc.hid&&!isGM6())){closeCard();return}
