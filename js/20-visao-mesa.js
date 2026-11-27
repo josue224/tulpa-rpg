@@ -17,7 +17,7 @@ const M6={
   hooks:{state:[],cast:[],layout:[],leave:[]},
 };
 T3.mesa=M6;
-const defState6=()=>({v:1,rev:0,speaker:{mode:'narrator',charId:null},map:null,mapCfg:{},tokens:[],cam:{x:.5,y:.5,z:1},fog:{on:false,open:[]},music:null,playlist:[],pause:{on:false,since:0},call:{on:false,id:'',whisper:null}});
+const defState6=()=>({v:1,rev:0,speaker:{mode:'narrator',charId:null},map:null,mapCfg:{},tokens:[],cam:{x:.5,y:.5,z:1},fog:{on:false,open:[]},music:null,vision:{mode:'cone',fov:200,rng:0},playlist:[],pause:{on:false,since:0},call:{on:false,id:'',whisper:null}});
 M6.state=defState6();
 const isGM6=()=>role3()==='master';
 const cloud6=()=>!!(sb()&&window.tulpaCloudUser&&camp3()&&typeof sb().from==='function');

@@ -19,7 +19,11 @@ T3.tac=TAC10;
 const TAU10=Math.PI*2;
 const FOV10=Math.PI*200/180;      /* visão humana realista: ~200° (todos os tokens; a lanterna continua em 60°) */
 const FOV_PL10=FOV10;
-const fovOf10=t=>{try{const ch=charById(t.charId);return ch&&ch.ownerId&&!gmChar6(ch)?FOV_PL10:FOV10}catch(e){return FOV10}};
+/* visão dos jogadores, ajustável pelo Mestre (M6.state.vision: modo 'cone' ou 'room', abertura em graus, alcance em m; 0 = ilimitado) */
+const visCfg10=()=>{const v=(M6.state&&M6.state.vision)||{};return{mode:v.mode==='room'?'room':'cone',fov:Math.max(30,Math.min(360,Number(v.fov)||200)),rng:Math.max(0,Number(v.rng)||0)}};
+const isPlTok10=t=>{try{const ch=charById(t.charId);return !!(ch&&ch.ownerId&&!gmChar6(ch))}catch(e){return false}};
+const fovOf10=t=>isPlTok10(t)?visCfg10().fov*Math.PI/180:FOV10;
+const rngOf10=t=>{if(!isPlTok10(t))return Infinity;const r=visCfg10().rng,g=mapCfg7();return r>0&&g.mpc>0?r/g.mpc*g.cell:Infinity};
 const LAMP_FOV10=Math.PI/3;       /* facho da lanterna: 60° */
 const LAMP_RANGE10=8;             /* alcance da lanterna em quadrados */
 const SPEED10=3.4;                /* quadrados por segundo andando */
@@ -196,7 +200,13 @@ function tokView10(t,geo){
     if(torchOn10(t))polys.push({poly:visPoly10(fx,fy,a,LAMP_FOV10,LAMP_RANGE10*g.cell),ox:fx,oy:fy,r:LAMP_RANGE10*g.cell,lamp:true});
     return polys;
   }
-  return[{poly:visPoly10(fx,fy,a,fovOf10(t),Infinity),ox:fx,oy:fy,r:0,cone:true}];
+  if(isPlTok10(t)&&visCfg10().mode==='room'){
+    /* só a sala inteira em que o jogador está (sem espiar por portas); fora de cômodos, volta ao redor todo */
+    const rs=roomAt10(geo.rooms,cx,cy);
+    if(rs.length)return rs.map(r=>({poly:r.pts,ox:fx,oy:fy,r:0,cone:true}));
+    return[{poly:visPoly10(cx,cy,0,TAU10,rngOf10(t)),ox:cx,oy:cy,r:0,cone:true}];
+  }
+  return[{poly:visPoly10(fx,fy,a,fovOf10(t),rngOf10(t)),ox:fx,oy:fy,r:0,cone:true}];
 }
 
 /* ---------- cômodos: a névoa só some enquanto o jogador está dentro (sem memória) ---------- */
@@ -228,7 +238,7 @@ function computeView10(){
   if(out.mode==='dark'){
     toks.forEach(t=>{if(mine.includes(t)||!torchOn10(t))return;const [fx,fy,a]=front10(t);out.others.push({poly:visPoly10(fx,fy,a,LAMP_FOV10,LAMP_RANGE10*mapCfg7().cell),ox:fx,oy:fy,r:LAMP_RANGE10*mapCfg7().cell})});
     if(lamps.length){
-      out.mine.forEach(m=>{const [fx,fy,a]=front10(m.t);m.clips=[visPoly10(fx,fy,a,fovOf10(m.t),Infinity),m.views[0].poly]});
+      out.mine.forEach(m=>{const [fx,fy,a]=front10(m.t);m.clips=[visPoly10(fx,fy,a,fovOf10(m.t),rngOf10(m.t)),m.views[0].poly]});
       out.lit=lamps.map(l=>litOf10(geo,l,out.mine));
     }
   }

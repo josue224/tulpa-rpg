@@ -30,7 +30,7 @@
 .npc-chip input{accent-color:var(--accent,#f0c85a)}
 .npc-chip.on{border-color:var(--accent,#f0c85a);box-shadow:0 0 0 1px var(--accent,#f0c85a)}
 .npc-dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,.6)}
-.npc-fab{position:absolute;right:var(--sp-2,8px);bottom:var(--sp-2,8px);z-index:6;min-height:var(--touch,44px)}
+.npc-fab{position:absolute;left:var(--sp-2,8px);bottom:var(--sp-2,8px);z-index:6;min-height:var(--touch,44px)}
 /* card flutuante */
 .npc-card{position:absolute;z-index:8;width:min(280px,calc(100% - 16px));background:var(--panel,#171e28);color:var(--text,#edf2f7);border:1px solid var(--line,#2c3645);border-radius:var(--ae-rad,12px);padding:var(--sp-3,12px);display:flex;flex-direction:column;gap:var(--sp-2,8px);box-shadow:0 12px 32px rgba(0,0,0,.5);max-height:calc(100% - 16px);overflow:auto}
 .npc-head{display:flex;gap:var(--sp-3,12px);align-items:center;padding-right:var(--sp-5,24px)}
@@ -45,3 +45,4 @@
 .npc-card .btn,.npc-vt .btn{min-height:var(--touch,44px)}
 .npc-x{position:absolute;top:var(--sp-1,4px);right:var(--sp-1,4px);min-width:var(--touch,44px);min-height:var(--touch,44px);background:none;border:0;color:inherit;cursor:pointer;font-size:1.1rem}
 .mb-amb{max-width:160px;min-height:var(--touch,44px)}
+.vis-fab{bottom:calc(var(--sp-2,8px) + var(--touch,44px) + var(--sp-2,8px))}
