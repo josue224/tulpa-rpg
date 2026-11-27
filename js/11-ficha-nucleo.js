@@ -100,7 +100,7 @@ rollSkill=function(skill,attr,opts={}){
 };
 
 /* ---- persistência de qualquer ficha que eu controle ---- */
-const pubSummary=d=>{const h=!!d?.hideStats;return{name:d?.name||'Personagem sem nome',stage:Number(d?.stage)||1,vital:h?0:Number(d?.vital)||0,lucidity:h?0:Number(d?.lucidity)||0,essence:h?0:Number(d?.essence)||0,statuses:(d?.statuses||[]).map(s=>typeof s==='string'?s:s.id),df:Number(E.defenseInfo(d||{attributes:{}}).DF)||10,vtMax:h?0:E.maxStats(d||{}).vt,esMax:h?0:E.maxStats(d||{}).es,hideStats:h,temp:h?0:Number(d?.vitalTemp)||0,...(!h&&d?.reacao?{reacao:d.reacao}:{}),dying:((d?.statuses||[]).find(s=>(s.id||s)==='agonia')||{}).turns??null,...(avOk(d?.avatar)?{avatar:d.avatar}:{}),...(avOk(d?.tokenAvatar)?{tokenAvatar:d.tokenAvatar}:{})}};
+const pubSummary=d=>{const h=!!d?.hideStats;return{name:d?.name||'Personagem sem nome',stage:Number(d?.stage)||1,vital:h?0:Number(d?.vital)||0,lucidity:h?0:Number(d?.lucidity)||0,essence:h?0:Number(d?.essence)||0,statuses:(d?.statuses||[]).map(s=>typeof s==='string'?s:s.id),df:Number(E.defenseInfo(d||{attributes:{}}).DF)||10,vtMax:h?0:E.maxStats(d||{}).vt,esMax:h?0:E.maxStats(d||{}).es,hideStats:h,temp:h?0:Number(d?.vitalTemp)||0,...(!h&&d?.reacao?{reacao:d.reacao}:{}),...(d?.disparada?{disparada:d.disparada}:{}),dying:((d?.statuses||[]).find(s=>(s.id||s)==='agonia')||{}).turns??null,...(avOk(d?.avatar)?{avatar:d.avatar}:{}),...(avOk(d?.tokenAvatar)?{tokenAvatar:d.tokenAvatar}:{})}};
 function combatCache(d,voc,trk){
   try{const c=skillCalc3({data:d,vocations:voc||vocations,tracks:trk||tracks},'Reflexo');d.combatCache={reflexDice:Math.max(1,Math.min(8,c.n)),reflexBonus:Math.max(-30,Math.min(60,c.bonus)),at:Date.now()}}catch(e){}
 }

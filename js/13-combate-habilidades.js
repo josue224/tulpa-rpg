@@ -465,21 +465,29 @@ async function doDefenseNow(aid,tid,mode,byMaster=false,react=''){
   const d=ch.id===activeCharacterId?data:ch.data,m=E.computeMods(d),di=E.defenseInfo(d);
   const turn=turnOf(ch);
   if(String(mode).startsWith('block:')){
-    const chk=E.canBlock(d,{weapon:p.dt.weapon,turn,noDefense:p.dt.noDefense,surprise:p.dt.surprise||d.combatSurprised});
-    if(chk.ok)return doBlockNow(aid,tid,mode.slice(6),byMaster);
-    toast('Sem bloqueio: '+chk.msg+' Rolando Esquiva.');mode='esquiva';
+    const pb=E.shotBlockable(p.dt.shot),chk=E.canBlock(d,{weapon:p.dt.weapon,turn,noDefense:p.dt.noDefense,surprise:p.dt.shot?!p.dt.shot.aware:p.dt.surprise||d.combatSurprised,pointBlank:pb});
+    if(chk.ok&&(!p.dt.shot||pb))return doBlockNow(aid,tid,mode.slice(6),byMaster);
+    toast('Sem bloqueio: '+(chk.msg||'só à queima-roupa.')+' Rolando Esquiva.');mode='esquiva';
+  }
+  /* tiro: Mergulho (RF); Esquiva só à queima-roupa com o alvo ciente; o resto é ATA × DF */
+  if(p.dt.shot){
+    const o=E.shotOptions(d,p.dt.shot,{turn,nat20:p.dt.best===20,weapon:p.dt.weapon});
+    if(mode==='mergulho'&&!o.dive.ok){toast('Sem Mergulho: '+o.dive.msg);mode='tiro'}
+    else if(mode==='esquiva'&&!o.dodge)mode='tiro';
+    else if(mode!=='mergulho'&&mode!=='esquiva')mode='tiro';
+    if(mode==='mergulho')react='';
   }
   let rxDef=react?reactionsFor(ch,d).find(x=>x.id===react):null;
   if(rxDef&&!E.reactionInfo(d,turn).reactionAvailable){toast('Sua Reação desta rodada já foi usada: '+rxDef.name+' não foi conjurado.');rxDef=null}
   if(rxDef){mutateChar(ch,x=>{E.useReaction(x,turn);x.essence=Math.max(0,(Number(x.essence)||0)-rxDef.cost)});toast(rxDef.name+'! −'+rxDef.cost+' ES');fx3('activate');if(rxDef.el)setTimeout(()=>{try{window.tulpaFx('cast',rxDef.el)}catch(e){}},40)}
   let r=null,detail={cmb:'def',aid,targetId:tid,mode,df:di.DF,armored:di.armored,prof:E.protProficient(d),react:rxDef?rxDef.id:'',canDefend:mode!=='none'||!!rxDef};
-  if(mode==='none')return insertRow(ch,'Sem defesa',{dice:[],bonus:0,total:0,detail}).then(row=>resolveFor(aid,tid,row)).catch(e=>fail3('defesa',e));
-  const skill=mode==='reflexo'?'Reflexo':'Esquiva';
-  const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},skill);
-  r=E.rollTest(d,skill,SKILL_ATTR,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis,consumeDelta:true});fx3('dice');
-  mutateChar(ch,x=>consumeOnce(x,cal));
-  showRollPopup({eyebrow:'DEFESA',title:`${nm(ch)} · ${skill}`,sub:`DF ${di.DF}`,sets:[{label:`${skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max',note:r.mode!=='normal'?r.mode:''}],big:r.total,detail:'Aguardando o resultado do confronto…'});
-  const row=await insertRow(ch,skill+(byMaster?' (pelo Mestre)':''),{dice:r.dice,bonus:r.bonus,total:r.total,attribute:'Destreza',detail:{...detail,best:r.best}});
+  if(mode==='none'||mode==='tiro')return insertRow(ch,mode==='tiro'?'Tiro direto':'Sem defesa',{dice:[],bonus:0,total:0,detail}).then(row=>resolveFor(aid,tid,row)).catch(e=>fail3('defesa',e));
+  const dive=mode==='mergulho',skill=dive||mode==='reflexo'?'Reflexo':'Esquiva',lb=dive?'Mergulho':skill;
+  const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},skill,dive?'Destreza':undefined);
+  r=E.rollTest(d,skill,cal.SA,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis,consumeDelta:true});fx3('dice');
+  mutateChar(ch,x=>{consumeOnce(x,cal);if(dive)E.useReaction(x,turn)});
+  showRollPopup({eyebrow:dive?'MERGULHO':'DEFESA',title:`${nm(ch)} · ${lb}`,sub:dive?`contra a Defesa Base ${E.DB}`:`DF ${di.DF}`,sets:[{label:`${skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max',note:r.mode!=='normal'?r.mode:''}],big:r.total,detail:'Aguardando o resultado do confronto…'});
+  const row=await insertRow(ch,lb+(byMaster?' (pelo Mestre)':''),{dice:r.dice,bonus:r.bonus,total:r.total,attribute:'Destreza',detail:{...detail,best:r.best}});
   await resolveFor(aid,tid,row);
 }
 /* Bloqueio: rola a perícia no atributo do estilo, gasta a Reação (ou um uso da Guarda) e resolve */
@@ -496,23 +504,27 @@ async function doBlockNow(aid,tid,style,byMaster=false){
 }
 async function resolveFor(aid,tid,defRow){
   const p=CB.pending[aid],ch=charById(tid);if(!p||!ch)return;
-  const a=p.dt,dd=defRow.detail,canDefend=dd.canDefend!==false;
+  const a=p.dt,dd=defRow.detail,canDefend=dd.canDefend!==false,sh=a.shot||null;
   const crit=(a.best>=a.weapon.critMin);
   const sumN=a.dmg.normal.reduce((x,y)=>x+y,0),dmgInfo={dado:a.weapon.dado,normal:a.dmg.normal,crit:a.dmg.crit,usedCrit:false,flat:a.dmg.total-sumN,total:a.dmg.total};
   const dT=ch.id===activeCharacterId?data:ch.data,targetDown=E.isDying(dT)||E.isDead(dT),nat20=a.best===20;
   /* cobertura parcial (mapa tático): +N na defesa de quem está atrás de uma quina */
   const cov=Math.max(0,Number(a.cover)||0),RFc=canDefend?defRow.total+cov:0;
-  let res=E.resolveAttack({ATA:p.row.total,RF:RFc,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:crit||nat20,nat20,targetDown,proficient:dd.prof!==false,armored:dd.armored});
+  /* tiro: a cobertura, a Disparada e o Caído entram na DF (nunca no RF) */
+  const sdf=sh?E.shotDF(dT,sh):null,DF=sdf?sdf.DF:dd.df,porTiro=!!sh&&!targetDown&&(dd.mode==='tiro'||dd.mode==='mergulho');
+  const confronto=(ATA,n20,cr)=>porTiro?E.resolveShot({ATA,nat20:n20,crit:cr,DF,RF:dd.mode==='mergulho'?defRow.total:null})
+    :E.resolveAttack({ATA,RF:RFc,DB:10,DF,canDefend:canDefend&&!targetDown,crit:cr||n20,nat20:n20,targetDown,proficient:dd.prof!==false,armored:dd.armored});
+  let res=confronto(p.row.total,nat20,crit);
   const out={final:0,absorbed:0,resisted:0,notes:[]},stAdd=[];
   /* reações instantâneas do defensor */
   const atkView={skill:a.weapon.skill,dice:p.row.dice||[],bonus:p.row.bonus||0,total:p.row.total};let critNow=crit;
-  if(dd.react==='brecha'&&!targetDown){res={...res,outcome:'esquiva',hit:false,crit:false,forced:false,extraAtk:0,extraDef:0,label:'Brecha Rápida',text:'Uma brecha na realidade se abre: o defensor se teleporta até 5 m e a ameaça é negada.'};out.notes.push('Reação: Brecha Rápida (Inexistência).')}
-  if(dd.react==='duplica'&&res.hit&&!targetDown){const c2=E.die(2);announceRoll(ch,'Duplica Efêmera (1d2)',{dice:[c2],sides:2,total:c2,eyebrow:'REAÇÃO',note:c2===1?'O atacante acertou a ilusão':'O atacante achou o verdadeiro'});if(c2===1){res={...res,outcome:'esquiva',hit:false,crit:false,forced:false,extraAtk:0,label:'Duplica Efêmera',text:'O golpe atravessou a duplicata ilusória. O Mestre pode pedir Percepção ao atacante para discernir.'}}out.notes.push(`Reação: Duplica Efêmera (1d2 = ${c2}).`)}
+  if(dd.react==='brecha'&&!targetDown){res={...res,outcome:'esquiva',hit:false,crit:false,forced:false,extraAtk:0,extraDef:0,fall:false,shot2:false,shotOutcome:'',label:'Brecha Rápida',text:'Uma brecha na realidade se abre: o defensor se teleporta até 5 m e a ameaça é negada.'};out.notes.push('Reação: Brecha Rápida (Inexistência).')}
+  if(dd.react==='duplica'&&res.hit&&!targetDown){const c2=E.die(2);announceRoll(ch,'Duplica Efêmera (1d2)',{dice:[c2],sides:2,total:c2,eyebrow:'REAÇÃO',note:c2===1?'O atacante acertou a ilusão':'O atacante achou o verdadeiro'});if(c2===1){res={...res,outcome:'esquiva',hit:false,crit:false,forced:false,extraAtk:0,fall:false,shot2:false,shotOutcome:'',label:'Duplica Efêmera',text:'O golpe atravessou a duplicata ilusória. O Mestre pode pedir Percepção ao atacante para discernir.'}}out.notes.push(`Reação: Duplica Efêmera (1d2 = ${c2}).`)}
   if(dd.react==='desvio'&&res.hit){
     const n=Math.max(1,(p.row.dice||[]).length),dice2=Array.from({length:n},()=>E.die(20)),best2=Math.max(...dice2),ATA2=best2+(p.row.bonus||0);
     announceRoll(ch,'Desvio Improvável · ataque repetido',{dice:dice2,sides:20,bonus:p.row.bonus||0,total:ATA2,eyebrow:'REAÇÃO'});
     critNow=best2>=a.weapon.critMin;
-    res=E.resolveAttack({ATA:ATA2,RF:RFc,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:critNow||best2===20,nat20:best2===20,targetDown,proficient:dd.prof!==false,armored:dd.armored});
+    res=confronto(ATA2,best2===20,critNow);
     Object.assign(atkView,{dice:dice2,total:ATA2});out.notes.push(`Reação: Desvio Improvável — o atacante repetiu o ataque (${p.row.total} → ${ATA2}).`);
   }
   if(res.forced)out.notes.push('20 natural: o ataque sempre acerta, independentemente de bônus ou defesa.');
@@ -524,8 +536,8 @@ async function resolveFor(aid,tid,defRow){
     res={...res,outcome:blk.hit?'normal':'retaliacao',hit:blk.hit,crit:blk.hit&&critNow,forced:false,extraAtk:0,extraDef:blk.counter?1:0,label:blk.label,text:blk.text,RF:defRow.total};
     if(blk.outcome==='brecha'||blk.outcome==='parcial')out.notes.push(`Bloqueio: ${full} ÷ 2 − ${dd.block.rd} (CON${dd.block.parts?.vert?' + Boxe':''}${dd.block.guard?' + Guarda':''}) = ${blk.damage} (mínimo 1).`);
   }
-  const hadAlert=(dT.statuses||[]).some(x=>(x.id||x)==='alerta');
-  if(res.hit||hadAlert){
+  const hadAlert=(dT.statuses||[]).some(x=>(x.id||x)==='alerta'),fall=!!res.fall&&!targetDown;
+  if(res.hit||hadAlert||fall){
     let base=blk?blk.damage:critNow?a.dmg.critTotal:a.dmg.total;
     if(res.hit&&dd.react==='intervencao'){const rr=E.rollExpr('2d6');announceRoll(ch,'Intervenção Divina Menor · redução 2d6',{dice:rr.rolls,sides:6,total:rr.total,eyebrow:'REAÇÃO'});base=Math.max(0,base-rr.total);out.notes.push(`Reação: Intervenção Divina Menor reduziu o dano em ${rr.total}.`)}
     if(res.hit){dmgInfo.usedCrit=critNow;dmgInfo.total=base}
@@ -533,12 +545,15 @@ async function resolveFor(aid,tid,defRow){
       d.statuses=d.statuses||[];d.activeEffects=d.activeEffects||[];
       /* o Estado de Alerta termina assim que o personagem é atacado */
       if(d.statuses.some(x=>x.id==='alerta')){d.statuses=d.statuses.filter(x=>x.id!=='alerta');out.notes.push('O Estado de Alerta terminou (você foi atacado).')}
+      if(fall&&!E.isDead(d)&&E.addStatus(d,'caido'))stAdd.push('caido');
       if(!res.hit)return;
       if(E.isDead(d)){out.notes.push('O alvo já está morto.');return}
       const wasDying=E.isDying(d);
       const r=E.applyDamageToSheet(d,base,{ignoreResist:!!a.ignoreResist});const pre=out.notes;Object.assign(out,r);out.notes=[...pre,...(r.notes||[])];
       if(critNow&&d.suturaAtiva)d.suturaRompe=true;
       (a.weapon.effects||[]).forEach(e=>{if(e.when==='hit'||(e.when==='crit'&&critNow)){if(!d.statuses.some(s=>s.id===e.status)){d.statuses.push({id:e.status,at:Date.now()});stAdd.push(e.status)}}});
+      /* crítico balístico ou perfurante: Sangrando (1 VT por rodada), sem acumular */
+      if(critNow&&E.isBallistic(a.weapon)&&E.applyBleed(d)){stAdd.push('sangrando');out.notes.push('Crítico balístico: Sangrando (1 VT por rodada).')}
       if(a.desarme){d.activeEffects.push({id:'once-'+rid(),name:'Desarmado',type:'once',dieDelta:-1,left:0,desc:'−1 dado na próxima jogada de ataque.'});out.notes.push('Desarme: −1 dado no próximo ataque.')}
       if(wasDying){
         /* Morrendo: golpe < metade do Vital máximo tira 1 turno na hora; ≥ metade finaliza */
@@ -558,8 +573,12 @@ async function resolveFor(aid,tid,defRow){
       else mutateChar(ch,d=>{d.retalExtra=1;d.retalTarget=a.attackerId;d.retalCounter=true});
     }
   }else if(res.extraDef){const dk=TURN.key||('r'+(camp3()?.combat?.round||0));const rg=(CB.retalGiven=CB.retalGiven||{}),rk=ch.id+'|'+dk;if(dT.retalKey!==dk&&!rg[rk]&&!(Number(dT.retalExtra)>0)){rg[rk]=1;mutateChar(ch,d=>{d.retalKey=dk;d.retalExtra=1;d.retalTarget=a.attackerId})}else{res={...res,extraDef:0};out.notes.push('Retaliação já usada neste turno: sem nova ação extra.')}}
-  if(cov&&canDefend&&!blk)out.notes.push(`Cobertura parcial: +${cov} na defesa.`);
-  const detail={cmb:'res',...(blk?{block:blk.outcome,reduction:blk.reduction,counter:!!res.extraDef}:{}),cover:cov,aid,targetId:tid,targetName:nm(ch),attackerId:a.attackerId,attackerName:a.attackerName,weapon:a.weapon.name,mode:dd.mode,outcome:res.outcome,label:res.label,text:res.text,hit:res.hit,crit:res.crit,ATA:res.ATA,RF:res.RF,DB:10,DF:dd.df,dmg:{final:out.final,absorbed:out.absorbed,resisted:out.resisted},statuses:stAdd,notes:out.notes,forced:!!res.forced,extraAtk:res.extraAtk,extraDef:res.extraDef,atk:atkView,react:dd.react||'',def:{skill:dd.block?'Bloqueio ('+dd.block.skill+')':dd.mode==='reflexo'?'Reflexo':dd.mode==='none'?'Sem defesa':'Esquiva',dice:defRow.dice||[],bonus:defRow.bonus||0,total:defRow.total},dmgInfo};
+  if(cov&&canDefend&&!blk&&!sh)out.notes.push(`Cobertura: +${cov} na defesa.`);
+  if(sdf&&!blk&&dd.mode!=='mergulho'&&(sdf.parts.length||sdf.ignored))out.notes.push(`DF ${DF} = ${sdf.base}${sdf.parts.map(x=>` + ${x.label} ${x.v}`).join('')}${sdf.ignored?' (a mira ignorou a Cobertura Parcial)':''}.`);
+  /* espingarda: empurrão quando o tiro supera a DF */
+  const push=sh&&res.hit&&sh.push>0&&res.ATA>=DF?{meters:sh.push}:null;
+  const tiro=sh?{outcome:res.shotOutcome||'',shot2:!!res.shot2&&!targetDown,fellNew:stAdd.includes('caido'),aimed:!!sh.aimed,itemId:a.weapon.itemId||'',w:a.weapon}:null;
+  const detail={cmb:'res',...(blk?{block:blk.outcome,reduction:blk.reduction,counter:!!res.extraDef}:{}),cover:cov,aid,targetId:tid,targetName:nm(ch),attackerId:a.attackerId,attackerName:a.attackerName,weapon:a.weapon.name,mode:dd.mode,outcome:res.outcome,label:res.label,text:res.text,hit:res.hit,crit:res.crit,ATA:res.ATA,RF:res.RF,DB:10,DF,...(tiro?{shot:tiro}:{}),...(push?{push}:{}),dmg:{final:out.final,absorbed:out.absorbed,resisted:out.resisted},statuses:stAdd,notes:out.notes,forced:!!res.forced,extraAtk:res.extraAtk,extraDef:res.extraDef,atk:atkView,react:dd.react||'',def:{skill:dd.block?'Bloqueio ('+dd.block.skill+')':dd.mode==='mergulho'?'Mergulho (Reflexo)':dd.mode==='tiro'?'Sem reação':dd.mode==='reflexo'?'Reflexo':dd.mode==='none'?'Sem defesa':'Esquiva',dice:defRow.dice||[],bonus:defRow.bonus||0,total:defRow.total},dmgInfo};
   try{await insertRow(ch,'Resultado do confronto',{dice:[],bonus:0,total:out.final,detail})}catch(e){fail3('registrar resultado',e)}
 }
 
@@ -575,7 +594,7 @@ function processTurnStart(ch){
     const dy=E.dyingTick(d);if(dy)log.push(dy.dead?'☠ MORREU: não foi estabilizado a tempo.':`Morrendo: restam ${dy.left} turno(s) para ser estabilizado.`);
     d.statuses.slice().forEach(s=>{
       const def=STATUS_BY_ID[s.id];if(!def)return;
-      if(def.dot&&!E.isDead(d)&&!E.isDying(d)&&!s.suspended){let rr=null;const amt=def.dot.fixed??(rr=E.rollExpr(def.dot.dice)).total;if(rr)annos.push([def.dot.label,rr]);const r=E.applyDamageToSheet(d,amt,{ignoreResist:true,ignoreTemp:false});log.push(`${def.dot.label}: −${amt} VT`);if(d.vital<=0&&!d.statuses.some(x=>x.id==='agonia')){E.startDying(d);log.push('Caiu a 0 VT: Morrendo')}}
+      if(def.dot&&!E.isDead(d)&&!E.isDying(d)&&!s.suspended&&(s.id!=='sangrando'||E.bleedTick(d,TURN.key))){let rr=null;const amt=def.dot.fixed??(rr=E.rollExpr(def.dot.dice)).total;if(rr)annos.push([def.dot.label,rr]);const r=E.applyDamageToSheet(d,amt,{ignoreResist:true,ignoreTemp:false});log.push(`${def.dot.label}: −${amt} VT`);if(d.vital<=0&&!d.statuses.some(x=>x.id==='agonia')){E.startDying(d);log.push('Caiu a 0 VT: Morrendo')}}
       if(def.untilTurn)d.statuses=d.statuses.filter(x=>x.id!==s.id);
     });
     if(d.statuses.some(s=>s.id==='atordoado')){const at=d.statuses.find(s=>s.id==='atordoado');if(!(Number(at.turnsLeft)>0))d.statuses=d.statuses.filter(s=>s.id!=='atordoado');TURN.actionUsed=true;log.push('Atordoado: perde esta ação')}
@@ -648,11 +667,13 @@ async function startAttack(ch,{retal=false}={}){
   if(retal){if(retalOf(ch)<=0){toast('Você não tem ação de retaliação.');return}}
   else if(actionsLeft(ch)<=0){toast('Você já usou sua ação neste turno.');return}
   const counter=retal&&!!d.retalCounter;
-  const quick=E.quickWeapons(d).filter(i=>!counter||E.isMeleeWeapon(i.w)),pack=E.packWeapons(d);
+  let quick=E.quickWeapons(d).filter(i=>!counter||E.isMeleeWeapon(i.w)),pack=E.packWeapons(d);
+  /* Pistolas treinadas: saca da mochila ou do bolso e dispara na mesma ação */
+  const saque=retal?[]:pack.filter(i=>T3.quickDraws?.(d,i));quick=quick.concat(saque);pack=pack.filter(i=>!saque.includes(i));
   const card=(w,id,tag)=>`<button class="t3-weapon" data-w="${id}"><b>${esc(w.name)}${d.favWeaponId&&d.favWeaponId===id?' ★':''}</b><span>${esc(w.skill)} · dano <b>${esc(w.dado)}</b> · crítico ${w.critMin>=20?'20':w.critMin+'-20'}${w.area?' · área':''}</span><span class="sub">${(w.effects||[]).map(e=>(STATUS_BY_ID[e.status]?.name||e.status)+' ('+(e.when==='crit'?'no crítico':'no acerto')+')').join(' · ')||'sem estado'}${tag?' · '+tag:''}</span></button>`;
-  openModal('ATACAR',nm(ch),`<p class="sub">Escolha a arma do saque rápido (mãos, cintura/coldre, bandoleira) ou ataque desarmado.</p><div class="t3-weapons">${quick.map(i=>card(i.w,i.id,LOCS[i.loc])).join('')}${card(UNARMED,'__soco','1d2 · Briga')}</div>${pack.length&&!retal?`<h4 style="margin-top:12px">Sacar da mochila (gasta a ação)</h4><div class="t3-weapons">${pack.map(i=>`<button class="t3-weapon" data-draw="${i.id}"><b>${esc(i.name)}</b><span>${esc(i.w.skill)} · ${esc(i.w.dado)} · crít. ${i.w.critMin>=20?'20':i.w.critMin+'-20'}</span><span class="sub">${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>`:''}${retal?`<div class="notice t3-alert">${counter?'Contra-Ataque do bloqueio: <b>só corpo a corpo</b>, de graça e <b>não pode ser esquivado</b>.':'Contra-ataque de Retaliação: <b>não pode ser esquivado</b>.'}</div>`:''}<label class="t3-check" style="margin-top:10px;${retal?'display:none':''}"><input type="checkbox" id="atkSurprise"> Ataque de surpresa (o alvo está desprevenido e só pode rolar Reflexo)</label>`,'Fechar',closeModal);
+  openModal('ATACAR',nm(ch),`<p class="sub">Escolha a arma do saque rápido (mãos, cintura/coldre, bandoleira) ou ataque desarmado.</p><div class="t3-weapons">${quick.map(i=>card(i.w,i.id,LOCS[i.loc]+(saque.includes(i)?' · saca e dispara na mesma ação':''))).join('')}${card(UNARMED,'__soco','1d2 · Briga')}</div>${pack.length&&!retal?`<h4 style="margin-top:12px">Sacar da mochila (gasta a ação)</h4><div class="t3-weapons">${pack.map(i=>`<button class="t3-weapon" data-draw="${i.id}"><b>${esc(i.name)}</b><span>${esc(i.w.skill)} · ${esc(i.w.dado)} · crít. ${i.w.critMin>=20?'20':i.w.critMin+'-20'}</span><span class="sub">${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>`:''}${retal?`<div class="notice t3-alert">${counter?'Contra-Ataque do bloqueio: <b>só corpo a corpo</b>, de graça e <b>não pode ser esquivado</b>.':'Contra-ataque de Retaliação: <b>não pode ser esquivado</b>.'}</div>`:''}<label class="t3-check" style="margin-top:10px;${retal?'display:none':''}"><input type="checkbox" id="atkSurprise"> Ataque de surpresa (o alvo está desprevenido e só pode rolar Reflexo)</label>`,'Fechar',closeModal);
   $$('[data-w]').forEach(b=>b.onclick=async()=>{
-    const surprise=!!$('atkSurprise')?.checked,id=b.dataset.w;const it0=quick.find(i=>i.id===id);const w=id==='__soco'?UNARMED:(it0?{peso:it0.peso,...it0.w,_itemId:it0.id,_ammo:!!it0.useAmmo}:null);closeModal();_modalResolve=null;
+    const surprise=!!$('atkSurprise')?.checked,id=b.dataset.w;const it0=quick.find(i=>i.id===id);const w=id==='__soco'?UNARMED:(it0?{peso:it0.peso,...it0.w,_itemId:it0.id,_ammo:!!it0.useAmmo,_draw:saque.includes(it0)}:null);closeModal();_modalResolve=null;
     if(!w)return;
     const area=w.area;
     const p=await pickTargets({title:'Alvo do ataque · '+w.name,hint:area?'Arma em área: marque todos os atingidos.':'Escolha o alvo (jogador ou NPC).',multi:area,exclude:[ch.id],skipDead:true,preset:retal&&d.retalTarget?[d.retalTarget]:[]});
@@ -665,7 +686,7 @@ async function startAttack(ch,{retal=false}={}){
     closeModal();spend(ch);mutateChar(ch,x=>{const t=E.ensureInv(x).items.find(i=>i.id===it.id);if(t)t.loc='maos'});toast(it.name+' sacada. A ação foi gasta.');renderCombatUI();
   });
 }
-async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=false,extra=null}={}){
+async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=false,extra=null,shot=null}={}){
   const d=ch.id===activeCharacterId?data:ch.data;
   /* munição opcional: armas de Distância marcadas gastam 1 "Munição solta" por ataque */
   if(w._ammo){const am=E.ensureInv(d).items.find(i=>/muni[çc][ãa]o/i.test(i.name)&&i.loc!=='chao'&&(Number(i.qty)||0)>0);if(!am){toast('Sem munição! Adicione "Munição solta" no inventário (Equipamentos) para recarregar.');return}}
@@ -673,35 +694,45 @@ async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=
   const favOn=!!w._itemId&&d.favWeaponId===w._itemId&&(Number(d.stage)||1)>=10&&['Arsenal Mental','Lâmina Psíquica'].includes(d.track);
   if(favOn)w={...w,critMin:Math.max(2,(Number(w.critMin)||20)-2)};
   let ids=targetIds.slice();const m0=E.computeMods(d),others=chars3().filter(c=>inScene(c)&&c.id!==ch.id&&!isDeadCh(c)).map(c=>c.id);
-  if(m0.flags.has('alvoAleatorio')&&others.length){ids=[others[Math.floor(E.rng()*others.length)]];toast('Enlouquecido: o ataque vai para um alvo aleatório!')}
+  const fixo=!!(shot&&(shot.free||shot.second)); /* 2º Disparo e Tiro Livre já têm alvo certo */
+  if(fixo){}
+  else if(m0.flags.has('alvoAleatorio')&&others.length){ids=[others[Math.floor(E.rng()*others.length)]];toast('Enlouquecido: o ataque vai para um alvo aleatório!')}
   else if(m0.flags.has('confuso')&&others.length&&(()=>{const c2=E.die(2);announceRoll(ch,'Confuso (1d2)',{dice:[c2],sides:2,total:c2,eyebrow:'ESTADO',note:c2===1?'Errou o alvo!':'Mantém o alvo'});return c2===1})()){ids=[others[Math.floor(E.rng()*others.length)]];toast('Confuso: você errou o alvo!')}
   if(m0.flags.has('soCorpoACorpo')&&w.cat!=='Corpo a corpo'&&w.skill!=='Briga'){toast('Trauma Ira: só ataques corpo a corpo.');return}
   const counter=retal&&!!d.retalCounter;
   if(counter&&!E.isMeleeWeapon(w)){toast('O Contra-Ataque é só corpo a corpo.');return}
   const wa=E.weaponAllowed(d,w);if(!wa.ok){toast(wa.msg);return}
+  if(w._draw){const it=E.ensureInv(d).items.find(i=>i.id===w._itemId),v=it?E.validPlacement(d,it,'maos'):{ok:false,msg:'item não encontrado.'};if(!v.ok){toast('Libere as mãos antes: '+v.msg);return}}
+  /* armas de disparo: especialização (ou metade fora dela) e o contexto do Tiroteio Tático */
+  const gun=E.isGun(w)?T3.shotPlan?.(ch,w,ids[0],shot):null,gfx=gun?.fx;
+  if(gfx){w={...w,critMin:gfx.critMin};if(gun.ctx)surprise=!gun.ctx.aware}
   /* especializações corpo a corpo: atributo no acerto, +1d20 e dano extra */
   const plan=E.meleePlan(d,w,{surprise,counter});
-  const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},w.skill,plan.attr);
+  const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},w.skill,plan.attr,gfx?.spec.calc||undefined);
   /* alvo Caído: vantagem em ataques corpo a corpo */
   const melee=w.cat==='Corpo a corpo'||w.skill==='Briga',downAdv=melee&&ids.length>0&&ids.every(i=>stIds(charById(i)?.data).includes('caido'));
-  const r=E.rollTest(d,w.skill,cal.SA,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis,adv:downAdv,extraDice:plan.extraDice,consumeDelta:true});fx3('dice');
+  const r=E.rollTest(d,w.skill,cal.SA,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis||!!gfx?.disadv,adv:downAdv,extraDice:plan.extraDice+(gfx?.extraDice||0),consumeDelta:true});fx3('dice');
   if(downAdv)toast('Alvo Caído: vantagem no ataque corpo a corpo.');
   /* FOR (ou DES em armas Leves e Briga) soma no dano corpo a corpo e de arremesso */
   const attrDmg=E.damageBonus(d,w,plan.attr?{attr:plan.attr}:{});
-  let flat=cal.mods.dmg+attrDmg.bonus+plan.flat;(d.activeEffects||[]).forEach(e=>{if(e.dmgExtra)flat+=E.rollExpr(e.dmgExtra).total});
+  let flat=cal.mods.dmg+attrDmg.bonus+plan.flat+(gfx?.flat||0);(d.activeEffects||[]).forEach(e=>{if(e.dmgExtra)flat+=E.rollExpr(e.dmgExtra).total});
   if(ids.length===1)E.meleeExtraDice(d,w,charById(ids[0])?.data).forEach(x=>{const v=E.rollExpr(x.dado).total;flat+=v;plan.notes.push(`${x.nome}: +${x.dado} (${v}) contra alvo Agarrado e Caído`)});
   const ignore=(d.activeEffects||[]).some(e=>e.ignoreResist);
-  const dmg=E.rollDamage(w,{extraDice:cal.mods.dmgDice+(favOn?1:0),flat});
+  const dmg=E.rollDamage(w,{extraDice:cal.mods.dmgDice+(favOn?1:0),flat,critWeaponOnly:E.isBallistic(w)});
+  if(gfx)plan.notes.push(...gfx.notes,...(gfx.spec.status==='generalista'?['Fora da especialização: metade do bônus']:[]));
   const aid=rid(),cm=camp3()?.combat;
   const des=d.extase?.on&&d.extase.bonus==='desarme';
-  const detail={cmb:'atk',aid,round:cm?.round||0,attackerId:ch.id,attackerName:nm(ch),targets:ids.map(i=>({id:i,name:nm(charById(i))})),weapon:{name:w.name,dado:w.dado,critMin:w.critMin,skill:w.skill,cat:w.cat,area:!!w.area,effects:w.effects||[]},best:r.best,dmg:{total:dmg.total,critTotal:dmg.critTotal,normal:dmg.normal,crit:dmg.crit},surprise,ignoreResist:ignore,desarme:!!des,noDefense:!!retal,...(extra||{})};
-  mutateChar(ch,x=>{if(w._itemId)x.armaEmUso=w._itemId;consumeOnce(x,cal,{attack:true});(x.activeEffects||[]).forEach(e=>{if(e.ignoreResist&&e.type==='once')e._used=1});if(w._ammo){const am=E.ensureInv(x).items.find(i=>/muni[çc][ãa]o/i.test(i.name)&&i.loc!=='chao'&&(Number(i.qty)||0)>0);if(am){am.qty=(Number(am.qty)||1)-1;if(am.qty<=0)x.inventory.items=x.inventory.items.filter(i=>i!==am)}}});
+  const detail={cmb:'atk',aid,round:cm?.round||0,attackerId:ch.id,attackerName:nm(ch),targets:ids.map(i=>({id:i,name:nm(charById(i))})),weapon:{name:w.name,dado:w.dado,critMin:w.critMin,skill:w.skill,cat:w.cat,area:!!w.area,effects:w.effects||[],itemId:w._itemId||''},best:r.best,dmg:{total:dmg.total,critTotal:dmg.critTotal,normal:dmg.normal,crit:dmg.crit},surprise,ignoreResist:ignore,desarme:!!des,noDefense:!!retal,...(extra||{}),...(gun?.ctx?{shot:{...gun.ctx,push:gfx.push,aimed:gfx.aimed}}:{})};
+  mutateChar(ch,x=>{if(w._itemId)x.armaEmUso=w._itemId;consumeOnce(x,cal,{attack:true});(x.activeEffects||[]).forEach(e=>{if(e.ignoreResist&&e.type==='once')e._used=1});if(w._draw){const it=E.ensureInv(x).items.find(i=>i.id===w._itemId);if(it)it.loc='maos'}if(w._ammo){const am=E.ensureInv(x).items.find(i=>/muni[çc][ãa]o/i.test(i.name)&&i.loc!=='chao'&&(Number(i.qty)||0)>0);if(am){if(gfx?.recover)E.registerRecovery(x,am);am.qty=(Number(am.qty)||1)-1;if(am.qty<=0)x.inventory.items=x.inventory.items.filter(i=>i!==am)}}});
   showRollPopup({eyebrow:counter?'CONTRA-ATAQUE':retal?'RETALIAÇÃO':'ATAQUE',title:`${nm(ch)} · ${w.name}`,sub:`${w.skill} → ${detail.targets.map(t=>t.name).join(', ')}`,
     sets:[{label:`${w.skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max',note:r.mode!=='normal'?r.mode:''},
           {label:`Dano ${w.dado}${flat?' '+sign(flat):''}`,dice:dmg.normal,bonus:dmg.mod+flat,total:dmg.total,note:r.best>=w.critMin?`CRÍTICO (${r.best})! Se acertar, rola de novo: [${dmg.crit.join(', ')}] → ${dmg.critTotal}`:''}],
     big:r.total,tone:r.best>=w.critMin?'hit':'',detail:(retal?'Retaliação: não pode ser esquivada.':'Aguardando a defesa…')+(downAdv?' · vantagem (alvo Caído)':'')+(favOn?' · ★ Arma Favorita':'')+(attrDmg.bonus?` · dano inclui +${attrDmg.bonus} de ${attrDmg.attr}`:'')+(plan.notes.length?' · '+plan.notes.map(esc).join(' · '):'')});
   if(!noSpend)spend(ch,retal?'retal':'std');
-  try{await insertRow(ch,(counter?'Contra-Ataque · ':retal?'Retaliação · ':'Ataque · ')+w.name,{dice:r.dice,bonus:r.bonus,total:r.total,attribute:cal.attr,detail});toast('Ataque lançado! Aguardando a defesa de '+detail.targets.map(t=>t.name).join(', ')+'.')}catch(e){fail3('atacar',e)}
+  /* depois de atacar, o movimento que sobrou trava */
+  if(!retal)T3.lockMove?.(ch);
+  if(gun)T3.shotAfter?.(ch,w,detail);
+  try{await insertRow(ch,(counter?'Contra-Ataque · ':retal?'Retaliação · ':gun?.ctx?.free?'Tiro Livre · ':gun?.ctx?.second?'2º Disparo · ':'Ataque · ')+w.name,{dice:r.dice,bonus:r.bonus,total:r.total,attribute:cal.attr,detail});toast('Ataque lançado! Aguardando a defesa de '+detail.targets.map(t=>t.name).join(', ')+'.')}catch(e){fail3('atacar',e)}
   renderCombatUI();
 }
 
@@ -791,7 +822,7 @@ function renderCombatUI(){
   chars3().filter(c=>inScene(c)&&isDyingCh(c)).forEach(c=>{h+=`<div class="notice t3-alert">☠ <b>${esc(nm(c))}</b> está <b>Morrendo</b> — restam <b>${dyingTurns(c)}</b> turno(s). ${myTurn&&!spectator?'Use <b>Sutura Bruta</b> ou <b>Síntese Cirúrgica</b> (Medicina) na sua ação para estabilizar.':'Aliados podem estabilizar com Sutura Bruta ou Síntese Cirúrgica.'} Um golpe tira 1 turno; dano igual ou maior que metade do Vital máximo finaliza.</div>`});
   h+=T3.summonCards?.(mine.filter(x=>inScene(x)&&(x._sheetAvailable||x.id===activeCharacterId)),{myTurn,cur})||'';
   extraChars.forEach(x=>{const ctr=!!dOf(x).retalCounter;h+=`<div class="notice t3-alert">⚡ <b>${esc(nm(x))}</b> ${ctr?'abriu uma brecha no bloqueio e tem 1 <b>Contra-Ataque</b> corpo a corpo grátis':`desviou com folga e tem ${retalOf(x)} ação de <b>Retaliação</b>`}. O contra-ataque <b>não pode ser esquivado</b>. <button class="btn small primary" data-extra="${x.id}">Contra-atacar</button></div>`});
-  if(pend.length){h+='<h4 style="margin-top:12px">Confrontos em andamento</h4>'+pend.map(([aid,v])=>Object.entries(v.targets).filter(([,t])=>!t.res).map(([tid,t])=>{const tc=charById(tid);const can=tc&&controls(tc);return `<div class="t3-pend">⚔ <b>${esc(v.dt.attackerName)}</b> ataca <b>${esc(nm(tc)||'?')}</b> (${esc(v.dt.weapon.name)}) — ${t.def?'defesa rolada, resolvendo…':(v.dt.noDefense?'retaliação: não pode ser esquivada':'aguardando defesa')} ${can&&!t.def&&!v.dt.noDefense?`<button class="btn small primary" data-defend="${aid}|${tid}">Defender</button>`:''}${role3()==='master'&&!t.def&&!can?`<button class="btn small" data-mdef="${aid}|${tid}">Rolar defesa por ${esc(nm(tc))}</button>${tc?._sheetAvailable&&E.canBlock(tc.data,{weapon:v.dt.weapon,turn:turnOf(tc),noDefense:v.dt.noDefense,surprise:v.dt.surprise}).ok?`<button class="btn small" data-mblk="${aid}|${tid}">Bloquear por ${esc(nm(tc))}</button>`:''}`:''}</div>`}).join('')).join('')}
+  if(pend.length){h+='<h4 style="margin-top:12px">Confrontos em andamento</h4>'+pend.map(([aid,v])=>Object.entries(v.targets).filter(([,t])=>!t.res).map(([tid,t])=>{const tc=charById(tid);const can=tc&&controls(tc);return `<div class="t3-pend">⚔ <b>${esc(v.dt.attackerName)}</b> ataca <b>${esc(nm(tc)||'?')}</b> (${esc(v.dt.weapon.name)}) — ${t.def?'defesa rolada, resolvendo…':(v.dt.noDefense?'retaliação: não pode ser esquivada':'aguardando defesa')} ${can&&!t.def&&!v.dt.noDefense?`<button class="btn small primary" data-defend="${aid}|${tid}">Defender</button>`:''}${role3()==='master'&&!t.def&&!can?`<button class="btn small" data-mdef="${aid}|${tid}">Rolar defesa por ${esc(nm(tc))}</button>${tc?._sheetAvailable&&(!v.dt.shot||E.shotBlockable(v.dt.shot))&&E.canBlock(tc.data,{weapon:v.dt.weapon,turn:turnOf(tc),noDefense:v.dt.noDefense,surprise:v.dt.surprise,pointBlank:E.shotBlockable(v.dt.shot)}).ok?`<button class="btn small" data-mblk="${aid}|${tid}">Bloquear por ${esc(nm(tc))}</button>`:''}`:''}</div>`}).join('')).join('')}
   if(CB.log.length){h+=`<details class="t3-logbox" ${CB.logOpen?'open':''}><summary>Registro do combate (${Math.min(CB.log.length,8)})</summary><div class="t3-log">`+CB.log.slice(0,8).map(l=>l.kind==='res'?`<div class="t3-logline ${l.dt.hit?'hit':'miss'}"><b>${esc(l.dt.attackerName)}</b> → <b>${esc(l.dt.targetName)}</b> (${esc(l.dt.weapon)}): ${esc(l.dt.label)}${l.dt.crit?' · CRÍTICO':''}${l.dt.hit?` · ${l.dt.dmg.final} de dano`:''} <span class="sub">ATA ${l.dt.ATA} × RF ${l.dt.RF} · DF ${l.dt.DF}</span></div>`:`<div class="t3-logline">${esc(l.text)}</div>`).join('')+'</div></details>'}
   p.innerHTML=h;
   const lb=p.querySelector('.t3-logbox');if(lb)lb.ontoggle=()=>{CB.logOpen=lb.open};
@@ -807,7 +838,7 @@ function renderCombatUI(){
   on('cbAtk',()=>startAttack(cur));on('cbAlert',()=>alertAction(cur));on('cbAbil',()=>abilitiesMenu(cur));on('cbOther',()=>otherAction(cur));on('cbEnd',()=>endTurn(cur));on('cbEndForce',()=>window.tulpaAdvanceTurn?.(true,true));
   $$('[data-extra]',p).forEach(b=>b.onclick=()=>startAttack(charById(b.dataset.extra),{retal:true}));
   $$('[data-defend]',p).forEach(b=>b.onclick=()=>{const [a,t]=b.dataset.defend.split('|');queuePrompt(a,t)});
-  $$('[data-mdef]',p).forEach(b=>b.onclick=async()=>{const [a,t]=b.dataset.mdef.split('|'),tc=charById(t);if(!tc?._sheetAvailable){toast('Ficha do jogador indisponível para o Mestre.');return}const d=tc.data,m=E.computeMods(d);await doDefense(a,t,(CB.pending[a].dt.noDefense||m.flags.has('semDefender')||m.flags.has('semAgir'))?'none':(CB.pending[a].dt.surprise?'reflexo':'esquiva'),true)});
+  $$('[data-mdef]',p).forEach(b=>b.onclick=async()=>{const [a,t]=b.dataset.mdef.split('|'),tc=charById(t);if(!tc?._sheetAvailable){toast('Ficha do jogador indisponível para o Mestre.');return}const d=tc.data,m=E.computeMods(d);if(CB.pending[a].dt.shot){queuePrompt(a,t);return}await doDefense(a,t,(CB.pending[a].dt.noDefense||m.flags.has('semDefender')||m.flags.has('semAgir'))?'none':(CB.pending[a].dt.surprise?'reflexo':'esquiva'),true)});
 }
 T3.renderCombatUI=renderCombatUI;
 /* Iniciativa: o servidor rola o Reflexo; aqui os dados passam a aparecer na tela e no histórico */

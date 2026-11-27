@@ -1,0 +1,22 @@
+/* Onda 11 · Tiroteio Tático: seletor de contexto e respostas ao tiro.
+   Só estrutura: cores e raios vêm das variáveis do tema. */
+.tiro{display:grid;gap:var(--sp-3);min-width:0}
+.tiro p{margin:0}
+.tiro fieldset{border:0;margin:0;padding:0;min-width:0}
+.tiro legend{padding:0;margin-bottom:var(--sp-1);font-weight:700;font-size:var(--fs-sm,13px)}
+.tiro-row{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+.tiro-chip{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:var(--touch,44px);padding:var(--sp-1) var(--sp-3);border:1px solid var(--line);border-radius:var(--ae-brad,8px);cursor:pointer;line-height:var(--lh-tight,1.25)}
+.tiro-chip input{width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:var(--accent)}
+.tiro-chip:has(input:checked){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);font-weight:700}
+.tiro-chip:has(input:disabled){opacity:.55;cursor:not-allowed}
+.tiro-chip:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.tiro-sum{display:grid;gap:var(--sp-1)}
+.tiro-sup,.tiro-acts .btn{min-height:var(--touch,44px);white-space:normal;text-align:left}
+.tiro-acts{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-3)}
+#tiroSheet .t3-table{margin-top:var(--sp-2)}
+#tiroSheet summary{min-height:var(--touch,44px);display:flex;align-items:center;cursor:pointer}
+#t3Combat .t3-pend .btn,#t3Combat .t3-alert .btn[data-texp],#t3Combat .t3-alert .btn[data-tgm]{margin-left:var(--sp-2)}
+@media (max-width:860px){
+  .tiro-chip{flex:1 1 140px}
+  .tiro-acts .btn,.tiro-sup{flex:1 1 100%;width:100%}
+}

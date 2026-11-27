@@ -89,14 +89,22 @@ function mvInfo14(ch){
   const canRun=!st.includes('exausto')&&!st.includes('exaurido')&&ci.level<2&&!m.flags.has('semCorrer');
   const mv=mvState14(ch);let max=base*(mv.run?2:1);
   /* depois de atacar, o movimento que sobrou trava (o Acerto Violento dá ação, não movimento) */
-  if(CB14.atkKey&&CB14.atkKey===TURN.key&&TURN.actor===ch.id&&mv.used<max){max=mv.used;why.push('você já atacou neste turno')}
-  return{max,base,why:why.join(', '),canRun,over:ci.level,locked:CB14.atkKey===TURN.key&&TURN.actor===ch.id};
+  const locked=TURN.actor===ch.id&&!!((CB14.atkKey&&CB14.atkKey===TURN.key)||mv.lock),lm=E.lockedMove(max,mv.used,locked);
+  if(lm<max){max=lm;why.push(mv.aim?'você mirou neste turno':'você já atacou neste turno')}
+  return{max,base,why:why.join(', '),canRun,over:ci.level,locked};
 }
+/* guarda a trava no aparelho (sobrevive ao F5). aim: Mirar gasta a Ação de Movimento inteira */
+function lockMove14(ch,{aim=false}={}){
+  if(!ch||!inCb14()||TURN.actor!==ch.id)return;
+  CB14.atkKey=TURN.key;const mv=mvState14(ch);mv.lock=true;if(aim)mv.aim=true;mvSave14(true);
+}
+T3.lockMove=lockMove14;
 function mvState14(ch){
   const k=TURN.key||'';
   if(CB14.mv.key!==k||CB14.mv.cid!==ch.id){
     let s=null;try{s=JSON.parse(sessionStorage.getItem('tulpa_mv_'+k)||'null')}catch(e){}
-    CB14.mv={key:k,cid:ch.id,used:s&&s.cid===ch.id?Number(s.used)||0:0,run:!!(s&&s.cid===ch.id&&s.run)};
+    const own=!!(s&&s.cid===ch.id);
+    CB14.mv={key:k,cid:ch.id,used:own?Number(s.used)||0:0,run:own&&!!s.run,lock:own&&!!s.lock,aim:own&&!!s.aim};
   }
   return CB14.mv;
 }
@@ -135,10 +143,10 @@ const aoe14=w=>!!(w&&(w.area||/molotov|granada|bomba|mina terrestre/i.test(w.nam
 const aoeR14=w=>/bazuca/i.test(w.name||'')?4.5:/mina/i.test(w.name||'')?3:3;
 function los14(ax,ay,bx,by){const d=hyp10(bx-ax,by-ay);if(d<1)return true;return castRay10(ax,ay,(bx-ax)/d,(by-ay)/d,blockers10(),d)>=d-2}
 /* três raios (centro e as bordas do alvo): todos livres = limpo; alguns = cobertura parcial; nenhum = sem linha de visão */
-function shot14(a,t){
-  const [ax,ay]=tokCenter10(a),[bx,by]=tokCenter10(t),d=hyp10(bx-ax,by-ay)||1,ux=(bx-ax)/d,uy=(by-ay)/d,off=tokR10(t)*.85;
+function shot14(a,t,tp,ap){
+  const [ax,ay]=tokCenter10(a,ap),[bx,by]=tokCenter10(t,tp),d=hyp10(bx-ax,by-ay)||1,ux=(bx-ax)/d,uy=(by-ay)/d,off=tokR10(t)*.85;
   const rays=[los14(ax,ay,bx,by),los14(ax,ay,bx-uy*off,by+ux*off),los14(ax,ay,bx+uy*off,by-ux*off)],n=rays.filter(Boolean).length;
-  return{dist:px2m14(d),vis:n>0,cover:n>0&&n<3,ax,ay,bx,by};
+  return{dist:px2m14(d),vis:n>0,cover:n>0&&n<3,rays:n,ax,ay,bx,by};
 }
 const ethereal14=ch=>E.hasEffect(d14(ch),'Disparo Etéreo');
 function evalAtk14(a,t){
@@ -151,13 +159,13 @@ function evalAtk14(a,t){
   if(!a.melee&&s.dist>reach+.01)return{ok:false,why:`Fora de alcance: ${fmtM14(s.dist)} m (alcance ${fmtM14(a.range)} m).`,s};
   const eth=!a.melee&&ethereal14(a.ch);
   if(!s.vis&&!eth)return{ok:false,why:'Sem linha de visão: tem uma parede no caminho.',s};
-  const cover=s.cover&&!eth&&!a.melee;
-  return{ok:true,cover,s,why:cover?'Cobertura parcial: +'+COVER14+' na defesa do alvo':eth&&!s.vis?'Disparo Etéreo: atravessa a cobertura':''};
+  const cover=s.cover&&!eth&&!a.melee,kind=cover?E.coverFromRays(s.rays):'';
+  return{ok:true,cover,kind,s,why:cover?`Cobertura ${kind}: +${E.coverBonus(kind)} na defesa do alvo`:eth&&!s.vis?'Disparo Etéreo: atravessa a cobertura':''};
 }
 
 /* ===================== 4. ataque escolhendo o alvo no mapa ===================== */
 const _perf14=performAttack;
-performAttack=async function(ch,w,ids,o={}){if(ch&&TURN.actor===ch.id&&!o.retal)CB14.atkKey=TURN.key;if(o&&o.retal){CB14.retal=null;cast6({t:'cbretal',cid:ch.id,done:1})}return _perf14.apply(this,arguments)};
+performAttack=async function(ch,w,ids,o={}){if(o&&o.retal){CB14.retal=null;cast6({t:'cbretal',cid:ch.id,done:1})}return _perf14.apply(this,arguments)};
 const _startAttack14=startAttack;
 startAttack=async function(ch,{retal=false,areaOnly=false}={}){
   if(!mapReady14(ch))return _startAttack14(ch,{retal});
@@ -168,12 +176,14 @@ startAttack=async function(ch,{retal=false,areaOnly=false}={}){
   let quick=E.quickWeapons(d);const pack=areaOnly||retal?[]:E.packWeapons(d);
   if(areaOnly)quick=quick.filter(i=>aoe14(i.w));
   const counter=retal&&!!d.retalCounter;if(counter)quick=quick.filter(i=>E.isMeleeWeapon(i.w));
+  /* Pistolas treinadas: saca da mochila ou do bolso e dispara na mesma ação */
+  const saque=pack.filter(i=>T3.quickDraws?.(d,i)),guardadas=pack.filter(i=>!saque.includes(i));quick=quick.concat(saque);
   const card=(w,id,tag)=>{const rg=weaponRange14(w);return`<button class="t3-weapon" data-w="${id}"><b>${esc(w.name)}${d.favWeaponId&&d.favWeaponId===id?' ★':''}</b><span>${esc(w.skill)} · dano <b>${esc(w.dado)}</b> · crítico ${w.critMin>=20?'20':w.critMin+'-20'} · ${aoe14(w)?`💣 área ${fmtM14(aoeR14(w))} m, até ${rg.m} m`:rg.melee?'corpo a corpo':'alcance '+rg.m+' m'}</span><span class="sub">${(w.effects||[]).map(e=>(STATUS_BY_ID[e.status]?.name||e.status)+' ('+(e.when==='crit'?'no crítico':'no acerto')+')').join(' · ')||'sem estado'}${tag?' · '+tag:''}</span></button>`};
   if(areaOnly&&!quick.length){toast('Nenhuma granada, bomba ou arma em área nas mãos, cintura ou bandoleira.');return}
-  openModal(areaOnly?'ARREMESSAR':'ATACAR',nm(ch),`<p class="sub">${areaOnly?'Escolha o explosivo. Depois mire no mapa: a DT do Arremesso sobe com a distância.':'Escolha a arma. Depois clique no alvo direto no mapa.'}</p><div class="t3-weapons">${quick.map(i=>card(i.w,i.id,LOCS[i.loc])).join('')}${areaOnly?'':card(UNARMED,'__soco','1d2 · Briga')}</div>${pack.length?`<h4 style="margin-top:12px">Sacar da mochila (gasta a Ação Padrão)</h4><div class="t3-weapons">${pack.map(i=>`<button class="t3-weapon" data-draw="${i.id}"><b>${esc(i.name)}</b><span>${esc(i.w.skill)} · ${esc(i.w.dado)} · crít. ${i.w.critMin>=20?'20':i.w.critMin+'-20'}</span><span class="sub">${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>`:''}${retal?`<div class="notice t3-alert">${counter?'Contra-Ataque do bloqueio: <b>só corpo a corpo</b>, de graça e <b>não pode ser esquivado</b>.':'Contra-ataque de Retaliação: <b>não pode ser esquivado</b>.'}</div>`:''}<label class="t3-check" style="margin-top:10px;${retal||areaOnly?'display:none':''}"><input type="checkbox" id="atkSurprise"> Ataque de surpresa (o alvo está desprevenido e só pode rolar Reflexo)</label>`,'Fechar',closeModal);
+  openModal(areaOnly?'ARREMESSAR':'ATACAR',nm(ch),`<p class="sub">${areaOnly?'Escolha o explosivo. Depois mire no mapa: a DT do Arremesso sobe com a distância.':'Escolha a arma. Depois clique no alvo direto no mapa.'}</p><div class="t3-weapons">${quick.map(i=>card(i.w,i.id,LOCS[i.loc]+(saque.includes(i)?' · saca e dispara na mesma ação':''))).join('')}${areaOnly?'':card(UNARMED,'__soco','1d2 · Briga')}</div>${guardadas.length?`<h4 style="margin-top:12px">Sacar da mochila (gasta a Ação Padrão)</h4><div class="t3-weapons">${guardadas.map(i=>`<button class="t3-weapon" data-draw="${i.id}"><b>${esc(i.name)}</b><span>${esc(i.w.skill)} · ${esc(i.w.dado)} · crít. ${i.w.critMin>=20?'20':i.w.critMin+'-20'}</span><span class="sub">${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>`:''}${retal?`<div class="notice t3-alert">${counter?'Contra-Ataque do bloqueio: <b>só corpo a corpo</b>, de graça e <b>não pode ser esquivado</b>.':'Contra-ataque de Retaliação: <b>não pode ser esquivado</b>.'}</div>`:''}<label class="t3-check" style="margin-top:10px;${retal||areaOnly?'display:none':''}"><input type="checkbox" id="atkSurprise"> Ataque de surpresa (o alvo está desprevenido e só pode rolar Reflexo)</label>`,'Fechar',closeModal);
   $$('[data-w]').forEach(b=>b.onclick=()=>{
     const surprise=!!$('atkSurprise')?.checked,id=b.dataset.w,it0=quick.find(i=>i.id===id);
-    const w=id==='__soco'?UNARMED:(it0?{...it0.w,_itemId:it0.id,_ammo:!!it0.useAmmo}:null);closeModal();_modalResolve=null;if(!w)return;
+    const w=id==='__soco'?UNARMED:(it0?{peso:it0.peso,...it0.w,_itemId:it0.id,_ammo:!!it0.useAmmo,_draw:saque.includes(it0)}:null);closeModal();_modalResolve=null;if(!w)return;
     const rg=weaponRange14(w),tp=E.throwProfile(d,w,rg.m),range=rg.melee?rg.m:tp.range;
     const wa=E.weaponAllowed(d,w);if(!wa.ok){toast(wa.msg);return}
     if(aoe14(w))startAim14({kind:'aoe',ch,w,max:range,r:aoeR14(w),short:tp.short});
@@ -221,10 +231,21 @@ T3.cbDown=(e,p)=>{
     const t=tokAtPt14(p.wx,p.wy);if(!t){toast('Clique em cima de um token para atacar.');return true}
     const ev=evalAtk14(a,t);if(!ev.ok){toast('⛔ '+ev.why);fx5('error');return true}
     endAim14();
-    traceFx14(a.ch.id,t.charId,a.melee?'melee':'shot',true);
-    performAttack(a.ch,a.w,[t.charId],{surprise:a.surprise,retal:a.retal,extra:ev.cover?{cover:COVER14}:null});
-    if(ev.cover)toast('🧱 '+nm(charById(t.charId))+' tem cobertura parcial: +'+COVER14+' na defesa.');
+    /* arma de disparo: o seletor tático decide o contexto (a cobertura entra na DF) */
+    const gun=E.isGun(a.w);
+    if(!gun)traceFx14(a.ch.id,t.charId,a.melee?'melee':'shot',true);
+    performAttack(a.ch,a.w,[t.charId],{surprise:a.surprise,retal:a.retal,extra:ev.cover&&!gun?{cover:E.coverBonus(ev.kind)}:null});
+    if(ev.cover&&!gun)toast(`🧱 ${nm(charById(t.charId))} tem cobertura ${ev.kind}: +${E.coverBonus(ev.kind)} na defesa.`);
     return true;
+  }
+  if(a.kind==='dive'){ /* Mergulho: até 3 m, sem atravessar parede, em lugar livre */
+    const own=tok14(a.ch.id);if(!own){endAim14();a.done(null);return true}
+    const [ox,oy]=tokCenter10(own),hit=tokAtPt14(p.wx,p.wy);
+    if(hit&&hit.id===own.id){endAim14();a.done(null);return true}
+    if(hyp10(p.wx-ox,p.wy-oy)>m2px14(a.m)+1){toast(`Longe demais: o Mergulho vai até ${fmtM14(a.m)} m.`);return true}
+    if(!los14(ox,oy,p.wx,p.wy)){toast('Há uma parede no caminho do Mergulho.');return true}
+    if(hit){toast('Esse lugar está ocupado.');return true}
+    endAim14();a.done([+p.wx.toFixed(1),+p.wy.toFixed(1)]);return true;
   }
   if(a.kind==='aoe'){const pt=aimPoint14(a);if(!pt)return true;endAim14();throw14(a.ch,a.w,[pt[0],pt[1]]);return true}
   if(a.kind==='pick'){
@@ -309,7 +330,7 @@ async function throw14(ch,w,pt){
   const crit=r.best>=w.critMin,dm=E.rollDamage(w,{extraDice:cal.mods.dmgDice,flat:cal.mods.dmg+E.damageBonus(d,w).bonus}),n=crit?dm.critTotal:dm.total;
   const molotov=/molotov/i.test(w.name||''),st=(w.effects||[]).filter(e=>e.when==='hit'||(e.when==='crit'&&crit)).map(e=>e.status);
   showRollPopup({eyebrow:'ARREMESSO',title:`${nm(ch)} · ${w.name}`,sub:`${fmtM14(dist)} m → DT ${DT}`,sets:[{label:`${w.skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max'},{label:`Dano ${w.dado}`,dice:crit?[...dm.normal,...dm.crit]:dm.normal,bonus:dm.mod+(dm.flat||0),total:n,note:crit?'CRÍTICO!':''}],big:r.total,tone:ok?'hit':'',detail:(tp.notes.length?tp.notes.map(esc).join(' · ')+'. ':'')+(ok||tp.exact?`Caiu no ponto certo. ${hits.length?'Atingidos: '+hits.map(t=>nm(charById(t.charId))).join(', '):'Ninguém na área.'}`:`Errou a DT: desviou ${fmtM14(sc)} m. ${hits.length?'Atingidos: '+hits.map(t=>nm(charById(t.charId))).join(', '):'Ninguém na área.'}`)});
-  if(TURN.actor===ch.id)CB14.atkKey=TURN.key;
+  lockMove14(ch);T3.shotExpose?.(ch,'atacou');
   spend(ch);
   /* explosivos de arremesso são gastos ao lançar */
   if(w._itemId&&w.skill==='Arremesso'&&w.cat==='Especial')mutateChar(ch,x=>{const it=E.ensureInv(x).items.find(i=>i.id===w._itemId);if(!it)return;it.qty=(Number(it.qty)||1)-1;if(it.qty<=0)x.inventory.items=x.inventory.items.filter(i=>i!==it)});
@@ -407,7 +428,7 @@ function rowFx14(dt){
     const o=dt.outcome,id=dt.targetId;
     if(dt.block&&dt.hit){const lb={brecha:'BRECHA! CONTRA-ATAQUE',parcial:'BLOQUEOU!',quebrada:'GUARDA QUEBRADA'}[dt.block];if(lb)setTimeout(()=>floatTxt14(id,lb,dt.block==='quebrada'?'#ff8a3d':'#7fe3ff'),440)}
     if(dt.hit){const n=dt.dmg?.final||0;floatTxt14(id,n?`−${n} VT`:'ABSORVIDO','#ff6b5b');if(dt.crit)setTimeout(()=>floatTxt14(id,'CRÍTICO!','#ffb020'),220);if(o==='violento')setTimeout(()=>floatTxt14(id,'ACERTO VIOLENTO!','#ff8a3d'),440)}
-    else floatTxt14(id,dt.block?'CONTRA-ATAQUE!':o==='retaliacao'?'RETALIAÇÃO!':o==='defesa'?'BLOQUEOU!':dt.label==='Brecha Rápida'?'BRECHA!':'ESQUIVOU!',o==='retaliacao'?'#ffd36b':'#7fe3ff');
+    else floatTxt14(id,{mergulho:'MERGULHOU!',recuperacao:'SE RECUPEROU!',queda:'CAIU!',errou:'ERROU!'}[dt.shot?.outcome]||(dt.block?'CONTRA-ATAQUE!':o==='retaliacao'?'RETALIAÇÃO!':o==='defesa'?'BLOQUEOU!':dt.label==='Brecha Rápida'?'BRECHA!':'ESQUIVOU!'),o==='retaliacao'?'#ffd36b':'#7fe3ff');
     /* Brecha Rápida: quem defendeu escolhe para onde se teleporta (até 5 m) */
     const tc=charById(id);if(dt.label==='Brecha Rápida'&&tc&&controls(tc)&&mapReady14(tc))setTimeout(()=>startAim14({kind:'tp',ch:tc,m:5}),600);
   }
@@ -449,8 +470,8 @@ T3.cbPaint=(x,v,g)=>{
     const at=tok14(a.ch.id);
     if(at){
       const [ax,ay]=tokCenter10(at),[sx,sy]=sc(ax,ay),r0=(at.s||1)*cs/2;
-      const ringM=a.kind==='atk'?a.range+(a.melee?0:0):a.kind==='aoe'?a.max:a.kind==='tp'?a.m:a.kind==='push'?2.2:a.kind==='plano'&&a.step==='dest'?a.m:0;
-      if(ringM&&a.kind!=='plano'){const rr=m2px14(ringM)*v.s+(a.melee?r0:0);x.save();x.beginPath();x.arc(sx,sy,rr,0,TAU10);x.fillStyle=a.kind==='aoe'?'rgba(255,150,60,.06)':'rgba(255,90,90,.06)';x.fill();x.setLineDash([8,6]);x.lineWidth=2;x.strokeStyle=a.kind==='tp'?'rgba(170,140,255,.9)':'rgba(255,110,90,.85)';x.stroke();x.setLineDash([]);x.restore();
+      const ringM=a.kind==='atk'?a.range+(a.melee?0:0):a.kind==='aoe'?a.max:a.kind==='tp'||a.kind==='dive'?a.m:a.kind==='push'?2.2:a.kind==='plano'&&a.step==='dest'?a.m:0;
+      if(ringM&&a.kind!=='plano'){const rr=m2px14(ringM)*v.s+(a.melee?r0:0);x.save();x.beginPath();x.arc(sx,sy,rr,0,TAU10);x.fillStyle=a.kind==='aoe'?'rgba(255,150,60,.06)':'rgba(255,90,90,.06)';x.fill();x.setLineDash([8,6]);x.lineWidth=2;x.strokeStyle=a.kind==='tp'||a.kind==='dive'?'rgba(170,140,255,.9)':'rgba(255,110,90,.85)';x.stroke();x.setLineDash([]);x.restore();
         if(!a.melee)pill14(x,(a.kind==='atk'?('Alcance '+fmtM14(ringM)+' m'):a.kind==='aoe'?'Arremesso até '+fmtM14(ringM)+' m':'Até '+fmtM14(ringM)+' m'),sx,sy-rr-6,'rgba(30,10,8,.85)','#ffd2c8',11)}
       const h=CB14.hover;
       if(a.kind==='atk'&&h){
@@ -458,7 +479,7 @@ T3.cbPaint=(x,v,g)=>{
         if(t&&t.charId!==a.ch.id){const ev=evalAtk14(a,t),[bx,by]=tokCenter10(t),[tx,ty]=sc(bx,by),tr=(t.s||1)*cs/2;
           x.save();x.beginPath();x.moveTo(sx,sy);x.lineTo(tx,ty);x.lineWidth=2.5;x.setLineDash(ev.ok?[]:[6,5]);x.strokeStyle=ev.ok?(ev.cover?'#ffd36b':'#7dffa8'):'#ff6b5b';x.stroke();x.setLineDash([]);
           x.beginPath();x.arc(tx,ty,tr+5,0,TAU10);x.lineWidth=2.5;x.stroke();x.beginPath();x.moveTo(tx-tr-10,ty);x.lineTo(tx-tr+2,ty);x.moveTo(tx+tr-2,ty);x.lineTo(tx+tr+10,ty);x.moveTo(tx,ty-tr-10);x.lineTo(tx,ty-tr+2);x.moveTo(tx,ty+tr-2);x.lineTo(tx,ty+tr+10);x.stroke();x.restore();
-          pill14(x,ev.ok?(ev.cover?'🧱 Cobertura · ':'🎯 ')+fmtM14(ev.s.dist)+' m':'⛔ '+(ev.s&&!ev.s.vis?'sem visão':'fora de alcance'),tx,ty-tr-12,ev.ok?'rgba(10,30,18,.88)':'rgba(40,8,8,.9)',ev.ok?(ev.cover?'#ffd36b':'#7dffa8'):'#ffb3a8',12)}
+          pill14(x,ev.ok?(ev.cover?`🧱 Cobertura +${E.coverBonus(ev.kind)} · `:'🎯 ')+fmtM14(ev.s.dist)+' m':'⛔ '+(ev.s&&!ev.s.vis?'sem visão':'fora de alcance'),tx,ty-tr-12,ev.ok?'rgba(10,30,18,.88)':'rgba(40,8,8,.9)',ev.ok?(ev.cover?'#ffd36b':'#7dffa8'):'#ffb3a8',12)}
       }
       if(a.kind==='aoe'&&h){
         const pt=aimPoint14(a);if(pt){const [px,py]=pt,[qx,qy]=sc(px,py),R=m2px14(a.r),d=px2m14(hyp10(px-ax,py-ay)),DT=dtFor14(d,a.short);
@@ -471,7 +492,7 @@ T3.cbPaint=(x,v,g)=>{
         (M6.state.tokens||[]).forEach(t=>{if(!a.sel.has(t.charId))return;const [x2,y2]=tokCenter10(t),[s2,t2]=sc(x2,y2);x.beginPath();x.arc(s2,t2,(t.s||1)*cs/2+5,0,TAU10);x.lineWidth=3;x.strokeStyle='#7fe3ff';x.stroke()});
         if(a.area&&h){x.save();x.beginPath();x.arc(...sc(h.wx,h.wy),m2px14(a.r)*v.s,0,TAU10);x.fillStyle='rgba(127,227,255,.1)';x.fill();x.setLineDash([6,5]);x.strokeStyle='rgba(127,227,255,.9)';x.lineWidth=2;x.stroke();x.restore()}
       }
-      if((a.kind==='tp'||a.kind==='plano'&&a.step==='dest')&&h){const o=a.kind==='tp'?[ax,ay]:a.from,okd=hyp10(h.wx-o[0],h.wy-o[1])<=m2px14(a.m)&&los14(o[0],o[1],h.wx,h.wy),[qx,qy]=sc(h.wx,h.wy);
+      if((a.kind==='tp'||a.kind==='dive'||a.kind==='plano'&&a.step==='dest')&&h){const o=a.kind==='plano'?a.from:[ax,ay],okd=hyp10(h.wx-o[0],h.wy-o[1])<=m2px14(a.m)&&los14(o[0],o[1],h.wx,h.wy),[qx,qy]=sc(h.wx,h.wy);
         if(a.kind==='plano'){const [ox,oy]=sc(o[0],o[1]);x.save();x.beginPath();x.arc(ox,oy,m2px14(a.m)*v.s,0,TAU10);x.setLineDash([8,6]);x.lineWidth=2;x.strokeStyle='rgba(170,140,255,.9)';x.stroke();x.restore()}
         x.beginPath();x.arc(qx,qy,r0,0,TAU10);x.fillStyle=okd?'rgba(170,140,255,.35)':'rgba(255,90,90,.3)';x.fill()}
     }
@@ -539,6 +560,7 @@ function hud14(force){
       :a.kind==='aoe'?`💣 <b>${esc(a.w.name)}</b>: mire no mapa e clique. Até 6 m DT 12 · 12 m DT 15 · 18 m DT 18 · mais longe DT 20+. Se falhar, desvia.`
       :a.kind==='pick'?`✦ <b>${esc(a.title)}</b>: ${a.multi?(a.area?'clique num ponto para pegar todos no raio de '+fmtM14(a.r)+' m, ou clique nos tokens':'clique nos tokens para marcar'):'clique no token'}.${a.multi?` <b>${n}</b> marcado(s).`:''}`
       :a.kind==='tp'?`✨ <b>Teleporte</b>: clique num lugar vazio e visível a até ${fmtM14(a.m)} m.`
+      :a.kind==='dive'?`🤸 <b>Mergulho</b>: clique onde parar, a até ${fmtM14(a.m)} m (clique no próprio token para ficar).`
       :a.kind==='push'?'💥 <b>Golpe Repulsor</b>: clique no alvo para empurrá-lo 3 m.'
       :`🜂 <b>Plano Superior</b>: ${a.step==='dest'?'clique no novo lugar (até 6 m).':'clique no token a reposicionar.'} Restam ${a.left}.`;
     html=`<div class="cbh-aim"><span>${msg}</span><span class="cbh-btns">${a.kind==='pick'&&a.multi?`<button type="button" class="btn small primary" data-cba="ok" ${n?'':'disabled'}>✓ Confirmar</button>`:''}${['atk','aoe','pick'].includes(a.kind)?'<button type="button" class="btn small" data-cba="list">Escolher pela lista</button>':''}<button type="button" class="btn small" data-cba="x">${a.kind==='plano'?'Concluir':'Cancelar'} (Esc)</button></span></div>`;
@@ -627,6 +649,7 @@ function act14(k){
     const info=mvInfo14(cur);if(!info.canRun){toast('Exausto ou sobrecarregado: não dá para disparar.');return}
     if(actionsLeft(cur)<=0){toast('Disparada gasta a Ação Padrão, e ela já foi usada.');return}
     spend(cur);const mv=mvState14(cur);mv.run=true;mvSave14(true);fx5('activate');
+    mutateChar(cur,x=>E.markSprint(x,turnOf(cur))); /* alvo em Disparada: +2 na DF contra tiros */
     insertRow(cur,'Disparada',{detail:{cmb:'log',text:`${nm(cur)} disparou: ${fmtM14(info.base*2)} m de movimento neste turno (Ação Padrão).`}}).catch(()=>{});
     toast(`🏃 Disparada: ${fmtM14(info.base*2)} m neste turno.`);renderCombatUI();mapDraw7();return;
   }

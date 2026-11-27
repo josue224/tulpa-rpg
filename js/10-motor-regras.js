@@ -156,10 +156,11 @@ E.rollTest=(d,skill,SKILL_ATTR,opts={})=>{
 };
 
 /* ---------- Dano ---------- */
-E.rollDamage=(weapon,{extraDice=0,flat=0,rng=E.rng}={})=>{
+E.rollDamage=(weapon,{extraDice=0,flat=0,rng=E.rng,critWeaponOnly=false}={})=>{
   const p=E.parseDice(weapon.dado);
-  const rollSet=()=>Array.from({length:p.n+extraDice},()=>E.die(p.s,rng));
-  const normal=rollSet(),crit=rollSet();
+  const rollSet=n=>Array.from({length:n},()=>E.die(p.s,rng));
+  /* critWeaponOnly (balístico/perfurante): o crítico dobra só os dados impressos na arma */
+  const normal=rollSet(p.n+extraDice),crit=rollSet(critWeaponOnly?p.n:p.n+extraDice);
   const base=normal.reduce((a,b)=>a+b,0)+p.mod+flat;
   const critTotal=base+crit.reduce((a,b)=>a+b,0);
   return{normal,crit,flat,mod:p.mod,total:base,critTotal,sides:p.s};
@@ -630,8 +631,8 @@ E.blockStyles=d=>{
   if(arma||E.hasShield(d))out.push({id:'arma',skill:'Armas Brancas',attr:'Força',label:'Armas Brancas (FOR) · '+(arma?arma.name:'escudo')});
   return out;
 };
-E.canBlock=(d,{weapon,turn=null,noDefense=false,surprise=false}={})=>{
-  if(!E.isMeleeWeapon(weapon))return{ok:false,msg:'Só dá para bloquear ataques corpo a corpo.'};
+E.canBlock=(d,{weapon,turn=null,noDefense=false,surprise=false,pointBlank=false}={})=>{
+  if(!pointBlank&&!E.isMeleeWeapon(weapon))return{ok:false,msg:'Só dá para bloquear ataques corpo a corpo.'};
   if(noDefense)return{ok:false,msg:'Este contra-ataque não permite defesa.'};
   if(surprise)return{ok:false,msg:'Desprevenido: não dá para bloquear.'};
   if(E.isDying(d)||E.isDead(d))return{ok:false,msg:'Incapaz de agir.'};
@@ -782,6 +783,175 @@ E.throwProfile=(d,w,base=12)=>{
   return{range:base+plus,short:6*dbl,exact,notes};
 };
 E.throwDT=(m,short=6)=>m<=short?12:m<=12?15:m<=18?18:20+2*Math.ceil(Math.max(0,m-24)/6);
+
+/* ===================================================================
+   ONDA 11 — Armas de Disparo (Tiroteio Tático). Puro: a UI (js/13,
+   js/27, js/60i) só informa o contexto e o alvo.
+   Contexto de um tiro: {aware, pointBlank, short, cover:''|'parcial'|'pesada',
+   sprint, aimed, rangePenalty, second, free, dist}.
+   =================================================================== */
+E.POINT_BLANK=1.5;E.SHOTGUN_RANGE=6;E.DIVE_M=3;E.EXPOSE_M=.75;E.SPRINT_DF=2;E.PRONE_DF=2;
+E.isGun=w=>w?.skill==='Armas de Disparo'&&!w.area;
+/* especialização que a arma pede (item da campanha: w.spec manda). '' = nenhuma: vale o generalismo */
+E.gunClass=w=>{
+  if(!E.isGun(w)||E.isCreatureAttack(w))return'';
+  if(w.spec)return w.spec;
+  const n=String(w.name||'').toLowerCase();
+  if(/precis|sniper|franco/.test(n))return'precisao';
+  if(/espingarda|escopeta/.test(n))return'espingardas';
+  if(/(^|\s)arco(\s|$)|besta|balestra/.test(n))return'arcos';
+  if(/metralhadora|fuzil|carabina|rifle|mosquete/.test(n))return'fuzis';
+  if(/pistola|rev[óo]lver/.test(n))return'pistolas';
+  return'';
+};
+/* balístico ou perfurante: o crítico dobra só os dados da arma e faz sangrar */
+E.isBallistic=w=>E.isGun(w)&&!/lan[çc]a-chamas|sinalizadora|taser|choque|estilingue|tranquiliz/i.test(w.name||'')&&!(w.effects||[]).some(e=>e.status==='queimando');
+/* como rolar o ataque: vertente da arma, metade fora da especialização, ou a perícia pura.
+   calc vai direto para skillCalc3/doRoll ({vert} ou {generalista}); trained libera o efeito tático */
+E.gunSpec=(d,w)=>{
+  const cls=E.gunClass(w),none={cls,vert:null,calc:null,trained:false,status:'',name:''};
+  if(!E.isGun(w)||E.isCreature(d)||E.isCreatureAttack(w))return none;
+  if(cls){const vert='armasdisparo.'+cls,c=E.vertCalc(d,vert);if(c)return{cls,vert,calc:{vert},trained:c.status==='treinado',status:c.status,name:c.def.name}}
+  const g=E.generalistCalc(d,'armasdisparo');
+  return g?{...none,calc:{generalista:'armasdisparo'},status:g.status}:none;
+};
+/* gatilhos automáticos das especializações (só vertentes treinadas) e da queima-roupa */
+E.shotEffects=(d,w,ctx={})=>{
+  const spec=E.gunSpec(d,w),f=(tipo,o={})=>spec.trained?E.vertEffects(d,tipo,{...o,vert:spec.vert}):[];
+  const sum=(tipo,quando)=>f(tipo,{quando}).reduce((a,x)=>a+(Number(x.effect.valor)||0),0);
+  const r={spec,extraDice:0,disadv:false,flat:0,critMin:Number(w?.critMin)||20,canAim:false,aimed:false,push:0,silent:false,recover:false,quickDraw:false,notes:[]};
+  if(!E.isGun(w))return r;
+  r.quickDraw=f('permite').some(x=>x.effect.acao==='sacarEDisparar');
+  r.silent=f('permite').some(x=>x.effect.acao==='disparoSilencioso');
+  r.recover=f('permite').some(x=>x.effect.acao==='recuperarMunicao');
+  if(ctx.pointBlank&&!ctx.suppress){
+    if(f('ignora',{quando:'queimaRoupa'}).length)r.notes.push(spec.name+': sem desvantagem à queima-roupa');
+    else{r.disadv=true;r.notes.push('Queima-roupa: desvantagem no ataque')}
+    const n=sum('dano','queimaRoupa');if(n){r.flat+=n;r.notes.push(`${spec.name}: +${n} de dano à queima-roupa`)}
+  }
+  if(ctx.rangePenalty){
+    if(f('ignora',{quando:'alcanceMedioLongo'}).length)r.notes.push(spec.name+': ignora a penalidade de alcance');
+    else{r.extraDice-=1;r.notes.push('Médio/longo alcance: −1d20')}
+  }
+  if(ctx.suppress){const n=sum('dados','supressao');if(n){r.extraDice+=n;r.notes.push(`${spec.name}: +${n}d20 na supressão`)}}
+  const aim=f('mirar')[0];r.canAim=!!aim;
+  if(ctx.aimed&&aim){const v=Number(aim.effect.valor)||1;r.aimed=true;r.critMin=Math.max(2,r.critMin-v);r.notes.push(`Mira: ignora Cobertura Parcial e crítico ${r.critMin}–20`)}
+  const pu=f('empurrao')[0];
+  if(pu&&!ctx.suppress){
+    const max=Number(pu.effect.alcanceMax)||E.SHOTGUN_RANGE;
+    if(ctx.pointBlank||ctx.short||(ctx.dist!=null&&ctx.dist<=max+.01)){r.push=Number(pu.effect.metros)||1.5;r.notes.push(`${spec.name}: empurra ${String(r.push).replace('.',',')} m ao superar a DF`)}
+  }
+  return r;
+};
+/* raio do barulho do disparo, em quadrados do mapa (0 = silencioso: não revela a posição) */
+E.shotNoise=(d,w)=>!E.isGun(w)?0:E.shotEffects(d,w).silent?0:E.gunClass(w)==='arcos'?3:16;
+/* Mirar (Sniper) custa a Ação de Movimento inteira: só antes de andar e sem Disparada */
+E.canAim=(d,w,{moved=0,ran=false}={})=>{
+  if(!E.shotEffects(d,w).canAim)return{ok:false,msg:'Mirar exige a especialização em Rifles de Precisão com um rifle de precisão.'};
+  if(ran)return{ok:false,msg:'Depois de uma Disparada não dá para mirar.'};
+  if(moved>.05)return{ok:false,msg:'Mirar gasta a Ação de Movimento: você já se moveu neste turno.'};
+  return{ok:true};
+};
+/* trava pós-disparo: o movimento que sobrou deixa de existir */
+E.lockedMove=(max,used,locked)=>locked&&used<max?used:max;
+
+/* ---------- contexto automático ---------- */
+/* 3 linhas de visão (centro e bordas): todas = sem cobertura · 2 = parcial · 1 = pesada · 0 = total */
+E.coverFromRays=(n,total=3)=>n>=total?'':n<=0?'total':n>=2?'parcial':'pesada';
+E.autoAware=({inCombat=false,targetInCombat=false,surprised=false,hostile=false,sees=false}={})=>
+  surprised?false:inCombat&&targetInCombat?true:hostile?!!sees:!inCombat;
+/* Disparada: vale até o começo do próximo turno de quem correu */
+E.markSprint=(d,t)=>{if(t)d.disparada={r:t.round,i:t.turnIndex}}; /* (altera d) */
+E.isSprinting=(d,t)=>!!(d?.disparada&&t&&!E.reactionFresh(d.disparada,t));
+
+/* ---------- Defesa contra o tiro: DF da ficha + cobertura + Disparada + Caído ---------- */
+E.shotDF=(target,{cover='',sprint=false,aimed=false}={})=>{
+  const base=E.defenseInfo(target).DF,parts=[],ignored=!!(aimed&&cover==='parcial');
+  const c=ignored?0:E.coverBonus(cover);if(c)parts.push({label:cover==='pesada'?'Cobertura pesada':'Cobertura parcial',v:c});
+  if(sprint)parts.push({label:'Em Disparada',v:E.SPRINT_DF});
+  if(E.hasStatus(target,'caido'))parts.push({label:'Caído',v:E.PRONE_DF});
+  return{base,DF:base+parts.reduce((a,p)=>a+p.v,0),parts,ignored};
+};
+
+/* ---------- Mergulho (RF) = (DES)d20 + Reflexo, consome a Reação ---------- */
+E.canDive=(d,{turn=null}={})=>{
+  if(E.isDying(d)||E.isDead(d))return{ok:false,msg:'Incapaz de agir.'};
+  const f=E.computeMods(d).flags;
+  if(['semDefender','semAgir','semEsquivar','semMover'].some(x=>f.has(x)))return{ok:false,msg:'Neste estado você não consegue mergulhar.'};
+  const i=E.reactionInfo(d,turn);
+  if(!i.reactionAvailable)return{ok:false,msg:i.forbidden?'Neste estado você não pode usar reações.':'A Reação desta rodada já foi usada.'};
+  return{ok:true};
+};
+/* no tiro, Esquiva e Bloqueio só existem à queima-roupa com o alvo ciente */
+E.shotBlockable=s=>!!(s&&s.aware&&s.pointBlank&&!s.second&&!s.free);
+/* o que o alvo pode fazer. direct = resolve na hora, ATA × DF */
+E.shotOptions=(d,shot,{turn=null,nat20=false,weapon=null}={})=>{
+  const no=why=>({direct:true,why,dive:{ok:false,msg:why},dodge:false,block:false});
+  if(shot.second)return no('2º Disparo: sem Mergulho nem Esquiva');
+  if(shot.free)return no('Tiro Livre');
+  if(!shot.aware)return no('Desprevenido');
+  const f=E.computeMods(d).flags;
+  if(E.isDying(d)||E.isDead(d)||f.has('semDefender')||f.has('semAgir'))return no('Alvo indefeso');
+  const pb=E.shotBlockable(shot);
+  const dive=nat20?{ok:false,msg:'20 natural: o Mergulho não adianta.'}:E.canDive(d,{turn});
+  const dodge=pb&&!f.has('semEsquivar'),block=pb&&E.canBlock(d,{weapon,turn,pointBlank:true}).ok;
+  const direct=!dive.ok&&!dodge&&!block;
+  return{direct,why:direct?dive.msg:'',dive,dodge,block};
+};
+/* Os 5 desfechos do Mergulho e o tiro direto. Precedência:
+   1º 20 natural: crítico garantido, o RF é ignorado (o alvo não cai e não há 2º Disparo);
+   2º sem RF (desprevenido, 2º Disparo, Tiro Livre, sem Reação ou não quis mergulhar): ATA >= DF acerta;
+   3º com RF, sempre contra a Defesa Base (a DF não entra):
+      ATA<DB  e RF>=DB  Erro e Recuperação (fica de pé)
+      ATA>=DB e RF>=DB  Mergulho bem-sucedido (Caído ou abrigado)
+      ATA>=DB e RF<DB   Acerto Violento (acerta, Caído, +1 Ação Padrão para o 2º Disparo)
+      ATA<DB  e RF<DB   Erro e Queda (Caído)
+   crit = o dado caiu na margem da arma: só conta quando acerta. */
+E.resolveShot=({ATA,RF=null,DB=E.DB,DF=E.DB,nat20=false,crit=false})=>{
+  const dived=RF!==null&&RF!==undefined;let id;
+  if(nat20)id='critico';
+  else if(!dived)id=ATA>=DF?'direto':'errou';
+  else if(ATA<DB)id=RF>=DB?'recuperacao':'queda';
+  else id=RF>=DB?'mergulho':'violento';
+  const hit=id==='critico'||id==='direto'||id==='violento';
+  const T={critico:['Crítico garantido (20 natural)','Um 20 natural acerta em cheio: o Mergulho não adianta.'],
+    direto:['Tiro certeiro',`O disparo alcança a Defesa (${ATA} × DF ${DF}).`],errou:['Tiro perdido',`O disparo não passa pela Defesa (${ATA} × DF ${DF}).`],
+    recuperacao:['Erro e recuperação','O tiro erra e o alvo se recupera de pé.'],mergulho:['Mergulho bem-sucedido','Nenhum dano: o alvo termina Caído ou abrigado.'],
+    violento:['Acerto violento','O tiro acerta, o alvo cai e o atirador ganha um 2º Disparo imediato.'],queda:['Erro e queda','O tiro erra, mas o alvo termina Caído.']}[id];
+  return{shotOutcome:id,outcome:id==='violento'?'violento':hit?'normal':'esquiva',hit,crit:hit&&(!!nat20||!!crit),forced:id==='critico',
+    fall:id==='mergulho'||id==='violento'||id==='queda',shot2:id==='violento',label:T[0],text:T[1],extraAtk:0,extraDef:0,full:false,ATA,RF:dived?RF:0,DB,DF};
+};
+
+/* ---------- Fogo de Supressão: Resistência [PRE] (Firmeza Mental) contra o ATA ---------- */
+E.canSuppress=(d,w,{cover=''}={})=>{
+  if(!E.isGun(w))return{ok:false,msg:'Fogo de Supressão exige uma arma de disparo.'};
+  const f=E.computeMods(d).flags;
+  if(f.has('semAgir')||f.has('semAtacar'))return{ok:false,msg:'Neste estado você não pode atacar.'};
+  if(cover!=='parcial'&&cover!=='pesada')return{ok:false,msg:'Fogo de Supressão só vale contra alvo em cobertura.'};
+  return{ok:true};
+};
+E.resolveSuppression=({ATA,resist=null})=>({suppressed:resist===null||resist<ATA,ATA,resist}); /* empate favorece o alvo */
+E.suppressionOf=d=>(d?.statuses||[]).find(s=>s&&s.id==='suprimido')||null;
+E.applySuppressed=(d,info)=>{d.statuses=(d.statuses||[]).filter(s=>E.statusId(s)!=='suprimido');d.statuses.push({id:'suprimido',at:Date.now(),...info})}; /* (altera d) */
+E.clearSuppressed=(d,sid)=>{const n=(d.statuses||[]).length;d.statuses=(d.statuses||[]).filter(s=>!(E.statusId(s)==='suprimido'&&(!sid||s.sid===sid)));return d.statuses.length!==n}; /* (altera d) */
+/* dura até o começo do próximo turno de quem atirou (t = E.turnCtx do atirador) */
+E.suppressionExpired=(s,t)=>!t||E.reactionFresh({r:s.r,i:s.i},t);
+/* andou: continua protegido só se a cobertura era do mapa e o novo lugar também cobre; sem visão não há tiro */
+E.exposes=({moved=0,autoCover=false,cover=''}={})=>moved>E.EXPOSE_M&&cover!=='total'&&!(autoCover&&!!cover);
+
+/* ---------- Sangramento (1 VT por rodada) ---------- */
+E.applyBleed=d=>E.addStatus(d,'sangrando'); /* (altera d) nunca acumula */
+/* uma vez por turno, mesmo que dois aparelhos (ou um F5) processem o mesmo início de turno */
+E.bleedTick=(d,key)=>{const s=(d?.statuses||[]).find(x=>x&&x.id==='sangrando');if(!s||s.suspended||(key&&s.tick===key))return false;if(key)s.tick=key;return true}; /* (altera d) */
+
+/* ---------- Arcos: a munição intacta volta no fim da cena ---------- */
+E.registerRecovery=(d,item)=>{if(!item)return;const r=d.municaoRec||{n:0};d.municaoRec={n:r.n+1,item:{...item,qty:1}}}; /* (altera d) */
+E.recoverAmmo=d=>{ /* (altera d) devolve quantas voltaram */
+  const r=d?.municaoRec;if(!r)return 0;delete d.municaoRec;if(!(r.n>0)||!r.item)return 0;
+  const inv=E.ensureInv(d),it=inv.items.find(i=>i.id===r.item.id)||inv.items.find(i=>i.name===r.item.name&&i.loc!=='chao');
+  if(it)it.qty=(Number(it.qty)||0)+r.n;else inv.items.push({...r.item,qty:r.n});
+  return r.n;
+};
 
 if(typeof module!=='undefined')module.exports=E;
 

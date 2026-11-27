@@ -30,7 +30,7 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
 <body>   markup (portal, app, modais)  →  scripts/CSS intercalados na MESMA posição dos blocos originais:
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
          → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Combate corpo a corpo)
-         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas) → js/60d → js/60e (filtros Arcade) → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/61   (antigo closure; 61 = inicialização, sempre por último)
+         → js/09 … js/60 → js/60b (App Shell) → js/60c (Fichas) → js/60d → js/60e (filtros Arcade) → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/61   (antigo closure; 61 = inicialização, sempre por último)
 ```
 
 Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` original, para manter a cascata idêntica (inclusive em relação a estilos que o JS injeta no `<head>`).
@@ -55,6 +55,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 14 | `14-polish.css` | novo | 2 KB | **Onda 5 · Polimento**: com estética/paleta ativa (`body.t3-pal`), o texto das abas da ficha e do topbar passa a seguir `--text` (antes usava cores fixas do tema clássico e ficava ilegível em estéticas claras); foco de teclado visível nos controles novos. |
 | 15 | `15-ficha-regras.css` | novo | 11 KB | **Onda 9**: benefícios dos atributos, interruptor da Blindagem de Lucidez, seletor Perícias/Especializações, contexto social e lista de vertentes (só layout; alvos de 44 px; 390 px). |
 | 16 | `16-combate-cac.css` | novo | 2 KB | **Onda 10**: marcador de Reação (área de toque de 44 px), botões de bloqueio e painel de corpo a corpo (só layout). |
+| 17 | `17-tiroteio.css` | novo | 2 KB | **Onda 11**: seletor do Tiroteio Tático, botões de resposta ao tiro e painel da ficha (só layout). |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
@@ -131,6 +132,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60f | `60f-arcade-gfx.js` | novo | 40 KB | **Motor gráfico do Arcade** (`window.GFX60`): sprites e tilesets procedurais, paralaxe, luz/glow, partículas, hit-stop visual e HUD. Sem `<script>`: entra pela `QUEUE` do `60d`. Ver a seção própria abaixo. |
 | 60g | `60g-ficha-regras.js` | novo | 17 KB | **Onda 9 · Ficha**: envolve `renderAttributes`/`renderStats`/`renderMind`/`renderSkills`; expõe `T3.socialTake(perícia)` (bônus social da próxima rolagem) e `T3.renderEspecializacoes()`. Rola por `rollSkill(perícia,atributo,{vert|generalista,label})`. |
 | 60h | `60h-combate-cac.js` | novo | 23 KB | **Onda 10 · Corpo a corpo**: marcador de Reação, Guarda, manobras (linhas `man`/`manres`), agarrão, empurrão no aparelho do Mestre, painel na Mesa e na ficha; envolve `processRow`, `applyFxLocal`, `renderCombatTab`, `castRitual`, `onCombatEnd`. Gancho de desarme: `T3.disarmHooks` e evento `tulpa:disarm`. |
+| 60i | `60i-tiroteio.js` | novo | 27 KB | **Onda 11 · Tiroteio Tático**: seletor de contexto, Mergulho, 2º Disparo, supressão e Tiro Livre (linhas `sup`/`supres`/`supx`/`dive`), barulho do disparo; envolve `performAttack`, `queuePrompt`, `defendPrompt`, `processRow`, `renderCombatTab`, `onCombatEnd`, `T3.cacPanel`/`cacBind`. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
@@ -169,6 +171,19 @@ Ficha: `d.vertentes={id:{g,de?,livre?}}`, `d.vertLegado={períciaAntiga:id}`. `c
 | Arremesso | `E.throwProfile(d,arma,alcance)` → `{range,short,exact}` · `E.throwDT(m,short)` |
 
 Transporte: `campaign_rolls`, `detail.cmb` `'man'` (quem age) e `'manres'` (quem controla o alvo; inclui `drop` e `released`). Bloqueio usa as linhas `def` (`detail.block`) e `res` (`block`, `counter`).
+
+### Tiroteio Tático (Onda 11)
+
+| Grupo | Chamada |
+|---|---|
+| Arma | `E.isGun` · `E.gunClass(w)` (`w.spec` manda) · `E.isBallistic` · `E.gunSpec(d,w)` → `calc` para `skillCalc3` |
+| Efeitos | `E.shotEffects(d,w,ctx)` · `E.shotNoise` · `E.canAim` · `E.lockedMove` |
+| Contexto | `E.coverFromRays` · `E.autoAware` · `E.markSprint`* · `E.isSprinting` · `E.shotDF(alvo,ctx)` |
+| Resolução | `E.canDive` · `E.shotOptions` · `E.shotBlockable` · `E.resolveShot({ATA,RF,DF,nat20,crit})` (RF nulo = tiro direto) |
+| Supressão | `E.canSuppress` · `E.resolveSuppression` · `E.suppressionOf` · `E.applySuppressed`* · `E.clearSuppressed`* · `E.suppressionExpired` · `E.exposes` |
+| Sangue e munição | `E.applyBleed`* · `E.bleedTick`* · `E.registerRecovery`* · `E.recoverAmmo`* |
+
+Contexto do tiro (`detail.shot` na linha `atk`): `{aware,pointBlank,short,cover,sprint,aimed,rangePenalty,second,free,dist,targetId,push}`. A linha `res` leva `shot:{outcome,shot2,fellNew,itemId,w}` e `push`. `performAttack(ch,w,ids,{shot})` sem `shot` abre o seletor para armas de disparo com 1 alvo.
 
 ## App Shell (Onda 1)
 

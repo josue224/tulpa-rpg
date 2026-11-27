@@ -241,6 +241,7 @@ function endSceneEffects(d){
   if(d.suturaAtiva&&d.suturaRompe&&!d.statuses.some(s=>s.id==='feridaexposta')){d.statuses.push({id:'feridaexposta',at:Date.now()});notes.push('Os grampos da Sutura Bruta rasgaram a pele: Ferida Exposta (+3 na DT da cirurgia).')}
   d.suturaAtiva=false;d.suturaRompe=false;
   E.resetSceneFlags(d);
+  const volta=E.recoverAmmo(d);if(volta)notes.push(`Munição recuperada intacta: ${volta} (Arcos & Balestras).`);
   return notes;
 }
 /* ---------- Descanso, Combustão e Medicina de campo ---------- */
