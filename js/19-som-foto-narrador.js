@@ -74,7 +74,7 @@ function av5(d,cls=''){
   const state=avState(d);
   return `<span class="av ${cls} ${state}" style="--avc:${AV_C[h%AV_C.length]}">${avOk(d?.avatar)?`<img src="${d.avatar}" alt="" decoding="sync">`:`<b>${esc(ini)}</b>`}</span>`;
 }
-function avState(d){const st=stIds(d||{}),mx=STAGES[d?.stage]||STAGES[1],low=(Number(d?.vital)||0)<=mx.vt/3;return st.includes('morto')||st.includes('agonia')?'down':low?'low':''}
+function avState(d){const st=stIds(d||{}),mx=dmax(d||{}),low=(Number(d?.vital)||0)<=mx.vt/3;return st.includes('morto')||st.includes('agonia')?'down':low?'low':''}
 /* Correção do pisca-pisca: cada foto vira UM nó do DOM, guardado por personagem + foto.
    Quando a mesa ou a ordem de combate são redesenhadas, o mesmo nó é recolocado no lugar
    (a imagem já está decodificada), em vez de criar um <img> novo a cada atualização. */
@@ -141,7 +141,7 @@ function decorateTable(){
         h3.before(head);head.append(avNode('card:'+ch.id,d,'lg'));id.append(h3);if(own)id.append(own);head.append(id);if(eye)head.append(eye)}
     }
     if(hidden(ch))return;
-    const mx=STAGES[d.stage]||STAGES[1],cur={vital:[Number(d.vital)||0,mx.vt],lucidity:[Number(d.lucidity)||0,mx.luc],essence:[Number(d.essence)||0,mx.es]};
+    const mx=dmax(d),cur={vital:[Number(d.vital)||0,mx.vt],lucidity:[Number(d.lucidity)||0,mx.luc],essence:[Number(d.essence)||0,mx.es]};
     const old=T5.prev[ch.id];
     if(old){
       const bars=$$('.resource-bar',card);

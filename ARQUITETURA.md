@@ -71,6 +71,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 7 | `07-combate-entrypoints.js` | 1122 | 0.3 KB | Combate · pontos de entrada: Listener de clique para #beginCombat e #rollNpcReflexes. |
 | 8 | `08-mesa-rolagens.js` | 1187–1377 | 14 KB | Mesa · rolagem de perícias compartilhada: IIFE: rolagem de perícias na mesa, pop-up e histórico. |
 | 9 | `09-catalogos-manual.js` | 3428–3864 | 90 KB | Catálogos do Manual V1.2: Armas, proteções, equipamentos, vocações, trilhas, rituais e sub-elementos (dados puros). |
+| 9b | `09b-catalogo-vertentes.js` | novo | 12 KB | **Onda 8**: `PERICIA_DEFS` (18) e `VERT_DEFS` (48 vertentes: id estável, perícia, atributos, descrição, efeitos estruturados, `requiresTraining`). Listas vivas, reconstruídas pelo `js/40` com `rules.pericia`/`rules.vert`. |
 | 10 | `10-motor-regras.js` | 3865–4163 | 20 KB | Motor de regras: Lógica pura sem DOM: carga, modificadores, rolagem, dano, defesa, morrendo, lucidez, descanso. |
 | 11 | `11-ficha-nucleo.js` | 4164–4472 | 26 KB | Núcleo da ficha: Etapa 3: T3, cálculo unificado, persistência, recursos, navegação; aparência/tema/preferências. |
 | 12 | `12-ficha-abas.js` | 4473–4757 | 43 KB | Abas da ficha: Visão geral, inventário, estados, lucidez/êxtase/trauma, combate & defesa, descanso. |
@@ -127,6 +128,30 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60e | `60e-arcade-filtros.js` | novo | 4 KB | **Onda 4 · Filtros do Arcade**: barra com busca e filtros por modo (Solo, Contra o Perseus, Mesa, PvP 1v1) acima da grade de jogos. Lê o modo dos botões de cada cartão e é recriada por um `MutationObserver` a cada volta à vitrine. Filtro lembrado em `localStorage t60e.arcFilter`. |
 | 60f | `60f-arcade-gfx.js` | novo | 40 KB | **Motor gráfico do Arcade** (`window.GFX60`): sprites e tilesets procedurais, paralaxe, luz/glow, partículas, hit-stop visual e HUD. Sem `<script>`: entra pela `QUEUE` do `60d`. Ver a seção própria abaixo. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
+
+## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
+
+Tudo é `E.*`, puro (sem DOM). `d` = dados da ficha. Funções marcadas com * alteram `d` (use dentro de `mutateChar` ou chame `save()`).
+
+| Grupo | Chamada |
+|---|---|
+| Cobertura | `E.COVER={parcial:4,pesada:6}` · `E.coverBonus(tipo)` |
+| Atributos | `E.attr(d,nome)` · `E.isCreature(d)` (`beastId`: sem benefícios) |
+| FOR / DES | `E.carryLimit(d)` · `E.damageBonus(d,arma,{attr})` → `{bonus,attr}` (já aplicado em `performAttack` e no arremesso) |
+| Defesa | `E.defenseInfo(d)` → `{DB,equip,mods,dex,dexAllowed,dexWhy,DF,hasDefense,armored}` · `E.defenseDex(d)` · `E.heavyProtection(d)` · `E.resolveAttack({...,armored})` |
+| Máximos | `E.maxStats(d)` (= `dmax(d)`; CON no VT, PRE na ES) · `E.syncMax(d,antes)`* |
+| Bloqueio | `E.blockReduction(d,{vert,guarda})` → `{total,con,vert,guarda}` · `E.blockedDamage(dano,reducao)` · `E.GUARDA_BONUS` |
+| CON / INT / PER | `E.combustionLimit(d)` · `E.combustao(faltam,CON)` · `E.intExtraSkills(d)` · `E.limitsFor(d)` · `E.medicineBonus(d)` · `E.stealthDT(d)` · `E.restLucBonus(d)` (já no `E.restRoll`) |
+| PRE | `E.shieldReady(d)` · `E.lucidityShield(d,n,{consume})`* · `E.applyLucidityDamage(d,n,{ignoreShield})`* · `E.resetSceneFlags(d)`* (no fim da cena). Estado em `d.lucShieldUsed`. **Ainda não ligado aos botões de Lucidez (Onda 9).** |
+| CAR / APA | `E.socialBonus(d,perícia,{primeira,dialogo,ancorar})` → `{bonus,attr,motivo}` |
+| Catálogo | `E.periciaDefs()` · `E.vertDefs()` · `E.vert(id)` · `E.pericia(chave)` · `E.vertsOf(chave)` · `list29/cur29('pericia'|'vert')` |
+| Treino | `E.skillTier(d,perícia)` · `E.legacyTier` · `E.trainedVerts(d,chave)` · `E.pendingVerts(d)` · `E.tierUsage(d)` |
+| Alterar treino* | `E.trainVert(d,id)` · `E.chooseVert(d,id,perícia)` · `E.setVertGrade(d,id,0|5|10|15)` · `E.checkVertGrade` · `E.removeVert(d,id)` → `{ok,msg}` |
+| Teste | `E.vertCalc(d,id,{vocList,attr})` → `{status,permitido,grau,voc,bonus,attr,dice,efeitoAtivo,efeitos}` · `E.generalist(n)` · `skillCalc3(ch,perícia,attr,{vert:id})` (com estados, talentos e Êxtase; `blocked`) |
+| Efeitos táticos | `E.vertEffects(d,tipo,{quando,alvo,vert})` · `E.vertSum(...)` (só vertentes treinadas) |
+| Ficha | `E.migrateSheet(d)`* (idempotente; `d.regrasV=8`) |
+
+Ficha: `d.vertentes={id:{g,de?,livre?}}`, `d.vertLegado={períciaAntiga:id}`. `characterData._publico` marca cópia sem acesso à ficha (vale `df`/`vtMax`/`esMax` publicados).
 
 ## App Shell (Onda 1)
 

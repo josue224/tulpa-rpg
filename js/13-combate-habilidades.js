@@ -458,7 +458,7 @@ async function doDefenseNow(aid,tid,mode,byMaster=false,react=''){
   const d=ch.id===activeCharacterId?data:ch.data,m=E.computeMods(d),di=E.defenseInfo(d);
   let rxDef=react?reactionsFor(ch,d).find(x=>x.id===react):null;
   if(rxDef){mutateChar(ch,x=>{x.essence=Math.max(0,(Number(x.essence)||0)-rxDef.cost)});toast(rxDef.name+'! −'+rxDef.cost+' ES');fx3('activate');if(rxDef.el)setTimeout(()=>{try{window.tulpaFx('cast',rxDef.el)}catch(e){}},40)}
-  let r=null,detail={cmb:'def',aid,targetId:tid,mode,df:di.DF,prof:E.protProficient(d),react:rxDef?rxDef.id:'',canDefend:mode!=='none'||!!rxDef};
+  let r=null,detail={cmb:'def',aid,targetId:tid,mode,df:di.DF,armored:di.armored,prof:E.protProficient(d),react:rxDef?rxDef.id:'',canDefend:mode!=='none'||!!rxDef};
   if(mode==='none')return insertRow(ch,'Sem defesa',{dice:[],bonus:0,total:0,detail}).then(row=>resolveFor(aid,tid,row)).catch(e=>fail3('defesa',e));
   const skill=mode==='reflexo'?'Reflexo':'Esquiva';
   const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},skill);
@@ -476,7 +476,7 @@ async function resolveFor(aid,tid,defRow){
   const dT=ch.id===activeCharacterId?data:ch.data,targetDown=E.isDying(dT)||E.isDead(dT),nat20=a.best===20;
   /* cobertura parcial (mapa tático): +N na defesa de quem está atrás de uma quina */
   const cov=Math.max(0,Number(a.cover)||0),RFc=canDefend?defRow.total+cov:0;
-  let res=E.resolveAttack({ATA:p.row.total,RF:RFc,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:crit||nat20,nat20,targetDown,proficient:dd.prof!==false});
+  let res=E.resolveAttack({ATA:p.row.total,RF:RFc,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:crit||nat20,nat20,targetDown,proficient:dd.prof!==false,armored:dd.armored});
   const out={final:0,absorbed:0,resisted:0,notes:[]},stAdd=[];
   /* reações instantâneas do defensor */
   const atkView={skill:a.weapon.skill,dice:p.row.dice||[],bonus:p.row.bonus||0,total:p.row.total};let critNow=crit;
@@ -486,7 +486,7 @@ async function resolveFor(aid,tid,defRow){
     const n=Math.max(1,(p.row.dice||[]).length),dice2=Array.from({length:n},()=>E.die(20)),best2=Math.max(...dice2),ATA2=best2+(p.row.bonus||0);
     announceRoll(ch,'Desvio Improvável · ataque repetido',{dice:dice2,sides:20,bonus:p.row.bonus||0,total:ATA2,eyebrow:'REAÇÃO'});
     critNow=best2>=a.weapon.critMin;
-    res=E.resolveAttack({ATA:ATA2,RF:RFc,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:critNow||best2===20,nat20:best2===20,targetDown,proficient:dd.prof!==false});
+    res=E.resolveAttack({ATA:ATA2,RF:RFc,DB:10,DF:dd.df,canDefend:canDefend&&!targetDown,crit:critNow||best2===20,nat20:best2===20,targetDown,proficient:dd.prof!==false,armored:dd.armored});
     Object.assign(atkView,{dice:dice2,total:ATA2});out.notes.push(`Reação: Desvio Improvável — o atacante repetiu o ataque (${p.row.total} → ${ATA2}).`);
   }
   if(res.forced)out.notes.push('20 natural: o ataque sempre acerta, independentemente de bônus ou defesa.');
@@ -638,7 +638,9 @@ async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=
   const melee=w.cat==='Corpo a corpo'||w.skill==='Briga',downAdv=melee&&ids.length>0&&ids.every(i=>stIds(charById(i)?.data).includes('caido'));
   const r=E.rollTest(d,w.skill,SKILL_ATTR,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis,adv:downAdv,consumeDelta:true});fx3('dice');
   if(downAdv)toast('Alvo Caído: vantagem no ataque corpo a corpo.');
-  let flat=cal.mods.dmg;(d.activeEffects||[]).forEach(e=>{if(e.dmgExtra)flat+=E.rollExpr(e.dmgExtra).total});
+  /* FOR (ou DES em armas Leves e Briga) soma no dano corpo a corpo e de arremesso */
+  const attrDmg=E.damageBonus(d,w);
+  let flat=cal.mods.dmg+attrDmg.bonus;(d.activeEffects||[]).forEach(e=>{if(e.dmgExtra)flat+=E.rollExpr(e.dmgExtra).total});
   const ignore=(d.activeEffects||[]).some(e=>e.ignoreResist);
   const dmg=E.rollDamage(w,{extraDice:cal.mods.dmgDice+(favOn?1:0),flat});
   const aid=rid(),cm=camp3()?.combat;
@@ -648,7 +650,7 @@ async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=
   showRollPopup({eyebrow:retal?'RETALIAÇÃO':'ATAQUE',title:`${nm(ch)} · ${w.name}`,sub:`${w.skill} → ${detail.targets.map(t=>t.name).join(', ')}`,
     sets:[{label:`${w.skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max',note:r.mode!=='normal'?r.mode:''},
           {label:`Dano ${w.dado}${flat?' '+sign(flat):''}`,dice:dmg.normal,bonus:dmg.mod+flat,total:dmg.total,note:r.best>=w.critMin?`CRÍTICO (${r.best})! Se acertar, rola de novo: [${dmg.crit.join(', ')}] → ${dmg.critTotal}`:''}],
-    big:r.total,tone:r.best>=w.critMin?'hit':'',detail:(retal?'Retaliação: não pode ser esquivada.':'Aguardando a defesa…')+(downAdv?' · vantagem (alvo Caído)':'')+(favOn?' · ★ Arma Favorita':'')});
+    big:r.total,tone:r.best>=w.critMin?'hit':'',detail:(retal?'Retaliação: não pode ser esquivada.':'Aguardando a defesa…')+(downAdv?' · vantagem (alvo Caído)':'')+(favOn?' · ★ Arma Favorita':'')+(attrDmg.bonus?` · dano inclui +${attrDmg.bonus} de ${attrDmg.attr}`:'')});
   if(!noSpend)spend(ch,retal?'retal':'std');
   try{await insertRow(ch,(retal?'Retaliação · ':'Ataque · ')+w.name,{dice:r.dice,bonus:r.bonus,total:r.total,attribute:SKILL_ATTR[w.skill],detail});toast('Ataque lançado! Aguardando a defesa de '+detail.targets.map(t=>t.name).join(', ')+'.')}catch(e){fail3('atacar',e)}
   renderCombatUI();

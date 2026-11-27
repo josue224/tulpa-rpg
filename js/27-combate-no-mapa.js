@@ -7,7 +7,7 @@
      Violento), ações livres (talento, saque rápido, combustão, descarte,
      lanterna/porta) e reação (retaliação e rituais de reação).
    - Mira clicando no token: alcance, linha de visão pelas paredes e
-     cobertura parcial (+2 na defesa).
+     cobertura parcial (+4 na defesa).
    - Arremesso e área: modelo no cursor, DT pela distância, desvio na
      falha, dano em todos na área (Resistência reduz à metade).
    - Rastro do golpe, números flutuantes, empurrão e teleporte.
@@ -18,7 +18,7 @@ const CB14={mini:(()=>{try{return localStorage.getItem('tulpa_cb_mini')==='1'}ca
 T3.cb14=CB14;
 const MOVE14=9;                       /* metros por turno */
 const STOP14=['agarrado','paralisado','congelado','amarrado','agonia','morto'];
-const COVER14=2;                      /* cobertura parcial: +2 na defesa */
+const COVER14=E.COVER.parcial;        /* cobertura parcial: +4 na defesa (a pesada, +6, entra pelo motor) */
 const AREA_TALENT_M14=6;              /* raio padrão de habilidades em área */
 
 const d14=ch=>ch?(ch.id===activeCharacterId?data:(ch.data||{})):{};
@@ -301,7 +301,7 @@ async function throw14(ch,w,pt){
   if(!ok){sc=clamp14(1.5+(DT-r.total)*.5,1.5,9);const ang=E.rng()*TAU10,ux=Math.cos(ang),uy=Math.sin(ang),tt=castRay10(pt[0],pt[1],ux,uy,blockers10(),m2px14(sc));ip=[pt[0]+ux*Math.max(0,tt-4),pt[1]+uy*Math.max(0,tt-4)];sc=px2m14(Math.max(0,tt-4))}
   const R=m2px14(aoeR14(w));
   const hits=(M6.state.tokens||[]).filter(t=>{const c=charById(t.charId);if(!c||!inScene(c)||isDeadCh(c))return false;const [x,y]=tokCenter10(t);return hyp10(x-ip[0],y-ip[1])<=R+tokR10(t)*.6&&los14(ip[0],ip[1],x,y)});
-  const crit=r.best>=w.critMin,dm=E.rollDamage(w,{extraDice:cal.mods.dmgDice,flat:cal.mods.dmg}),n=crit?dm.critTotal:dm.total;
+  const crit=r.best>=w.critMin,dm=E.rollDamage(w,{extraDice:cal.mods.dmgDice,flat:cal.mods.dmg+E.damageBonus(d,w).bonus}),n=crit?dm.critTotal:dm.total;
   const molotov=/molotov/i.test(w.name||''),st=(w.effects||[]).filter(e=>e.when==='hit'||(e.when==='crit'&&crit)).map(e=>e.status);
   showRollPopup({eyebrow:'ARREMESSO',title:`${nm(ch)} · ${w.name}`,sub:`${fmtM14(dist)} m → DT ${DT}`,sets:[{label:`${w.skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max'},{label:`Dano ${w.dado}`,dice:crit?[...dm.normal,...dm.crit]:dm.normal,bonus:dm.mod+(dm.flat||0),total:n,note:crit?'CRÍTICO!':''}],big:r.total,tone:ok?'hit':'',detail:ok?`Caiu no ponto certo. ${hits.length?'Atingidos: '+hits.map(t=>nm(charById(t.charId))).join(', '):'Ninguém na área.'}`:`Errou a DT: desviou ${fmtM14(sc)} m. ${hits.length?'Atingidos: '+hits.map(t=>nm(charById(t.charId))).join(', '):'Ninguém na área.'}`});
   if(TURN.actor===ch.id)CB14.atkKey=TURN.key;

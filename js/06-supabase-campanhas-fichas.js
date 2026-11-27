@@ -147,6 +147,8 @@
      if(keep)return{...keep,ownerId:r.owner_id,ownerLabel:(!r.owner_id||r.owner_id===c.createdBy)?'Mestre':r.owner_label,inScene:r.in_scene};
      const characterData=sh?.sheet_data?{...blank(),...sh.sheet_data}:{...blank(),...summary};
      normalizeAgeAndService(characterData);
+     /* sem acesso à ficha: os atributos acima são só o padrão; o motor usa a DF e os máximos publicados */
+     if(!sh&&role()!=='master'&&r.owner_id!==uid())characterData._publico=true;
      return {
        id:r.id,ownerId:r.owner_id,ownerLabel:(!r.owner_id||r.owner_id===c.createdBy)?'Mestre':r.owner_label,
        inScene:r.in_scene,
@@ -249,6 +251,7 @@
    const button=$id('newCharacter');if(button)button.disabled=true;
    try{
      const initial={...blank(),...(opts.data||{})};if(opts.boss)initial.hideStats=true;
+     E.migrateSheet(initial);
      const {data:row,error}=await sb.from('characters').insert({
        campaign_id:c.id,owner_id:ownerId,owner_label:ownerLabel,
        public_data:publicSummary(initial),in_scene:!opts.hidden
@@ -448,7 +451,7 @@
  adjustResource=function(charId,key,delta){
    const ch=currentCampaign()?.characters.find(x=>x.id===charId);if(!ch)return;
    if(role()!=='master'&&ch.ownerId!==uid()){say('Você só pode alterar seus próprios recursos.');return}
-   const max=({vital:stageStatsFor(ch.data.stage).vt,lucidity:stageStatsFor(ch.data.stage).luc,essence:stageStatsFor(ch.data.stage).es})[key];
+   const max=({vital:stageStatsFor(ch.data).vt,lucidity:stageStatsFor(ch.data).luc,essence:stageStatsFor(ch.data).es})[key];
    ch.data[key]=Math.max(0,Math.min(max,(Number(ch.data[key])||0)+delta));
    const d=ch.data;
    sb.from('characters').update({public_data:publicSummary(d),updated_at:new Date().toISOString()}).eq('id',ch.id)

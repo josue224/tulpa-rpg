@@ -248,11 +248,11 @@ function foesOf36(){
 function advise36(ch){
   const d=dOf6(ch);const b=beasts36().find(x=>x.id===d.beastId);if(!b)return null;
   const ai=b.ai||'agressivo',P=AIP36[ai]||AIP36.agressivo,round=Number(camp3()?.combat?.round)||1;
-  const T=foesOf36().map(c=>{const x=dOf6(c),mx=(STAGES[x.stage]||STAGES[1]).vt;return{c,n:nm(c),def:Number(x.defense)||10,pct:(Number(x.vital)||0)/mx,stage:Number(x.stage)||1,es:Number(x.essence)||0,st:stIds36(x)}});
+  const T=foesOf36().map(c=>{const x=dOf6(c),mx=Number(x.beastMax)||dmax(x).vt;return{c,n:nm(c),def:Number(x.defense)||10,pct:(Number(x.vital)||0)/mx,stage:Number(x.stage)||1,es:Number(x.essence)||0,st:stIds36(x)}});
   if(!T.length)return{b,P,text:'Nenhum alvo de pé.',tgt:null};
   const by=(f,dir=1)=>T.slice().sort((p,q)=>dir*(f(p)-f(q)))[0];
   let tgt,why,act='atacar';
-  const myMx=Number(d.beastMax)||(STAGES[d.stage]||STAGES[1]).vt,myPct=((Number(d.vital)||0)+(Number(d.vitalTemp)||0))/myMx;
+  const myMx=Number(d.beastMax)||dmax(d).vt,myPct=((Number(d.vital)||0)+(Number(d.vitalTemp)||0))/myMx;
   const timed=(b.abil||[]).find(x=>/a cada 2 rodadas/i.test(x.d));
   if(ai==='covarde'&&myPct<1/3){act='fugir';why='Vital abaixo de 1/3: tenta fugir ou se render.'}
   else if(ai==='cacador'){tgt=by(t=>t.pct);why=`mais ferido (${Math.round(tgt.pct*100)}% do Vital)`}

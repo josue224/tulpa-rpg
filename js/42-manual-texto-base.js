@@ -96,7 +96,7 @@ const MAN31=[
  ]},
  {id:'c5.7',h:'5.7 Alcances, Linha de Visão e Cobertura',b:[
   {tb:[['Categoria de Arma','Alcance Máximo'],['Corpo a corpo e Briga','Adjacente (~2,2 m)'],['Rifle de precisão, fuzis de assalto, bazuca','90 m'],['Metralhadora leve, lança-granadas','60 m'],['Arco longo','45 m'],['Arcos, bestas, submetralhadora e demais armas de disparo','30 m'],['Pistolas, revólver, pistola de pregos, explosivos de arremesso','24 m'],['Escopetas, espingardas, estilingue, zarabatana','15 m'],['Arpões e armas leves de arremesso (shuriken, kunai, dardo, chakram, bumerangue)','12 m']]},
-  ['c5.7.p1','Paredes e portas fechadas bloqueiam linha de visão e ataques à distância. Em **cobertura parcial** (parte das linhas de visão bloqueadas), o alvo recebe **+2 na Defesa**. Em **cobertura total**, o ataque à distância não pode ser feito (exceto com Disparo Etéreo). Ataques corpo a corpo ignoram cobertura e têm **Vantagem contra alvos Caídos**.']
+  ['c5.7.p1','Paredes e portas fechadas bloqueiam linha de visão e ataques à distância. Em **cobertura parcial** (parte das linhas de visão bloqueadas), o alvo recebe **+4 na Defesa** (cobertura **pesada**, quando só uma pequena parte do alvo aparece: **+6**). Em **cobertura total**, o ataque à distância não pode ser feito (exceto com Disparo Etéreo). Ataques corpo a corpo ignoram cobertura e têm **Vantagem contra alvos Caídos**.']
  ]},
  {id:'c5.8',h:'5.8 Arremesso, Explosivos e Área',b:[
   {live:'dt'},

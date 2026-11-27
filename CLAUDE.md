@@ -16,6 +16,7 @@ Hospedado no **GitHub Pages** (`josue224/tulpa-rpg`, branch `main`), backend **S
 index.html                 markup + <link>/<script> na ordem de execução
 css/01…14-*.css            estilos (a ordem importa: é a cascata original)
 js/01…61-*.js              scripts clássicos (escopo global compartilhado)
+js/09b-catalogo-vertentes.js  18 perícias e vertentes (dados; editáveis pela chave rules)
 supabase/functions/perseus-ai/index.ts   Edge Function da IA do Perseus (Gemini)
 supabase/migrations/tulpa-mesa.sql        campaign_store, campaign_blobs, RLS, move_campaign_token
 supabase/migrations/tulpa-mapa-tatico.sql move_campaign_token_v2, use_campaign_door, set_campaign_light
@@ -51,7 +52,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112708`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112709`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
@@ -112,7 +113,10 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
   - ações livres;
   - 1 reação (retaliação e rituais de reação);
   - **só 1 talento por turno** (talento não gasta a ação).
-- **Cobertura parcial:** +2 na defesa (`COVER14`). Mira com alcance e linha de visão pelas paredes.
+- **Cobertura:** parcial **+4** e pesada **+6** (`E.COVER`; `COVER14` no mapa usa a parcial). Cobertura total bloqueia a linha de visão. Mira com alcance e linha de visão pelas paredes.
+- **Defesa:** DF = 10 + proteções + estados + **DES** (sem proteção Pesada vestida nem excesso de carga). A DES sozinha não conta como "bloqueio" (`armored`).
+- **Atributos (`js/10`, nunca somar de novo na UI):** FOR carga 3+FOR e dano CaC/arremesso (DES em armas Leves e Briga ágil, `E.damageBonus`); CON +VT máximo, redução de bloqueio e Combustão CON+2; PRE +ES máxima e blindagem do 1º dano de Lucidez por cena; INT perícias extras INT−1 e cura médica; PER DT furtiva 10+PER e Lucidez na Trégua; CAR/APA bônus sociais. Máximos sempre por `E.maxStats`/`dmax`, nunca direto de `STAGES`. Criaturas (`beastId`) não somam esses benefícios.
+- **Vertentes:** treino em `d.vertentes`; o treino antigo (`extraSkills`/`skillUpgrades`) nunca é apagado e vale cheio até virar vertente. Fora da especialização: metade do grau (`E.generalist`) mais o +V inteiro, sem efeito tático; `requiresTraining` bloqueia. Dados só em `PERICIA_DEFS`/`VERT_DEFS` (`rules.pericia`/`rules.vert`).
 - **Área e arremesso:** DT pela distância, desvio na falha, Resistência reduz o dano à metade.
 - Rituais em 3 níveis: **Base 5 ES · Avançada 10 ES · Próspera 20 ES**.
 - Ciclo Elemental: **Fé → Natureza → Inexistência → Ilusão → Verdade → Fé**. 5 Sub-Elementos: Sol, Desrealização, Pofenia, Confabulação, Metáfora.
@@ -219,10 +223,11 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Arcade visual, Onda 5 · Lote 4 (`?v=2026112706`)**: DOOM (paredes, chão e teto texturizados por andar, Perseus corrompidos, itens e armas desenhados, HUD diegético; no aparelho lento o raycast desenha metade das colunas), Julgamento (um palco e um réu por chefe, balas e almas desenhadas, também no PvP), Rinha (uma arena por rival, lutadores animados com golpes, defesa, K.O. e Supremo) e Abismo (salas, portas, inimigos, chefes, relíquias e luz por andar) usam o `GFX60`, com HUD em chips e contagem regressiva. Só visual: regras, hitboxes, pontuação, semente, rede, predição do convidado e energia oculta do Arquiteto iguais. Arte em `dmArt48` e `juArt49` (`js/55`), `riArt50` e `abArt51` (`js/56`). **Teste manual:** uma partida de cada no celular (fluidez do DOOM), Julgamento, Rinha e Abismo em Mesa com convidado, e `prefers-reduced-motion` ligado.
 - **Arcade visual, Onda 6 · Lote 5 (`?v=2026112707`)**: Poço das Almas (poço de pedra com água espectral, pinos de alma com um desenho por tipo, lançador de bronze, balde em cálice e HUD de almas, multiplicador e poder), Teosofia Clicker (biblioteca à luz de velas, grimório animado, ícones próprios para os 14 geradores e as melhorias, placas, orbe, fenda e árvore de prestígio desenhados), Volley (quatro quadras: praia, cais em ventania, Lua e forja, com rede, torcida, bola de gomos, sombras e placar) e Voo (um céu em paralaxe, colunas, chão e clima por Céu e no Infinito, asas, morcegos, anéis e poderes desenhados). Somente visual: a predição do convidado no Volley não mudou.
 - **Arcade visual, Onda 7 · Lote 6 (`?v=2026112708`)**: Coleta de Essência (oficina alquímica com frascos, perigos, poderes e Colosso desenhados, Caldeirão e Impulso diegéticos), Eco da Memória (uma Câmara por regra, medalhões apagado/aceso/falso e painel de "observe / sua vez") e Jogo da Velha (mesa ritual, marcas talhadas, fichas dos jogadores). Botões de toque de todos os jogos com ícones SVG, ≥ 44 px e sem sobreposição (`GFX60.dressPad` envolve o `padBind`; o `data-k` não muda; estilos `.pad60` no `css/13`). Com isso os 22 jogos estão com o visual novo. Somente visual.
+- **Regras, Onda 8 · Motor e catálogo (`?v=2026112709`)**: benefícios diretos dos 8 atributos no motor (Vital +CON, Essência +PRE, DES na Defesa, FOR/DES no dano, perícias extras INT−1), 18 perícias e 48 vertentes (a especificação cita 49, mas lista 48) em `js/09b`, generalismo, migração idempotente das fichas e cobertura +4/+6. A interface de vertentes, Bloqueio/Manobras, Tiroteio, itens caídos e Manual vêm nas Ondas 9–13. API no `ARQUITETURA.md`. **Teste manual:** ficha antiga logada (Vital/Essência cheios sobem, bônus iguais), ataque corpo a corpo com dano +FOR, DF na Mesa para jogador e Mestre.
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.
-1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112701`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
+1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112709`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
 2. **Teste manual pós-login** de tudo que o teste automático não cobre: login real, mesa, mapa, call, transmissão e Arcade com carregamento sob demanda (inclusive em sala multijogador, com convidado entrando antes de o Arcade carregar).
 3. **Atualizar o Manual em PDF:** perícias começam em 0 e não existe História.
 4. **Balancear a Coleta de Essência.** A Receita 7, "Destilado do Vazio", foi a mais difícil para o bot (6 de 8 tentativas). Ajuste se os jogadores reclamarem.

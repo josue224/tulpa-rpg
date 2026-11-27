@@ -7,7 +7,7 @@ const camp3=()=>(typeof currentCampaign==='function'?currentCampaign():null);
 const sign=n=>(n>=0?'+':'')+n;
 const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
 const fx3=k=>{try{window.tulpaFx?.(k)}catch(e){}};
-const dmax=d=>STAGES[d.stage]||STAGES[1];
+const dmax=d=>E.maxStats(d); /* tabela do estágio + CON no Vital e PRE na Essência */
 T3.me=()=>({id:uid3(),role:role3()});
 
 /* ---- catálogo: novas vocações, perícia História, correção de arquétipos, rituais completos ---- */
@@ -32,19 +32,18 @@ window.tulpaDiceFor=(d,skill)=>E.diceFor(d,skill,SKILL_ATTR);
 /* Graus de perícia (pág. 2-3): escolhas de +5; Mestre +10 (Estágio 5: 1 · 7: 3 · 8: 4); Maestria +15 (Estágio 9: 1);
    Estágio 10: +1 perícia sobe direto para +10 sem gastar escolha de +5. */
 E.tierLimits=st=>{st=Number(st)||1;return{five:(STAGES[st]||STAGES[1]).extra,ten:st>=8?4:st>=7?3:st>=5?1:0,fifteen:st>=9?1:0,free10:st>=10?1:0}};
-E.skillTier=(d,skill)=>{
-  const up=Number(d?.skillUpgrades?.[skill])||0;if(up>=15)return 15;if(up>=10||d?.free10===skill)return 10;
-  return Math.min(15,(d?.extraSkills||[]).filter(x=>x===skill).length*5);
-};
-E.tierUsage=d=>{const ups=d?.skillUpgrades||{},sk=Object.keys(ups).filter(k=>ups[k]>=10);
-  return{five:(d?.extraSkills||[]).length,ten:sk.filter(k=>d.free10!==k).length,fifteen:sk.filter(k=>ups[k]>=15).length,free10:d?.free10?1:0}};
+/* E.skillTier, E.tierUsage, E.limitsFor e as vertentes ficam no motor (js/10) */
 E.baseSkill=()=>0; /* todas as perícias começam em 0 */
 /* attrOv: atributo escolhido para este teste (o padrão da perícia continua sendo o SKILL_ATTR) */
-function skillCalc3(ch,skill,attrOv){
+/* opts.vert (id da vertente): perícia, grau, atributo e generalismo vêm de E.vertCalc */
+function skillCalc3(ch,skill,attrOv,opts){
+  const vc=opts?.vert?E.vertCalc(ch.data||{},opts.vert,{vocList:ch.vocations||vocations,attr:attrOv}):null;
+  if(vc){skill=vc.skill;attrOv=vc.attr}
   const d=ch.data||{},std=SKILL_ATTR[skill],attr=attrOv&&ATTRS.includes(attrOv)?attrOv:std,SA=attr===std?SKILL_ATTR:{...SKILL_ATTR,[skill]:attr},m=E.computeMods(d),n=E.diceFor(d,skill,SA,m);
   const vlist=(ch.vocations||vocations),v=vlist.find(x=>x.name===d.vocation);
   let voc=0;if(v&&(v.skills||[]).map(s=>s==='Percepção'?'Observação':s).includes(skill)){const y=Number(d.serviceYears)||0;voc=y>=40?15:y>=10?10:5}
-  const extra=E.skillTier(d,skill),start=E.baseSkill(skill);
+  if(vc)voc=vc.voc;
+  const extra=vc?vc.grau:E.skillTier(d,skill),start=E.baseSkill(skill);
   const base=start+(Number(d.skillOverrides?.[skill])||0)+extra+voc+E.flatFor(d,skill,m);
   const matches=e=>e.skill===skill||(Array.isArray(e.skills)&&e.skills.includes(skill));
   const effects=d.activeEffects||[];
@@ -57,7 +56,7 @@ function skillCalc3(ch,skill,attrOv){
   const isAtk=ATTACK_SKILLS.includes(skill),isDodge=skill==='Esquiva'||skill==='Reflexo';
   const combatFlat=(isAtk?m.atk:0)+(isDodge?m.dodge:0);
   const dis=m.disadv.has('ataque')&&isAtk||m.disadvSkills.has(skill)||(m.disadv.has('ataqueDistancia')&&['Armas de Disparo','Arremesso'].includes(skill));
-  return{attr,std,SA,n,base,start,tier:extra,voc,persistent,once,onceList,team,combatFlat,dis,mods:m,bonus:base+persistent+once+team+combatFlat};
+  return{vert:vc,blocked:!!vc&&!vc.permitido,attr,std,SA,n,base,start,tier:extra,voc,persistent,once,onceList,team,combatFlat,dis,mods:m,bonus:base+persistent+once+team+combatFlat};
 }
 window.tulpaSkillCalc=skillCalc3;
 /* a ficha usa os mesmos cálculos */
@@ -93,7 +92,7 @@ rollSkill=function(skill,attr){
 };
 
 /* ---- persistência de qualquer ficha que eu controle ---- */
-const pubSummary=d=>{const h=!!d?.hideStats;return{name:d?.name||'Personagem sem nome',stage:Number(d?.stage)||1,vital:h?0:Number(d?.vital)||0,lucidity:h?0:Number(d?.lucidity)||0,essence:h?0:Number(d?.essence)||0,statuses:(d?.statuses||[]).map(s=>typeof s==='string'?s:s.id),df:Number(E.defenseInfo(d||{attributes:{}}).DF)||10,hideStats:h,temp:h?0:Number(d?.vitalTemp)||0,dying:((d?.statuses||[]).find(s=>(s.id||s)==='agonia')||{}).turns??null,...(avOk(d?.avatar)?{avatar:d.avatar}:{}),...(avOk(d?.tokenAvatar)?{tokenAvatar:d.tokenAvatar}:{})}};
+const pubSummary=d=>{const h=!!d?.hideStats;return{name:d?.name||'Personagem sem nome',stage:Number(d?.stage)||1,vital:h?0:Number(d?.vital)||0,lucidity:h?0:Number(d?.lucidity)||0,essence:h?0:Number(d?.essence)||0,statuses:(d?.statuses||[]).map(s=>typeof s==='string'?s:s.id),df:Number(E.defenseInfo(d||{attributes:{}}).DF)||10,vtMax:h?0:E.maxStats(d||{}).vt,esMax:h?0:E.maxStats(d||{}).es,hideStats:h,temp:h?0:Number(d?.vitalTemp)||0,dying:((d?.statuses||[]).find(s=>(s.id||s)==='agonia')||{}).turns??null,...(avOk(d?.avatar)?{avatar:d.avatar}:{}),...(avOk(d?.tokenAvatar)?{tokenAvatar:d.tokenAvatar}:{})}};
 function combatCache(d,voc,trk){
   try{const c=skillCalc3({data:d,vocations:voc||vocations,tracks:trk||tracks},'Reflexo');d.combatCache={reflexDice:Math.max(1,Math.min(8,c.n)),reflexBonus:Math.max(-30,Math.min(60,c.bonus)),at:Date.now()}}catch(e){}
 }
@@ -110,12 +109,15 @@ function mutateChar(ch,fn){
   if(!ch)return;
   (window.__dirty=window.__dirty||{})[ch.id]=Date.now();
   if(ch.id===activeCharacterId){fn(data);save()}
-  else{fn(ch.data);persistRemote(ch).then(()=>{window.__dirty[ch.id]=Date.now()}).catch(e=>{console.error(e);toast('Falha ao salvar '+(ch.data?.name||'personagem'))})}
+  else{E.migrateSheet(ch.data);fn(ch.data);persistRemote(ch).then(()=>{window.__dirty[ch.id]=Date.now()}).catch(e=>{console.error(e);toast('Falha ao salvar '+(ch.data?.name||'personagem'))})}
   try{if(!$('tablePanel').classList.contains('hide'))renderTable()}catch(e){}
 }
 const controls=ch=>!!ch&&(role3()==='master'?(!ch.ownerId||ch.ownerId===uid3()):ch.ownerId===uid3());
 const canEdit=ch=>!!ch&&(role3()==='master'||ch.ownerId===uid3());
 const inScene=ch=>ch&&ch.inScene!==false;
+
+/* ficha antiga ganha os campos das vertentes e os novos máximos antes de desenhar (idempotente) */
+{const _r8=render;render=function(){try{E.migrateSheet(data)}catch(e){console.warn('[T8] migrar ficha',e)}return _r8.apply(this,arguments)}}
 
 /* ---- recursos com +/− (corrige o bug dos sliders) ---- */
 function setResource(key,value,{silent=false}={}){

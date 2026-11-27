@@ -30,7 +30,7 @@ function sheetBrief(){
 }
 const RULES_BRIEF=`REGRAS ESSENCIAIS (Manual Tulpa RPG V1.2):
 - Teste: role tantos d20 quanto o atributo e fique com o maior + bônus da perícia. Toda perícia começa em 0; vocação dá +V (+5; 10 anos +10; 40 anos +15); extras +5; Mestre +10 (Estágios 5/7/8); Maestria +15 (Estágio 9); Estágio 10: +1 perícia direto em +10.
-- Tabela de Defesa: Defesa Base DB 10; DF = 10 + proteções. ATA = ataque; RF = Esquiva (vendo) ou Reflexo (desprevenido). RF < DB e ATA > DB = Acerto Violento (atacante ganha 1 ação). RF > DB e ATA < DB = Retaliação (defensor ganha 1 ação extra; a retaliação não pode ser esquivada). Sem proficiência na proteção, só retalia se RF > DF, senão conta como Defesa Completa. RF ≥ DB: acerta se ATA ≥ RF e ≥ DF. 20 natural sempre acerta. Crítico rola os dados de dano de novo e soma.
+- Tabela de Defesa: Defesa Base DB 10; DF = 10 + proteções + Destreza (sem proteção Pesada nem excesso de carga); cobertura parcial +4, pesada +6. Atributos: Vital máximo +CON, Essência máxima +PRE, dano corpo a corpo/arremesso +FOR (DES em armas Leves e Briga ágil), perícias extras INT-1. ATA = ataque; RF = Esquiva (vendo) ou Reflexo (desprevenido). RF < DB e ATA > DB = Acerto Violento (atacante ganha 1 ação). RF > DB e ATA < DB = Retaliação (defensor ganha 1 ação extra; a retaliação não pode ser esquivada). Sem proficiência na proteção, só retalia se RF > DF, senão conta como Defesa Completa. RF ≥ DB: acerta se ATA ≥ RF e ≥ DF. 20 natural sempre acerta. Crítico rola os dados de dano de novo e soma.
 - Lucidez 0 = Protocolo de Colapso (1d6): 1º colapso 4–6 Êxtase, 1–3 Penalidade 1 (Lucidez volta a Máx÷2); 2º Máx÷3; 3º Trauma Permanente se Penalidade ≥ 2. Em Êxtase, cada dano de Lucidez pede 1d6 (1–3 perde o Êxtase).
 - Combustão Vital: 2 VT por ES faltante (máx. Vigor+2 ES por turno), deixa Estigmas. Última Centelha zera o Vital: +1d20, depois Morrendo.
 - Vital 0 = Morrendo: 3 turnos para estabilizar; golpe ≥ metade do Vital máximo finaliza. Sutura Bruta (1 ação, Suprimento, DT 15): 2d6+INT de VT temporário e suspende sangramento. Síntese Cirúrgica (Trégua, Kit, DT 15/18): 2d8+INT+Estágio de Vital; falha dá Infecção.
@@ -150,9 +150,9 @@ function quickNpc(){
   const st=Math.max(1,Math.min(10,(Number(data.stage)||1)+E.die(3)-2)),S=STAGES[st];
   const at=Object.fromEntries(ATTRS.map(a=>[a,1+Math.floor(E.rng()*Math.min(4,1+st/2))]));
   const w=rnd(WEAPONS.filter(x=>x.cat!=='Especial')),p=rnd(PROTECTIONS.filter(x=>x.def<=Math.min(6,1+st)));
-  const npc={name:rnd(NOMES),stage:st,vt:S.vt,es:S.es,at,w,p};
+  const npc={name:rnd(NOMES),stage:st,vt:S.vt+(at['Constituição']||1),es:S.es+(at['Presença']||1),at,w,p};
   T3.lastNpc=npc;
-  return {npc,html:`👹 <b>${esc(npc.name)}</b> · Estágio ${st}<br>VT ${S.vt} · ES ${S.es} · DF ${10+p.def} (${esc(p.name)})<br>${Object.entries(at).map(([k,v])=>`${k.slice(0,3)} ${v}`).join(' · ')}<br>Arma: <b>${esc(w.name)}</b> (${esc(w.skill)}, ${esc(w.dado)}, crít ${w.critMin}-20)<div class="sub">Crie como personagem do Mestre na Visão de Mesa e use o 🙈 para esconder os status, se for um chefe.</div>`};
+  return {npc,html:`👹 <b>${esc(npc.name)}</b> · Estágio ${st}<br>VT ${npc.vt} · ES ${npc.es} · DF ${10+p.def+(p.peso==='Pesado'&&p.def>0?0:at['Destreza']||1)} (${esc(p.name)})<br>${Object.entries(at).map(([k,v])=>`${k.slice(0,3)} ${v}`).join(' · ')}<br>Arma: <b>${esc(w.name)}</b> (${esc(w.skill)}, ${esc(w.dado)}, crít ${w.critMin}-20)<div class="sub">Crie como personagem do Mestre na Visão de Mesa e use o 🙈 para esconder os status, se for um chefe.</div>`};
 }
 const QUICK=['Analisar minha ficha','O que fazer no meu turno?','Explicar Defesa e Retaliação','Sugerir RP para meu Trauma/Estado','Gerar NPC/Inimigo rápido'];
 const aiOn=()=>(prefs.aiProvider||'tulpa')!=='off';

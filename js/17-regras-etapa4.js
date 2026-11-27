@@ -73,16 +73,17 @@ T3.bindSummons=function(p){
 
 /* ---------- perícias: base +1, graus +5 / +10 (Mestre) / +15 (Maestria) ---------- */
 const TIER_LBL={5:'+5',10:'Mestre +10',15:'Maestria +15'};
-function tierSkills(d){const set=new Set([...(d.extraSkills||[]),...Object.keys(d.skillUpgrades||{}),...(d.free10?[d.free10]:[])]);return [...set].filter(s=>E.skillTier(d,s)>0).sort((a,b)=>a.localeCompare(b,'pt-BR'))}
+/* só o treino por perícia; o que já virou vertente fica na lista de vertentes */
+function tierSkills(d){const set=new Set([...(d.extraSkills||[]),...Object.keys(d.skillUpgrades||{}),...(d.free10?[d.free10]:[])]);return [...set].filter(s=>E.legacyTier(d,s)>0).sort((a,b)=>a.localeCompare(b,'pt-BR'))}
 function tierUp(skill){
-  const L=E.tierLimits(data.stage),U=E.tierUsage(data),free=!!data.freeMode,t=E.skillTier(data,skill);data.skillUpgrades=data.skillUpgrades||{};
+  const L=E.limitsFor(data),U=E.tierUsage(data),free=!!data.freeMode,t=E.legacyTier(data,skill);data.skillUpgrades=data.skillUpgrades||{};
   if(t===5){if(!free&&U.ten>=L.ten){toast(L.ten?`Limite de perícias Mestre (+10) no Estágio ${data.stage}: ${L.ten}.`:'Perícias +10 (Mestre) liberam no Estágio 5.');return}data.skillUpgrades[skill]=10}
   else if(t===10){if(!free&&U.fifteen>=L.fifteen){toast(L.fifteen?'Você já tem a sua perícia de Maestria (+15).':'Maestria (+15) libera no Estágio 9.');return}data.skillUpgrades[skill]=15}
   else return;
-  save();toast(skill+': '+TIER_LBL[E.skillTier(data,skill)]);
+  save();toast(skill+': '+TIER_LBL[E.legacyTier(data,skill)]);
 }
 function tierDown(skill){
-  const ups=data.skillUpgrades=data.skillUpgrades||{},t=E.skillTier(data,skill);
+  const ups=data.skillUpgrades=data.skillUpgrades||{},t=E.legacyTier(data,skill);
   if(t===15)ups[skill]=10;
   else if(t===10){if(data.free10===skill&&!ups[skill])data.free10='';else delete ups[skill]}
   else if(t===5){const i=data.extraSkills.lastIndexOf(skill);if(i>=0)data.extraSkills.splice(i,1)}
@@ -95,14 +96,14 @@ renderSkills=function(){
   $('skillGrid').innerHTML=BASE_SKILLS.filter(s=>s.toLowerCase().includes(q)).map(s=>{const c=skillCalc3(ch,s);
     return `<div class="skill"><div class="skill-info"><div class="skill-name">${esc(s)}${c.tier?` <span class="t3-tier t${c.tier}">${TIER_LBL[c.tier]}</span>`:''}</div><div class="skill-attr">${esc(SKILL_ATTR[s])} · ${c.n}d20 · base +${c.start}${c.voc?' · vocação +'+c.voc:''}${c.tier?' · extra +'+c.tier:''}${c.persistent+c.once?' · talento '+sign(c.persistent+c.once):''}</div></div><div class="skill-right"><span class="skill-val">${sign(c.bonus)}</span><button class="roll" data-roll="${esc(s)}">D20</button></div></div>`}).join('');
   $$('[data-roll]',$('skillGrid')).forEach(b=>b.onclick=()=>rollSkill(b.dataset.roll));
-  const L=E.tierLimits(data.stage),U=E.tierUsage(data),free=!!data.freeMode;
-  $('extraSkillsLabel').textContent=free?`Modo Livre · ${U.five} escolhas +5`:`${U.five} / ${L.five} escolhas +5`;
+  const L=E.limitsFor(data),U=E.tierUsage(data),free=!!data.freeMode;
+  $('extraSkillsLabel').textContent=free?`Modo Livre · ${U.five} escolhas +5`:`${U.five} / ${L.five} escolhas +5${L.intExtra?` (+${L.intExtra} por Inteligência)`:''}`;
   $('skillSlots').textContent=free?'Sem limites (Modo Livre)':`${Math.max(0,L.five-U.five)} escolhas +5 restantes`;
   const keep=$('addSkillSelect').value;
   $('addSkillSelect').innerHTML=BASE_SKILLS.map(s=>{const t=E.skillTier(data,s);return `<option value="${esc(s)}">${esc(s)}${t?' ('+TIER_LBL[t]+')':''}</option>`}).join('');
   if(keep)$('addSkillSelect').value=keep;
   const list=tierSkills(data);
-  $('extraSkillList').innerHTML=list.map(s=>{const t=E.skillTier(data,s),canUp=(t===5&&(free||U.ten<L.ten))||(t===10&&(free||U.fifteen<L.fifteen));
+  $('extraSkillList').innerHTML=list.map(s=>{const t=E.legacyTier(data,s),canUp=(t===5&&(free||U.ten<L.ten))||(t===10&&(free||U.fifteen<L.fifteen));
     return `<span class="pill t3-tierpill">${esc(s)} <b class="t3-tier t${t}">${TIER_LBL[t]}</b>${data.free10===s?' <small>(Estágio 10)</small>':''}${t<15?`<button class="t3-x" data-tup="${esc(s)}" ${canUp?'':'disabled'} title="${t===5?'Subir para Mestre +10':'Subir para Maestria +15'}">▲</button>`:''}<button class="t3-x" data-tdown="${esc(s)}" title="Baixar um grau">▼</button></span>`}).join('')||'<span class="sub">Nenhum bônus extra aplicado.</span>';
   let box=$('t3TierBox');if(!box){box=document.createElement('div');box.id='t3TierBox';$('extraSkillList').after(box)}
   const cnt=(a,b,l,t)=>`<span class="pill"><b class="t3-tier t${t}">${l}</b> ${a} / ${free?'∞':b}</span>`;
@@ -112,7 +113,7 @@ renderSkills=function(){
   $$('[data-tdown]').forEach(b=>b.onclick=()=>tierDown(b.dataset.tdown));
 };
 $('addSkillBonus').onclick=()=>{
-  const s=$('addSkillSelect').value,L=E.tierLimits(data.stage),U=E.tierUsage(data);data.extraSkills=data.extraSkills||[];
+  const s=$('addSkillSelect').value,L=E.limitsFor(data),U=E.tierUsage(data);data.extraSkills=data.extraSkills||[];
   if(!data.freeMode&&U.five>=L.five){toast('Você já usou todas as escolhas de +5 deste estágio.');return}
   if(E.skillTier(data,s)>=5){toast(s+' já tem bônus extra. Use ▲ para subir de grau.');return}
   data.extraSkills.push(s);save();
@@ -158,7 +159,7 @@ setInterval(syncMasterBtn,1500);
 {const _r4=render;render=function(){_r4();try{syncMasterBtn()}catch(e){}}}
 
 /* ---------- merge: atualização externa (Mestre) chegando com edição local pendente ---------- */
-const MERGE_REMOTE=['vital','vitalTemp','lucidity','essence','statuses','activeEffects','combatExtra','violentKey','violentRow','retalExtra','retalTarget','hideStats','suturaAtiva','suturaRompe','collapsePending','dying'];
+const MERGE_REMOTE=['vital','vitalTemp','lucidity','essence','statuses','activeEffects','combatExtra','violentKey','violentRow','retalExtra','retalTarget','hideStats','suturaAtiva','suturaRompe','collapsePending','dying','lucShieldUsed'];
 window.tulpaMergeSheet=function(local,remote){
   const out={...blank(),...local};
   MERGE_REMOTE.forEach(k=>{if(k in remote)out[k]=remote[k];else delete out[k]});

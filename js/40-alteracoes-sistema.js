@@ -7,12 +7,12 @@
 const R29={camp:'',rules:null,base:null,sec:'voc',q:'',edit:null,loadedAt:0,fetching:false,lastCast:0};
 T3.rules29=R29;
 const cl29=o=>o==null?o:JSON.parse(JSON.stringify(o));
-const defRules29=()=>({v:1,rev:0,voc:{},track:{},ritual:{},item:{},status:{},trauma:{},beast:[],subel:[],table:{},log:[]});
+const defRules29=()=>({v:1,rev:0,voc:{},track:{},ritual:{},item:{},status:{},trauma:{},pericia:{},vert:{},beast:[],subel:[],table:{},log:[]});
 const rules29=()=>R29.rules||(R29.rules=defRules29());
 const ARCH29=['Lutador','Gênio','Ritualista'];
 const PESO29=['Bolso','Leve','Médio','Pesado'];
 const SEC29=[['voc','✦','Vocações'],['track','⌁','Trilhas'],['ritual','✶','Rituais'],['item','▣','Itens e Equipamentos'],['status','☠','Estados e Condições'],['beast','👹','Bestiário'],['trauma','☾','Traumas e Colapsos'],['subel','✧','Sub-Elementos'],['table','⚖','Regras da Mesa'],['log','🕘','Histórico']];
-const KIND29={voc:'Vocação',track:'Trilha',ritual:'Ritual',item:'Item',status:'Estado',beast:'Bestiário',trauma:'Trauma',subel:'Sub-Elemento',table:'Regras da Mesa'};
+const KIND29={voc:'Vocação',track:'Trilha',ritual:'Ritual',item:'Item',status:'Estado',beast:'Bestiário',trauma:'Trauma',subel:'Sub-Elemento',table:'Regras da Mesa',pericia:'Perícia',vert:'Vertente'};
 
 /* ---------- conteúdo original (antes de qualquer alteração do Mestre) ---------- */
 function base29(){
@@ -23,6 +23,7 @@ function base29(){
     ritual:cl29(RITUALS.filter(r=>!/^(custom|gm)-/.test(String(r.id)))),
     weapon:cl29(WEAPONS),prot:cl29(PROTECTIONS),gear:cl29(GEAR),
     status:cl29(STATUS_DEFS),trauma:cl29(TRAUMA_DEFS),
+    pericia:cl29(PERICIA_DEFS),vert:cl29(VERT_DEFS),
   };
   return R29.base;
 }
@@ -138,6 +139,29 @@ function ritSet29(x,o){
   ['name','element','cost'].forEach(k=>{if(o[k])x[k]=o[k]});
   if(Array.isArray(o.levels)){x.levels=x.levels||['','',''];o.levels.forEach((l,i)=>{if(l!=null)x.levels[i]=l});x.desc=x.levels[0]||x.desc}
 }
+/* perícias e vertentes: rules.pericia / rules.vert = {id:{campos alterados, add?, del?}} */
+function vertSet29(sec,x,o){
+  (sec==='vert'?['name','desc','pericia','skill']:['name','desc','grupo']).forEach(k=>{if(o[k]!=null)x[k]=o[k]});
+  if(sec==='pericia'){if(Array.isArray(o.skills)&&o.skills.length)x.skills=o.skills.slice();return x}
+  if(Array.isArray(o.attrs)){const a=o.attrs.filter(n=>ATTRS.includes(n));if(a.length)x.attrs=a}
+  if(Array.isArray(o.effects))x.effects=cl29(o.effects.filter(e=>e&&typeof e.tipo==='string'));
+  if(o.requiresTraining!=null)x.requiresTraining=!!o.requiresTraining;
+  return x;
+}
+function vertNew29(sec,id,o){
+  if(sec==='pericia')return vertSet29(sec,{id,name:id,grupo:'Mesa',skills:[o.name||id],desc:''},o);
+  const p=PERICIA_DEFS.find(x=>x.id===o.pericia);
+  return vertSet29(sec,{id,pericia:o.pericia||'',skill:p?.skills[0]||'',name:id,attrs:['Força'],desc:'',effects:[],requiresTraining:false},o);
+}
+function rebuildVert29(){
+  const R=rules29(),B=base29();
+  [['pericia',PERICIA_DEFS],['vert',VERT_DEFS]].forEach(([sec,arr])=>{
+    const out=[];
+    B[sec].forEach(b=>{const o=R[sec]?.[b.id];if(o&&o.del)return;const x=cl29(b);if(o)vertSet29(sec,x,o);out.push(x)});
+    Object.entries(R[sec]||{}).forEach(([id,o])=>{if(o&&o.add&&!o.del&&!B[sec].some(b=>b.id===id))out.push(vertNew29(sec,id,o))});
+    arr.length=0;out.forEach(x=>arr.push(x));
+  });
+}
 /* regras da mesa: deslocamento base, DT do Arremesso e DT de Furtividade */
 T3.moveBase=()=>{const n=Number(rules29().table?.move);return n>0?n:9};
 {const _dt29=dtFor14;dtFor14=function(m){const b=Number(rules29().table?.dtThrow);return _dt29(m)+(b>0?b-12:0)};T3.cbDbg&&(T3.cbDbg.dtFor14=dtFor14)}
@@ -148,6 +172,7 @@ function rebuildAll29(){
   try{rebuildStatus29()}catch(e){console.warn('[T29] estados',e)}
   try{rebuildTrauma29()}catch(e){console.warn('[T29] traumas',e)}
   try{rebuildRitual29()}catch(e){console.warn('[T29] rituais',e)}
+  try{rebuildVert29()}catch(e){console.warn('[T29] vertentes',e)}
   try{applyTable29()}catch(e){}
 }
 /* toda vez que a ficha desenha, vocações, trilhas e inventário seguem as regras da campanha */
@@ -166,7 +191,7 @@ const canEdit29=()=>{try{const ch=charById(activeCharacterId);return !ch||ch.own
 function setRules29(r,{notify=false}={}){
   const old=R29.rules;
   R29.rules={...defRules29(),...(r&&typeof r==='object'?r:{})};
-  ['voc','track','ritual','item','status','trauma','table'].forEach(k=>{if(!R29.rules[k]||typeof R29.rules[k]!=='object'||Array.isArray(R29.rules[k]))R29.rules[k]={}});
+  ['voc','track','ritual','item','status','trauma','table','pericia','vert'].forEach(k=>{if(!R29.rules[k]||typeof R29.rules[k]!=='object'||Array.isArray(R29.rules[k]))R29.rules[k]={}});
   ['beast','subel','log'].forEach(k=>{if(!Array.isArray(R29.rules[k]))R29.rules[k]=[]});
   rebuildAll29();
   try{render()}catch(e){}
@@ -244,6 +269,8 @@ function hits29(e){
     if(e.kind==='item'){const [k,n]=String(e.key).split('|');if((d.inventory?.items||[]).some(it=>it&&it.kind===k&&[n,e.label].includes(it._k29||it.name)))tab='inventory'}
     if(e.kind==='status'&&(d.statuses||[]).some(s=>s&&s.id===e.key))tab='states';
     if(e.kind==='trauma'&&(d.traumas||[]).some(s=>s&&s.id===e.key))tab='mind';
+    if(e.kind==='vert'&&d.vertentes?.[e.key])tab='skills';
+    if(e.kind==='pericia'&&((PERICIA_DEFS.find(p=>p.id===e.key)?.skills||[]).some(s=>E.skillTier(d,s)>0)))tab='skills';
     if(e.kind==='table')tab='combat';
     if(tab)out.push({ch,tab});
   });
@@ -328,6 +355,12 @@ function list29(sec){
     Object.entries(R.trauma).forEach(([k,o])=>{if(o&&o.add)rows.push({key:k,name:o.name||k,sub:(o.grp||'')+' · '+String(o.text||'').slice(0,80),st:st(o,false)})});
     return rows;
   }
+  if(sec==='pericia'||sec==='vert'){
+    const sub=(b,o)=>sec==='vert'?((PERICIA_DEFS.find(p=>p.id===(o?.pericia||b?.pericia))?.name||'')+' · '+(o?.attrs||b?.attrs||[]).join(' ou ')):(o?.skills||b?.skills||[]).join(' · ');
+    const rows=B[sec].map(b=>{const o=R[sec][b.id];return{key:b.id,name:o?.name||b.name,sub:sub(b,o),st:st(o,true)}});
+    Object.entries(R[sec]).forEach(([k,o])=>{if(o&&o.add&&!B[sec].some(b=>b.id===k))rows.push({key:k,name:o.name||k,sub:sub(null,o),st:st(o,false)})});
+    return rows;
+  }
   if(sec==='beast'){const L=R.beast||[],row=(b,st)=>({key:b.id,name:b.name,sub:`${b.tier||'Inimigo'} · VT ${b.vital||'—'} · Defesa ${b.def||'—'} · ${b.dano||'—'}`,st});
     return(typeof BEAST_BASE!=='undefined'?BEAST_BASE:[]).map(b=>{const o=L.find(x=>x.id===b.id);return row(o||b,o?'edit':'orig')}).concat(L.filter(x=>!String(x.id).startsWith('bb-')).map(b=>row(b,'new')))}
   if(sec==='subel'){const L=R.subel||[];
@@ -344,13 +377,14 @@ function cur29(sec,key){
   if(sec==='item'){const [kind,n]=String(key).split('|'),arr=kind==='weapon'?B.weapon:kind==='prot'?B.prot:B.gear,b=arr.find(x=>x.name===n),o=R.item[key]||{};const x=b?cl29(b):itemNew29(kind,{name:n,...o});if(b)itemSet29(kind,x,o);x.kind=kind;return x}
   if(sec==='status'){const b=B.status.find(x=>x.id===key),o=R.status[key]||{};const t=cl29(b||{id:key,name:'',group:'manual',narr:'',text:''});statusSet29(t,o);return t}
   if(sec==='trauma'){const b=B.trauma.find(x=>x.id===key),o=R.trauma[key]||{};const t=cl29(b||{id:key,name:'',grp:'Mente',text:''});['name','text','grp'].forEach(k=>{if(o[k]!=null)t[k]=o[k]});return t}
+  if(sec==='pericia'||sec==='vert'){const b=B[sec].find(x=>x.id===key),o=R[sec][key]||{};return b?vertSet29(sec,cl29(b),o):vertNew29(sec,key,o)}
   if(sec==='beast'){const b=(typeof BEAST_BASE!=='undefined'?BEAST_BASE:[]).find(x=>x.id===key),o=(R.beast||[]).find(x=>x.id===key);return cl29(o?{...(b||{}),...o}:b||{id:key,name:'',tier:'Inimigo',el:'',vital:20,def:12,atk:'+3',dano:'1d6',skills:'',notes:'',ai:'agressivo'})}
   if(sec==='subel'){const b=String(key).startsWith('sub-')&&typeof SUBEL_BASE!=='undefined'?SUBEL_BASE.find(x=>x.id===key):null,o=(R.subel||[]).find(x=>x.id===key);
     if(b)return cl29({...b,element:`${b.a} + ${b.b}`,off:1,...(o?{desc:o.desc}:{})});
     return cl29(o||{id:key,name:'',element:'Natureza',desc:''})}
   return{};
 }
-const isNative29=(sec,key)=>{const B=base29();return sec==='voc'?B.voc.some(x=>x.name===key):sec==='track'?B.track.some(x=>tkey29(x)===key):sec==='ritual'?B.ritual.some(x=>x.id===key):sec==='item'?(()=>{const [k,n]=String(key).split('|');return(k==='weapon'?B.weapon:k==='prot'?B.prot:B.gear).some(x=>x.name===n)})():sec==='status'?B.status.some(x=>x.id===key):sec==='trauma'?B.trauma.some(x=>x.id===key):false};
+const isNative29=(sec,key)=>{const B=base29();return sec==='voc'?B.voc.some(x=>x.name===key):sec==='track'?B.track.some(x=>tkey29(x)===key):sec==='ritual'?B.ritual.some(x=>x.id===key):sec==='item'?(()=>{const [k,n]=String(key).split('|');return(k==='weapon'?B.weapon:k==='prot'?B.prot:B.gear).some(x=>x.name===n)})():sec==='status'?B.status.some(x=>x.id===key):sec==='trauma'?B.trauma.some(x=>x.id===key):(sec==='pericia'||sec==='vert')?B[sec].some(x=>x.id===key):false};
 
 /* ---------- a central ---------- */
 function sysBtn29(){

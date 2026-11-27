@@ -61,7 +61,7 @@ kb('estagios','Estágios (evolução)',['estagio','estagios','evoluir','evolucao
  'O personagem evolui do <b>Estágio 1 ao 10</b>. Cada estágio aumenta Vital, Lucidez e Essência, e dá pontos de atributo (nos estágios 2, 4, 7 e 10), perícias extras e poderes de trilha (3, 5, 8 e 10). É só mudar o estágio na Visão geral: o app atualiza os máximos sozinho.',
  {go:[G('overview','#stageList')],rel:['atributos','trilha']});
 kb('defesa','Defesa',['defesa','df','db','defesa base','armadura','proteger','proteção','defesa total','bloqueio'],
- '<b>Defesa Base (DB) = 10.</b> Sua <b>DF</b> = 10 + proteções vestidas + bônus/penalidades. Atacante rola ATA; defensor rola RF (Esquiva ou Reflexo). Com DF acima de 10, o equipamento pode <b>bloquear</b> o golpe, mas só se seu Reflexo não ficar abaixo de 10.',
+ '<b>Defesa Base (DB) = 10.</b> Sua <b>DF</b> = 10 + proteções vestidas + <b>Destreza</b> (se não usar proteção Pesada nem estiver com excesso de carga) + bônus/penalidades. Cobertura parcial +4, pesada +6. Atacante rola ATA; defensor rola RF (Esquiva ou Reflexo). Com proteção vestida, o equipamento pode <b>bloquear</b> o golpe, mas só se seu Reflexo não ficar abaixo de 10.',
  {go:[G('combat','#combatTabBody')],rel:['ataque','esquiva-reflexo','protecoes']});
 kb('ataque','Ataque',['ataque','atacar','ata','qual pericia ataco','briga','armas brancas','armas de disparo','arremesso','soco','dano da arma'],
  'A perícia do ataque depende da arma: <b>Briga</b> (soco 1d2, soco inglês), <b>Armas Brancas</b> (faca, espada…), <b>Armas de Disparo</b> (pistola, arco…) e <b>Arremesso</b> (granada, shuriken…). Você rola o ataque e o dano da arma na hora; o alvo rola a defesa.',
@@ -155,7 +155,7 @@ kb('dica-build','Dicas de build',['build','dica de build','qual escolher','suges
  '<b>Lutador:</b> Força/Destreza/Constituição altas; arma boa e proteção. <b>Gênio:</b> Inteligência, Percepção e Carisma; vocação com várias perícias úteis. <b>Ritualista:</b> Presença/Inteligência e bastante Essência. Regra de ouro: <b>nunca deixe Destreza em 1</b>, ela define Esquiva, Reflexo e iniciativa. (De nada.)',
  {rel:['atributos','arquetipo']});
 kb('regras-casa','O que é regra da casa',['regra da casa','regras da casa','o que voce inventou','nao esta no manual','interpretacao'],
- 'Onde o manual é vago o app usou uma interpretação: <b>DF = 10 + equipamento</b>; cada nível de Penalidade de Lucidez tira <b>1 dado</b> de atributos mentais; crítico <b>dobra os dados</b> de dano; armas contundentes atordoam no crítico; Alerta termina ao ser atacado; Vital Temporário some no fim da cena. Se o seu Mestre pensar diferente, o Mestre ganha.');
+ 'Onde o manual é vago o app usou uma interpretação: <b>DF = 10 + equipamento + Destreza</b>; cada nível de Penalidade de Lucidez tira <b>1 dado</b> de atributos mentais; crítico <b>dobra os dados</b> de dano; armas contundentes atordoam no crítico; Alerta termina ao ser atacado; Vital Temporário some no fim da cena. Se o seu Mestre pensar diferente, o Mestre ganha.');
 kb('nao-ataca','Não consigo atacar',['nao consigo atacar','nao posso atacar','botao atacar apagado','atacar desativado','nao aparece atacar','nao e minha vez'],
  'Checklist rápido: 1) é a <b>sua vez</b> no painel de combate? 2) seu olhinho está ligado? 3) você já usou a ação do turno? 4) um estado te impede (Atordoado, Paralisado, Morrendo)? 5) tem arma nas <b>mãos/cintura/bandoleira</b>? Sem arma você ataca no <b>Soco</b>.',
  {rel:['turno-combate','olhinho']});
@@ -181,7 +181,7 @@ const TOURS={
   {h:'Toques finais',t:'Escreva a <b>crônica, conexões e anotações</b> no fim de Registros. Pronto! Peça <i>“revisar minha ficha”</i> e eu confiro se esqueceu algo.',go:G('records','#notes')}]},
  'combate':{title:'Como funciona o combate',steps:[
   {h:'Prepare o equipamento',t:'Antes da luta, deixe a arma nas <b>mãos, cintura ou bandoleira</b> (saque rápido) e vista suas proteções.',go:G('inventory','#invBody')},
-  {h:'Sua Defesa',t:'Defesa Base 10 + equipamento. Aqui você vê a <b>DF</b> e a tabela de resultados do confronto.',go:G('combat','#combatTabBody')},
+  {h:'Sua Defesa',t:'Defesa Base 10 + equipamento + Destreza. Aqui você vê a <b>DF</b> e a tabela de resultados do confronto.',go:G('combat','#combatTabBody')},
   {h:'Iniciativa',t:'Cada participante rola <b>Reflexo</b> e a ordem sai do maior para o menor. Jogadores rolam o seu; o Mestre rola pelos NPCs.',go:{view:'hub:table'}},
   {h:'No seu turno',t:'Escolha: <b>Atacar</b>, <b>Alerta</b>, <b>Talentos</b>, <b>Outra ação</b>, <b>Sutura Bruta</b> ou <b>Síntese</b>. Depois <b>Concluir turno</b>.',go:{view:'hub:table'}},
   {h:'Defendendo',t:'Quando atacarem você, role <b>Esquiva</b> (se viu) ou <b>Reflexo</b> (desprevenido). Os dados aparecem na tela de todos.',go:null},
@@ -209,7 +209,7 @@ const TAB_TIPS={
  inventory:['Arma nas mãos, cintura ou bandoleira = saque rápido. Vista proteções para subir a DF.','Falta item? Use <b>＋ Criar item novo</b>.'],
  states:['Aplique o estado e o app faz o resto. Remova com o ×.'],
  mind:['Lucidez 0 = Protocolo de Colapso. O app cuida das contas.'],
- combat:['DF = 10 + proteções vestidas. Resultados: esquiva, bloqueio, normal, violento e retaliação.'],
+ combat:['DF = 10 + proteções vestidas + Destreza (sem proteção Pesada). Resultados: esquiva, bloqueio, normal, violento e retaliação.'],
  rest:['Trégua recupera ES e Lucidez, nunca Vital. Para Vital: Sutura Bruta ou Síntese Cirúrgica.'],
  records:['Rituais: <b>Aprender</b> primeiro, depois <b>Conjurar</b>. Anote a crônica no fim da página.']
 };

@@ -103,7 +103,7 @@ async function pReply(h,{m='smug',delay=true}={}){
 
 /* ---------- revisão da ficha ---------- */
 function reviewSheet(){
-  const d=data,bad=[],ok=[],st=stageStats(),free=!!d.freeMode,left=free?0:attrPointsLeft(),used=(d.extraSkills||[]).length;
+  const d=data,bad=[],ok=[],lim=E.limitsFor(d).five,free=!!d.freeMode,left=free?0:attrPointsLeft(),used=E.tierUsage(d).five;
   const B=(t,g)=>bad.push({t,g}),O=t=>ok.push(t);
   if(!d.name||/sem nome/i.test(d.name))B('Seu agente ainda não tem <b>nome</b>.',G('overview','#charName'));else O(`Nome: <b>${esc(d.name)}</b>`);
   if(left>0)B(`Sobram <b>${left}</b> ponto(s) de atributo para distribuir.`,G('attributes','#attrPoints'));
@@ -114,9 +114,9 @@ function reviewSheet(){
   if((d.attributes?.['Destreza']||1)<=1)B('<b>Destreza 1</b> deixa Esquiva, Reflexo e iniciativa péssimos. Pense nisso.',G('attributes','#attributes'));
   if(!d.vocation)B('Você ainda não escolheu uma <b>vocação</b>.',G('vocation','#vocSelect'));else O(`Vocação: <b>${esc(d.vocation)}</b>`);
   if(free)O('Modo Criação Livre: limites de pontos e perícias não se aplicam');
-  else if(used<st.extra)B(`Faltam <b>${st.extra-used}</b> perícia(s) extra(s) (você usou ${used} de ${st.extra}).`,G('skills','#extraSkillsLabel'));
-  else if(used>st.extra)B(`Você marcou <b>${used-st.extra}</b> perícia(s) extra(s) a mais que o limite (${st.extra}).`,G('skills','#extraSkillsLabel'));
-  else O(`Perícias extras: ${used}/${st.extra}`);
+  else if(used<lim)B(`Faltam <b>${lim-used}</b> perícia(s) extra(s) (você usou ${used} de ${lim}).`,G('skills','#extraSkillsLabel'));
+  else if(used>lim)B(`Você marcou <b>${used-lim}</b> perícia(s) extra(s) a mais que o limite (${lim}).`,G('skills','#extraSkillsLabel'));
+  else O(`Perícias extras: ${used}/${lim}`);
   if(d.stage>=3&&!(d.awakened===true||(d.awakened==null&&!!d.track)||d.freeMode))O('Ainda não <b>despertou</b>: segue subindo de Estágio sem Trilha até o ✨ Despertar acontecer na história.');
   else if(d.stage>=3){
     if(!d.archetype)B('Você está no Estágio 3+ e ainda não escolheu <b>arquétipo</b>.',G('track','#archSelect'));
@@ -125,7 +125,7 @@ function reviewSheet(){
   }
   const qw=E.quickWeapons(d);
   if(!qw.length)B('Sem arma pronta: seus ataques serão no <b>soco (1d2)</b>.',G('inventory','#addList'));else O(`Armas prontas: ${qw.map(i=>esc(i.name)).join(', ')}`);
-  const di=E.defenseInfo(d);if(di.equip<=0)B('Nenhuma <b>proteção</b> vestida: Defesa 10, sem bloqueio.',G('inventory','#invBody'));else O(`Defesa (DF): <b>${di.DF}</b>`);
+  const di=E.defenseInfo(d);if(di.equip<=0)B(`Nenhuma <b>proteção</b> vestida: Defesa ${di.DF}, sem bloqueio.`,G('inventory','#invBody'));else O(`Defesa (DF): <b>${di.DF}</b>`);
   const ci=E.cargaInfo(d);if(ci.level>0)B(`Você está <b>${ci.label}</b> (${ci.carga}/${ci.limit} de carga).`,G('inventory','#invBody'));
   if((d.statuses||[]).length)B(`Estados ativos: ${d.statuses.map(s=>esc(STATUS_BY_ID[s.id]?.name||s.id)).join(', ')}.`,G('states','#stActive'));
   if(d.collapsePending)B('Há um <b>Protocolo de Colapso</b> pendente.',G('mind','#mindBody'));
