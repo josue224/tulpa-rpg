@@ -99,7 +99,9 @@ E.addSrc=(m,def,label)=>{
 E.hasEffect=(d,name)=>(d.activeEffects||[]).some(e=>e.name===name);
 E.computeMods=d=>{
   const m=E.newMods();
-  (d.statuses||[]).forEach(s=>E.addSrc(m,C.STATUS_BY_ID[s.id],C.STATUS_BY_ID[s.id]?.name||s.id));
+  /* Exaustão (estado Exausto e carga Sobrecarregada): a vertente de Fôlego multiplica a penalidade física (valor lido do efeito) */
+  let exaust=0;
+  (d.statuses||[]).forEach(s=>{E.addSrc(m,C.STATUS_BY_ID[s.id],C.STATUS_BY_ID[s.id]?.name||s.id);if(s.id==='exausto')exaust+=Number(C.STATUS_BY_ID.exausto?.physDice)||0});
   (d.traumas||[]).forEach(t=>E.addSrc(m,C.TRAUMA_BY_ID[t.id],'Trauma: '+(C.TRAUMA_BY_ID[t.id]?.name||t.id)));
   if(d.extase?.on&&d.extase.bonus)E.addSrc(m,C.EXTASE_BY_ID[d.extase.bonus],'Êxtase: '+C.EXTASE_BY_ID[d.extase.bonus]?.name);
   const pl=Number(d.penaltyLevel)||0;
@@ -107,11 +109,12 @@ E.computeMods=d=>{
   const ignore=E.hasEffect(d,'Força do Cotidiano');
   const load=E.cargaInfo(d,ignore);
   if(load.level===1)E.addSrc(m,{skillDice:Object.fromEntries(C.AGILITY_SKILLS.map(s=>[s,-1])),defense:-2},'Carga: Pesado');
-  if(load.level===2)E.addSrc(m,{physDice:-1,skillDice:{'Esquiva':-2,'Reflexo':-2},defense:-5,flags:['semCorrer','semSaltar']},'Carga: Sobrecarregado');
+  if(load.level===2){E.addSrc(m,{physDice:-1,skillDice:{'Esquiva':-2,'Reflexo':-2},defense:-5,flags:['semCorrer','semSaltar']},'Carga: Sobrecarregado');exaust+=-1}
   if(load.level===3)E.addSrc(m,{defense:-5,flags:['semAtacar','semEsquivar','semMover']},'Carga: Imobilizado');
   (d.activeEffects||[]).forEach(e=>{
     E.addSrc(m,{defense:+e.defense||0,atk:+e.atk||0,dodge:+e.dodge||0,dmg:+e.dmg||0,dmgDice:+e.dmgDice||0,resist:+e.resist||0,attrDice:e.attrDice,skillDice:e.skillDice,flags:e.flags},e.name);
   });
+  if(exaust<0&&E.exhaustionFactor){const f=E.exhaustionFactor(d);if(f<1){const novo=-Math.floor(-exaust*f);m.physDice+=novo-exaust;m.sources.push('Fôlego: Exaustão reduzida')}}
   return m;
 };
 E.attrOf=(skill,SKILL_ATTR)=>SKILL_ATTR[skill];
@@ -536,6 +539,37 @@ E.healBonus=(d,alvo)=>E.vertSum(d,'cura',{alvo});
 E.healDice=(d,alvo)=>E.vertEffects(d,'cura',{alvo}).filter(x=>x.effect.dado).map(x=>({dado:x.effect.dado,nome:x.def.name}));
 /* apoio de um aliado especialista na Trégua: o valor está na própria vertente */
 E.supportBonus=()=>Math.max(0,...E.vertDefs().flatMap(v=>(v.effects||[]).filter(e=>e.tipo==='cura'&&e.alvo==='lucidez').map(e=>Number(e.valor)||0)));
+
+/* ---------- Automação das vertentes utilitárias (Onda 4) ---------- */
+/* multiplicador de uma vertente treinada (efeito "multiplicador"): o menor vale para reduções, o maior para ganhos; 1 = sem efeito */
+E.vertMult=(d,alvo,modo)=>{const v=E.vertEffects(d,'multiplicador',{alvo}).map(x=>Number(x.effect.valor)).filter(n=>n>0);
+  if(!v.length)return 1;return modo==='min'?Math.min(...v):Math.max(...v)};
+E.exhaustionFactor=d=>E.vertMult(d,'penalidadeExaustao','min');
+/* apneia: rodadas = (base + CON × por ponto) × multiplicador (Fôlego); seg = rodadas × duração da rodada */
+E.apneia=d=>{const base=E.regra('apneiaBase')+E.attr(d,'Constituição')*E.regra('apneiaPorCon'),mult=E.vertMult(d,'apneia'),rodadas=Math.max(0,Math.floor(base*mult));
+  return{base,mult,rodadas,seg:rodadas*E.regra('rodadaSeg')}};
+/* tempo de busca com Varredura de Cena (minutos → minutos, arredondado para cima) */
+E.searchTime=(d,min)=>{const n=Math.max(0,Number(min)||0),mult=E.vertMult(d,'tempoBusca','min');return{mult,min:Math.ceil(n*mult)}};
+/* +d20 contextual de uma vertente numa situação (não acumula: vale o maior) */
+E.contextDice=(d,id,quando)=>Math.max(0,...E.vertEffects(d,'dados',{vert:id,quando}).map(x=>Number(x.effect.valor)||0));
+/* situações "+dados" que a ação já cobre sozinha (o botão da ficha aplica o dado, sem o jogador marcar) */
+E.contextList=(d,id)=>[...new Set(E.vertEffects(d,'dados',{vert:id}).filter(x=>Number(x.effect.valor)>0).map(x=>x.effect.quando).filter(Boolean))];
+/* a vertente permite agir sem alarme? (trancas e sistemas): a rolagem pode ser silenciosa */
+E.SILENT_ACOES=['trancaSilenciosa','invadirSemAlerta'];
+E.silentVert=(d,id)=>E.vertEffects(d,'permite',{vert:id}).some(x=>E.SILENT_ACOES.includes(x.effect.acao));
+E.vertBlocks=(d,acao)=>E.vertEffects(d,'bloqueia').some(x=>x.effect.acao===acao);
+/* barricada: DT = base + efeito "dt" da vertente treinada (alvo 'barricada' ou 'coberturaImprovisada') */
+E.barricadeKinds={porta:'barricada',cobertura:'coberturaImprovisada'};
+E.barricadeDT=(d,kind)=>E.regra('barricadaDT')+E.vertSum(d,'dt',{alvo:E.barricadeKinds[kind]||'barricada'});
+E.BAR_MAX=40;
+E.barAt=(list,map,kind,ref)=>(Array.isArray(list)?list:[]).find(b=>b&&b.map===map&&b.kind===kind&&(kind==='porta'?b.wall===ref:(b.x===ref?.x&&b.y===ref?.y)));
+E.barPrune=list=>(Array.isArray(list)?list:[]).filter(b=>b&&typeof b==='object'&&b.id&&b.map&&(b.kind==='porta'?b.wall:Number.isFinite(b.x)&&Number.isFinite(b.y))).slice(-E.BAR_MAX);
+/* autópsia: achados revelados = 0 abaixo da DT; 1 na DT e +1 a cada passo de margem (máximo = nº de achados) */
+E.AUTOPSY_FINDS=['Hora da morte','Calibre ou arma','Substâncias no corpo','Anomalias'];
+E.autopsy=(total,dt,passo,n)=>{const max=n||E.AUTOPSY_FINDS.length;if(!(total>=dt))return 0;return Math.min(max,1+Math.floor((total-dt)/Math.max(1,passo||1)))};
+/* Psiquiatria: Lucidez devolvida (efeito "cura" de alvo lucidez); nunca cura Vital (efeito "bloqueia curarVital") */
+E.psychSupport=d=>({luc:E.healBonus(d,'lucidez'),noVital:E.vertBlocks(d,'curarVital'),dt:E.regra('psiquiatriaDT')});
+E.SURTO_STATUS=['ansioso','tenso','amedrontado','confuso','emotivo','apatia'];
 
 /* ---------- Treinar, escolher e remover (alteram d; devolvem {ok,msg}) ---------- */
 /* Perícia antiga esperando vertente na mesma perícia (prefere a perícia da própria vertente) */

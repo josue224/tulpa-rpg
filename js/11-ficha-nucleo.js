@@ -92,10 +92,13 @@ rollSkill=function(skill,attr,opts={}){
   if(pre.blocked){toast('Essa especialização exige treino específico.');return null}
   const soc=T3.socialTake?.(pre.skill),r=doRoll(ch,skill,{attr,vert:opts.vert,generalista:opts.generalista,extraBonus:soc?.bonus||0,extraDice:opts.extraDice||0});
   const label=opts.label||r.calc.skill;
-  consumeOnce(data,r.calc);save();renderTalents();renderSkills();rollModal(label,r,[soc?.bonus?`Bônus social: +${soc.bonus} ${soc.attr} (${soc.motivo})`:'',opts.extraDice?`Situação da especialização: +${opts.extraDice}d20`:''].filter(Boolean).join(' · '));
+  consumeOnce(data,r.calc);save();renderTalents();renderSkills();rollModal(label,r,[soc?.bonus?`Bônus social: +${soc.bonus} ${soc.attr} (${soc.motivo})`:'',opts.extraDice?`Situação da especialização: +${opts.extraDice}d20`:'',opts.silent?'Rolagem silenciosa: não avisa a mesa':''].filter(Boolean).join(' · '));
   window.tulpaRollFx?window.tulpaRollFx($('modalBody'),{d20:true,crit:r.best===20,fumble:r.best===1,who:[data.name]}):fx3('dice');
-  T3.shareSheetRoll?.(label,r);
-  T3.narrateRoll?T3.narrateRoll({name:data.name,skill:label,dice:[r.best],total:r.total}):T3.perseusReact?.(r.best===20?'nat20':(r.best===1?'nat1':''));
+  /* rolagem silenciosa (trancas e sistemas sem alarme): o resultado fica só na tela de quem rolou, sem aviso no histórico da mesa */
+  if(!opts.silent){
+    T3.shareSheetRoll?.(label,r);
+    T3.narrateRoll?T3.narrateRoll({name:data.name,skill:label,dice:[r.best],total:r.total}):T3.perseusReact?.(r.best===20?'nat20':(r.best===1?'nat1':''));
+  }
   return r;
 };
 

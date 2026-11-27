@@ -91,8 +91,8 @@ const VERT_DEFS=(()=>{
     [permite('estancarSangramentoGrave'),permite('estabilizarEmUmaAcao'),{tipo:'cura',alvo:'sutura',valor:2}]);
   V('medicina','cirurgia','Cirurgia & Clínica Avançada',[INT],'Remove projéteis e venenos profundos; na Trégua, trata críticos restaurando +1d4 de Vital sem suprimentos adicionais.',
     [permite('removerProjeteisEVenenos'),{tipo:'cura',alvo:'criticoTregua',dado:'1d4'}],{requiresTraining:true});
-  V('medicina','forense','Perícia Forense & Autópsia',[INT,PER],'Determina hora da morte, calibre, substâncias e anomalias em cadáveres sem laboratório completo.',
-    [permite('autopsiaSemLaboratorio')]);
+  V('medicina','forense','Perícia Forense & Autópsia',[INT,PER],'Determina hora da morte, calibre, substâncias e anomalias em cadáveres sem laboratório completo; +1d20 no laudo (ação Autópsia na ficha).',
+    [permite('autopsiaSemLaboratorio'),dados('autopsia')]);
   V('medicina','psiquiatria','Psiquiatria & Apoio Psicológico',[PRE,CAR],'Estabiliza surtos e restaura +2 de Lucidez extra; não cura Vital.',
     [permite('estabilizarSurto'),{tipo:'cura',alvo:'lucidez',valor:2},{tipo:'bloqueia',acao:'curarVital'}]);
 
@@ -103,67 +103,67 @@ const VERT_DEFS=(()=>{
 
   V('seguranca','arrombamento','Arrombamento & Mecânica',[DES,INT],'Abre trancas comuns em silêncio; +1d20 para desarmar armadilhas mecânicas.',
     [permite('trancaSilenciosa'),dados('desarmarArmadilha')]);
-  V('seguranca','eletronica','Sistemas Eletrônicos & Vigilância',[INT],'Grampeia, sabota circuitos e invade sistemas dos anos 90 sem acionar alertas.',
-    [permite('invadirSemAlerta'),permite('grampearESabotar')]);
+  V('seguranca','eletronica','Sistemas Eletrônicos & Vigilância',[INT],'Grampeia, sabota circuitos e invade sistemas dos anos 90 sem acionar alertas; +1d20 em armadilhas e sistemas eletrônicos.',
+    [permite('invadirSemAlerta'),permite('grampearESabotar'),dados('armadilhaEletronica')]);
   V('seguranca','fortificacao','Fortificação & Barricadas',[FOR,INT],'+2 de resistência/DT em portas barricadas e coberturas improvisadas.',
     [{tipo:'dt',alvo:'barricada',valor:2},{tipo:'dt',alvo:'coberturaImprovisada',valor:2}]);
 
   V('conducao','terrestres','Veículos Terrestres',[DES],'+1d20 em manobras evasivas, perseguições e cobertura móvel.',
     [dados('manobraEvasiva'),dados('perseguicao'),dados('coberturaMovel')]);
-  V('conducao','embarcacoes','Embarcações',[PER],'Navegação marítima e fluvial, inclusive com mau tempo.',
-    [permite('navegar')]);
-  V('conducao','aeronaves','Aeronaves',[INT,DES],'Decolagem, pouso e voo por instrumentos.',
-    [permite('pilotarAeronave')],{requiresTraining:true});
-  V('conducao','submersiveis','Veículos Submersíveis / Pesados Especiais',[INT],'Sonar, pressão e maquinário pesado.',
-    [permite('operarSubmersivelPesado')],{requiresTraining:true});
+  V('conducao','embarcacoes','Embarcações',[PER],'Navegação marítima e fluvial, inclusive com mau tempo; +1d20 em manobras evasivas.',
+    [permite('navegar'),dados('manobraEvasiva')]);
+  V('conducao','aeronaves','Aeronaves',[INT,DES],'Decolagem, pouso e voo por instrumentos; +1d20 em manobras evasivas. Exige treino específico.',
+    [permite('pilotarAeronave'),dados('manobraEvasiva')],{requiresTraining:true});
+  V('conducao','submersiveis','Veículos Submersíveis / Pesados Especiais',[INT],'Sonar, pressão e maquinário pesado; +1d20 em manobras evasivas. Exige treino específico.',
+    [permite('operarSubmersivelPesado'),dados('manobraEvasiva')],{requiresTraining:true});
 
-  V('sobrevivencia','rastreamento','Rastreamento & Caça',[PER],'Pegadas, criaturas, emboscadas naturais, água e comida.',
-    [permite('rastrearECacar')]);
-  V('sobrevivencia','orientacao','Orientação & Abrigo',[INT,PER],'Navegação sem GPS, leitura do clima e acampamento oculto.',
-    [permite('orientarEAbrigar')]);
-  V('sobrevivencia','ambiental','Resistência Ambiental',[CON],'Selva, extremos térmicos, doenças e privação sem penalidade severa.',
-    [ignora('privacaoSevera')]);
+  V('sobrevivencia','rastreamento','Rastreamento & Caça',[PER],'Pegadas, criaturas, emboscadas naturais, água e comida; +1d20 ao rastrear ou caçar.',
+    [permite('rastrearECacar'),dados('rastrear')]);
+  V('sobrevivencia','orientacao','Orientação & Abrigo',[INT,PER],'Navegação sem GPS, leitura do clima e acampamento oculto; +1d20 para se orientar ou abrigar.',
+    [permite('orientarEAbrigar'),dados('orientar')]);
+  V('sobrevivencia','ambiental','Resistência Ambiental',[CON],'Selva, extremos térmicos, doenças e privação sem penalidade severa; +1d20 contra clima ou privação extrema.',
+    [ignora('privacaoSevera'),dados('climaExtremo')]);
 
   /* ---------- Social, Mental & Oculto ---------- */
   V('intimidacao','coercao','Coerção Física',[FOR],'+1d20 estando armado ou em vantagem física.',
     [dados('armadoOuVantagemFisica')]);
-  V('intimidacao','pressao','Pressão Psicológica',[PRE],'Frieza, autoridade ou chantagem à distância ou em desvantagem.',
-    [permite('intimidarEmDesvantagem')]);
+  V('intimidacao','pressao','Pressão Psicológica',[PRE],'Frieza, autoridade ou chantagem à distância ou em desvantagem; +1d20 nessas situações.',
+    [permite('intimidarEmDesvantagem'),dados('intimidarEmDesvantagem')]);
 
   V('intuicao','leitura','Leitura Fria & Detecção de Mentiras',[PER],'+1d20 para detectar mentiras, intenções ou armas ocultas.',
     [dados('detectarMentira'),dados('intencaoOuArmaOculta')]);
-  V('intuicao','empatia','Empatia & Leitura Emocional',[CAR],'Identifica traumas, motivações e a melhor abordagem.',
-    [permite('lerTraumasEMotivacoes')]);
+  V('intuicao','empatia','Empatia & Leitura Emocional',[CAR],'Identifica traumas, motivações e a melhor abordagem; +1d20 para ler emoções.',
+    [permite('lerTraumasEMotivacoes'),dados('lerEmocoes')]);
 
   V('lideranca','comando','Comando Tático',[PRE],'1 vez por cena, com 1 Ação de Movimento, concede +1d20 no próximo teste de um aliado que ouça.',
     [{tipo:'conceder',alvo:'aliado',valor:1,custo:'movimento',limite:'cena'}]);
   V('lideranca','inspiracao','Inspiração & Moral',[CAR],'+1d20 ao grupo em resistência ao medo ou negociação coletiva.',
     [{...dados('resistirMedo'),alvo:'grupo'},{...dados('negociacaoColetiva'),alvo:'grupo'}]);
 
-  V('persuasao','negociacao','Negociação & Submundo',[CAR],'Barganha, suborno e lábia de rua: reduz preços e evita escalada.',
-    [permite('barganharESubornar'),permite('evitarEscalada')]);
+  V('persuasao','negociacao','Negociação & Submundo',[CAR],'Barganha, suborno e lábia de rua: reduz preços e evita escalada; +1d20 ao barganhar ou subornar.',
+    [permite('barganharESubornar'),permite('evitarEscalada'),dados('barganha')]);
   V('persuasao','sociedade','Alta Sociedade & Protocolo',[APA,CAR],'+1d20 com autoridades, políticos, empresários e elite.',
     [dados('elite')],{skill:'Etiqueta'});
 
-  V('enganacao','blefe','Blefe & Improviso',[CAR],'Mentiras rápidas e manipulação verbal.',
-    [permite('blefar')]);
-  V('enganacao','disfarce','Disfarce & Infiltração',[APA,DES],'Muda aparência, postura, sotaque e documentos.',
-    [permite('disfarcar')]);
+  V('enganacao','blefe','Blefe & Improviso',[CAR],'Mentiras rápidas e manipulação verbal; +1d20 em blefes e improvisos.',
+    [permite('blefar'),dados('blefe')]);
+  V('enganacao','disfarce','Disfarce & Infiltração',[APA,DES],'Muda aparência, postura, sotaque e documentos; +1d20 ao disfarçar-se ou infiltrar-se.',
+    [permite('disfarcar'),dados('disfarce')]);
 
-  V('furtividade','urbana','Infiltração Urbana & Sombras',[DES],'Silêncio em prédios, corredores e multidões.',
-    [permite('silencioUrbano')]);
-  V('furtividade','camuflagem','Camuflagem & Emboscada',[PER,DES],'Oculta-se em vegetação ou escombros e prepara surpresas.',
-    [permite('camuflarEEmboscar')]);
+  V('furtividade','urbana','Infiltração Urbana & Sombras',[DES],'Silêncio em prédios, corredores e multidões; +1d20 nessas situações.',
+    [permite('silencioUrbano'),dados('silencioUrbano')]);
+  V('furtividade','camuflagem','Camuflagem & Emboscada',[PER,DES],'Oculta-se em vegetação ou escombros e prepara surpresas; +1d20 ao se camuflar ou emboscar.',
+    [permite('camuflarEEmboscar'),dados('camuflagem')]);
 
-  V('resistencia','vigor','Vigor Físico',[CON],'Venenos, toxinas, doenças, dor, sufocamento e fadiga.',
-    [permite('resistirFisico')]);
-  V('resistencia','firmeza','Firmeza Mental',[PRE],'Medo, terror sobrenatural, controle mental, tortura e Fogo de Supressão.',
-    [permite('resistirMental'),permite('resistirSupressao')]);
+  V('resistencia','vigor','Vigor Físico',[CON],'Venenos, toxinas, doenças, dor, sufocamento e fadiga; +1d20 nessas resistências.',
+    [permite('resistirFisico'),dados('resistirFisico')]);
+  V('resistencia','firmeza','Firmeza Mental',[PRE],'Medo, terror sobrenatural, controle mental, tortura e Fogo de Supressão; +1d20 contra medo e controle mental.',
+    [permite('resistirMental'),permite('resistirSupressao'),dados('resistirMental')]);
 
-  V('teosofia','estudo','Estudo Oculto & Sigilos',[INT],'Textos antigos, idiomas mortos, cultos e teoria das anomalias.',
-    [permite('estudarOculto')]);
-  V('teosofia','canalizacao','Sensibilidade & Canalização',[PRE],'Sente Aura e interferências e canaliza Essência.',
-    [permite('sentirAura'),permite('canalizarEssencia')]);
+  V('teosofia','estudo','Estudo Oculto & Sigilos',[INT],'Textos antigos, idiomas mortos, cultos e teoria das anomalias; +1d20 ao estudar textos ocultos.',
+    [permite('estudarOculto'),dados('estudarOculto')]);
+  V('teosofia','canalizacao','Sensibilidade & Canalização',[PRE],'Sente Aura e interferências e canaliza Essência; +1d20 ao sentir Aura ou canalizar.',
+    [permite('sentirAura'),permite('canalizarEssencia'),dados('canalizar')]);
 
   return out;
 })();
@@ -237,6 +237,13 @@ const REGRA_DEFS=(()=>{
   R('mergulhoM','Tiroteio Tático','Mergulho: deslocamento máximo (m)',3,0,12,{step:0.5});
 
   R('generalistaDiv','Perícias','Generalista (fora da especialização): o grau é dividido por',2,1,5,{who:'vertente'});
+  R('rodadaSeg','Perícias','Duração de uma rodada (segundos), para o cronômetro de apneia',6,1,60,{who:'vertente'});
+  R('apneiaBase','Perícias','Apneia: rodadas sem respirar, base',3,0,60,{who:'vertente'});
+  R('apneiaPorCon','Perícias','Apneia: rodadas a mais por ponto de CON',1,0,10,{who:'vertente'});
+  R('barricadaDT','Perícias','Barricada (porta ou cobertura): DT base para forçar ou derrubar',10,1,40);
+  R('autopsiaDT','Perícias','Autópsia: DT para o 1º achado',12,1,40,{who:'medicina'});
+  R('autopsiaPasso','Perícias','Autópsia: margem acima da DT para cada achado a mais',4,1,20,{who:'medicina'});
+  R('psiquiatriaDT','Perícias','Psiquiatria: DT para estabilizar um surto',12,1,40,{who:'medicina'});
 
   R('suturaDT','Medicina de Campo','Sutura Bruta: DT',15,1,40,{who:'medicina'});
   R('sinteseDT','Medicina de Campo','Síntese Cirúrgica: DT',15,1,40,{who:'medicina'});
@@ -258,6 +265,10 @@ const QUANDO_LABEL={
   negociacaoColetiva:'negociação coletiva',elite:'autoridades e elite',
   desarmado:'desarmado',queimaRoupa:'queima-roupa',alcanceMedioLongo:'médio e longo alcance',superaDF:'ao superar a DF',
   corpoACorpo:'corpo a corpo',arremesso:'arremesso',alvoAgarradoCaido:'alvo Agarrado e Caído',
-  contraArmaBrancaCurta:'contra armas brancas curtas',privacaoSevera:'privação severa'
+  contraArmaBrancaCurta:'contra armas brancas curtas',privacaoSevera:'privação severa',
+  armadilhaEletronica:'armadilha ou sistema eletrônico',rastrear:'rastrear ou caçar',orientar:'orientar-se ou abrigar-se',climaExtremo:'clima ou privação extrema',
+  intimidarEmDesvantagem:'intimidar à distância ou em desvantagem',lerEmocoes:'ler emoções ou traumas',barganha:'barganhar ou subornar',blefe:'blefe ou improviso',
+  disfarce:'disfarce ou infiltração',silencioUrbano:'silêncio em prédios e multidões',camuflagem:'camuflagem ou emboscada',resistirFisico:'resistir a veneno, dor ou fadiga',
+  resistirMental:'resistir a medo ou controle mental',estudarOculto:'estudar textos ocultos',canalizar:'sentir Aura ou canalizar',autopsia:'laudo de autópsia'
 };
 const QUANDO_AUTO=['contraAtaque','desarmar','empurrar','derrubar','agarrar','escapar','supressao','armaImprovisada','bloqueioArma'];

@@ -49,7 +49,11 @@ const MAN31=[
  ]},
  {id:'c1.8',h:'1.8 Vertentes: Combate & Ação Física',b:[{live:'verts',grupo:'Combate & Ação Física'}]},
  {id:'c1.9',h:'1.9 Vertentes: Ciência, Técnica & Campo',b:[{live:'verts',grupo:'Ciência, Técnica & Campo'}]},
- {id:'c1.10',h:'1.10 Vertentes: Social, Mental & Oculto',b:[{live:'verts',grupo:'Social, Mental & Oculto'}]}
+ {id:'c1.10',h:'1.10 Vertentes: Social, Mental & Oculto',b:[{live:'verts',grupo:'Social, Mental & Oculto'}]},
+ {id:'c1.11',h:'1.11 Ações das Especializações (ficha e mapa)',b:[
+  ['c1.11.p1','Toda vertente tem ao menos um gatilho que o sistema aplica: o **+d20 da situação** (marque a opção na ficha ou na Mesa, sem acumular na mesma vertente), uma **ação dedicada** (aba Perícias › Especializações) ou um efeito automático em combate. Os valores vêm da própria vertente e das regras da mesa, e o Mestre pode editá-los pela central ⚙️.'],
+  ['c1.11.l1','- **Fôlego & Resistência Física:** a apneia dura **{{r:apneiaBase}} + {{r:apneiaPorCon}} por ponto de CON** rodadas, multiplicadas pelo Fôlego (cada rodada = {{r:rodadaSeg}} s; há um cronômetro na ficha), e a penalidade física de Exaustão (estado Exausto ou Sobrecarregado) é multiplicada pelo valor da vertente, arredondando a penalidade para baixo.\n- **Varredura de Cena:** a calculadora da ficha mostra o tempo de busca já reduzido.\n- **Arrombamento & Mecânica e Sistemas Eletrônicos:** botões de tranca, sistema e armadilha com o +d20 da situação já incluído; trancas e sistemas aceitam **rolagem silenciosa** (não avisa a mesa nem entra no histórico).\n- **Condução:** cada classe de veículo mostra se você está treinado, generalista ou **bloqueado**: veículos que exigem treino específico (aeronaves, submersíveis) nunca aceitam o generalista (grau ÷{{r:generalistaDiv}}). Manobras evasivas e cobertura móvel somam o +d20 da vertente treinada.\n- **Perícia Forense & Autópsia:** o laudo rola contra a **DT {{r:autopsiaDT}}**; cada **{{r:autopsiaPasso}}** pontos de margem revelam mais um achado (hora da morte, calibre ou arma, substâncias, anomalias).\n- **Cirurgia & Clínica Avançada:** a Síntese Cirúrgica na Trégua oferece o dado extra de Vital para paciente crítico.\n- **Psiquiatria & Apoio Psicológico:** estabilizar um surto exige sucesso contra a **DT {{r:psiquiatriaDT}}**, devolve Lucidez ao aliado e acalma uma condição mental passageira. Nunca cura Vital. Em combate gasta a Ação Padrão.\n- **Comando Tático e Inspiração:** o bônus concedido a aliados fica no botão da própria vertente (Comando Tático: 1 vez por cena).']
+ ]}
 ]},
 {id:'c2',h:'2. Catálogo de Vocações',secs:[
  {id:'c2.0',h:'',b:[
@@ -143,6 +147,9 @@ const MAN31=[
  {id:'c5.16',h:'5.16 Condições de Combate',b:[{live:'condicoes'}]},
  {id:'c5.17',h:'5.17 Itens Caídos no Mapa',b:[
   ['c5.17.l1','- **Cair:** quem é desarmado solta a arma na célula livre adjacente mais próxima (até 1,5 m); sem célula livre, ela cai aos pés. Sem token no mapa, o item fica **Largado** na ficha.\n- **Largar:** ação livre no próprio turno.\n- **Pegar Item (1 Ação):** qualquer personagem a até 1 célula (1,5 m) pode pegar; o item vai para o inventário dele, com dano e munição preservados.\n- O Mestre pode devolver o item ao dono.']
+ ]},
+ {id:'c5.18',h:'5.18 Fortificação e Barricadas',b:[
+  ['c5.18.l1','- **Barricar:** no menu do token, **Barricar ou forçar**. Uma porta fechada ao lado ou a célula livre à frente do token ganha uma barricada. Em combate gasta a **Ação Padrão**, só no seu turno; fora dele é livre.\n- **DT:** a base da mesa ({{r:barricadaDT}}) mais o bônus da especialização **Fortificação & Barricadas** (valor editável).\n- **Porta barricada:** não abre sem forçar. Força + Atletismo contra a DT derruba a barricada (gasta a Ação Padrão em combate); inimigos em patrulha não abrem portas barricadas.\n- **Cobertura improvisada:** fica marcada com a DT para ser derrubada; vale como cobertura parcial se o Mestre aplicar no contexto do tiro.\n- **Quem decide:** só o aparelho do Mestre grava as barricadas; o jogador pede e o Mestre confirma, como nos itens caídos.']
  ]}
 ]},
 {id:'c6',h:'6. Sobrevivência, Medicina e Cenas de Trégua',secs:[

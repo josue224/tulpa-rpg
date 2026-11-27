@@ -763,5 +763,10 @@ function subelPanel29(){
 /* o painel antigo do Mestre sai da ficha */
 try{$('masterPanel')?.classList.add('hide')}catch(e){}
 try{base29()}catch(e){console.warn('[T29] base',e)}
+/* Perseus (Onda 4): alterações recentes do Mestre e a revisão das regras, para o conhecimento e o prompt da IA */
+T3.rulesLog29=(n=8)=>(rules29().log||[]).slice(0,n).map(e=>({at:e.at,kind:KIND29[e.kind]||e.kind,label:String(e.label||e.key||''),add:!!e.add,del:!!e.del,
+  changes:(e.changes||[]).slice(0,4).map(([f,a,b])=>`${f}: ${a??'—'} → ${b??'—'}`)}));
+T3.rulesRev29=()=>Number(R29.rules?.rev)||0;
+T3.rulesTable29=()=>{const t=rules29().table||{};return{move:T3.moveBase(),dtThrow:Number(t.dtThrow)>0?Number(t.dtThrow):12,dtStealth:Number(t.dtStealth)||0}};
 console.info('[Tulpa] Etapa 29 carregada');
 

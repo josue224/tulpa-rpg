@@ -31,7 +31,7 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
          → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos) → css/19 (Manual: regras)
          → js/09 → js/09b → js/10 … js/28 → js/32 → js/33 → js/35 … js/49 → js/60b (App Shell) → js/60c (Fichas) → js/60d (carregador) → js/60e (filtros Arcade)
-         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/61   (61 = inicialização, sempre por último)
+         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/60n (Ações das especializações) → js/60o (Barricadas) → js/61   (61 = inicialização, sempre por último)
 
 Sob demanda (sem <script>; QUEUE do js/60d, nesta ordem, na 1ª abertura do Arcade):
          js/60f (motor gráfico) → js/29 → js/30 → js/31 → js/34 → js/50 → js/51 → … → js/60
@@ -65,6 +65,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 20 | `20-sync-status.css` | novo | 1 KB | **Onda 1**: indicador de sincronização (`.sync60`), ponto cheio/anel/riscado conforme o estado. |
 | 21 | `21-mapa-guia.css` | novo | 1 KB | **Onda 2**: guia sobre o mapa em branco (`.map-guide20`) e altura mínima do `#mapStage`. |
 | 22 | `22-polish-pro.css` | novo | 12 KB | **Onda 3 · Polimento profissional**: tokens `--mo-*` (em `body`), entradas só com transform/opacity, hover/foco, alvos de 44 px no celular, hierarquia de rótulos e barras, e as atmosferas por família (`--fam` em `body::after`, `#aeTex` atrás do conteúdo, grão de painel em `--ae-fill` sem vidro). |
+| 23 | `23-vertentes-acoes.css` | novo | 2 KB | **Onda 4**: cartões `.vta-*` do painel Ações das especializações e `.bar-opts`/`.bar-row` do menu de barricadas. Só estrutura (cores e raios vêm da estética). |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
@@ -149,6 +150,8 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60k | `60k-manual-regras.js` | novo | 9 KB | **Onda 13**: componentes vivos do Manual (`LIVE31.attrs/verts/bloqueio/manobras/tiro/cobertura/condicoes`) e `T3.vertGrant` (+d20 concedido a aliados). |
 | 60l | `60l-sync-status.js` | novo | 7 KB | **Onda 1**: reconexão com espera dos canais da mesa/campanha, conferência leve (`updated_at` de `state`/`rules`/`manual`) ao voltar foco/rede, reserva de 25 s só com o tempo real caído, ressincronização e indicador "Sincronizado/Reconectando/Offline". IIFE; usa `T3.mesaResub/mesaResync`, `tulpaResubCampaign`, `tulpaResyncCharacters`; `T3.syncStatus()` para depurar. |
 | 60m | `60m-mapa-base.js` | novo | 9 KB | **Onda 2** (IIFE): `T3.mapBlank20` (grade com coordenadas, escala e luz ambiente quando não há imagem de mapa), guia do Mestre/jogador (`T3.mapGuide20`), `T3.fogHalo20` (halo mínimo na névoa) e rede de segurança que remonta/redimensiona o canvas. Chamado pelo `mapPaint7` do `js/21`. |
+| 60n | `60n-vertentes-acoes.js` | novo | 18 KB | **Onda 4** (IIFE): painel **Ações das especializações** na aba Especializações (`#vtTools`, desenhado depois de `renderSkills`): Fôlego (cronômetro de apneia e Exaustão), Varredura de Cena, Segurança (+d20 por situação e rolagem silenciosa), Condução (checagem de treino por veículo), Perícia Forense (autópsia, checklist em `d.autopsia`), Cirurgia (atalho da Síntese) e Psiquiatria (`psiq`: `luc` e remoção de condição mental, nunca Vital). `T3.vta60n` para depurar. Nenhum número fixo: tudo vem de `E.*`. |
+| 60o | `60o-barricadas.js` | novo | 14 KB | **Onda 4** (IIFE): barricadas no mapa. Livro `M6.state.barricades` + `barDone` (só o Mestre grava); jogador pede por `barreq` (op `set` ou `break`) e o Mestre responde `barres` em `campaign_rolls`; DT por `E.barricadeDT`; envolve `doorUse10` (porta barricada pede Força + Atletismo), `enemyDoor23` (inimigo não abre), `paintOver10` (selo "DT n"), `mapMenu7` (botão Barricar ou forçar) e `processRow`. `T3.barricadas`, `T3.barricar(ch)`. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
@@ -174,6 +177,19 @@ Tudo é `E.*`, puro (sem DOM). `d` = dados da ficha. Funções marcadas com * al
 | Ficha | `E.migrateSheet(d)`* (idempotente; `d.regrasV=8`) |
 
 Ficha: `d.vertentes={id:{g,de?,livre?}}`, `d.vertLegado={períciaAntiga:id}`. `characterData._publico` marca cópia sem acesso à ficha (vale `df`/`vtMax`/`esMax` publicados).
+
+### Vertentes utilitárias (Onda 4)
+
+| Grupo | Chamada |
+|---|---|
+| Multiplicadores | `E.vertMult(d,alvo,'min'\|'max')` · `E.exhaustionFactor(d)` (usado por `E.computeMods`: reduz a penalidade física de Exausto e Sobrecarregado) · `E.apneia(d)` → `{base,mult,rodadas,seg}` · `E.searchTime(d,min)` |
+| Contexto | `E.contextDice(d,id,quando)` · `E.contextList(d,id)` · `E.silentVert(d,id)` (`E.SILENT_ACOES`) · `E.vertBlocks(d,acao)` |
+| Barricada | `E.barricadeDT(d,'porta'\|'cobertura')` · `E.barAt(lista,mapa,tipo,ref)` · `E.barPrune` · `E.BAR_MAX` · entrada `{id,map,kind,wall\|x,y,dt,by,byName,at}` |
+| Medicina | `E.autopsy(total,dt,passo)` · `E.AUTOPSY_FINDS` · `E.psychSupport(d)` → `{luc,noVital,dt}` · `E.SURTO_STATUS` |
+| Números novos (`REGRA_DEFS`) | `rodadaSeg` · `apneiaBase` · `apneiaPorCon` · `barricadaDT` · `autopsiaDT` · `autopsiaPasso` · `psiquiatriaDT` |
+| Perseus (`js/14`, `js/18`, `js/40`) | `rules14(texto)` (`{{r:id}}` `{{x:id}}` `{{carga}}` `{{comb}}` `{{attr:Nome}}`) · `allK14()` (base + `buildDyn14`) · `manualHits14` · `rulesBrief()` · `T3.rulesLog29(n)` · `T3.rulesTable29()` · `T3.rulesRev29()` |
+
+Transporte da barricada: `campaign_rolls`, `detail.cmb` `'barreq'` (jogador) e `'barres'` (Mestre). Sem SQL novo.
 
 ### Corpo a corpo (Onda 10)
 

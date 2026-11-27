@@ -54,7 +54,10 @@ const curView=()=>{const k=viewKey();return k.startsWith('sheet:')?k.slice(6):k.
 /* ---------- busca ---------- */
 function search(q){
   const nq=normP(q),qt=nq.split(' ').filter(w=>w&&!STOP.has(w));
-  return K.map(e=>{
+  /* base estática + entradas vivas (regras em vigor) + blocos do Manual casando com a pergunta */
+  const base=allK14();
+  const man=(()=>{try{return manualHits14(nq,qt)}catch(e){console.warn('[Perseus] manual',e);return[]}})();
+  return base.map(e=>{
     let sc=0;
     for(const k of e.nk){
       if(!k)continue;
@@ -66,7 +69,7 @@ function search(q){
     }
     for(const w of e.nt)if(qt.includes(w))sc+=1;
     return{e,sc};
-  }).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc);
+  }).filter(x=>x.sc>0).concat(man).sort((a,b)=>b.sc-a.sc);
 }
 const intentOf=nq=>({
   go:/\b(me leve|leva|levar|leve me|abre|abrir|abra|ir para|vai para|ir pra|onde fica|onde esta|onde encontro|mostra|mostre|aponta)\b/.test(nq),
@@ -80,12 +83,12 @@ function topicActions(e,{showSteps=false}={}){
   if(e.tour)b.push(actBtn('🧭 Passo a passo',{t:'tour',id:e.tour},true));
   if(e.go&&e.go[0])b.push(actBtn('📍 Me leve até lá',{t:'go',g:e.go[0]},!e.tour));
   if(e.steps&&!showSteps)b.push(actBtn('📋 Ver os passos',{t:'topic',id:e.id,steps:true}));
-  (e.rel||[]).slice(0,3).forEach(id=>{const r=K.find(x=>x.id===id);if(r)b.push(actBtn('↪ '+r.title,{t:'topic',id}))});
+  (e.rel||[]).slice(0,3).forEach(id=>{const r=allK14().find(x=>x.id===id);if(r)b.push(actBtn('↪ '+r.title,{t:'topic',id}))});
   return b.length?`<div class="pacts">${b.join('')}</div>`:'';
 }
 function topicHtml(e,{steps=false,opener=true}={}){
-  let h=(opener&&Math.random()<.4?rnd(V.open)+'<br>':'')+`<b>${e.title}</b><br>${e.a}`;
-  if(e.steps&&steps)h+=`<ol>${e.steps.map(s=>`<li>${s}</li>`).join('')}</ol>`;
+  let h=(opener&&Math.random()<.4?rnd(V.open)+'<br>':'')+`<b>${e.title}</b><br>${rules14(e.a)}`;
+  if(e.steps&&steps)h+=`<ol>${e.steps.map(s=>`<li>${rules14(s)}</li>`).join('')}</ol>`;
   return h+topicActions(e,{showSteps:steps});
 }
 function saveHist(){try{localStorage.setItem(PSKEY,JSON.stringify(PS.hist.slice(-40)))}catch(e){}}
@@ -144,7 +147,7 @@ function showCoach(){
   if(!T){c.classList.add('hide');return}
   const tour=TOURS[T.id],s=tour.steps[T.i],n=tour.steps.length;
   c.classList.remove('hide');
-  c.innerHTML=`<div class="coach-top"><span class="t3-catimg pav"></span><div class="grow"><small>🧭 ${esc(tour.title)} · passo ${T.i+1} de ${n}</small><b>${esc(s.h)}</b></div><button class="cx" data-pact='${esc(JSON.stringify({t:'tourend'}))}' title="Encerrar">✕</button></div><div class="coach-t">${s.t}</div><div class="coach-bar"><i style="width:${(T.i+1)/n*100}%"></i></div><div class="pacts">${T.i>0?actBtn('◀ Anterior',{t:'tourgo',d:-1}):''}${s.go?actBtn('📍 Me leve',{t:'go',g:s.go}):''}${T.i<n-1?actBtn('Próximo ▶',{t:'tourgo',d:1},true):actBtn('Concluir ✔',{t:'tourend',done:true},true)}${actBtn('💬',{t:'chat'})}</div><label class="coach-auto"><input type="checkbox" id="coachAuto" ${PS.autoGo?'checked':''}> levar automaticamente a cada passo</label>`;
+  c.innerHTML=`<div class="coach-top"><span class="t3-catimg pav"></span><div class="grow"><small>🧭 ${esc(tour.title)} · passo ${T.i+1} de ${n}</small><b>${esc(s.h)}</b></div><button class="cx" data-pact='${esc(JSON.stringify({t:'tourend'}))}' title="Encerrar">✕</button></div><div class="coach-t">${rules14(s.t)}</div><div class="coach-bar"><i style="width:${(T.i+1)/n*100}%"></i></div><div class="pacts">${T.i>0?actBtn('◀ Anterior',{t:'tourgo',d:-1}):''}${s.go?actBtn('📍 Me leve',{t:'go',g:s.go}):''}${T.i<n-1?actBtn('Próximo ▶',{t:'tourgo',d:1},true):actBtn('Concluir ✔',{t:'tourend',done:true},true)}${actBtn('💬',{t:'chat'})}</div><label class="coach-auto"><input type="checkbox" id="coachAuto" ${PS.autoGo?'checked':''}> levar automaticamente a cada passo</label>`;
   const a=$('coachAuto');if(a)a.onchange=()=>{PS.autoGo=a.checked};
   if(PS.autoGo&&s.go)goTo(s.go);
 }
@@ -187,7 +190,7 @@ function startTourMsg(e){
   pReply(`${rnd(V.open)}<br>Bora! Eu te guio por <b>${esc(TOURS[e.tour].title)}</b> em ${TOURS[e.tour].steps.length} passos. Vou fechando o chat e destacando cada lugar.${'<div class="pacts">'+actBtn('🧭 Começar agora',{t:'tour',id:e.tour},true)+'</div>'}`,{m:'hype'});
 }
 function quickMenu(){const ch=(CHIPS[curView()]||CHIPS.home).slice(0,3);return `<div class="pacts">${ch.map(c=>actBtn(c,{t:'ask',q:c})).join('')}</div>`}
-function tipHtml(){const v=curView(),tips=TAB_TIPS[v];if(!tips)return 'Nesta tela eu não tenho dica específica. Pergunta o que quiser!';return '💡 <b>Dica da tela:</b> '+rnd(tips)}
+function tipHtml(){const v=curView(),tips=TAB_TIPS[v];if(!tips)return 'Nesta tela eu não tenho dica específica. Pergunta o que quiser!';return '💡 <b>Dica da tela:</b> '+rules14(rnd(tips))}
 async function askAI(q,top){
   const body={question:q,history:PS.hist.slice(-8).map(m=>({role:m.r==='u'?'user':'assistant',text:String(m.h).replace(/<[^>]+>/g,' ')})),context:{view:viewKey(),stage:data.stage,vocation:data.vocation,archetype:data.archetype,track:data.track},knowledge:top.map(x=>({title:x.e.title,text:x.e.a.replace(/<[^>]+>/g,'')})),persona:'Você é o Perseus, um gato azul assistente do Tulpa RPG. Fale em português do Brasil, com sarcasmo leve e expressivo, mas sempre ajudando de verdade com as regras.'};
   PS.typing=true;const t=renderMsg({r:'p',h:'<span class="typing"><i></i><i></i><i></i></span>'});
@@ -215,7 +218,7 @@ async function sendQ(q){q=String(q||'').trim();if(!q)return;addMsg('u',q);$('pin
 function handleAct(a){
   if(!a)return;
   if(a.t==='ask')return sendQ(a.q);
-  if(a.t==='topic'){const e=K.find(x=>x.id===a.id);if(e)pReply(topicHtml(e,{steps:!!a.steps,opener:false}),{m:'smug'});return}
+  if(a.t==='topic'){const e=allK14().find(x=>x.id===a.id);if(e)pReply(topicHtml(e,{steps:!!a.steps,opener:false}),{m:'smug'});return}
   if(a.t==='go'){const ok=goTo(a.g);if(ok){closeIfMobile();mood('hype');say(rnd(V.gone),3800)}else{if(PS.open)addMsg('p',rnd(V.nogo));else say(rnd(V.nogo),4200)}return}
   if(a.t==='tour')return startTour(a.id);
   if(a.t==='tourgo'){if(!PS.tour)return;const n=TOURS[PS.tour.id].steps.length;PS.tour.i=Math.max(0,Math.min(n-1,PS.tour.i+a.d));showCoach();return}
