@@ -51,12 +51,12 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112705`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112706`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
   ```
-- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112705'`) é só um fallback.
+- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112706'`) é só um fallback.
 
 ### Como verificar antes de commitar
 
@@ -216,6 +216,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Arcade visual, Onda 2 · Lote 1 (`?v=2026112703`)**: Corredor do Vazio (palco em paralaxe por bioma, dia e noite, mini-chefes desenhados), Salto Astral (um céu e um tipo de plataforma por Torre, mais o Infinito) e Block Blast Astral (relicário de latão, blocos de esmalte, gelo, trancas e gemas desenhados) usam o `GFX60`, com HUD em chips e contagem regressiva própria. Só visual: regras, pontuação, semente e rede iguais. A arte de cada jogo fica no próprio arquivo (`rnArt40`, `saArt56`, `bbArt47`). **Teste manual:** uma partida de cada no celular, a Mesa com fantasmas no Corredor e no Salto, e `prefers-reduced-motion` ligado.
 - **Arcade visual, Onda 3 · Lote 2 (`?v=2026112704`)**: Rhythm (um santuário por Semana, notas e receptores desenhados), Fuga (cenário e ladrilhos por fase, também no Infinito), Salto Vazio (tileset por capítulo, serras, chaves, porta e medalhas desenhadas) e Corrida (maquete por pista, karts, marcas de pneu e ícones dos rituais) usam o `GFX60`, com HUD em chips e contagem regressiva. Só visual: janelas, física, pontuação, semente e rede iguais; no Rhythm os Perseus passaram para trás das notas. Arte em `rhArt38`/`fuArt38` (`js/50`), `svArt41` (`js/51`) e `ktArt42` (`js/52`). **Teste manual:** uma partida de cada no celular, Rhythm 1v1, Mesa com fantasmas na Fuga, no Salto e na Corrida, e `prefers-reduced-motion` ligado.
 - **Arcade visual, Onda 4 · Lote 3 (`?v=2026112705`)**: UNO (mesa de feltro, cartas desenhadas com um símbolo por Elemento, relógio e diário da mesa), Defesa do Santuário (um terreno por mapa, totens por Elemento e nível, Traumas e chefes animados), Trono do Mestre (salão do trono, medidores em vitral, retratos pintados nas cartas) e Sudoku (grimório, pistas em serifa, erro marcado também com X, ferramentas com ícone) usam o `GFX60`, com HUD em chips e contagem regressiva. Só visual: regras, áreas de clique, pontuação, semente, rede e cartas ocultas iguais. No UNO, a mão revelada pela Carta de Poder agora aparece por cima do descarte. Arte em `unoArt43` (`js/52`), `sdArt44` e `trArt45` (`js/53`) e `skArt46` (`js/54`). **Teste manual:** uma partida de cada no celular, UNO em Mesa com convidado (Revelar, Troca e Delatar) e `prefers-reduced-motion` ligado.
+- **Arcade visual, Onda 5 · Lote 4 (`?v=2026112706`)**: DOOM (paredes, chão e teto texturizados por andar, Perseus corrompidos, itens e armas desenhados, HUD diegético; no aparelho lento o raycast desenha metade das colunas), Julgamento (um palco e um réu por chefe, balas e almas desenhadas, também no PvP), Rinha (uma arena por rival, lutadores animados com golpes, defesa, K.O. e Supremo) e Abismo (salas, portas, inimigos, chefes, relíquias e luz por andar) usam o `GFX60`, com HUD em chips e contagem regressiva. Só visual: regras, hitboxes, pontuação, semente, rede, predição do convidado e energia oculta do Arquiteto iguais. Arte em `dmArt48` e `juArt49` (`js/55`), `riArt50` e `abArt51` (`js/56`). **Teste manual:** uma partida de cada no celular (fluidez do DOOM), Julgamento, Rinha e Abismo em Mesa com convidado, e `prefers-reduced-motion` ligado.
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.
