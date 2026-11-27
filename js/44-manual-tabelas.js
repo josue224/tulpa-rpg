@@ -152,7 +152,7 @@ async function save31g(){
     const head=g.head.map(h=>String(h||'').trim());if(head.some(h=>!h))return fail('Todo título de coluna precisa de texto.');
     if(!R.length)return fail('A tabela precisa de pelo menos uma linha.');
     const rows=R.map(r=>head.map((_,j)=>String(r[j]==null?'':r[j]).slice(0,400)));
-    T.tb=T.tb||{};T.tb[g.kind]={head,rows};label='Tabela do Manual';
+    T.tb=T.tb||{};T.tb[g.kind]={head,rows,br:BASE_REV31};label='Tabela do Manual';
   }
   M31.tg=null;
   const ok=await saveMan31(label);

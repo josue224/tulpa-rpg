@@ -63,6 +63,8 @@ function tokens31(s){
 function regras31(s){
   const f=v=>String(v).replace('.',','),x=v=>v===1?'':f(v)+' × ';
   return String(s).replace(/\{\{r:(\w+)\}\}/g,(m,id)=>{const v=E.regra(id);return v===undefined?m:f(v)})
+    .replace(/\{\{nPericias\}\}/g,()=>String((typeof BASE_SKILLS!=='undefined'?BASE_SKILLS:[]).filter(x=>x!=='História').length))
+    .replace(/\{\{nPericiasV\}\}/g,()=>{try{const n=list29('pericia').filter(r=>r.st!=='del').length;return String(n)}catch(e){return'18'}})
     .replace(/\{\{carga\}\}/g,()=>`${f(E.regra('cargaBase'))} + ${x(E.regra('cargaPorFor'))}Força (+${f(E.regra('cargaMochila'))} com Mochila ou Maleta)`)
     .replace(/\{\{comb\}\}/g,()=>`${f(E.regra('combBase'))} + ${x(E.regra('combPorCon'))}Constituição`);
 }
@@ -222,7 +224,7 @@ function shell31(){
         <label class="m31-search"><span class="sr-only">Buscar no Manual</span><input type="search" id="m31q" placeholder="Buscar ritual, estado, vocação, item ou regra…" autocomplete="off"></label>
         <span class="m31-hits sub" id="m31hits" aria-live="polite"></span>
         <label class="t3-switch m31-pvsw hide" id="m31pvw"><input type="checkbox" id="m31pv"><span>👁️ Pré-visualizar como Player</span></label>
-        <button type="button" class="btn small" id="m31print" title="Gera um PDF com o conteúdo atual (use Salvar como PDF na janela de impressão)">📥 <span class="m31-pl">Baixar </span>PDF<span class="m31-pl"> Atualizado</span></button>
+        <button type="button" class="btn small" id="m31print" title="Monta um PDF do Manual com o que você lê agora (use Salvar como PDF na janela de impressão)" aria-label="Exportar Manual em PDF">📥 <span class="m31-pl">Exportar Manual </span>(PDF)</button>
         <button type="button" class="btn small" id="m31x">Fechar</button>
       </div>
     </header>
@@ -237,7 +239,7 @@ function shell31(){
   $('m31toc').onclick=()=>{M31.toc=!M31.toc;w.classList.toggle('m31-tocopen',M31.toc);$('m31toc').setAttribute('aria-expanded',String(M31.toc))};
   let qt=0;$('m31q').oninput=e=>{clearTimeout(qt);qt=setTimeout(()=>{M31.q=e.target.value.trim();paint31(!M31.q);const f=$q('#m31content mark.m31-hl');if(f)f.scrollIntoView({block:'center'});else if(M31.q)$('m31main').scrollTop=0},140)};
   $('m31pv').onchange=e=>{M31.pv=e.target.checked;M31.edit=null;paint31(true)};
-  $('m31print').onclick=print31;
+  $('m31print').onclick=()=>{if(T3.manualPdf&&T3.manualPdf.run)T3.manualPdf.run();else print31()};
   $('m31nav').addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(!a)return;e.preventDefault();go31(a.dataset.go);if(innerWidth<900){M31.toc=false;w.classList.remove('m31-tocopen');$('m31toc').setAttribute('aria-expanded','false')}});
   const main=$('m31main');
   main.addEventListener('click',click31);
@@ -353,7 +355,7 @@ async function click31(e){
   const de=t.closest('[data-m31d]');if(de){const id=de.dataset.m31d;if(!confirm('Excluir este bloco do Manual desta campanha? Texto original do manual pode ser restaurado depois.'))return;
     const me=(D.add||[]).find(a=>a.id===id);
     if(me){D.add.forEach(a=>{if(a.after===id)a.after=me.after});D.add=D.add.filter(a=>a.id!==id);delete D.ed[id]}
-    else D.ed[id]={del:1};
+    else D.ed[id]={del:1,br:BASE_REV31};
     await saveMan31('Bloco removido');return}
   const rs=t.closest('[data-m31r]');if(rs){delete D.ed[rs.dataset.m31r];await saveMan31('Texto restaurado');return}
   if(t.closest('[data-m31cancel]')){if(M31.newId){D.add=(D.add||[]).filter(a=>!(a.id===M31.newId&&!a.t));M31.newId=null}M31.edit=null;paint31(true);return}
@@ -362,7 +364,7 @@ async function click31(e){
     const v=($('m31ta')?.value||'').replace(/\r/g,'').trim();
     if(!v){toast('Escreva o texto ou use 🗑️ para excluir.');return}
     if(v.length>6000){toast('Texto muito longo (máximo 6000 caracteres por bloco).');return}
-    const a=(D.add||[]).find(x=>x.id===id);if(a){a.t=v;delete D.ed[id]}else D.ed[id]={t:v};
+    const a=(D.add||[]).find(x=>x.id===id);if(a){a.t=v;delete D.ed[id]}else D.ed[id]={t:v,br:BASE_REV31};
     M31.edit=null;M31.newId=null;
     const sec=$q(`[data-ed="${CSS.escape(id)}"]`)?.closest('.m31-sec');const h=sec?$q('.m31-h3',sec)?.textContent:'';
     await saveMan31(h||'Texto do Manual');return}

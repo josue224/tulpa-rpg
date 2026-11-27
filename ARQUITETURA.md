@@ -29,9 +29,9 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
 <head>   css/01-base-layout.css  →  supabase-js (CDN)
 <body>   markup (portal, app, modais)  →  scripts/CSS intercalados na MESMA posição dos blocos originais:
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
-         → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos) → css/19 (Manual: regras)
+         → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos) → css/19 (Manual: regras) → css/20 … css/23 → css/24 (Reconciliação do Manual)
          → js/09 → js/09b → js/10 … js/28 → js/32 → js/33 → js/35 … js/49 → js/60b (App Shell) → js/60c (Fichas) → js/60d (carregador) → js/60e (filtros Arcade)
-         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/60n (Ações das especializações) → js/60o (Barricadas) → js/61   (61 = inicialização, sempre por último)
+         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/60n (Ações das especializações) → js/60o (Barricadas) → js/60p (Reconciliação do Manual) → js/60q (Exportar PDF) → js/61   (61 = inicialização, sempre por último)
 
 Sob demanda (sem <script>; QUEUE do js/60d, nesta ordem, na 1ª abertura do Arcade):
          js/60f (motor gráfico) → js/29 → js/30 → js/31 → js/34 → js/50 → js/51 → … → js/60
@@ -66,6 +66,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 21 | `21-mapa-guia.css` | novo | 1 KB | **Onda 2**: guia sobre o mapa em branco (`.map-guide20`) e altura mínima do `#mapStage`. |
 | 22 | `22-polish-pro.css` | novo | 12 KB | **Onda 3 · Polimento profissional**: tokens `--mo-*` (em `body`), entradas só com transform/opacity, hover/foco, alvos de 44 px no celular, hierarquia de rótulos e barras, e as atmosferas por família (`--fam` em `body::after`, `#aeTex` atrás do conteúdo, grão de painel em `--ae-fill` sem vidro). |
 | 23 | `23-vertentes-acoes.css` | novo | 2 KB | **Onda 4**: cartões `.vta-*` do painel Ações das especializações e `.bar-opts`/`.bar-row` do menu de barricadas. Só estrutura (cores e raios vêm da estética). |
+| 24 | `24-manual-reconciliar.css` | novo | 3 KB | **Onda 5**: avisos de texto desatualizado do Mestre (`.rec-note`, `.rec-top`, `.rec-hist`), diferença por palavra (`.rec-d` riscado, `.rec-i` sublinhado: nunca só cor) e o aviso de Desfazer (`.rec-snack`). Só estrutura, alvo de 44 px, sem rolagem lateral em 390 px. |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
@@ -152,6 +153,8 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60m | `60m-mapa-base.js` | novo | 9 KB | **Onda 2** (IIFE): `T3.mapBlank20` (grade com coordenadas, escala e luz ambiente quando não há imagem de mapa), guia do Mestre/jogador (`T3.mapGuide20`), `T3.fogHalo20` (halo mínimo na névoa) e rede de segurança que remonta/redimensiona o canvas. Chamado pelo `mapPaint7` do `js/21`. |
 | 60n | `60n-vertentes-acoes.js` | novo | 18 KB | **Onda 4** (IIFE): painel **Ações das especializações** na aba Especializações (`#vtTools`, desenhado depois de `renderSkills`): Fôlego (cronômetro de apneia e Exaustão), Varredura de Cena, Segurança (+d20 por situação e rolagem silenciosa), Condução (checagem de treino por veículo), Perícia Forense (autópsia, checklist em `d.autopsia`), Cirurgia (atalho da Síntese) e Psiquiatria (`psiq`: `luc` e remoção de condição mental, nunca Vital). `T3.vta60n` para depurar. Nenhum número fixo: tudo vem de `E.*`. |
 | 60o | `60o-barricadas.js` | novo | 14 KB | **Onda 4** (IIFE): barricadas no mapa. Livro `M6.state.barricades` + `barDone` (só o Mestre grava); jogador pede por `barreq` (op `set` ou `break`) e o Mestre responde `barres` em `campaign_rolls`; DT por `E.barricadeDT`; envolve `doorUse10` (porta barricada pede Força + Atletismo), `enemyDoor23` (inimigo não abre), `paintOver10` (selo "DT n"), `mapMenu7` (botão Barricar ou forçar) e `processRow`. `T3.barricadas`, `T3.barricar(ch)`. |
+| 60p | `60p-manual-reconciliar.js` | novo | 12 KB | **Onda 5** (IIFE): reconciliação do Manual Vivo. Detecta trechos que o Mestre reescreveu antes de o texto base mudar (`BASE_REV31` e `BASE_CHG31`, em `js/42`) e mostra, só para o Mestre, o aviso com Ver diferença, Atualizar para regra nova e Manter meu texto, mais o botão global (dois toques, com resumo). Histórico em `manual.hist`, dispensas em `manual.ack`. Publica `T3.manualRec`. |
+| 60q | `60q-manual-pdf.js` | novo | 11 KB | **Onda 5** (IIFE): exportador de PDF. Monta capa, sumário e capítulos com os mesmos dados vivos do Manual (`secHtml31` com `M31.pv=true`, sem controles do Mestre) e imprime num iframe com `@page` (cabeçalho e rodapé com página). Publica `T3.manualPdf` (`run`, `html`). |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
@@ -238,6 +241,28 @@ Entrada: `{id,line,st:'floor'|'taken',map,x,y,from,by?,as?,item,...}`. `line` li
 | Central (`js/40`) | chaves `rules.attr={nome:{desc}}`, `rules.num={id:valor}`, `rules.pericia`, `rules.vert` · `rebuildVert29`/`rebuildNum29` (conferem tudo) · `eff29` · `effText29` · seções `attr`, `pericia`, `vert`, `num` · log com `ids`/`requer` para `hits29` |
 | Texto (`js/43`) | `{{r:id}}`, `{{carga}}`, `{{comb}}` nos blocos e tabelas do Manual |
 | Rolagem | `doRoll(..,{extraDice})` · `rollSkill(..,{extraDice})` · `T3.rollSkillAs(ch,perícia,atributo,{vert,generalista,extraDice,social})` |
+
+## Reconciliação do Manual e exportação em PDF (Onda 5)
+
+**Versão do texto base (`js/42`).** `BASE_REV31` (hoje 2) sobe quando o texto base muda de um jeito que pode contradizer o que o Mestre reescreveu. `BASE_CHG31` mapeia `id do bloco (ou "live:turn"/"live:doors", ou id de tabela) → revisão em que mudou`. Só os ids listados disparam aviso. Ao mudar o texto base de um bloco que o Mestre pode ter editado: suba `BASE_REV31`, ponha o id em `BASE_CHG31` com a revisão nova e descreva a mudança no CLAUDE.md. Bloco novo (sem edição anterior) não entra.
+
+**Dados no registro `manual` (sem SQL):**
+
+| Campo | Conteúdo |
+|---|---|
+| `ed[id].br`, `tbl.tb[id].br` | revisão-base em que o Mestre editou (gravada por `js/43` e `js/44`; sem marca vale 1) |
+| `ack[id]` | revisão em que ele escolheu "Manter meu texto" |
+| `hist[id]` | até 5 itens `{at,bt,k:'ed'\|'del'\|'tb',t\|head+rows,br,ack}`; `bt` agrupa o lote de "Atualizar todas" |
+
+**Regras do aviso (`js/60p`, só Mestre fora da pré-visualização de Player):** pendente = há `BASE_CHG31[id]`, a edição é anterior (`br<chg`), não houve `ack>=chg` e o texto do Mestre difere do base. Atualizar guarda o texto antigo em `hist` e apaga a edição (o bloco volta ao base); Desfazer devolve (e guarda o texto atual, se houver). Atualizar grava com `saveMan31` (os jogadores recebem o aviso de sempre); Manter grava sem avisar ninguém. Falha ao gravar restaura o estado em memória. O Perseus lê o texto vigente como antes, sem fluxo novo.
+
+| Grupo | Chamada |
+|---|---|
+| Reconciliar | `T3.manualRec.pending()` · `.atualizar(itens,rótulo)` · `.manter(itens)` · `.desfazer({id}\|{bt})` · `.diff(a,b)` (palavra a palavra, LCS) · `.diffHtml` · `.baseIndex()` |
+| Tokens novos (`js/43`) | `{{nPericias}}` (perícias da tabela) e `{{nPericiasV}}` (perícias com vertentes) |
+| PDF | `T3.manualPdf.run()` (botão "Exportar Manual (PDF)", visível a todos) · `.html()` (documento completo, para testes) · `.parts()` |
+
+**PDF:** o documento sai dos mesmos dados vivos (nunca números fixos: edições do Mestre, `{{r:id}}` resolvido, vocações, rituais, itens, estados e todas as vertentes, inclusive as criadas pelo Mestre). Os símbolos SVG dos rituais, botões, avisos e campos são removidos. O CSS de impressão fica dentro do `js/60q` (documento autônomo, preto sobre branco, não depende da estética). Margens com cabeçalho e rodapé usam `@page` com caixas de margem (Chrome 131+; onde não há suporte, o conteúdo sai igual sem elas). O sumário tem links mas não tem número de página, porque o Chrome ainda não suporta `target-counter`. No iOS abre numa aba nova e imprime de lá. O PDF/arquivo estático antigo do Manual não existe no repo; o botão antigo "Baixar PDF Atualizado" (`print31`, `body.m31-print`) continua no código só como reserva.
 
 ## App Shell (Onda 1)
 

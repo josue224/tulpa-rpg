@@ -22,7 +22,7 @@ const MAN31=[
   ['c1.1.l1','- **Distribuição inicial (Estágio 1):** todos os atributos começam em **1**. O jogador distribui **7 pontos livres**, respeitando o mínimo de 1 e o máximo de **3** por atributo.\n- **Evolução:** a partir do Estágio 2, o limite sobe para **4** por atributo. Pontos extras acumulados são concedidos nos Estágios 2 (+1), 4 (+2), 7 (+3) e 10 (+4).\n- **Equivalência de termos:** sempre que uma regra ou fórmula mencionar *Agilidade (AGI)*, utiliza-se **Destreza**; sempre que mencionar *Vigor*, utiliza-se **Constituição**.\n- **Troca de atributo por teste:** o Mestre pode autorizar ou exigir a rolagem de uma perícia com outro atributo (ou um teste de atributo puro) conforme a situação narrativa — como usar Constituição em vez de Força em Escalada no talento *É Logo Ali*.']
  ]},
  {id:'c1.2',h:'1.2 Perícias e Aptidões',b:[
-  ['c1.2.p1','**Todas as 39 perícias começam em 0.** O bônus total de uma perícia é a soma do grau de treinamento (+5, +10 Mestre ou +15 Maestria), do bônus **+V da Vocação**, de bônus fixos (como Êxtase ou ajustes de campanha) e de talentos ou efeitos ativos em cena. Dezoito dessas perícias se dividem em **especializações (vertentes)**: veja a seção 1.7.'],
+  ['c1.2.p1','**Todas as {{nPericias}} perícias começam em 0.** O bônus total de uma perícia é a soma do grau de treinamento (+5, +10 Mestre ou +15 Maestria), do bônus **+V da Vocação**, de bônus fixos (como Êxtase ou ajustes de campanha) e de talentos ou efeitos ativos em cena. {{nPericiasV}} dessas perícias se dividem em **especializações (vertentes)**: veja a seção 1.7.'],
   ['c1.2.l1','- **+V da Vocação (anos de serviço):** 0 a 9 anos = **+5** · 10 a 39 anos = **+10** · 40 anos ou mais = **+15**.\n- **Grupos de perícias:** *Sociais* (Empatia, Enganação, Etiqueta, Intimidação, Liderança, Persuasão, Sedução); *Agilidade e Movimento* (Acrobacia, Atletismo, Escalada, Esquiva, Furtividade, Natação, Reflexo); *Ataque* (Briga, Armas Brancas, Armas de Disparo, Arremesso); *Testes Físicos* (perícias de Força, Destreza ou Constituição); *Atributos Mentais* (Inteligência, Percepção, Presença, Carisma, Aparência).'],
   {live:'skills'},
   ['c1.2.p2','Cada perícia evolui na ordem **+5 → +10 (Mestre) → +15 (Maestria)** e só pode receber uma escolha de +5. A tabela abaixo resume os limites acumulados por estágio:'],
@@ -228,3 +228,20 @@ const MAN31=[
 ]}
 ];
 
+
+/* ---------- Revisão do texto base (reconciliação das edições do Mestre) ----------
+   BASE_REV31 sobe quando o texto base muda de um jeito que pode contradizer um texto
+   que o Mestre já reescreveu. BASE_CHG31 diz em que revisão cada trecho mudou pela última vez
+   (bloco, fórmula ou tabela; tabelas vivas usam "live:turn" e "live:doors").
+   Toda edição do Mestre guarda "br" (a revisão-base sobre a qual foi feita); sem "br" vale 1.
+   Só os trechos listados aqui disparam aviso (js/60p). Não acrescente trecho que só ganhou
+   texto novo: blocos criados do zero não têm edição anterior para contradizer. */
+const BASE_REV31=2;
+const BASE_CHG31={
+  'c1.2.p1':2,   /* perícias começam em 0 */
+  'c5.4.f1':2,'c5.4.l1':2,'c5.5.l1':2,'c5.7.p1':2,'c5.9.p1':2,  /* ataque, defesa, bloqueio, cobertura, reações */
+  'c6.1.l1':2,'c6.2.l1':2,   /* Combustão Vital, Sutura e Síntese */
+  'c9.1.f1':2,'c9.3.p1':2,   /* carga e proteções */
+  'c10.2.l1':2,  /* bestiário e personalização */
+  'live:turn':2  /* economia do turno (Reação por rodada) */
+};

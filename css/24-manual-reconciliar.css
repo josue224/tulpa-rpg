@@ -1,0 +1,46 @@
+/* Onda 5 · Reconciliação do Manual (avisos do Mestre, diferença e desfazer).
+   Só estrutura: a cor vem das variáveis da estética (--text --accent --line) e o texto herda a cor do Manual.
+   Os avisos só existem no DOM para o Mestre (js/60p). Alvo de toque de 44px e sem rolagem lateral em 390px. */
+.rec-note,.rec-top,.rec-hist{
+  box-sizing:border-box;max-width:76ch;min-width:0;margin:var(--sp-3) 0;
+  padding:var(--sp-3);border:1px solid var(--border-strong,var(--line,rgba(255,255,255,.25)));
+  border-left:4px solid var(--accent,#c9a227);border-radius:var(--ae-brad,8px);
+  background:color-mix(in srgb,var(--accent,#c9a227) 10%,var(--m31-base,transparent));
+  color:inherit;font-size:var(--fs-sm,14px);line-height:var(--lh-body,1.5);overflow-wrap:anywhere;
+}
+.rec-top{max-width:none;margin-top:0}
+.rec-t,.rec-sub{margin:0 0 var(--sp-2)}
+.rec-sub{font-size:var(--fs-xs,12px);opacity:.9}
+.rec-act{display:flex;flex-wrap:wrap;gap:var(--sp-2);align-items:center}
+.rec-act .btn,.rec-hist .btn,.rec-snack .btn{min-height:var(--touch,44px);white-space:normal;text-align:center}
+.rec-hist{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2);border-left-color:var(--line,rgba(255,255,255,.4));background:transparent;padding:var(--sp-2) var(--sp-3)}
+.rec-diff{margin-top:var(--sp-3);display:grid;gap:var(--sp-2);min-width:0}
+.rec-leg{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin:0}
+.rec-k{padding:2px var(--sp-2);border-radius:4px;font-size:var(--fs-xs,12px);font-weight:700}
+.rec-text{
+  white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;max-height:60vh;overflow:auto;
+  padding:var(--sp-3);border:1px solid var(--border-subtle,var(--line,rgba(255,255,255,.2)));border-radius:var(--ae-brad,6px);
+  background:var(--m31-base,transparent);line-height:var(--lh-body,1.6);
+}
+.rec-text:focus-visible,.rec-note button:focus-visible,.rec-top button:focus-visible,.rec-hist button:focus-visible,.rec-snack button:focus-visible,.rec-full summary:focus-visible{
+  outline:2px solid var(--accent,#c9a227);outline-offset:2px;
+}
+/* removido = riscado com fundo vermelho; novo = sublinhado com fundo verde (nunca só cor) */
+.rec-d{text-decoration:line-through;text-decoration-thickness:2px;background:color-mix(in srgb,#d64545 28%,transparent);border-radius:2px}
+.rec-i{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px;background:color-mix(in srgb,#2fa05a 28%,transparent);border-radius:2px}
+.rec-full summary{cursor:pointer;min-height:var(--touch,44px);display:flex;align-items:center}
+.rec-full h6{margin:var(--sp-2) 0 var(--sp-1);font-size:var(--fs-xs,12px);text-transform:uppercase;letter-spacing:.06em}
+.rec-sum ul{margin:0 0 var(--sp-2);padding-left:var(--sp-4)}
+.rec-sum li{margin:var(--sp-1) 0}
+.rec-snack{
+  position:fixed;z-index:60;left:var(--sp-4);right:var(--sp-4);bottom:calc(var(--sp-4) + env(safe-area-inset-bottom,0px));
+  margin:0 auto;max-width:560px;display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-2);
+  padding:var(--sp-3);border:1px solid var(--border-strong,var(--line,#888));border-radius:var(--ae-brad,8px);
+  background:var(--m31-base,#14171d);color:var(--text,inherit);box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:var(--fs-sm,14px);
+}
+.rec-snack span{flex:1 1 200px;min-width:0}
+@media (max-width:860px){
+  .rec-snack{bottom:calc(60px + var(--sp-4) + env(safe-area-inset-bottom,0px))}
+  .rec-act .btn{flex:1 1 100%}
+}
+@media (prefers-reduced-motion:no-preference){.rec-note,.rec-top{animation:rec-in .2s ease-out}@keyframes rec-in{from{opacity:0}to{opacity:1}}}
