@@ -152,6 +152,8 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | Tilesets | `tile(tipo,{size,a,b,seed})` · `fillTile(x,ladrilho,X,Y,W,H,{ox,oy,alpha})`. Tipos: `pedra tijolo madeira grama terra areia metal cristal agua feltro pergaminho runa` |
 | Cenário | `scene(nome,W,H,{seed})` → `.draw(x,camX,camY,t,{from,to})`. Nomes: `fe natureza inexistencia ilusao verdade espaco cripta` |
 | Paralaxe própria | `parallax(id,W,H,[{paint,speed,vy,drift,alpha,y,w,h,s}])`; pintores `paint.sky(cores)` e `paint.{stars,ridge,spires,trees,pillars,nebula,clouds,fog}({...})` |
+| Paralaxe vertical | `vparallax(id,W,H,[{paint,speed,drift,alpha,w,h,s}])` → `.draw(x,camY,t,{from,to})` (fecha de cima a baixo) · `wrap(x,w,h,fn,{vert})` repete um elemento nas bordas · `poly(x,pontos,cor)` |
+| Contagem regressiva | o objeto do `make` leva `g60intro:{title,sub,acc}` e a contagem do `mgOverlay` vira a versão do motor |
 | Ambiente | `ambient(tipo,{W,H,n,col,seed})` → `.draw(x,t,camX)`. Tipos: `poeira brasas folhas neve chuva motes vagalumes` |
 | Luz | `glow(x,cx,cy,r,cor,a,{add,sy})` · `lights(W,H,{dark,color})` → `.begin(dark).add(x,y,r,cor,i).apply(x,{glow})` · `rays(x,cx,cy,{n,len,width,col,a,t,from,spread})` |
 | Acabamento | `shadow(x,cx,chaoY,largura,{alt,alpha,h})` · `vignette(x,W,H,{a,col})` · `scanlines(x,W,H,a)` |
@@ -210,16 +212,16 @@ Automático com `prefers-reduced-motion`: sem hit-stop, sem tremor, clarão frac
 
 ### Onde cada jogo desenha
 
-Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HUD (`C.hud`), nos botões de toque, na preparação e no resultado. As versões antigas em `js/26` e `js/28` a `js/34` estão sobrescritas: edite a versão abaixo (linhas de 27/11/2026).
+Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HUD (`C.hud`), nos botões de toque, na preparação e no resultado. As versões antigas em `js/26` e `js/28` a `js/34` estão sobrescritas: edite a versão abaixo (linhas de 27/11/2026). Os da Onda 2 já usam o motor, com a arte em `rnArt40` (`js/51`), `saArt56` (`js/59`) e `bbArt47` (`js/54`), no mesmo arquivo.
 
 | Onda | Jogo (`id`) | Arquivo · função de desenho (linha) | W×H |
 |---|---|---|---|
-| 2 | Corredor do Vazio (`runner`) | `js/51` · `runner40().draw` (167) | 800×320 |
-| 2 | Salto Astral (`salto`) | `js/59` · `salto56().draw` (111) | 480×640 |
-| 2 | Block Blast Astral (`blast`) | `js/54` · `blast47().draw` (328); `drawBlock` (294), `drawMark`, `drawPiece` | 480×720 |
+| 2 | Corredor do Vazio (`runner`) | `js/51` · `runner40().draw` (358) | 800×320 |
+| 2 | Salto Astral (`salto`) | `js/59` · `salto56().draw` (231) | 480×640 |
+| 2 | Block Blast Astral (`blast`) | `js/54` · `blast47().draw` (396); `drawBlock` (359), `drawMark`, `drawPiece` | 480×720 |
 | 3 | Rhythm (`rhythm`) | `js/50` · `rhythm38().draw` (442); `drawNote` (381) | 800×450 |
 | 3 | Fuga (`fuga`) | `js/50` · `fuga38().draw` (740) | 800×450 |
-| 3 | Salto Vazio (`vazio`) | `js/51` · `vazio41().draw` (440) | 800×450 |
+| 3 | Salto Vazio (`vazio`) | `js/51` · `vazio41().draw` (649) | 800×450 |
 | 3 | Corrida (`corrida`) | `js/52` · `corrida42().draw` (229); pista pré-pintada em `paintTrack` (116) | 800×450 |
 | 4 | UNO (`uno`) | `js/52` · `uno43().draw` (436); `cardDraw` (393) | 800×450 |
 | 4 | Defesa (`santuario`) | `js/53` · `sanctuary44().draw` (194) | 800×450 |
@@ -233,7 +235,7 @@ Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HU
 | 6 | Clicker (`clicker`) | `js/57` · `clicker53().draw` (322) | 800×450 |
 | 6 | Volley (`volley`) | `js/58` · `volley54().draw` (178) | 800×450 |
 | 6 | Voo (`voo`) | `js/58` · `voo55().draw` (311) | 480×640 |
-| 7 | Coleta (`coleta`) | `js/59` · `coleta57().draw` (290) | 480×640 |
+| 7 | Coleta (`coleta`) | `js/59` · `coleta57().draw` (444) | 480×640 |
 | 7 | Eco (`eco`) | `js/60` · `eco58().draw` (111) | 480×560 |
 | 7 | Velha (`velha`) | `js/60` · `velha59().draw` (248) | 480×600 |
 

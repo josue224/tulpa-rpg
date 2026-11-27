@@ -278,6 +278,25 @@
   /* cenário pronto: scene('fe'|'natureza'|'inexistencia'|'ilusao'|'verdade'|'espaco'|'cripta',W,H,{seed}) */
   G.scene=(name,W,H,{seed=1}={})=>{const n=SCENES[name]?name:'inexistencia';return G.parallax(`sc-${n}-${seed}`,W,H,SCENES[n](G.paint))};
 
+  /* paralaxe VERTICAL (escaladas e quedas): cada camada fecha de cima a baixo.
+     Mesma forma de camada do parallax; camY cresce quando a câmera sobe. */
+  G.vparallax=(id,W,H,layers)=>{
+    const L=layers.map((l,i)=>({speed:0,drift:0,alpha:1,w:Math.round(W),h:Math.round(H),s:1,...l,key:`vp:${id}:${W}x${H}:${i}`}));
+    return{layers:L,
+      draw(x,camY=0,t=0,{from=0,to=L.length}={}){
+        const red=G.reduced(),k=Math.abs(x.getTransform?x.getTransform().d:1)||1,base=x.globalAlpha;
+        for(let i=from;i<to&&i<L.length;i++){const l=L[i],img=bake(l.key,l.w,l.h,l.paint,{s:l.s});
+          const off=(red?0:camY*l.speed+l.drift*t);
+          x.globalAlpha=base*l.alpha;
+          for(let Y=mod(off,l.h)-l.h;Y<H;Y+=l.h){if(Y+l.h<=0)continue;const a=Math.round(Y*k)/k,b=Math.round((Y+l.h)*k)/k;x.drawImage(img,0,a,l.w,b-a)}}
+        x.globalAlpha=base;
+      }};
+  };
+  /* desenha um elemento repetido nas bordas, para a camada fechar. fn não pode sortear. */
+  G.wrap=(x,w,h,fn,{vert=false}={})=>{for(let i=-1;i<2;i++){x.save();x.translate(vert?0:i*w,vert?i*h:0);fn();x.restore()}};
+  /* polígono preenchido [[x,y],...] */
+  G.poly=(x,pts,col)=>fillPoly(x,pts,col);
+
   /* ===================== luz, sombra e acabamento ===================== */
   const dot=col=>bake('dot:'+col,96,96,x=>{const g=x.createRadialGradient(48,48,0,48,48,48);g.addColorStop(0,G.rgba(col,1));g.addColorStop(.22,G.rgba(col,.62));g.addColorStop(.55,G.rgba(col,.2));g.addColorStop(1,G.rgba(col,0));x.fillStyle=g;x.fillRect(0,0,96,96)});
   /* brilho aditivo (substitui shadowBlur). Use cores fixas: cada cor vira 1 sprite. */
@@ -479,6 +498,24 @@
   G.svg=name=>ICONS[name]?`<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="${ICONS[name]}"/></svg>`:'';
   /* itens: {icon,label,value,tone:'ok'|'warn'|'bad'}; texto sempre escapado */
   G.chips=items=>`<span class="g60-hud">${(items||[]).filter(Boolean).map(i=>`<span class="g60-chip${['ok','warn','bad'].includes(i.tone)?' g60-'+i.tone:''}">${G.svg(i.icon)}${i.label?`<small>${escH(i.label)}</small>`:''}${i.value!=null?`<b>${escH(i.value)}</b>`:''}</span>`).join('')}</span>`;
+
+  /* contagem regressiva comercial: o jogo põe g60intro:{title,sub,acc} no objeto do make() */
+  function drawIntro(x,W,H,it,left){
+    const n=Math.max(1,Math.ceil(left)),f=G.reduced()?0:Math.max(0,left-(n-1)),acc=it.acc||'#ffd36b';
+    x.save();x.fillStyle='rgba(6,3,12,.46)';x.fillRect(0,0,W,H);x.restore();
+    const cy=H*.56,R=Math.min(W,H)*.14;
+    G.glow(x,W/2,cy,R*2.4,acc,.3);
+    x.save();x.lineWidth=Math.max(3,R*.09);x.strokeStyle='rgba(255,255,255,.16)';x.beginPath();x.arc(W/2,cy,R,0,TAU);x.stroke();
+    x.strokeStyle=acc;x.lineCap='round';x.beginPath();x.arc(W/2,cy,R,-Math.PI/2,-Math.PI/2+TAU*(G.reduced()?1:f||1));x.stroke();x.restore();
+    G.hud.text(x,String(n),W/2,cy+R*.04,{size:R*1.15*(1+f*.12),al:'center',w:900,col:'#ffffff',stroke:6});
+    G.hud.banner(x,W,H,it.title||'Prepare-se',{sub:it.sub||'Prepare-se',acc,y:Math.max(H*.2,cy-R-G.fs(30,18)*1.7)});
+  }
+  if(typeof mgOverlay==='function'){const _ov=mgOverlay;mgOverlay=function(x){
+    const C=MG.C,it=MG.g&&MG.g.g60intro;
+    if(!it||!C||Date.now()>=C.t0)return _ov.apply(this,arguments);
+    try{drawIntro(x,MG.W,MG.H,it,(C.t0-Date.now())/1000)}catch(e){console.warn('[GFX60]',e);return _ov.apply(this,arguments)}
+    MG.C=null;try{return _ov.apply(this,arguments)}finally{MG.C=C}
+  }}
 
   /* ===================== ganchos no Arcade ===================== */
   if(typeof mgLoop==='function'){const _loop=mgLoop;mgLoop=function(now){const out=_loop.apply(this,arguments);try{sample(now);present()}catch(e){console.warn('[GFX60]',e)}return out}}
