@@ -15,7 +15,7 @@ const DI={ready:false,readyAt:0,queue:[],busy:false,pend:{},pin:'',hover:'',barS
   wait:{fresh:8000,pick:120000,off:4000,on:45000}};
 T3.itens=DI;
 
-const drops=()=>Array.isArray(M6.state.drops)?M6.state.drops:[];
+const drops=()=>Array.isArray(M6.state.drops)?M6.state.drops.filter(e=>e&&typeof e==='object'):[];
 const done=()=>Array.isArray(M6.state.dropsDone)?M6.state.dropsDone:[];
 const doneWith=id=>[...done().filter(x=>x!==id),id].slice(-300);
 const sheet=ch=>ch?(ch.id===activeCharacterId?data:(ch.data||{})):{};

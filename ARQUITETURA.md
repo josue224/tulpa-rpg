@@ -31,7 +31,7 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
          → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos) → css/19 (Manual: regras)
          → js/09 → js/09b → js/10 … js/28 → js/32 → js/33 → js/35 … js/49 → js/60b (App Shell) → js/60c (Fichas) → js/60d (carregador) → js/60e (filtros Arcade)
-         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/61   (61 = inicialização, sempre por último)
+         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/61   (61 = inicialização, sempre por último)
 
 Sob demanda (sem <script>; QUEUE do js/60d, nesta ordem, na 1ª abertura do Arcade):
          js/60f (motor gráfico) → js/29 → js/30 → js/31 → js/34 → js/50 → js/51 → … → js/60
@@ -63,6 +63,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 18 | `18-itens-caidos.css` | novo | 3 KB | **Onda 12**: ícones dos itens no chão, ficha do item e botão “Pegar Item” sobre o mapa (só layout; fundo escuro próprio, como a barra de combate). |
 | 19 | `19-manual-regras.css` | novo | 2 KB | **Onda 13**: cartões das vertentes no Manual, editor de efeitos do Mestre, opção de situação na ficha e na Mesa (só layout). |
 | 20 | `20-sync-status.css` | novo | 1 KB | **Onda 1**: indicador de sincronização (`.sync60`), ponto cheio/anel/riscado conforme o estado. |
+| 21 | `21-mapa-guia.css` | novo | 1 KB | **Onda 2**: guia sobre o mapa em branco (`.map-guide20`) e altura mínima do `#mapStage`. |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
@@ -146,6 +147,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60j | `60j-itens-caidos.js` | novo | 22 KB | **Onda 12 · Itens caídos**: livro `M6.state.drops`/`dropsDone` (só o Mestre grava), pedidos `dropreq`/`pickreq`/`pickres`, ajuste das fichas, camada SVG no mapa e botão contextual; envolve `paintOver10`, `mapMenu7`, `renderInventory`, `processRow`, `renderCombatUI`, `pendingMine14`. |
 | 60k | `60k-manual-regras.js` | novo | 9 KB | **Onda 13**: componentes vivos do Manual (`LIVE31.attrs/verts/bloqueio/manobras/tiro/cobertura/condicoes`) e `T3.vertGrant` (+d20 concedido a aliados). |
 | 60l | `60l-sync-status.js` | novo | 7 KB | **Onda 1**: reconexão com espera dos canais da mesa/campanha, conferência leve (`updated_at` de `state`/`rules`/`manual`) ao voltar foco/rede, reserva de 25 s só com o tempo real caído, ressincronização e indicador "Sincronizado/Reconectando/Offline". IIFE; usa `T3.mesaResub/mesaResync`, `tulpaResubCampaign`, `tulpaResyncCharacters`; `T3.syncStatus()` para depurar. |
+| 60m | `60m-mapa-base.js` | novo | 9 KB | **Onda 2** (IIFE): `T3.mapBlank20` (grade com coordenadas, escala e luz ambiente quando não há imagem de mapa), guia do Mestre/jogador (`T3.mapGuide20`), `T3.fogHalo20` (halo mínimo na névoa) e rede de segurança que remonta/redimensiona o canvas. Chamado pelo `mapPaint7` do `js/21`. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
