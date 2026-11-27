@@ -36,8 +36,10 @@ const noStore6=e=>!!e&&(e.code==='42P01'||e.code==='PGRST205'||e.code==='PGRST20
 async function stDetect6(){
   if(M6.backend)return M6.backend;
   if(!cloud6())return M6.backend='local';
+  /* só a tabela inexistente justifica a reserva (campaign_items). Um erro passageiro (rede, token expirando) NÃO pode fixar a reserva para a sessão toda:
+     o Player passaria a ler campaign_items enquanto o Mestre grava em campaign_store e nunca mais veria as mudanças. Nesse caso o erro sobe e a detecção é refeita. */
   try{const {error}=await sb().from('campaign_store').select('key').eq('campaign_id',camp3().id).limit(1);if(error)throw error;M6.backend='store'}
-  catch(e){M6.backend='items';if(!noStore6(e))console.warn('[T6] campaign_store indisponível, usando a reserva',e)}
+  catch(e){if(!noStore6(e))throw e;M6.backend='items'}
   return M6.backend;
 }
 const lk6=key=>'tulpa_mesa_'+(camp3()?.id||'local')+'_'+key;
@@ -140,9 +142,52 @@ function readPresence6(){
   try{const ps=M6.ch.presenceState();Object.values(ps).forEach(list=>(list||[]).forEach(p=>{if(p&&p.uid&&(!out[p.uid]||p.at<out[p.uid].at))out[p.uid]=p}))}catch(e){}
   M6.present=out;
 }
+/* aviso leve para o indicador de sincronização (js/60l) */
+function sync6(){try{window.dispatchEvent(new CustomEvent('tulpa:sync'))}catch(e){}}
+/* canal de transmissão e presença */
+function subMesaCh6(id){
+  const ch=sb().channel('tulpa-mesa-'+id,{config:{broadcast:{self:false},presence:{key:uid3()||rid()}}});
+  ch.on('broadcast',{event:'m'},({payload})=>{if(M6.campId!==id||!payload)return;M6.hooks.cast.forEach(f=>{try{f(payload)}catch(e){console.warn('[T6] transmissão',e)}})});
+  ch.on('presence',{event:'sync'},()=>{if(M6.campId!==id)return;readPresence6();layoutMesa6();M6.hooks.layout.forEach(f=>{try{f()}catch(e){}})});
+  M6.chSt='JOINING';
+  ch.subscribe(st=>{
+    if(M6.ch!==ch||M6.campId!==id)return;
+    M6.chSt=st;
+    if(st==='SUBSCRIBED'){M6.live=true;trackMe6()}else if(st==='CHANNEL_ERROR'||st==='TIMED_OUT'||st==='CLOSED')M6.live=false;
+    sync6();
+  });
+  M6.ch=ch;
+}
+/* registros da mesa (campaign_store, ou campaign_items na reserva) em tempo real */
+function subDb6(id){
+  const tbl=M6.backend==='store'?'campaign_store':'campaign_items';
+  const ch=sb().channel('tulpa-store-'+id).on('postgres_changes',{event:'*',schema:'public',table:tbl,filter:'campaign_id=eq.'+id},p=>{if(M6.campId===id)onStoreChange6(p)});
+  M6.dbSt='JOINING';
+  ch.subscribe(st=>{if(M6.dbch!==ch||M6.campId!==id)return;M6.dbSt=st;sync6()});
+  M6.dbch=ch;
+}
+/* refaz os dois canais (usado pela reconexão com espera do 60l) */
+function resubMesa6(){
+  const id=M6.campId;if(!id||!cloud6()||typeof sb().channel!=='function')return false;
+  const a=M6.ch,b=M6.dbch;M6.ch=M6.dbch=null;M6.live=false;
+  try{if(a)sb().removeChannel(a)}catch(e){}
+  try{if(b)sb().removeChannel(b)}catch(e){}
+  try{subMesaCh6(id);subDb6(id)}catch(e){console.warn('[T6] reconectar canais',e);return false}
+  return true;
+}
+/* relê o que o tempo real pode ter perdido: estado da mesa, documentos e lista de mapas */
+async function resyncMesa6(){
+  const id=M6.campId;if(!id)return false;
+  const st=await stGet6('state');if(M6.campId!==id)return false;
+  if(st&&typeof st==='object'&&(Number(st.rev)||0)!==(Number(M6.state.rev)||0))acceptState6(st,'resync');
+  refreshDocs6();T3.mapRefreshList?.();
+  return true;
+}
+T3.mesaResub=resubMesa6;T3.mesaResync=resyncMesa6;
 async function joinMesa6(){
   const c=camp3();if(!c)return;
   if(M6.campId===c.id)return;
+  if(M6.joinFailAt&&Date.now()-M6.joinFailAt<3000)return;
   leaveMesa6();
   M6.campId=c.id;M6.backend='';M6.state=defState6();M6.present={};M6.myChar=null;M6.maps=[];M6.docs=[];M6.live=false;
   const jk='tulpa_join_'+c.id;let at=0;try{at=Number(sessionStorage.getItem(jk))||0}catch(e){}
@@ -152,18 +197,13 @@ async function joinMesa6(){
   M6.seenDocs=new Set(lsGet6('tulpa_docs_seen_'+(uid3()||'x'),[]));
   M6.gmNotes=lsGet6('tulpa_bn_gm_'+c.id,[]);
   const id=c.id;
-  await stDetect6();
+  try{await stDetect6()}catch(e){
+    /* sem saber qual armazenamento a campanha usa, não dá para assinar o canal certo: desfaz a entrada e deixa o módulo de sincronização (60l) tentar de novo com espera */
+    console.warn('[T6] detectar armazenamento',e);if(M6.campId===id){leaveMesa6();M6.joinFailAt=Date.now()}sync6();return;
+  }
   if(M6.campId!==id)return;
   if(cloud6()&&typeof sb().channel==='function'){
-    try{
-      const ch=sb().channel('tulpa-mesa-'+id,{config:{broadcast:{self:false},presence:{key:uid3()||rid()}}});
-      ch.on('broadcast',{event:'m'},({payload})=>{if(M6.campId!==id||!payload)return;M6.hooks.cast.forEach(f=>{try{f(payload)}catch(e){console.warn('[T6] transmissão',e)}})});
-      ch.on('presence',{event:'sync'},()=>{if(M6.campId!==id)return;readPresence6();layoutMesa6();M6.hooks.layout.forEach(f=>{try{f()}catch(e){}})});
-      ch.subscribe(st=>{if(st==='SUBSCRIBED'&&M6.campId===id){M6.live=true;trackMe6()}});
-      M6.ch=ch;
-      const tbl=M6.backend==='store'?'campaign_store':'campaign_items';
-      M6.dbch=sb().channel('tulpa-store-'+id).on('postgres_changes',{event:'*',schema:'public',table:tbl,filter:'campaign_id=eq.'+id},p=>{if(M6.campId===id)onStoreChange6(p)}).subscribe();
-    }catch(e){console.warn('[T6] canal da mesa',e)}
+    try{subMesaCh6(id);subDb6(id)}catch(e){console.warn('[T6] canal da mesa',e)}
   }
   try{const st=await stGet6('state');if(M6.campId!==id)return;if(st)acceptState6(st,'carga');else applyState6('carga')}catch(e){console.warn('[T6] carregar mesa',e);applyState6('carga')}
   if(isGM6()&&M6.backend==='store'){try{const v=await stGet6('gmnotes:'+uid3());if(v&&Array.isArray(v.list)&&v.list.length>=M6.gmNotes.length){M6.gmNotes=v.list;lsSet6('tulpa_bn_gm_'+id,M6.gmNotes)}}catch(e){}}
@@ -171,9 +211,10 @@ async function joinMesa6(){
 }
 function leaveMesa6(){
   M6.hooks.leave.forEach(f=>{try{f()}catch(e){}});
-  try{if(M6.ch)sb()?.removeChannel(M6.ch)}catch(e){}
-  try{if(M6.dbch)sb()?.removeChannel(M6.dbch)}catch(e){}
-  M6.ch=M6.dbch=null;M6.live=false;M6.campId=null;clearTimeout(M6.saveTimer);
+  const a=M6.ch,b=M6.dbch;M6.ch=M6.dbch=null;M6.live=false;M6.campId=null;M6.chSt=M6.dbSt='';clearTimeout(M6.saveTimer);
+  try{if(a)sb()?.removeChannel(a)}catch(e){}
+  try{if(b)sb()?.removeChannel(b)}catch(e){}
+  sync6();
 }
 function onStoreChange6(p){
   const row=p.new&&Object.keys(p.new).length?p.new:null,items=M6.backend!=='store';

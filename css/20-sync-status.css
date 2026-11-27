@@ -1,0 +1,27 @@
+/* Indicador de sincronização (js/60l). Só espaçamento em --sp-*, tipografia em --fs-* e as variáveis de estética permitidas.
+   O estado não depende só de cor: o ponto muda de forma (cheio, anel pulsante, riscado) e o rótulo acompanha. */
+.sync60{
+  display:inline-flex;align-items:center;gap:var(--sp-2);flex:0 0 auto;
+  min-height:calc(var(--sp-5) + var(--sp-2));padding:var(--sp-1) var(--sp-3);margin:0;
+  font:inherit;font-family:var(--f-ui,inherit);font-size:var(--fs-xs);line-height:var(--lh-tight,1.2);font-weight:600;white-space:nowrap;
+  color:var(--text);background:var(--panel2,var(--panel));
+  border:1px solid var(--line);border-radius:var(--ae-brad,var(--sp-2));
+  cursor:pointer;
+}
+.sync60[hidden]{display:none!important}
+.sync60:hover{border-color:var(--accent)}
+.sync60:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sync60-dot{
+  width:var(--sp-2);height:var(--sp-2);flex:0 0 var(--sp-2);box-sizing:border-box;border-radius:50%;
+  background:var(--accent);border:2px solid var(--accent);
+}
+.sync60[data-st="reconnecting"] .sync60-dot{background:transparent;animation:sync60-pulse 1.2s ease-in-out infinite}
+.sync60[data-st="offline"] .sync60-dot{
+  background:linear-gradient(135deg,transparent 38%,var(--text) 38% 62%,transparent 62%);border-color:var(--text);
+}
+@keyframes sync60-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.sync60[data-st="reconnecting"] .sync60-dot{animation:none}}
+#mesaBar .sync60{margin-inline:var(--sp-1)}
+@media (max-width:860px){
+  .sync60{min-height:var(--touch);padding:var(--sp-1) var(--sp-3)}
+}

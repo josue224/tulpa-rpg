@@ -39,7 +39,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
    - Código novo vai num arquivo novo **antes** do 61 (ex.: `js/60l-xxx.js`; CSS novo: `css/20-…`), com uma `<script>` na posição certa.
 5. Uma função pode chamar algo de um arquivo **posterior** só depois do carregamento (eventos, timers, cliques). Nunca no topo do arquivo.
 6. O padrão de encadeamento continua válido: `const _f=fn; fn=function(){ … _f.apply(this,arguments) … }`.
-7. Arquivos novos de camada (`60b`–`60e`, `60g`–`60k`) usam **IIFE**, sem criar nomes globais.
+7. Arquivos novos de camada (`60b`–`60e`, `60g`–`60l`) usam **IIFE**, sem criar nomes globais.
 8. **Assets base64:** `js/15`, `js/36`, `js/45` e `js/47`. Não edite e não leia inteiros (~770 KB). Mexa neles só para trocar a arte.
 
 ### Carregamento sob demanda do Arcade (`js/60d-arcade-loader.js`)
@@ -52,12 +52,12 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112715`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112716`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
   ```
-- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112715'`) é só um fallback.
+- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112716'`) é só um fallback.
 
 ### Como verificar antes de commitar
 
@@ -241,6 +241,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Regras, Onda 11 · Tiroteio Tático (`?v=2026112712`)**: seletor de contexto do tiro (detectado pelo mapa e ajustável), Mergulho com os 5 desfechos e deslocamento, 2º Disparo, Fogo de Supressão com Suprimido e Tiro Livre, Mirar, trava de movimento que sobrevive ao F5, crítico balístico com Sangrando, as 5 especializações, barulho do disparo para a IA e painel Tiroteio na ficha. Sem SQL novo. Testado só com campanha falsa (Mestre nos dois lados). **Teste manual:** Mestre e jogador em aparelhos separados com mapa: os dois lados do Mergulho (o Mestre online move o token), supressão com o alvo andando, queima-roupa com bloqueio, escopeta empurrando, arco silencioso contra inimigo em patrulha e o seletor no celular.
 - **Regras, Onda 12 · Itens caídos no mapa (`?v=2026112713`)**: desarmar e "Largar no mapa" (inventário, menu do token e HUD do combate) criam o item no chão, com ícone, ficha do item (hover, foco ou toque), névoa e visões do Mestre, botão "Pegar Item (1 Ação)" e "Devolver" para o Mestre. Sem SQL novo. Testado só com campanha falsa. **Teste manual:** Mestre e dois jogadores em aparelhos separados: desarmar um jogador, os dois pegarem juntos, largar com o Mestre fora da mesa, F5 no Mestre e conferir que nada duplicou nas fichas.
 - **Regras, Onda 13 · Manual Vivo e edição pelo Mestre (`?v=2026112715`)**: Manual com os 8 atributos, 18 perícias e 48 vertentes (1.7 a 1.10), Bloqueio, Manobras, Tiroteio, Coberturas, Condições e itens caídos (5.12 a 5.17), tudo lido dos dados do motor; textos antigos atualizados; central ⚙️ e lápis no Manual editam benefícios, números, perícias e vertentes (criar/excluir, com editor de efeitos); situações de vertente, +d20 concedido, curas de especialização e seletor da Mesa com vertentes e contexto CAR/APA (`js/60k` + `css/19`). Sem SQL.
+- **Onda 1 · Sincronização Mestre -> Player (`?v=2026112716`)**: causa raiz (confirmada no código; o banco real não pôde ser inspecionado): (1) `stDetect6` (`js/20`) caía para a reserva `campaign_items` em **qualquer** erro, não só tabela inexistente. Um erro passageiro (rede, token) no aparelho do Player fixava a reserva pela sessão inteira, enquanto o Mestre gravava em `campaign_store`: o Player lia e assinava outra tabela e nunca mais via o estado da mesa; (2) os canais `tulpa-store-<id>` (mesa/mapa), `tulpa-mesa-<id>` e `tulpa-campaign-<id>` (fichas) ignoravam `CHANNEL_ERROR`/`TIMED_OUT`/`CLOSED` e nada era relido depois de uma queda, então tudo que o Mestre mudava durante a queda se perdia até um F5. Hipótese não verificável sem o banco: tabelas fora da publicação `supabase_realtime`. O que mudou: `stDetect6` só usa a reserva se a tabela não existe (senão lança o erro e a entrada na mesa é refeita); `js/20` ganhou `subMesaCh6`/`subDb6`/`resubMesa6`/`resyncMesa6` (`T3.mesaResub`, `T3.mesaResync`, `M6.dbSt`/`M6.chSt`, evento `tulpa:sync`); `js/06` guarda o status do canal da campanha (`__tulpaCampSt`) e expõe `tulpaResubCampaign`/`tulpaResyncCharacters`; **novo `js/60l-sync-status.js`** (IIFE) refaz os canais com espera (4, 8, 16, 30 s), confere só `updated_at` de `state`/`rules`/`manual` ao voltar o foco ou a rede (`visibilitychange`/`focus`/`online`), reserva de 25 s só com o tempo real caído, e relê tudo ao reconectar; **indicador** "Sincronizado / Reconectando / Offline" (botão que força a conferência) na barra superior, ou na barra da Mesa quando a superior some, estilo no novo `css/20-sync-status.css`. Migração opcional `supabase/migrations/tulpa-sync-realtime.sql` (idempotente, só adiciona tabelas à publicação `supabase_realtime`); o site funciona sem ela. Testado só com Supabase falso (estados do indicador, 1440 e 390 px, sem overflow nem erro de console). **Teste manual:** Mestre e Player (conta teste) em aparelhos separados: o Mestre troca o mapa, move um token e edita uma regra e o Manual, e o Player vê sem F5; no Player, desligar a rede (ou o Wi-Fi) por ~30 s, o Mestre muda algo, religar: o indicador passa por Reconectando e volta a Sincronizado já com a mudança; trocar de aba e voltar após 1 min; conferir o indicador no celular (toque abre a conferência). Se mesmo assim o Player não receber nada, rodar `tulpa-sync-realtime.sql` e conferir se a conta teste está em `campaign_members` (a RLS devolve vazio, sem erro, para quem não é membro).
 
 **Bloco A (visual do Arcade, Ondas 1–7) e Bloco B (regras novas, Ondas 8–13) concluídos.** Testado só no Edge headless com campanha e Supabase falsos.
 

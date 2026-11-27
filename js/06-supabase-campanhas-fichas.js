@@ -322,7 +322,8 @@
  }
  function subscribeCampaign(id){
    if(realtimeChannel)sb.removeChannel(realtimeChannel);
-   realtimeChannel=sb.channel('tulpa-campaign-'+id)
+   window.__tulpaCampSt='JOINING';
+   const ch=realtimeChannel=sb.channel('tulpa-campaign-'+id)
      .on('postgres_changes',{event:'*',schema:'public',table:'characters',filter:'campaign_id=eq.'+id},async payload=>{if(payload?.new?.id&&Date.now()-(OWN_WRITE_AT[payload.new.id]||0)<3000)return;if(!cloudLoading)try{await loadCampaignCharacters(id)}catch(e){console.error(e)}})
      .on('postgres_changes',{event:'*',schema:'public',table:'campaign_runtime',filter:'campaign_id=eq.'+id},async payload=>{
        const c=currentCampaign();if(!c||c.id!==id)return;
@@ -349,8 +350,16 @@
        }
      })
      .on('postgres_changes',{event:'*',schema:'public',table:'campaign_members',filter:'campaign_id=eq.'+id},async()=>{try{await loadDashboard()}catch(e){console.error(e)}})
-     .subscribe(status=>{if(status==='SUBSCRIBED')setCloudBadge('Tempo real conectado')});
+     .subscribe(status=>{
+       if(realtimeChannel!==ch)return;
+       window.__tulpaCampSt=status;
+       if(status==='SUBSCRIBED')setCloudBadge('Tempo real conectado');
+       try{window.dispatchEvent(new CustomEvent('tulpa:sync'))}catch(e){}
+     });
  }
+ /* usados pelo js/60l (ressincronização): refaz o canal da campanha e relê as fichas sem esperar o tempo real */
+ window.tulpaResubCampaign=()=>{const c=currentCampaign();if(!c||!uid())return false;subscribeCampaign(c.id);return true};
+ window.tulpaResyncCharacters=async()=>{const c=currentCampaign();if(!c||!uid()||cloudLoading)return false;await loadCampaignCharacters(c.id);return true};
  // Replace local-only portal operations with cloud-backed versions.
  const localOpenDashboard=openDashboard;
  openDashboard=function(r,playerId=null){
