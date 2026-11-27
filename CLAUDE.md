@@ -52,12 +52,12 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112710`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112711`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
   ```
-- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112710'`) é só um fallback.
+- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112711'`) é só um fallback.
 
 ### Como verificar antes de commitar
 
@@ -111,8 +111,10 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
   - **9 m exatos** de movimento (`MOVE14=9`);
   - 1 Ação Padrão;
   - ações livres;
-  - 1 reação (retaliação e rituais de reação);
+  - **1 Reação por rodada** (Bloqueio e rituais de reação; a Retaliação/Contra-Ataque é ação extra à parte), que volta no início do turno do dono (`d.reacao` + `E.reactionInfo`; não crie outro contador);
   - **só 1 talento por turno** (talento não gasta a ação).
+- **Corpo a corpo (`E.*`, UI em `js/13`, `js/27`, `js/60h`):** **Guarda Fechada** (Ação Padrão) dá até 2 Bloqueios na rodada e +2 de redução. **Bloqueio** (`E.resolveBlock`), testado nesta ordem: Erro Total (ATA<10 e Bloqueio≥10: 0 dano + Contra-Ataque; 20 natural vira Parcial) → Brecha (Bloqueio≥ATA com ATA<10, ou folga ≥5: dano ÷2 − CON − bônus, mín. 1, + Contra-Ataque) → Parcial (Bloqueio≥10 e ATA maior) → Guarda Quebrada (Bloqueio<10 e ATA≥10: dano total). Casos não cobertos viram Parcial. O Contra-Ataque é grátis, só corpo a corpo e sem defesa.
+- **Manobras** (Desarmar, Derrubar, Agarrar/Escapar, Empurrar): 1 Ação Padrão, adjacente, sem dano; empate favorece quem defende. Quem controla o alvo resolve (linhas `man`/`manres` em `campaign_rolls`); o **aparelho do Mestre** move o empurrado (`E.pushPath`, para em parede, borda ou token). Deslocamento forçado não libera movimento manual de ninguém.
 - **Cobertura:** parcial **+4** e pesada **+6** (`E.COVER`; `COVER14` no mapa usa a parcial). Cobertura total bloqueia a linha de visão. Mira com alcance e linha de visão pelas paredes.
 - **Defesa:** DF = 10 + proteções + estados + **DES** (sem proteção Pesada vestida nem excesso de carga). A DES sozinha não conta como "bloqueio" (`armored`).
 - **Atributos (`js/10`, nunca somar de novo na UI):** FOR carga 3+FOR e dano CaC/arremesso (DES em armas Leves e Briga ágil, `E.damageBonus`); CON +VT máximo, redução de bloqueio e Combustão CON+2; PRE +ES máxima e blindagem do 1º dano de Lucidez por cena; INT perícias extras INT−1 e cura médica; PER DT furtiva 10+PER e Lucidez na Trégua; CAR/APA bônus sociais. Máximos sempre por `E.maxStats`/`dmax`, nunca direto de `STAGES`. Criaturas (`beastId`) não somam esses benefícios.
@@ -226,10 +228,11 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Arcade visual, Onda 7 · Lote 6 (`?v=2026112708`)**: Coleta de Essência (oficina alquímica com frascos, perigos, poderes e Colosso desenhados, Caldeirão e Impulso diegéticos), Eco da Memória (uma Câmara por regra, medalhões apagado/aceso/falso e painel de "observe / sua vez") e Jogo da Velha (mesa ritual, marcas talhadas, fichas dos jogadores). Botões de toque de todos os jogos com ícones SVG, ≥ 44 px e sem sobreposição (`GFX60.dressPad` envolve o `padBind`; o `data-k` não muda; estilos `.pad60` no `css/13`). Com isso os 22 jogos estão com o visual novo. Somente visual.
 - **Regras, Onda 8 · Motor e catálogo (`?v=2026112709`)**: benefícios diretos dos 8 atributos no motor (Vital +CON, Essência +PRE, DES na Defesa, FOR/DES no dano, perícias extras INT−1), 18 perícias e 48 vertentes (a especificação cita 49, mas lista 48) em `js/09b`, generalismo, migração idempotente das fichas e cobertura +4/+6. A interface de vertentes, Bloqueio/Manobras, Tiroteio, itens caídos e Manual vêm nas Ondas 9–13. API no `ARQUITETURA.md`. **Teste manual:** ficha antiga logada (Vital/Essência cheios sobem, bônus iguais), ataque corpo a corpo com dano +FOR, DF na Mesa para jogador e Mestre.
 - **Regras, Onda 9 · Ficha (`?v=2026112710`)**: benefícios dos 8 atributos junto de cada um (`js/60g` + `css/15`), alerta de proteção pesada/sobrecarga, Blindagem de Lucidez ligada a todos os lançamentos de dano, contexto social (CAR/APA) nas rolagens da ficha e aba Especializações (treinar, escolher a vertente do treino antigo, rolar, generalista ÷2). Testado só com ficha local falsa. **Teste manual:** logado, jogador e Mestre treinam uma especialização, rolam com o histórico da mesa ligado e tiram Lucidez pela ficha e pela Mesa.
+- **Regras, Onda 10 · Corpo a corpo (`?v=2026112711`)**: marcador de Reação (barra da ordem, HUD, Mesa e ficha), Guarda Fechada, Bloqueio com os 4 desfechos e Contra-Ataque, Desarmar, Derrubar, Agarrar/Escapar/Soltar e Empurrar no mapa com alerta de colisão, condições Agarrado/Segurando e efeitos das vertentes corpo a corpo e de arremesso. Sem SQL novo. Testado só com campanha falsa (Mestre controlando os dois lados). O desarme deixa a arma em "Largado" (`equipped:false`) e dispara `T3.disarmHooks` / `tulpa:disarm` para a Onda 12. **Teste manual:** Mestre e jogador logados em aparelhos separados: bloqueio, contra-ataque, cada manobra nos dois sentidos, empurrão contra parede (o Mestre precisa estar online) e a barra de combate no celular.
 
 ### Pendente / próximos passos
 0. **Teste manual pós-login da Onda de estabilidade:** névoa nas 3 visões do Mestre e no jogador, música no aparelho do Mestre com um vídeo que dava erro 150, e Volley, Rinha e Abismo com convidado em outra rede.
-1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112710`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
+1. **Atualizar o `ARQUITETURA.md`.** Ele cita o token `?v=20261122p` (o real é `2026112711`) e ainda lista `js/29–31`, `34` e `50–60` como tags do `index.html` (hoje vêm do `60d`).
 2. **Teste manual pós-login** de tudo que o teste automático não cobre: login real, mesa, mapa, call, transmissão e Arcade com carregamento sob demanda (inclusive em sala multijogador, com convidado entrando antes de o Arcade carregar).
 3. **Atualizar o Manual em PDF:** perícias começam em 0 e não existe História.
 4. **Balancear a Coleta de Essência.** A Receita 7, "Destilado do Vazio", foi a mais difícil para o bot (6 de 8 tentativas). Ajuste se os jogadores reclamarem.

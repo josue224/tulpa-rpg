@@ -5,6 +5,8 @@ window.T3.CB=CB;
 const chars3=()=>camp3()?.characters||[];
 const charById=id=>chars3().find(c=>c.id===id);
 const nm=ch=>ch?.data?.name||'Personagem';
+/* onde este personagem está na rodada (null fora de combate): base da Reação e da Guarda */
+const turnOf=ch=>E.turnCtx(camp3()?.combat,ch?.id);
 const myLabel=()=>role3()==='master'?'Mestre':(window.tulpaCloudUser?.user_metadata?.display_name||window.tulpaCloudUser?.email?.split('@')[0]||'Jogador');
 
 /* ---------- modal com promessa e cancelamento ---------- */
@@ -410,16 +412,16 @@ async function announceRoll(ch,label,{dice=[],sides=20,bonus=0,total=0,note='',s
 function rollAnn(ch,label,expr,eyebrow='ROLAGEM'){const pd=E.parseDice(expr),rr=E.rollExpr(expr);announceRoll(ch,label,{dice:rr.rolls,sides:pd.s,bonus:rr.mod,total:rr.total,eyebrow});return rr.total}
 T3.announceRoll=announceRoll;
 function queuePopup(dt){
-  const sets=[{label:`Ataque · ${dt.atk?.skill||''}`,dice:dt.atk?.dice||[],bonus:dt.atk?.bonus||0,total:dt.ATA,hi:'max'},{label:`${dt.def?.skill||'Defesa'}${dt.DF>10?' · DF '+dt.DF:''}`,dice:dt.def?.dice||[],bonus:dt.def?.bonus||0,total:dt.RF,hi:'max'}];
+  const sets=[{label:`Ataque · ${dt.atk?.skill||''}`,dice:dt.atk?.dice||[],bonus:dt.atk?.bonus||0,total:dt.ATA,hi:'max'},{label:`${dt.def?.skill||'Defesa'}${dt.block?' · reduz '+(dt.reduction||0):dt.DF>10?' · DF '+dt.DF:''}`,dice:dt.def?.dice||[],bonus:dt.def?.bonus||0,total:dt.RF,hi:'max'}];
   const di=dt.dmgInfo;
   if(dt.hit&&di)sets.push({label:`Dano ${di.dado}${di.usedCrit?' (crítico: dados rolados 2×)':''}`,dice:[...di.normal,...(di.usedCrit?di.crit:[])],bonus:di.flat,total:di.total,note:dt.dmg.final!==di.total?`Após absorção/resistência: ${dt.dmg.final}`:''});
-  showRollPopup({crit:!!(dt.crit&&dt.hit),fumble:false,block:dt.outcome==='defesa',eyebrow:'CONFRONTO',title:`${dt.attackerName} ⚔ ${dt.targetName}`,sub:dt.weapon,sets,big:dt.label+(dt.crit?' · CRÍTICO':''),tone:{esquiva:'ok',defesa:'ok',retaliacao:'ok',normal:'hit',violento:'bad'}[dt.outcome],
+  showRollPopup({crit:!!(dt.crit&&dt.hit),fumble:false,block:dt.outcome==='defesa'||!!(dt.block&&dt.hit),eyebrow:'CONFRONTO',title:`${dt.attackerName} ⚔ ${dt.targetName}`,sub:dt.weapon,sets,big:dt.label+(dt.crit?' · CRÍTICO':''),tone:{esquiva:'ok',defesa:'ok',retaliacao:'ok',normal:'hit',violento:'bad'}[dt.outcome],
     detail:esc(dt.text)+(dt.hit?`<br><b>${dt.dmg.final} de dano</b>${dt.statuses?.length?' · '+dt.statuses.map(x=>esc(STATUS_BY_ID[x]?.name||x)).join(', '):''}`:'')+(dt.notes||[]).map(n=>`<br><span class="sub">${esc(n)}</span>`).join('')});
 }
 const miniDice=(dice,hi)=>{const a=(dice||[]).map(Number),b=hi&&a.length?Math.max(...a):null;return `<span class="t3-mini">${a.map(x=>`<i class="${hi&&x===b?'best':''}">${x}</i>`).join('')}</span>`};
 window.tulpaHistItem=r=>{
   const d=r.detail||{},hh=new Date(r.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),di=d.dmgInfo;
-  return `<div class="roll-hist-item t3-hist"><div><span class="rh-name">⚔ ${esc(d.attackerName)} → ${esc(d.targetName)}</span> <span class="rh-skill">${esc(d.weapon)} · ${esc(d.label)}${d.crit?' · CRÍTICO':''}</span></div><div class="t3-histdice"><div><small>ATAQUE ${esc(d.atk?.skill||'')}</small>${miniDice(d.atk?.dice,true)}<b>${d.ATA}</b></div><div><small>${esc((d.def?.skill||'DEFESA').toUpperCase())}${d.DF>10?' · DF '+d.DF:''}</small>${miniDice(d.def?.dice,true)}<b>${d.RF}</b></div>${d.hit&&di?`<div><small>DANO ${esc(di.dado)}${di.usedCrit?' ×2':''}</small>${miniDice([...di.normal,...(di.usedCrit?di.crit:[])],false)}${di.flat?`<span class="rh-bonus">${sign(di.flat)}</span>`:''}<b>${d.dmg.final}</b></div>`:''}</div><div class="rh-meta">${hh} · ${esc(d.text||'')}</div></div>`;
+  return `<div class="roll-hist-item t3-hist"><div><span class="rh-name">⚔ ${esc(d.attackerName)} → ${esc(d.targetName)}</span> <span class="rh-skill">${esc(d.weapon)} · ${esc(d.label)}${d.crit?' · CRÍTICO':''}</span></div><div class="t3-histdice"><div><small>ATAQUE ${esc(d.atk?.skill||'')}</small>${miniDice(d.atk?.dice,true)}<b>${d.ATA}</b></div><div><small>${esc((d.def?.skill||'DEFESA').toUpperCase())}${d.block?' · reduz '+(d.reduction||0):d.DF>10?' · DF '+d.DF:''}</small>${miniDice(d.def?.dice,true)}<b>${d.RF}</b></div>${d.hit&&di?`<div><small>DANO ${esc(di.dado)}${di.usedCrit?' ×2':''}</small>${miniDice([...di.normal,...(di.usedCrit?di.crit:[])],false)}${di.flat?`<span class="rh-bonus">${sign(di.flat)}</span>`:''}<b>${d.dmg.final}</b></div>`:''}</div><div class="rh-meta">${hh} · ${esc(d.text||'')}</div></div>`;
 };
 
 /* ---------- defesa ---------- */
@@ -436,15 +438,20 @@ async function defendPrompt(aid,tid){
   const d=ch.id===activeCharacterId?data:ch.data,m=E.computeMods(d);
   const forced=m.flags.has('semDefender')||m.flags.has('semAgir')||m.flags.has('semEsquivar');
   const reflexOnly=p.dt.surprise||d.combatSurprised;
-  const di=E.defenseInfo(d);
-  const rx=forced?[]:reactionsFor(ch,d);
+  const di=E.defenseInfo(d),turn=turnOf(ch),ri=E.reactionInfo(d,turn);
+  const rxAll=forced?[]:reactionsFor(ch,d),rx=ri.reactionAvailable?rxAll:[];
+  /* Bloqueio (Reação): só contra corpo a corpo, vendo o ataque e com a Reação (ou a Guarda) livre */
+  const bchk=E.canBlock(d,{weapon:p.dt.weapon,turn,noDefense:p.dt.noDefense,surprise:reflexOnly});
+  const bopts=forced||!bchk.ok?[]:E.blockStyles(d).map(s=>{const pl=E.blockPlan(d,s.id,turn),k=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},pl.skill,pl.attr);return{pl,n:Math.max(1,k.n+pl.extraDice),bonus:k.bonus}});
+  const blkHtml=forced||!E.isMeleeWeapon(p.dt.weapon)?'':bopts.length?`<div class="cac-block" role="group" aria-label="Bloquear (Reação)"><p class="sub"><b>Bloquear (Reação)</b>${ri.guard?' · Guarda Fechada: restam '+ri.left:''} · vence com folga de 5 ou se o ataque errar a Defesa Base 10: Contra-Ataque grátis.</p><div class="inline">${bopts.map(o=>`<button class="btn" data-blk="${o.pl.id}">🛡 ${esc(o.pl.label)} · ${o.n}d20 ${sign(o.bonus)} · reduz ${o.pl.reduction}</button>`).join('')}</div></div>`:`<p class="sub cac-no">🛡 Bloqueio indisponível: ${esc(bchk.msg||'')}</p>`;
+  const rxOff=rxAll.length&&!rx.length?'<p class="sub">Reação desta rodada já usada: rituais de reação indisponíveis.</p>':'';
   const rxHtml=rx.length?`<div class="field" style="margin-top:8px"><label>Reação instantânea (opcional, paga Essência)</label><select id="defReact"><option value="">Nenhuma</option>${rx.map(x=>`<option value="${x.id}">${esc(x.name)} — ${x.cost} ES · ${esc(x.hint)}</option>`).join('')}</select></div>`:'';
-  const body=`<div class="notice t3-alert"><b>${esc(p.dt.attackerName)}</b> ataca <b>${esc(nm(ch))}</b> com <b>${esc(p.dt.weapon.name)}</b>!</div><p>${forced?'Você <b>não pode se defender</b> neste estado.':reflexOnly?'Você foi pego desprevenido: role <b>Reflexo</b>.':'Se você está vendo o ataque role <b>Esquiva</b>; se foi pego desprevenido role <b>Reflexo</b>.'}</p><p class="sub">Sua Defesa (DF): ${di.DF} · Defesa Base 10${di.hasDefense?' · o equipamento pode bloquear o golpe':''}. ${m.disadv.size||m.disadvSkills.size?'Há desvantagens em vigor.':''}</p>${forced?'':`<div class="inline">${reflexOnly?'':'<button class="btn primary" id="defEsq">🎲 Esquiva (estou vendo)</button>'}<button class="btn ${reflexOnly?'primary':''}" id="defRef">🎲 Reflexo (desprevenido)</button></div>`}${rxHtml}${di.hasDefense?`<p class="sub">${E.protProficient(d)?'Proficiente nas proteções vestidas.':'Sem proficiência na proteção: a retaliação só vem se a rolagem superar a sua DF.'}</p>`:''}`;
+  const body=`<div class="notice t3-alert"><b>${esc(p.dt.attackerName)}</b> ataca <b>${esc(nm(ch))}</b> com <b>${esc(p.dt.weapon.name)}</b>!</div><p>${forced?'Você <b>não pode se defender</b> neste estado.':reflexOnly?'Você foi pego desprevenido: role <b>Reflexo</b>.':'Se você está vendo o ataque role <b>Esquiva</b>; se foi pego desprevenido role <b>Reflexo</b>.'}</p><p class="sub">Sua Defesa (DF): ${di.DF} · Defesa Base 10${di.hasDefense?' · o equipamento pode bloquear o golpe':''}. ${m.disadv.size||m.disadvSkills.size?'Há desvantagens em vigor.':''}</p>${forced?'':`<div class="inline">${reflexOnly?'':'<button class="btn primary" id="defEsq">🎲 Esquiva (estou vendo)</button>'}<button class="btn ${reflexOnly?'primary':''}" id="defRef">🎲 Reflexo (desprevenido)</button></div>`}${blkHtml}${rxHtml}${rxOff}${di.hasDefense?`<p class="sub">${E.protProficient(d)?'Proficiente nas proteções vestidas.':'Sem proficiência na proteção: a retaliação só vem se a rolagem superar a sua DF.'}</p>`:''}`;
   const label=forced?'Sofrer o ataque':(reflexOnly?'Rolar Reflexo':'Rolar Esquiva');
   const dflt=forced?'none':reflexOnly?'reflexo':'esquiva';
   const rv=()=>$('defReact')?.value||'';
   openModal('VOCÊ ESTÁ SENDO ATACADO',nm(ch),body,label,()=>{const x=rv();closeModal();doDefense(aid,tid,x==='brecha'?'none':dflt,false,x)});
-  setTimeout(()=>{const e=$('defEsq'),r=$('defRef');if(e)e.onclick=()=>{const x=rv();closeModal();doDefense(aid,tid,x==='brecha'?'none':'esquiva',false,x)};if(r)r.onclick=()=>{const x=rv();closeModal();doDefense(aid,tid,x==='brecha'?'none':'reflexo',false,x)}},0);
+  setTimeout(()=>{$$('#modalBody [data-blk]').forEach(b=>b.onclick=()=>{closeModal();doDefense(aid,tid,'block:'+b.dataset.blk)});const e=$('defEsq'),r=$('defRef');if(e)e.onclick=()=>{const x=rv();closeModal();doDefense(aid,tid,x==='brecha'?'none':'esquiva',false,x)};if(r)r.onclick=()=>{const x=rv();closeModal();doDefense(aid,tid,x==='brecha'?'none':'reflexo',false,x)}},0);
 }
 /* uma defesa por ataque e por alvo: nunca roda duas vezes, nem em paralelo, nem depois do resultado */
 async function doDefense(aid,tid,mode,byMaster=false,react=''){
@@ -456,8 +463,15 @@ async function doDefense(aid,tid,mode,byMaster=false,react=''){
 async function doDefenseNow(aid,tid,mode,byMaster=false,react=''){
   const p=CB.pending[aid],ch=charById(tid);if(!p||!ch||p.targets[tid]?.def||p.targets[tid]?.res)return;
   const d=ch.id===activeCharacterId?data:ch.data,m=E.computeMods(d),di=E.defenseInfo(d);
+  const turn=turnOf(ch);
+  if(String(mode).startsWith('block:')){
+    const chk=E.canBlock(d,{weapon:p.dt.weapon,turn,noDefense:p.dt.noDefense,surprise:p.dt.surprise||d.combatSurprised});
+    if(chk.ok)return doBlockNow(aid,tid,mode.slice(6),byMaster);
+    toast('Sem bloqueio: '+chk.msg+' Rolando Esquiva.');mode='esquiva';
+  }
   let rxDef=react?reactionsFor(ch,d).find(x=>x.id===react):null;
-  if(rxDef){mutateChar(ch,x=>{x.essence=Math.max(0,(Number(x.essence)||0)-rxDef.cost)});toast(rxDef.name+'! −'+rxDef.cost+' ES');fx3('activate');if(rxDef.el)setTimeout(()=>{try{window.tulpaFx('cast',rxDef.el)}catch(e){}},40)}
+  if(rxDef&&!E.reactionInfo(d,turn).reactionAvailable){toast('Sua Reação desta rodada já foi usada: '+rxDef.name+' não foi conjurado.');rxDef=null}
+  if(rxDef){mutateChar(ch,x=>{E.useReaction(x,turn);x.essence=Math.max(0,(Number(x.essence)||0)-rxDef.cost)});toast(rxDef.name+'! −'+rxDef.cost+' ES');fx3('activate');if(rxDef.el)setTimeout(()=>{try{window.tulpaFx('cast',rxDef.el)}catch(e){}},40)}
   let r=null,detail={cmb:'def',aid,targetId:tid,mode,df:di.DF,armored:di.armored,prof:E.protProficient(d),react:rxDef?rxDef.id:'',canDefend:mode!=='none'||!!rxDef};
   if(mode==='none')return insertRow(ch,'Sem defesa',{dice:[],bonus:0,total:0,detail}).then(row=>resolveFor(aid,tid,row)).catch(e=>fail3('defesa',e));
   const skill=mode==='reflexo'?'Reflexo':'Esquiva';
@@ -466,6 +480,18 @@ async function doDefenseNow(aid,tid,mode,byMaster=false,react=''){
   mutateChar(ch,x=>consumeOnce(x,cal));
   showRollPopup({eyebrow:'DEFESA',title:`${nm(ch)} · ${skill}`,sub:`DF ${di.DF}`,sets:[{label:`${skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max',note:r.mode!=='normal'?r.mode:''}],big:r.total,detail:'Aguardando o resultado do confronto…'});
   const row=await insertRow(ch,skill+(byMaster?' (pelo Mestre)':''),{dice:r.dice,bonus:r.bonus,total:r.total,attribute:'Destreza',detail:{...detail,best:r.best}});
+  await resolveFor(aid,tid,row);
+}
+/* Bloqueio: rola a perícia no atributo do estilo, gasta a Reação (ou um uso da Guarda) e resolve */
+async function doBlockNow(aid,tid,style,byMaster=false){
+  const p=CB.pending[aid],ch=charById(tid);if(!p||!ch)return;
+  const d=ch.id===activeCharacterId?data:ch.data,turn=turnOf(ch),plan=E.blockPlan(d,style,turn),di=E.defenseInfo(d);
+  const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},plan.skill,plan.attr);
+  const r=E.rollTest(d,plan.skill,cal.SA,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis,extraDice:plan.extraDice,consumeDelta:true});fx3('dice');
+  mutateChar(ch,x=>{consumeOnce(x,cal);E.useReaction(x,turn,{block:true})});
+  showRollPopup({eyebrow:'BLOQUEIO',title:`${nm(ch)} · ${plan.skill}`,sub:`Reduz ${plan.reduction}${plan.guard?' (Guarda Fechada)':''}`,sets:[{label:`${plan.skill} (${plan.attr}) ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max',note:r.mode!=='normal'?r.mode:''}],big:r.total,detail:'Aguardando o resultado do confronto…'});
+  const detail={cmb:'def',aid,targetId:tid,mode:'bloqueio',df:di.DF,armored:di.armored,prof:E.protProficient(d),react:'',canDefend:true,best:r.best,block:{style:plan.id,skill:plan.skill,rd:plan.reduction,parts:plan.parts,guard:plan.guard}};
+  const row=await insertRow(ch,'Bloqueio · '+plan.skill+(byMaster?' (pelo Mestre)':''),{dice:r.dice,bonus:r.bonus,total:r.total,attribute:plan.attr,detail});
   await resolveFor(aid,tid,row);
 }
 async function resolveFor(aid,tid,defRow){
@@ -490,9 +516,17 @@ async function resolveFor(aid,tid,defRow){
     Object.assign(atkView,{dice:dice2,total:ATA2});out.notes.push(`Reação: Desvio Improvável — o atacante repetiu o ataque (${p.row.total} → ${ATA2}).`);
   }
   if(res.forced)out.notes.push('20 natural: o ataque sempre acerta, independentemente de bônus ou defesa.');
+  /* Bloqueio: troca a tabela de Esquiva pelos 4 desfechos do motor */
+  let blk=null;
+  if(dd.block&&canDefend&&!targetDown){
+    const full=critNow?a.dmg.critTotal:a.dmg.total;
+    blk=E.resolveBlock({block:defRow.total,ATA:p.row.total,DB:10,damage:full,reduction:dd.block.rd,nat20});
+    res={...res,outcome:blk.hit?'normal':'retaliacao',hit:blk.hit,crit:blk.hit&&critNow,forced:false,extraAtk:0,extraDef:blk.counter?1:0,label:blk.label,text:blk.text,RF:defRow.total};
+    if(blk.outcome==='brecha'||blk.outcome==='parcial')out.notes.push(`Bloqueio: ${full} ÷ 2 − ${dd.block.rd} (CON${dd.block.parts?.vert?' + Boxe':''}${dd.block.guard?' + Guarda':''}) = ${blk.damage} (mínimo 1).`);
+  }
   const hadAlert=(dT.statuses||[]).some(x=>(x.id||x)==='alerta');
   if(res.hit||hadAlert){
-    let base=critNow?a.dmg.critTotal:a.dmg.total;
+    let base=blk?blk.damage:critNow?a.dmg.critTotal:a.dmg.total;
     if(res.hit&&dd.react==='intervencao'){const rr=E.rollExpr('2d6');announceRoll(ch,'Intervenção Divina Menor · redução 2d6',{dice:rr.rolls,sides:6,total:rr.total,eyebrow:'REAÇÃO'});base=Math.max(0,base-rr.total);out.notes.push(`Reação: Intervenção Divina Menor reduziu o dano em ${rr.total}.`)}
     if(res.hit){dmgInfo.usedCrit=critNow;dmgInfo.total=base}
     mutateChar(ch,d=>{
@@ -517,9 +551,15 @@ async function resolveFor(aid,tid,defRow){
     });
   }
   if(a.noDefense)res={...res,extraAtk:0};
-  if(res.extraDef){const dk=TURN.key||('r'+(camp3()?.combat?.round||0));const rg=(CB.retalGiven=CB.retalGiven||{}),rk=ch.id+'|'+dk;if(dT.retalKey!==dk&&!rg[rk]&&!(Number(dT.retalExtra)>0)){rg[rk]=1;mutateChar(ch,d=>{d.retalKey=dk;d.retalExtra=1;d.retalTarget=a.attackerId})}else{res={...res,extraDef:0};out.notes.push('Retaliação já usada neste turno: sem nova ação extra.')}}
-  if(cov&&canDefend)out.notes.push(`Cobertura parcial: +${cov} na defesa.`);
-  const detail={cmb:'res',cover:cov,aid,targetId:tid,targetName:nm(ch),attackerId:a.attackerId,attackerName:a.attackerName,weapon:a.weapon.name,mode:dd.mode,outcome:res.outcome,label:res.label,text:res.text,hit:res.hit,crit:res.crit,ATA:res.ATA,RF:res.RF,DB:10,DF:dd.df,dmg:{final:out.final,absorbed:out.absorbed,resisted:out.resisted},statuses:stAdd,notes:out.notes,forced:!!res.forced,extraAtk:res.extraAtk,extraDef:res.extraDef,atk:atkView,react:dd.react||'',def:{skill:dd.mode==='reflexo'?'Reflexo':dd.mode==='none'?'Sem defesa':'Esquiva',dice:defRow.dice||[],bonus:defRow.bonus||0,total:defRow.total},dmgInfo};
+  if(blk){
+    /* cada Brecha ou Erro Total dá 1 Contra-Ataque corpo a corpo (o limite natural é a Reação) */
+    if(res.extraDef){
+      if(E.isDying(dT)||E.isDead(dT)){res={...res,extraDef:0};out.notes.push('Sem condições de contra-atacar.')}
+      else mutateChar(ch,d=>{d.retalExtra=1;d.retalTarget=a.attackerId;d.retalCounter=true});
+    }
+  }else if(res.extraDef){const dk=TURN.key||('r'+(camp3()?.combat?.round||0));const rg=(CB.retalGiven=CB.retalGiven||{}),rk=ch.id+'|'+dk;if(dT.retalKey!==dk&&!rg[rk]&&!(Number(dT.retalExtra)>0)){rg[rk]=1;mutateChar(ch,d=>{d.retalKey=dk;d.retalExtra=1;d.retalTarget=a.attackerId})}else{res={...res,extraDef:0};out.notes.push('Retaliação já usada neste turno: sem nova ação extra.')}}
+  if(cov&&canDefend&&!blk)out.notes.push(`Cobertura parcial: +${cov} na defesa.`);
+  const detail={cmb:'res',...(blk?{block:blk.outcome,reduction:blk.reduction,counter:!!res.extraDef}:{}),cover:cov,aid,targetId:tid,targetName:nm(ch),attackerId:a.attackerId,attackerName:a.attackerName,weapon:a.weapon.name,mode:dd.mode,outcome:res.outcome,label:res.label,text:res.text,hit:res.hit,crit:res.crit,ATA:res.ATA,RF:res.RF,DB:10,DF:dd.df,dmg:{final:out.final,absorbed:out.absorbed,resisted:out.resisted},statuses:stAdd,notes:out.notes,forced:!!res.forced,extraAtk:res.extraAtk,extraDef:res.extraDef,atk:atkView,react:dd.react||'',def:{skill:dd.block?'Bloqueio ('+dd.block.skill+')':dd.mode==='reflexo'?'Reflexo':dd.mode==='none'?'Sem defesa':'Esquiva',dice:defRow.dice||[],bonus:defRow.bonus||0,total:defRow.total},dmgInfo};
   try{await insertRow(ch,'Resultado do confronto',{dice:[],bonus:0,total:out.final,detail})}catch(e){fail3('registrar resultado',e)}
 }
 
@@ -529,7 +569,9 @@ function processTurnStart(ch){
   if(isDyingCh(ch)||isDeadCh(ch))return;
   const log=[],annos=[];
   mutateChar(ch,d=>{
-    d.combatExtra=0;d.retalExtra=0;d.retalTarget=null;d.statuses=d.statuses||[];
+    d.combatExtra=0;d.retalExtra=0;d.retalTarget=null;delete d.retalCounter;d.statuses=d.statuses||[];
+    /* início do próprio turno: a Reação volta e a Guarda se abre */
+    E.pruneReaction(d,turnOf(ch));
     const dy=E.dyingTick(d);if(dy)log.push(dy.dead?'☠ MORREU: não foi estabilizado a tempo.':`Morrendo: restam ${dy.left} turno(s) para ser estabilizado.`);
     d.statuses.slice().forEach(s=>{
       const def=STATUS_BY_ID[s.id];if(!def)return;
@@ -592,7 +634,7 @@ const retalOf=ch=>Number((ch.id===activeCharacterId?data:ch.data).retalExtra)||0
 /* quem não tem a vez só age com a Retaliação (a ação extra de defesa) */
 const actionsLeft=ch=>{const isTurn=TURN.actor===ch.id;return(isTurn&&!TURN.actionUsed?1:0)+((isTurn&&TURN.extraUsed)?0:Math.min(1,Number((ch.id===activeCharacterId?data:ch.data).combatExtra)||0))+(isTurn?0:retalOf(ch))};
 function spend(ch,kind='std'){
-  if(kind==='retal'){mutateChar(ch,d=>{d.retalExtra=Math.max(0,(Number(d.retalExtra)||0)-1);if(!d.retalExtra)d.retalTarget=null});return}
+  if(kind==='retal'){mutateChar(ch,d=>{d.retalExtra=Math.max(0,(Number(d.retalExtra)||0)-1);if(!d.retalExtra){d.retalTarget=null;delete d.retalCounter}});return}
   if(TURN.actor===ch.id&&!TURN.actionUsed){TURN.actionUsed=true;return}
   if(TURN.actor!==ch.id&&retalOf(ch)>0){spend(ch,'retal');return}
   if(TURN.actor===ch.id)TURN.extraUsed=true;
@@ -605,9 +647,10 @@ async function startAttack(ch,{retal=false}={}){
   if(m.flags.has('semAgir')||m.flags.has('semAtacar')){toast('Neste estado você não pode atacar.');return}
   if(retal){if(retalOf(ch)<=0){toast('Você não tem ação de retaliação.');return}}
   else if(actionsLeft(ch)<=0){toast('Você já usou sua ação neste turno.');return}
-  const quick=E.quickWeapons(d),pack=E.packWeapons(d);
+  const counter=retal&&!!d.retalCounter;
+  const quick=E.quickWeapons(d).filter(i=>!counter||E.isMeleeWeapon(i.w)),pack=E.packWeapons(d);
   const card=(w,id,tag)=>`<button class="t3-weapon" data-w="${id}"><b>${esc(w.name)}${d.favWeaponId&&d.favWeaponId===id?' ★':''}</b><span>${esc(w.skill)} · dano <b>${esc(w.dado)}</b> · crítico ${w.critMin>=20?'20':w.critMin+'-20'}${w.area?' · área':''}</span><span class="sub">${(w.effects||[]).map(e=>(STATUS_BY_ID[e.status]?.name||e.status)+' ('+(e.when==='crit'?'no crítico':'no acerto')+')').join(' · ')||'sem estado'}${tag?' · '+tag:''}</span></button>`;
-  openModal('ATACAR',nm(ch),`<p class="sub">Escolha a arma do saque rápido (mãos, cintura/coldre, bandoleira) ou ataque desarmado.</p><div class="t3-weapons">${quick.map(i=>card(i.w,i.id,LOCS[i.loc])).join('')}${card(UNARMED,'__soco','1d2 · Briga')}</div>${pack.length&&!retal?`<h4 style="margin-top:12px">Sacar da mochila (gasta a ação)</h4><div class="t3-weapons">${pack.map(i=>`<button class="t3-weapon" data-draw="${i.id}"><b>${esc(i.name)}</b><span>${esc(i.w.skill)} · ${esc(i.w.dado)} · crít. ${i.w.critMin>=20?'20':i.w.critMin+'-20'}</span><span class="sub">${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>`:''}${retal?'<div class="notice t3-alert">Contra-ataque de Retaliação: <b>não pode ser esquivado</b>.</div>':''}<label class="t3-check" style="margin-top:10px;${retal?'display:none':''}"><input type="checkbox" id="atkSurprise"> Ataque de surpresa (o alvo está desprevenido e só pode rolar Reflexo)</label>`,'Fechar',closeModal);
+  openModal('ATACAR',nm(ch),`<p class="sub">Escolha a arma do saque rápido (mãos, cintura/coldre, bandoleira) ou ataque desarmado.</p><div class="t3-weapons">${quick.map(i=>card(i.w,i.id,LOCS[i.loc])).join('')}${card(UNARMED,'__soco','1d2 · Briga')}</div>${pack.length&&!retal?`<h4 style="margin-top:12px">Sacar da mochila (gasta a ação)</h4><div class="t3-weapons">${pack.map(i=>`<button class="t3-weapon" data-draw="${i.id}"><b>${esc(i.name)}</b><span>${esc(i.w.skill)} · ${esc(i.w.dado)} · crít. ${i.w.critMin>=20?'20':i.w.critMin+'-20'}</span><span class="sub">${LOCS[i.loc]} → mãos</span></button>`).join('')}</div>`:''}${retal?`<div class="notice t3-alert">${counter?'Contra-Ataque do bloqueio: <b>só corpo a corpo</b>, de graça e <b>não pode ser esquivado</b>.':'Contra-ataque de Retaliação: <b>não pode ser esquivado</b>.'}</div>`:''}<label class="t3-check" style="margin-top:10px;${retal?'display:none':''}"><input type="checkbox" id="atkSurprise"> Ataque de surpresa (o alvo está desprevenido e só pode rolar Reflexo)</label>`,'Fechar',closeModal);
   $$('[data-w]').forEach(b=>b.onclick=async()=>{
     const surprise=!!$('atkSurprise')?.checked,id=b.dataset.w;const it0=quick.find(i=>i.id===id);const w=id==='__soco'?UNARMED:(it0?{peso:it0.peso,...it0.w,_itemId:it0.id,_ammo:!!it0.useAmmo}:null);closeModal();_modalResolve=null;
     if(!w)return;
@@ -633,26 +676,32 @@ async function performAttack(ch,w,targetIds,{surprise=false,retal=false,noSpend=
   if(m0.flags.has('alvoAleatorio')&&others.length){ids=[others[Math.floor(E.rng()*others.length)]];toast('Enlouquecido: o ataque vai para um alvo aleatório!')}
   else if(m0.flags.has('confuso')&&others.length&&(()=>{const c2=E.die(2);announceRoll(ch,'Confuso (1d2)',{dice:[c2],sides:2,total:c2,eyebrow:'ESTADO',note:c2===1?'Errou o alvo!':'Mantém o alvo'});return c2===1})()){ids=[others[Math.floor(E.rng()*others.length)]];toast('Confuso: você errou o alvo!')}
   if(m0.flags.has('soCorpoACorpo')&&w.cat!=='Corpo a corpo'&&w.skill!=='Briga'){toast('Trauma Ira: só ataques corpo a corpo.');return}
-  const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},w.skill);
+  const counter=retal&&!!d.retalCounter;
+  if(counter&&!E.isMeleeWeapon(w)){toast('O Contra-Ataque é só corpo a corpo.');return}
+  const wa=E.weaponAllowed(d,w);if(!wa.ok){toast(wa.msg);return}
+  /* especializações corpo a corpo: atributo no acerto, +1d20 e dano extra */
+  const plan=E.meleePlan(d,w,{surprise,counter});
+  const cal=skillCalc3({data:d,vocations:ch.vocations||vocations,tracks:ch.tracks||tracks},w.skill,plan.attr);
   /* alvo Caído: vantagem em ataques corpo a corpo */
   const melee=w.cat==='Corpo a corpo'||w.skill==='Briga',downAdv=melee&&ids.length>0&&ids.every(i=>stIds(charById(i)?.data).includes('caido'));
-  const r=E.rollTest(d,w.skill,SKILL_ATTR,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis,adv:downAdv,consumeDelta:true});fx3('dice');
+  const r=E.rollTest(d,w.skill,cal.SA,{mods:cal.mods,bonus:cal.bonus,disadv:cal.dis,adv:downAdv,extraDice:plan.extraDice,consumeDelta:true});fx3('dice');
   if(downAdv)toast('Alvo Caído: vantagem no ataque corpo a corpo.');
   /* FOR (ou DES em armas Leves e Briga) soma no dano corpo a corpo e de arremesso */
-  const attrDmg=E.damageBonus(d,w);
-  let flat=cal.mods.dmg+attrDmg.bonus;(d.activeEffects||[]).forEach(e=>{if(e.dmgExtra)flat+=E.rollExpr(e.dmgExtra).total});
+  const attrDmg=E.damageBonus(d,w,plan.attr?{attr:plan.attr}:{});
+  let flat=cal.mods.dmg+attrDmg.bonus+plan.flat;(d.activeEffects||[]).forEach(e=>{if(e.dmgExtra)flat+=E.rollExpr(e.dmgExtra).total});
+  if(ids.length===1)E.meleeExtraDice(d,w,charById(ids[0])?.data).forEach(x=>{const v=E.rollExpr(x.dado).total;flat+=v;plan.notes.push(`${x.nome}: +${x.dado} (${v}) contra alvo Agarrado e Caído`)});
   const ignore=(d.activeEffects||[]).some(e=>e.ignoreResist);
   const dmg=E.rollDamage(w,{extraDice:cal.mods.dmgDice+(favOn?1:0),flat});
   const aid=rid(),cm=camp3()?.combat;
   const des=d.extase?.on&&d.extase.bonus==='desarme';
   const detail={cmb:'atk',aid,round:cm?.round||0,attackerId:ch.id,attackerName:nm(ch),targets:ids.map(i=>({id:i,name:nm(charById(i))})),weapon:{name:w.name,dado:w.dado,critMin:w.critMin,skill:w.skill,cat:w.cat,area:!!w.area,effects:w.effects||[]},best:r.best,dmg:{total:dmg.total,critTotal:dmg.critTotal,normal:dmg.normal,crit:dmg.crit},surprise,ignoreResist:ignore,desarme:!!des,noDefense:!!retal,...(extra||{})};
-  mutateChar(ch,x=>{consumeOnce(x,cal,{attack:true});(x.activeEffects||[]).forEach(e=>{if(e.ignoreResist&&e.type==='once')e._used=1});if(w._ammo){const am=E.ensureInv(x).items.find(i=>/muni[çc][ãa]o/i.test(i.name)&&i.loc!=='chao'&&(Number(i.qty)||0)>0);if(am){am.qty=(Number(am.qty)||1)-1;if(am.qty<=0)x.inventory.items=x.inventory.items.filter(i=>i!==am)}}});
-  showRollPopup({eyebrow:retal?'RETALIAÇÃO':'ATAQUE',title:`${nm(ch)} · ${w.name}`,sub:`${w.skill} → ${detail.targets.map(t=>t.name).join(', ')}`,
+  mutateChar(ch,x=>{if(w._itemId)x.armaEmUso=w._itemId;consumeOnce(x,cal,{attack:true});(x.activeEffects||[]).forEach(e=>{if(e.ignoreResist&&e.type==='once')e._used=1});if(w._ammo){const am=E.ensureInv(x).items.find(i=>/muni[çc][ãa]o/i.test(i.name)&&i.loc!=='chao'&&(Number(i.qty)||0)>0);if(am){am.qty=(Number(am.qty)||1)-1;if(am.qty<=0)x.inventory.items=x.inventory.items.filter(i=>i!==am)}}});
+  showRollPopup({eyebrow:counter?'CONTRA-ATAQUE':retal?'RETALIAÇÃO':'ATAQUE',title:`${nm(ch)} · ${w.name}`,sub:`${w.skill} → ${detail.targets.map(t=>t.name).join(', ')}`,
     sets:[{label:`${w.skill} ${r.n}d20`,dice:r.dice,bonus:r.bonus,total:r.total,hi:'max',note:r.mode!=='normal'?r.mode:''},
           {label:`Dano ${w.dado}${flat?' '+sign(flat):''}`,dice:dmg.normal,bonus:dmg.mod+flat,total:dmg.total,note:r.best>=w.critMin?`CRÍTICO (${r.best})! Se acertar, rola de novo: [${dmg.crit.join(', ')}] → ${dmg.critTotal}`:''}],
-    big:r.total,tone:r.best>=w.critMin?'hit':'',detail:(retal?'Retaliação: não pode ser esquivada.':'Aguardando a defesa…')+(downAdv?' · vantagem (alvo Caído)':'')+(favOn?' · ★ Arma Favorita':'')+(attrDmg.bonus?` · dano inclui +${attrDmg.bonus} de ${attrDmg.attr}`:'')});
+    big:r.total,tone:r.best>=w.critMin?'hit':'',detail:(retal?'Retaliação: não pode ser esquivada.':'Aguardando a defesa…')+(downAdv?' · vantagem (alvo Caído)':'')+(favOn?' · ★ Arma Favorita':'')+(attrDmg.bonus?` · dano inclui +${attrDmg.bonus} de ${attrDmg.attr}`:'')+(plan.notes.length?' · '+plan.notes.map(esc).join(' · '):'')});
   if(!noSpend)spend(ch,retal?'retal':'std');
-  try{await insertRow(ch,(retal?'Retaliação · ':'Ataque · ')+w.name,{dice:r.dice,bonus:r.bonus,total:r.total,attribute:SKILL_ATTR[w.skill],detail});toast('Ataque lançado! Aguardando a defesa de '+detail.targets.map(t=>t.name).join(', ')+'.')}catch(e){fail3('atacar',e)}
+  try{await insertRow(ch,(counter?'Contra-Ataque · ':retal?'Retaliação · ':'Ataque · ')+w.name,{dice:r.dice,bonus:r.bonus,total:r.total,attribute:cal.attr,detail});toast('Ataque lançado! Aguardando a defesa de '+detail.targets.map(t=>t.name).join(', ')+'.')}catch(e){fail3('atacar',e)}
   renderCombatUI();
 }
 
@@ -734,14 +783,15 @@ function renderCombatUI(){
   if(myTurn&&!spectator&&!skipCur){
     const d=cur.id===activeCharacterId?data:cur.data;const m=E.computeMods(d);
     const blocked=m.flags.has('semAgir');
-    h+=`<div class="t3-menu"><button class="btn primary" id="cbAtk" ${blocked||left<=0?'disabled':''}>⚔ Atacar</button><button class="btn" id="cbAlert" ${blocked||left<=0?'disabled':''}>👁 Alerta (+1 Esquiva/Reflexo)</button><button class="btn" id="cbAbil" ${blocked?'disabled':''}>✦ Talentos / Habilidades${TURN.talentUsed?' ✓':''}</button><button class="btn" id="cbOther" ${blocked||left<=0?'disabled':''}>⌖ Outra ação (−1 DES)</button><button class="btn" id="cbSut" ${blocked||left<=0?'disabled':''}>🩹 Sutura Bruta</button>${hasTraining(cur,'Medicina')?`<button class="btn" id="cbSin" ${blocked||left<=0?'disabled':''}>🧵 Síntese Cirúrgica</button>`:''}${stIds(d).includes('caido')?`<button class="btn" id="cbUp" ${blocked||left<=0?'disabled':''}>⬆ Levantar (1 ação)</button>`:''}<button class="btn" id="cbSummon" title="Criar uma invocação ou Tulpa manualmente">🜏 Invocação</button><button class="btn danger" id="cbEnd">✔ Concluir turno</button></div><div class="sub" style="margin-top:6px">Ações disponíveis: <b>${left}</b>${Number(d.combatExtra)?` (inclui ${d.combatExtra} extra)`:''} · Talento no turno: ${TURN.talentUsed?'usado':'livre'}${blocked?' · <b style="color:#a33">Você não pode agir neste estado.</b>':''}</div>`;
+    h+=`<div class="t3-menu"><button class="btn primary" id="cbAtk" ${blocked||left<=0?'disabled':''}>⚔ Atacar</button><button class="btn" id="cbAlert" ${blocked||left<=0?'disabled':''}>👁 Alerta (+1 Esquiva/Reflexo)</button><button class="btn" id="cbAbil" ${blocked?'disabled':''}>✦ Talentos / Habilidades${TURN.talentUsed?' ✓':''}</button><button class="btn" id="cbOther" ${blocked||left<=0?'disabled':''}>⌖ Outra ação (−1 DES)</button><button class="btn" id="cbSut" ${blocked||left<=0?'disabled':''}>🩹 Sutura Bruta</button>${hasTraining(cur,'Medicina')?`<button class="btn" id="cbSin" ${blocked||left<=0?'disabled':''}>🧵 Síntese Cirúrgica</button>`:''}${stIds(d).includes('caido')?`<button class="btn" id="cbUp" ${blocked||left<=0?'disabled':''}>⬆ Levantar (1 ação)</button>`:''}<button class="btn" id="cbMan" ${blocked?'disabled':''} title="Desarmar, Derrubar, Agarrar, Escapar ou Empurrar (Ação Padrão)">🤼 Manobras</button><button class="btn" id="cbGuard" ${blocked||left<=0||E.reactionInfo(d,turnOf(cur)).guard?'disabled':''} title="Ação Padrão: até 2 Bloqueios na rodada e +2 de redução">🛡 Guarda Fechada</button><button class="btn" id="cbSummon" title="Criar uma invocação ou Tulpa manualmente">🜏 Invocação</button><button class="btn danger" id="cbEnd">✔ Concluir turno</button></div><div class="sub" style="margin-top:6px">Ações disponíveis: <b>${left}</b>${Number(d.combatExtra)?` (inclui ${d.combatExtra} extra)`:''} · Talento no turno: ${TURN.talentUsed?'usado':'livre'}${blocked?' · <b style="color:#a33">Você não pode agir neste estado.</b>':''}</div>`;
   }else if(role3()==='master'&&cur&&!myTurn&&!skipCur){
     h+=`<div class="inline"><button class="btn danger" id="cbEndForce">Forçar fim do turno de ${esc(nm(cur))}</button></div>`;
   }
+  h+=T3.cacPanel?.(mine.filter(x=>inScene(x)&&(x._sheetAvailable||x.id===activeCharacterId)))||'';
   chars3().filter(c=>inScene(c)&&isDyingCh(c)).forEach(c=>{h+=`<div class="notice t3-alert">☠ <b>${esc(nm(c))}</b> está <b>Morrendo</b> — restam <b>${dyingTurns(c)}</b> turno(s). ${myTurn&&!spectator?'Use <b>Sutura Bruta</b> ou <b>Síntese Cirúrgica</b> (Medicina) na sua ação para estabilizar.':'Aliados podem estabilizar com Sutura Bruta ou Síntese Cirúrgica.'} Um golpe tira 1 turno; dano igual ou maior que metade do Vital máximo finaliza.</div>`});
   h+=T3.summonCards?.(mine.filter(x=>inScene(x)&&(x._sheetAvailable||x.id===activeCharacterId)),{myTurn,cur})||'';
-  extraChars.forEach(x=>{h+=`<div class="notice t3-alert">⚡ <b>${esc(nm(x))}</b> desviou com folga e tem ${retalOf(x)} ação de <b>Retaliação</b>. O contra-ataque <b>não pode ser esquivado</b>. <button class="btn small primary" data-extra="${x.id}">Contra-atacar</button></div>`});
-  if(pend.length){h+='<h4 style="margin-top:12px">Confrontos em andamento</h4>'+pend.map(([aid,v])=>Object.entries(v.targets).filter(([,t])=>!t.res).map(([tid,t])=>{const tc=charById(tid);const can=tc&&controls(tc);return `<div class="t3-pend">⚔ <b>${esc(v.dt.attackerName)}</b> ataca <b>${esc(nm(tc)||'?')}</b> (${esc(v.dt.weapon.name)}) — ${t.def?'defesa rolada, resolvendo…':(v.dt.noDefense?'retaliação: não pode ser esquivada':'aguardando defesa')} ${can&&!t.def&&!v.dt.noDefense?`<button class="btn small primary" data-defend="${aid}|${tid}">Defender</button>`:''}${role3()==='master'&&!t.def&&!can?`<button class="btn small" data-mdef="${aid}|${tid}">Rolar defesa por ${esc(nm(tc))}</button>`:''}</div>`}).join('')).join('')}
+  extraChars.forEach(x=>{const ctr=!!dOf(x).retalCounter;h+=`<div class="notice t3-alert">⚡ <b>${esc(nm(x))}</b> ${ctr?'abriu uma brecha no bloqueio e tem 1 <b>Contra-Ataque</b> corpo a corpo grátis':`desviou com folga e tem ${retalOf(x)} ação de <b>Retaliação</b>`}. O contra-ataque <b>não pode ser esquivado</b>. <button class="btn small primary" data-extra="${x.id}">Contra-atacar</button></div>`});
+  if(pend.length){h+='<h4 style="margin-top:12px">Confrontos em andamento</h4>'+pend.map(([aid,v])=>Object.entries(v.targets).filter(([,t])=>!t.res).map(([tid,t])=>{const tc=charById(tid);const can=tc&&controls(tc);return `<div class="t3-pend">⚔ <b>${esc(v.dt.attackerName)}</b> ataca <b>${esc(nm(tc)||'?')}</b> (${esc(v.dt.weapon.name)}) — ${t.def?'defesa rolada, resolvendo…':(v.dt.noDefense?'retaliação: não pode ser esquivada':'aguardando defesa')} ${can&&!t.def&&!v.dt.noDefense?`<button class="btn small primary" data-defend="${aid}|${tid}">Defender</button>`:''}${role3()==='master'&&!t.def&&!can?`<button class="btn small" data-mdef="${aid}|${tid}">Rolar defesa por ${esc(nm(tc))}</button>${tc?._sheetAvailable&&E.canBlock(tc.data,{weapon:v.dt.weapon,turn:turnOf(tc),noDefense:v.dt.noDefense,surprise:v.dt.surprise}).ok?`<button class="btn small" data-mblk="${aid}|${tid}">Bloquear por ${esc(nm(tc))}</button>`:''}`:''}</div>`}).join('')).join('')}
   if(CB.log.length){h+=`<details class="t3-logbox" ${CB.logOpen?'open':''}><summary>Registro do combate (${Math.min(CB.log.length,8)})</summary><div class="t3-log">`+CB.log.slice(0,8).map(l=>l.kind==='res'?`<div class="t3-logline ${l.dt.hit?'hit':'miss'}"><b>${esc(l.dt.attackerName)}</b> → <b>${esc(l.dt.targetName)}</b> (${esc(l.dt.weapon)}): ${esc(l.dt.label)}${l.dt.crit?' · CRÍTICO':''}${l.dt.hit?` · ${l.dt.dmg.final} de dano`:''} <span class="sub">ATA ${l.dt.ATA} × RF ${l.dt.RF} · DF ${l.dt.DF}</span></div>`:`<div class="t3-logline">${esc(l.text)}</div>`).join('')+'</div></details>'}
   p.innerHTML=h;
   const lb=p.querySelector('.t3-logbox');if(lb)lb.ontoggle=()=>{CB.logOpen=lb.open};
@@ -750,7 +800,9 @@ function renderCombatUI(){
   if(role3()==='master')postInitiative(c);
   if(skipCur)autoSkip();
   on('cbUp',()=>{if(actionsLeft(cur)<=0){toast('Você já usou sua ação neste turno.');return}spend(cur);mutateChar(cur,x=>{x.statuses=(x.statuses||[]).filter(s=>s.id!=='caido')});insertRow(cur,'Levantar',{detail:{cmb:'log',text:`${nm(cur)} se levantou (1 ação).`}}).catch(()=>{});toast('Você se levantou.');renderCombatUI()});
-  on('cbSummon',()=>T3.offerSummon?.(null,null,cur));
+  on('cbSummon',()=>T3.offerSummon?.(null,null,cur));on('cbMan',()=>T3.cacMenu?.(cur));on('cbGuard',()=>T3.cacGuard?.(cur));
+  $$('[data-mblk]',p).forEach(b=>b.onclick=()=>{const [a,t]=b.dataset.mblk.split('|');doDefense(a,t,'block:'+E.blockStyles(charById(t).data).at(-1).id,true)});
+  T3.cacBind?.(p);
   T3.bindSummons?.(p);
   on('cbAtk',()=>startAttack(cur));on('cbAlert',()=>alertAction(cur));on('cbAbil',()=>abilitiesMenu(cur));on('cbOther',()=>otherAction(cur));on('cbEnd',()=>endTurn(cur));on('cbEndForce',()=>window.tulpaAdvanceTurn?.(true,true));
   $$('[data-extra]',p).forEach(b=>b.onclick=()=>startAttack(charById(b.dataset.extra),{retal:true}));

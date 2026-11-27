@@ -9,7 +9,9 @@ E.parseDice=str=>{const m=String(str||'0').replace(/\s/g,'').match(/^(\d+)d(\d+)
 E.rollExpr=(str,r=E.rng)=>{const p=E.parseDice(str),rolls=Array.from({length:p.n},()=>E.die(p.s,r));return{rolls,mod:p.mod,total:rolls.reduce((a,b)=>a+b,0)+p.mod,expr:str}};
 
 /* ---------- Inventário e carga ---------- */
-E.ensureInv=d=>{const inv=d.inventory=d.inventory||{};if(!Array.isArray(inv.items))inv.items=[];inv.mochila=!!inv.mochila;inv.bandoleira=!!inv.bandoleira;return inv};
+E.ensureInv=d=>{const inv=d.inventory=d.inventory||{};if(!Array.isArray(inv.items))inv.items=[];inv.mochila=!!inv.mochila;inv.bandoleira=!!inv.bandoleira;
+  inv.items.forEach(i=>{if(i&&i.equipped===false&&i.loc!=='chao')delete i.equipped}); /* arma recolhida do chão volta a valer */
+  return inv};
 E.pesoVal=p=>C.CARGA[p]??0;
 E.itemCarga=it=>{
   if(!it||it.loc==='chao')return 0;
@@ -35,7 +37,7 @@ E.cargaInfo=(d,ignore=false)=>{
 E.handsUsed=d=>E.ensureInv(d).items.reduce((a,i)=>{
   if(i.loc==='maos')return a+(i.kind==='weapon'&&i.peso==='Pesado'?2:1);
   if(i.kind==='prot'&&i.loc==='vestido'&&i.p?.slot==='escudo')return a+1;
-  return a;},0);
+  return a;},0)+E.holding(d).length; /* cada alvo agarrado ocupa 1 mão */
 E.validPlacement=(d,it,loc)=>{
   const inv=E.ensureInv(d),others=inv.items.filter(x=>x.id!==it.id);
   const cnt=(l,f=()=>true)=>others.filter(x=>x.loc===l&&f(x)).length;
@@ -63,7 +65,7 @@ E.validPlacement=(d,it,loc)=>{
   if(loc==='maos'){
     const need=it.kind==='weapon'&&it.peso==='Pesado'?2:1;
     const used=others.reduce((a,i)=>a+(i.loc==='maos'?(i.kind==='weapon'&&i.peso==='Pesado'?2:1):(i.kind==='prot'&&i.loc==='vestido'&&i.p?.slot==='escudo'?1:0)),0);
-    return used+need<=2?{ok:true}:{ok:false,msg:'Suas 2 mãos já estão ocupadas (escudo ocupa 1 mão; arma Pesada ocupa 2).'};
+    return used+E.holding(d).length+need<=2?{ok:true}:{ok:false,msg:'Suas 2 mãos já estão ocupadas (escudo e alvo agarrado ocupam 1 mão; arma Pesada ocupa 2).'};
   }
   return{ok:false,msg:'Local inválido.'};
 };
@@ -536,5 +538,250 @@ E.migrateSheet=d=>{
   }
   return ch;
 };
+/* ===================================================================
+   ONDA 10 — Corpo a corpo: Reação, Guarda Fechada, Bloqueio,
+   Contra-Ataque, manobras, agarrão, desarme, empurrão e arremesso.
+   Puro: a UI (js/13, js/27, js/60h) só escolhe alvos e chama daqui.
+   Dados injetáveis: quem rola passa os totais já rolados.
+   =================================================================== */
+
+/* ---------- estados (a ficha pública traz só os ids) ---------- */
+E.statusId=s=>typeof s==='string'?s:s?.id;
+E.hasStatus=(d,id)=>(d?.statuses||[]).some(s=>E.statusId(s)===id);
+E.isMeleeWeapon=w=>!!w&&!w.area&&w.skill!=='Arremesso'&&w.skill!=='Armas de Disparo'&&(w.cat==='Corpo a corpo'||w.skill==='Briga'||(w.skill==='Armas Brancas'&&w.cat!=='Distância'));
+E.isShortBlade=w=>E.isMeleeWeapon(w)&&w.skill==='Armas Brancas'&&(w.peso==='Leve'||w.peso==='Bolso');
+E.isImprovised=w=>!!w&&w.note!=='desarmado'&&/improvis|p[ée][- ]de[- ]cabra|taco com pregos|corrente|foice|garrafa|cadeira/i.test((w.name||'')+' '+(w.note||''));
+E.isTwoHanded=w=>w?.peso==='Pesado';
+E.isCreatureAttack=w=>w?.note==='ataque da criatura'||w?.note==='invocação';
+
+/* ---------- Agarrão: alvo = {id:'agarrado',by} · quem segura = {id:'segurando',alvos:[{id,at}]} ---------- */
+E.holding=d=>((d?.statuses||[]).find(s=>s&&s.id==='segurando')?.alvos||[]).map(a=>a.id);
+E.grappledBy=d=>(d?.statuses||[]).find(s=>E.statusId(s)==='agarrado')?.by||'';
+E.addStatus=(d,id,extra)=>{d.statuses=d.statuses||[];if(E.hasStatus(d,id))return false;d.statuses.push({id,at:Date.now(),...extra});return true}; /* (altera d) */
+E.applyGrapple=(d,byId)=>{d.statuses=(d.statuses||[]).filter(s=>E.statusId(s)!=='agarrado');d.statuses.push({id:'agarrado',at:Date.now(),by:byId||''})}; /* (altera d) */
+E.releaseGrapple=(d,byId)=>{const n=(d.statuses||[]).length;d.statuses=(d.statuses||[]).filter(s=>!(E.statusId(s)==='agarrado'&&(!byId||!s.by||s.by===byId)));return d.statuses.length!==n}; /* (altera d) */
+E.addHold=(d,targetId)=>{ /* (altera d) */
+  d.statuses=d.statuses||[];let s=d.statuses.find(x=>x&&x.id==='segurando');
+  if(!s){s={id:'segurando',at:Date.now(),alvos:[]};d.statuses.push(s)}
+  s.alvos=(s.alvos||[]).filter(a=>a.id!==targetId).concat({id:targetId,at:Date.now()});
+};
+E.dropHold=(d,targetId)=>{ /* (altera d) sem alvo = solta todos */
+  const s=(d.statuses||[]).find(x=>x&&x.id==='segurando');if(!s)return false;
+  const before=(s.alvos||[]).length;s.alvos=targetId?(s.alvos||[]).filter(a=>a.id!==targetId):[];
+  const gone=before-s.alvos.length;
+  if(!s.alvos.length)d.statuses=d.statuses.filter(x=>x!==s);
+  return gone>0;
+};
+/* agarrado não usa arma de duas mãos; quem segura alguém só tem 1 mão livre */
+E.weaponAllowed=(d,w)=>E.isTwoHanded(w)&&!E.isCreatureAttack(w)&&(E.hasStatus(d,'agarrado')||E.holding(d).length)
+  ?{ok:false,msg:E.hasStatus(d,'agarrado')?'Agarrado: não dá para usar arma de duas mãos.':'Você segura alguém com uma das mãos: não dá para usar arma de duas mãos.'}:{ok:true};
+
+/* ---------- Reação (1 por rodada) e Guarda Fechada (até 2 Bloqueios) ----------
+   d.reacao={r:rodada,i:índice do turno no último gasto,n:gastos,b:bloqueios,g:guarda}
+   O registro vence sozinho no início do próximo turno do dono: nenhum aparelho precisa zerar nada. */
+E.GUARDA_CAP=2;
+E.turnCtx=(combat,charId)=>{
+  if(!combat?.active||combat.phase!=='active')return null;
+  const o=combat.order||[];
+  return{round:Number(combat.round)||1,turnIndex:Math.max(0,Math.min(Number(combat.turnIndex)||0,o.length-1)),myIndex:o.findIndex(x=>x.characterId===charId)};
+};
+E.reactionFresh=(rec,t)=>{ /* true = o registro já venceu */
+  if(!rec||!t)return true;
+  const r=Number(rec.r)||0,i=Number(rec.i)||0,k=t.myIndex;
+  if(t.round<r)return true; /* combate novo */
+  const nr=k>i?r:r+1,ni=k<0?0:k;
+  return t.round>nr||(t.round===nr&&t.turnIndex>=ni);
+};
+E.reactionInfo=(d,t)=>{
+  const rec=t&&!E.reactionFresh(d?.reacao,t)?d.reacao:null,uses=Number(rec?.n)||0,guard=!!rec?.g,cap=guard?E.GUARDA_CAP:1;
+  const forbidden=!!d&&E.computeMods(d).flags.has('semReacao');
+  return{tracked:!!t,uses,blocks:Number(rec?.b)||0,guard,cap,forbidden,
+    reactionAvailable:!forbidden&&(!t||uses<1),canBlock:!forbidden&&(!t||uses<cap),left:forbidden?0:Math.max(0,cap-uses)};
+};
+E.useReaction=(d,t,{block=false}={})=>{ /* (altera d) bloquear cabe na Guarda; o resto exige a Reação livre */
+  const i=E.reactionInfo(d,t);
+  if(i.forbidden)return{ok:false,msg:'Neste estado você não pode usar reações.'};
+  if(!t)return{ok:true};
+  if(block?!i.canBlock:!i.reactionAvailable)return{ok:false,msg:i.guard?'Os 2 usos da Guarda Fechada já não permitem isso nesta rodada.':'A Reação desta rodada já foi usada.'};
+  d.reacao={r:t.round,i:t.turnIndex,n:i.uses+1,b:i.blocks+(block?1:0),g:i.guard};
+  return{ok:true};
+};
+E.closeGuard=(d,t)=>{ /* (altera d) custa a Ação Padrão: quem chama gasta */
+  if(!t)return{ok:false,msg:'A Guarda Fechada só vale durante o combate.'};
+  const i=E.reactionInfo(d,t);
+  if(i.forbidden)return{ok:false,msg:'Neste estado você não pode usar reações.'};
+  if(i.guard)return{ok:false,msg:'Sua guarda já está fechada.'};
+  d.reacao={r:t.round,i:t.turnIndex,n:i.uses,b:i.blocks,g:true};
+  return{ok:true};
+};
+E.setReaction=(d,t,used)=>{ /* (altera d) ajuste manual no marcador */
+  if(!t)return;
+  const i=E.reactionInfo(d,t);
+  if(!used&&!i.guard){delete d.reacao;return}
+  d.reacao={r:t.round,i:t.turnIndex,n:used?i.cap:0,b:used?i.blocks:0,g:i.guard};
+};
+E.pruneReaction=(d,t)=>{if(d?.reacao&&E.reactionFresh(d.reacao,t))delete d.reacao;return d}; /* (altera d) */
+
+/* ---------- Bloqueio ---------- */
+E.hasShield=d=>(d?.inventory?.items||[]).some(i=>i&&i.kind==='prot'&&(i.loc==='vestido'||i.loc==='maos')&&i.p?.slot==='escudo');
+E.blockWeapon=d=>E.quickWeapons(d).find(i=>i.w&&i.w.skill==='Armas Brancas'&&E.isMeleeWeapon(i.w)&&E.weaponAllowed(d,{...i.w,peso:i.peso}).ok)||null;
+E.blockStyles=d=>{
+  const out=[{id:'briga',skill:'Briga',attr:'Constituição',label:'Briga (CON)'}],arma=E.blockWeapon(d);
+  if(arma||E.hasShield(d))out.push({id:'arma',skill:'Armas Brancas',attr:'Força',label:'Armas Brancas (FOR) · '+(arma?arma.name:'escudo')});
+  return out;
+};
+E.canBlock=(d,{weapon,turn=null,noDefense=false,surprise=false}={})=>{
+  if(!E.isMeleeWeapon(weapon))return{ok:false,msg:'Só dá para bloquear ataques corpo a corpo.'};
+  if(noDefense)return{ok:false,msg:'Este contra-ataque não permite defesa.'};
+  if(surprise)return{ok:false,msg:'Desprevenido: não dá para bloquear.'};
+  if(E.isDying(d)||E.isDead(d))return{ok:false,msg:'Incapaz de agir.'};
+  const f=E.computeMods(d).flags;
+  if(['semDefender','semAgir','semEsquivar'].some(x=>f.has(x)))return{ok:false,msg:'Você não pode se defender neste estado.'};
+  const i=E.reactionInfo(d,turn);
+  if(!i.canBlock)return{ok:false,msg:i.forbidden?'Neste estado você não pode usar reações.':i.guard?'Os 2 bloqueios da Guarda Fechada já foram usados.':'A Reação desta rodada já foi usada.'};
+  return{ok:true};
+};
+E.blockPlan=(d,styleId,turn=null)=>{
+  const list=E.blockStyles(d),st=list.find(x=>x.id===styleId)||list[0],guard=E.reactionInfo(d,turn).guard;
+  const rd=E.blockReduction(d,{guarda:guard});
+  return{...st,guard,reduction:rd.total,parts:rd,extraDice:st.id==='arma'?E.vertSum(d,'dados',{quando:'bloqueioArma'}):0};
+};
+/* Os 4 desfechos. A ordem importa:
+   1º Erro Total (ATA<DB e Bloqueio>=DB), senão a 1ª condição da Brecha o engoliria;
+   2º Brecha (Bloqueio>=ATA com ATA<DB, ou folga de 5 ou mais);
+   3º Parcial (Bloqueio>=DB e ATA>Bloqueio);
+   4º Guarda Quebrada (Bloqueio<DB e ATA>=DB).
+   O que as 4 condições não cobrem vira Parcial: Bloqueio>=ATA>=DB com folga menor que 5, e os dois
+   abaixo da DB com o ataque maior. 20 natural nunca vira Erro Total: nesse caso vira Parcial. */
+E.resolveBlock=({block,ATA,DB=E.DB,damage=0,reduction=0,nat20=false})=>{
+  let outcome;
+  if(ATA<DB&&block>=DB)outcome=nat20?'parcial':'erro';
+  else if((block>=ATA&&ATA<DB)||block-ATA>=5)outcome='brecha';
+  else if(block>=DB&&ATA>block)outcome='parcial';
+  else if(block<DB&&ATA>=DB)outcome='quebrada';
+  else outcome='parcial';
+  const final=outcome==='erro'?0:outcome==='quebrada'?damage:E.blockedDamage(damage,reduction);
+  const label={erro:'Erro total do agressor',brecha:'Bloqueio com brecha',parcial:'Bloqueio parcial',quebrada:'Guarda quebrada'}[outcome];
+  const text={erro:'O golpe se perde no vazio: nenhum dano, e quem defendeu ganha 1 Contra-Ataque corpo a corpo.',
+    brecha:`O bloqueio abre uma brecha: ${damage} → ${final} de dano, e quem defendeu ganha 1 Contra-Ataque corpo a corpo.`,
+    parcial:`O bloqueio amortece o golpe: ${damage} → ${final} de dano, sem contra-ataque.`,
+    quebrada:'A guarda se rompe: dano total, sem redução e sem contra-ataque.'}[outcome];
+  return{outcome,label,text,damage:final,raw:damage,reduction,hit:outcome!=='erro',counter:outcome==='erro'||outcome==='brecha'};
+};
+
+/* ---------- Ataque corpo a corpo: efeitos das vertentes ---------- */
+E.meleePlan=(d,w,{surprise=false,counter=false}={})=>{
+  const out={attr:null,extraDice:0,flat:0,notes:[]};
+  if(!E.isMeleeWeapon(w)||E.isCreature(d)||E.isCreatureAttack(w))return out;
+  if(E.isShortBlade(w)){
+    if(E.vertEffects(d,'atributoAtaque').length&&E.attr(d,'Destreza')>E.attr(d,'Força')){out.attr='Destreza';out.notes.push('Lâminas Curtas: Destreza no acerto e no dano')}
+    const n=surprise?Math.max(E.vertSum(d,'dados',{quando:'furtivo'}),E.vertSum(d,'dados',{quando:'desprevenido'})):0;
+    if(n){out.extraDice+=n;out.notes.push(`Lâminas Curtas: +${n}d20 contra desprevenido`)}
+  }
+  if(E.isImprovised(w)){const n=E.vertSum(d,'dados',{quando:'armaImprovisada'});if(n){out.extraDice+=n;out.notes.push(`Briga de Rua: +${n}d20 com arma improvisada`)}}
+  if(w.note==='desarmado'){const n=E.vertSum(d,'dano',{quando:'desarmado'});if(n){out.flat+=n;out.notes.push(`Briga de Rua: +${n} de dano desarmado`)}}
+  if(counter){const n=E.vertSum(d,'dados',{quando:'contraAtaque'});if(n){out.extraDice+=n;out.notes.push(`Boxe / Muay Thai: +${n}d20 no Contra-Ataque`)}}
+  return out;
+};
+/* dados de dano somados contra o alvo (Jiu-Jitsu: alvo Agarrado e Caído) */
+E.meleeExtraDice=(d,w,target)=>!E.isMeleeWeapon(w)||!E.hasStatus(target,'agarrado')||!E.hasStatus(target,'caido')?[]
+  :E.vertEffects(d,'danoExtra',{quando:'alvoAgarradoCaido'}).map(x=>({dado:x.effect.dado,nome:x.def.name}));
+
+/* ---------- Manobras (1 Ação Padrão, adjacente, sem dano) ---------- */
+E.MANOBRAS={
+  desarmar:{name:'Desarmar',skills:['Briga','Armas Brancas'],def:['Briga','Armas Brancas'],hint:'Disputa. Se vencer, a arma do alvo cai no chão.'},
+  derrubar:{name:'Derrubar',skills:['Briga'],def:['Briga'],hint:'Disputa. Se vencer, o alvo fica Caído (empate favorece quem defende).'},
+  agarrar:{name:'Agarrar',skills:['Briga'],def:['Briga'],hint:'Disputa. O alvo fica Agarrado; você ocupa 1 mão e anda pela metade.'},
+  escapar:{name:'Escapar',skills:['Briga'],def:['Briga'],hint:'Disputa contra quem segura você.'},
+  empurrar:{name:'Empurrar',skills:['Briga'],def:[],hint:'Teste contra DT 10 + maior entre FOR e CON do alvo. Empurra até 4,5 m (teto de 1,5 m × sua FOR).'}
+};
+/* alvo é opcional: a ficha de outro jogador pode não estar neste aparelho (vale o que for público) */
+E.maneuverCheck=(d,m,target=null,targetId='')=>{
+  if(!E.MANOBRAS[m])return{ok:false,msg:'Manobra desconhecida.'};
+  if(E.isDying(d)||E.isDead(d))return{ok:false,msg:'Incapaz de agir.'};
+  const f=E.computeMods(d).flags;
+  if(f.has('semAgir')||(m!=='escapar'&&f.has('semAtacar')))return{ok:false,msg:'Neste estado você não pode agir.'};
+  if(m==='escapar'&&!E.hasStatus(d,'agarrado'))return{ok:false,msg:'Você não está Agarrado.'};
+  if(m==='agarrar'){
+    if(E.holding(d).includes(targetId))return{ok:false,msg:'Você já está segurando esse alvo.'};
+    if(E.handsUsed(d)>=2)return{ok:false,msg:'Libere uma mão para agarrar.'};
+  }
+  if(target){
+    if(E.isDead(target))return{ok:false,msg:'O alvo está morto.'};
+    if(m==='derrubar'&&E.hasStatus(target,'caido'))return{ok:false,msg:'O alvo já está Caído.'};
+  }
+  return{ok:true};
+};
+/* rolagem de quem inicia: perícia, atributo e dados de vertente (só as da própria perícia) */
+E.maneuverPlan=(d,m,{skill,targetTwoHanded=false}={})=>{
+  const def=E.MANOBRAS[m],sk=def.skills.includes(skill)?skill:def.skills[0],p=E.pericia(sk),notes=[];
+  const mine=(tipo,quando)=>E.vertEffects(d,tipo,{quando}).filter(x=>p&&x.def.pericia===p.id);
+  let attr=sk==='Briga'?'Força':null,extraDice=0,bonus=0;
+  if(m==='empurrar'){const alt=mine('atributoManobra','empurrar')[0]?.effect.atributo;if(alt&&E.attr(d,alt)>E.attr(d,'Força')){attr=alt;notes.push('Taekwondo / Karatê: Destreza para Empurrar')}}
+  mine('dados',m).forEach(x=>{const n=Number(x.effect.valor)||0;extraDice+=n;notes.push(`${x.def.name}: +${n}d20`)});
+  if(m==='desarmar'&&targetTwoHanded){bonus-=2;notes.push('Alvo empunha arma de duas mãos: −2')}
+  return{skill:sk,attr,extraDice,bonus,notes};
+};
+E.contest=(atk,def)=>({success:atk>def,margin:atk-def}); /* empate favorece quem defende */
+E.pushDT=target=>10+Math.max(1,E.attr(target,'Força'),E.attr(target,'Constituição'));
+E.pushMeters=(margin,atkFor)=>margin<0?0:Math.min((margin>=10?3:margin>=5?2:1)*1.5,1.5*Math.max(1,Number(atkFor)||1));
+/* resolução no lado do alvo: def = total do defensor (null = indefeso) */
+E.resolveManeuver=({m,atk,def=null,dt=0,atkFor=1,twoHanded=false})=>{
+  const total=atk+(m==='desarmar'&&twoHanded?-2:0);
+  if(m==='empurrar'){const margin=total-dt,meters=E.pushMeters(margin,atkFor);return{success:meters>0,margin,meters,total,dt}}
+  if(def===null||def===undefined)return{success:true,margin:total,meters:0,total,def:null};
+  return{...E.contest(total,def),meters:0,total,def};
+};
+/* Judô / Wrestling: ao derrubar, gastar a Reação para manter Agarrado */
+E.canHoldAfterTrip=(d,turn=null)=>E.vertEffects(d,'permite').some(x=>x.effect.acao==='agarrarAoDerrubar')&&E.reactionInfo(d,turn).reactionAvailable&&E.handsUsed(d)<2;
+
+/* ---------- Desarme ---------- */
+/* arma "empunhada": a que está nas mãos; senão a última usada para atacar (cintura/bandoleira) */
+E.disarmTarget=d=>{
+  const list=E.quickWeapons(d).filter(i=>i.w&&!E.isCreatureAttack(i.w));
+  return list.find(i=>i.loc==='maos'&&i.id===d.armaEmUso)||list.find(i=>i.loc==='maos')||list.find(i=>i.id===d.armaEmUso)||null;
+};
+E.disarm=(d,itemId)=>{ /* (altera d) devolve a cópia do item largado: é o gancho do DroppedItem (Onda 12) */
+  const it=itemId?E.ensureInv(d).items.find(i=>i.id===itemId):E.disarmTarget(d);if(!it)return null;
+  const from=it.loc;it.loc='chao';it.equipped=false;if(d.armaEmUso===it.id)d.armaEmUso='';
+  return{...JSON.parse(JSON.stringify(it)),from};
+};
+
+/* ---------- Empurrão no mapa: linha reta até parede, borda ou outro token (unidades do mapa) ---------- */
+E.segDist=(px,py,s)=>{const ex=s.bx-s.ax,ey=s.by-s.ay,l=ex*ex+ey*ey,t=l?Math.max(0,Math.min(1,((px-s.ax)*ex+(py-s.ay)*ey)/l)):0;return Math.hypot(px-s.ax-ex*t,py-s.ay-ey*t)};
+E.segCross=(ax,ay,bx,by,s)=>{
+  const rx=bx-ax,ry=by-ay,ex=s.bx-s.ax,ey=s.by-s.ay,den=rx*ey-ry*ex;if(Math.abs(den)<1e-12)return false;
+  const t=((s.ax-ax)*ey-(s.ay-ay)*ex)/den,u=((s.ax-ax)*ry-(s.ay-ay)*rx)/den;
+  return t>=0&&t<=1&&u>=-1e-9&&u<=1+1e-9;
+};
+E.pushPath=({x,y,dx,dy,dist,radius,segments=[],circles=[],bounds=null})=>{
+  const len=Math.hypot(dx,dy),ux=len?dx/len:1,uy=len?dy/len:0,n=Math.max(1,Math.ceil(dist/Math.max(.5,radius*.15)));
+  let cx=x,cy=y,moved=0,hit=null,hitId='';
+  for(let k=1;k<=n;k++){
+    const at=dist*k/n,nx=x+ux*at,ny=y+uy*at;
+    if(bounds&&((nx<radius-1e-6&&nx<cx)||(ny<radius-1e-6&&ny<cy)||(nx>bounds.W-radius+1e-6&&nx>cx)||(ny>bounds.H-radius+1e-6&&ny>cy)))hit='borda';
+    if(!hit)for(const s of segments){const d1=E.segDist(nx,ny,s);if(E.segCross(cx,cy,nx,ny,s)||(d1<radius*.95&&d1<E.segDist(cx,cy,s)-1e-6)){hit=s.edge?'borda':'parede';break}}
+    if(!hit)for(const c of circles){const d1=Math.hypot(nx-c.x,ny-c.y);if(d1<(radius+c.r)*.95&&d1<Math.hypot(cx-c.x,cy-c.y)-1e-6){hit='token';hitId=c.id||'';break}}
+    if(hit)break;
+    cx=nx;cy=ny;moved=at;
+  }
+  return{x:cx,y:cy,moved,hit,hitId};
+};
+E.PUSH_HAZARD={parede:'1d4',borda:'1d6',token:'1d4'};
+
+/* ---------- Arremesso ---------- */
+E.isExplosive=w=>w?.skill==='Arremesso'&&(!!w.area||/molotov|granada|bomba|mina|dinamite/i.test(w.name||''));
+E.throwProfile=(d,w,base=12)=>{
+  if(w?.skill!=='Arremesso')return{range:base,short:6,exact:false,notes:[]};
+  const plus=E.vertSum(d,'alcance'),notes=[];
+  const dbl=E.isTwoHanded(w)?1:E.vertEffects(d,'multiplicador',{alvo:'alcanceCurto'}).reduce((a,x)=>Math.max(a,Number(x.effect.valor)||1),1);
+  const exact=E.isExplosive(w)&&E.vertEffects(d,'permite').some(x=>x.effect.acao==='explosivoNoPontoExato');
+  if(plus)notes.push(`Carga & Explosivos: +${plus} m de alcance`);
+  if(dbl>1)notes.push(`Precisão Leve: alcance curto de ${6*dbl} m`);
+  if(exact)notes.push('Carga & Explosivos: o explosivo cai no ponto exato');
+  return{range:base+plus,short:6*dbl,exact,notes};
+};
+E.throwDT=(m,short=6)=>m<=short?12:m<=12?15:m<=18?18:20+2*Math.ceil(Math.max(0,m-24)/6);
+
 if(typeof module!=='undefined')module.exports=E;
 

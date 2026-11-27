@@ -72,7 +72,7 @@ const STATUS_DEFS=[
 ST('ansioso','Ansioso','manual','Seu coração acelera, suas mãos tremem e você olha para todos os lados.','−1 em Inteligência e Percepção; não pode descansar totalmente.',{attrDice:{'Inteligência':-1,'Percepção':-1},flags:['semDescansoTotal']}),
 ST('envenenado','Envenenado','manual','Queimação pelo corpo, músculos pesados e visão embaçada.','Perde 1 de vida por turno; −1 em Força e Destreza.',{dot:{fixed:1,label:'Veneno'},attrDice:{'Força':-1,'Destreza':-1}}),
 ST('tenso','Tenso','manual','Cada som parece alto demais; músculos rígidos.','−1 em testes sociais; +1 em testes de Percepção.',{socialDice:-1,attrDice:{'Percepção':1}}),
-ST('agarrado','Agarrado','manual','Algo prende seus braços e pernas.','Não pode se mover; só tenta se soltar ou ataca com desvantagem.',{flags:['semMover'],disadv:['ataque']}),
+ST('agarrado','Agarrado','manual','Algo prende seus braços e pernas.','Deslocamento 0; não usa armas de duas mãos; −1 dado em testes físicos. Escapar gasta a Ação Padrão.',{flags:['semMover','semDuasMaos'],physDice:-1}),
 ST('caido','Caído','manual','Você perde o equilíbrio e vai ao chão.','Oponente tem vantagem em ataques corpo a corpo; levantar gasta 1 ação.',{flags:['caido']}),
 ST('atordoado','Atordoado','manual','Zumbido na mente, visão dupla.','Perde a próxima ação; −5 na Defesa até se recuperar.',{defense:-5,flags:['perdeAcao']}),
 ST('exausto','Exausto','manual','Músculos doem, respiração pesada.','−1 em testes físicos; não pode correr.',{physDice:-1,flags:['semCorrer']}),
@@ -109,7 +109,8 @@ ST('vulneravel','Vulnerável','sistema','Você se expôs ao agir sem cobertura.'
 ST('alerta','Em Alerta','sistema','Sentidos focados no ambiente.','+1 em Destreza, somente para Reflexo e Esquiva. Termina ao ser atacado ou no início do seu próximo turno (pode ativar de novo).',{skillDice:{'Esquiva':1,'Reflexo':1},untilTurn:true}),
 ST('morto','Morto','sistema','O corpo não resistiu.','Fora de combate definitivamente (o Mestre decide o destino do personagem).',{flags:['semAgir','semMover','semDefender']}),
 ST('desistente','Desistente (Colapso)','sistema','Você desistiu do Êxtase e a mente apagou.','Incapacitado até o fim da cena; Lucidez fica em 0 sem recuperar pontos.',{flags:['semAgir']}),
-ST('emotivo','Emotivo','sistema','Memória forte do passado.','Teste de Resistência falhou: fica emotivo por uma rodada.',{})
+ST('emotivo','Emotivo','sistema','Memória forte do passado.','Teste de Resistência falhou: fica emotivo por uma rodada.',{}),
+ST('segurando','Segurando','sistema','Você mantém alguém preso com uma das mãos.','Metade do deslocamento e 1 mão ocupada enquanto segurar. Soltar é livre.',{flags:['segurando']})
 ];
 /* Onda 1 · novos estados (efeitos lidos pelo motor de combate) */
 STATUS_DEFS.push(
