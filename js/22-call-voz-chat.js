@@ -6,7 +6,7 @@
    Só o Mestre inicia e encerra; todos entram automaticamente.
    Sussurro: o Mestre isola o áudio com um ou mais jogadores.
    =================================================================== */
-const BUILD8='21/11 22:28';
+const BUILD8=(()=>{try{const m=document.querySelector('meta[name="tulpa-build"]');return(m&&m.content&&m.content.trim())||'21/11 22:28'}catch(e){return'21/11 22:28'}})();
 const V8={on:false,callId:'',ch:null,live:false,stream:null,peers:new Map(),muted:false,listenOnly:false,blocked:false,states:{},me:{speaking:false},vad:null,beat:null,joining:false,bad:new Set(),sid:'',dead:new Set(),vers:{}};
 T3.voice=V8;
 if(prefs.callVol===undefined)prefs.callVol=100;
@@ -441,7 +441,7 @@ function updateBanner8(){
 }
 async function updateCheck8(){
   if(!/^https?:$/.test(location.protocol)||BUILD8.indexOf('__')===0)return;
-  try{const r=await fetch(location.pathname,{cache:'reload'});if(!r.ok)return;const t=await r.text();const m=t.match(/const BUILD8='([^']*)'/);if(m&&m[1]&&m[1]!==BUILD8)updateBanner8()}catch(e){}
+  try{const r=await fetch(location.pathname,{cache:'reload'});if(!r.ok)return;const t=await r.text();const m=t.match(/<meta\s+name="tulpa-build"\s+content="([^"]*)"/);if(m&&m[1]&&m[1].trim()!==BUILD8)updateBanner8()}catch(e){}
 }
 setTimeout(updateCheck8,15000);setInterval(updateCheck8,240000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')updateCheck8()});

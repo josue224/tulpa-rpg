@@ -52,12 +52,12 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 
 ### Cache: tokens `?v=…`
 
-- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112714`. O `60d` reaproveita o token da própria tag.
+- Todo `src`/`href` local leva `?v=TOKEN`, hoje `?v=2026112715`. O `60d` reaproveita o token da própria tag.
 - **Em todo deploy que mude qualquer arquivo, troque o token em todas as tags:**
   ```bash
   sed -i 's/?v=[^"]*"/?v=AAAAMMDDNN"/g' index.html
   ```
-- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112714'`) é só um fallback.
+- Atualize também `<meta name="tulpa-build">`. O `VER` reserva dentro do `60d` (`'2026112715'`) é só um fallback.
 
 ### Como verificar antes de commitar
 
@@ -240,7 +240,7 @@ Ao publicar, **nunca apague** `supabase/`, `.nojekyll` nem `tulpa-mapa-tatico.sq
 - **Regras, Onda 10 · Corpo a corpo (`?v=2026112711`)**: marcador de Reação (barra da ordem, HUD, Mesa e ficha), Guarda Fechada, Bloqueio com os 4 desfechos e Contra-Ataque, Desarmar, Derrubar, Agarrar/Escapar/Soltar e Empurrar no mapa com alerta de colisão, condições Agarrado/Segurando e efeitos das vertentes corpo a corpo e de arremesso. Sem SQL novo. Testado só com campanha falsa (Mestre controlando os dois lados). O desarme deixa a arma em "Largado" (`equipped:false`) e dispara `T3.disarmHooks` / `tulpa:disarm` para a Onda 12. **Teste manual:** Mestre e jogador logados em aparelhos separados: bloqueio, contra-ataque, cada manobra nos dois sentidos, empurrão contra parede (o Mestre precisa estar online) e a barra de combate no celular.
 - **Regras, Onda 11 · Tiroteio Tático (`?v=2026112712`)**: seletor de contexto do tiro (detectado pelo mapa e ajustável), Mergulho com os 5 desfechos e deslocamento, 2º Disparo, Fogo de Supressão com Suprimido e Tiro Livre, Mirar, trava de movimento que sobrevive ao F5, crítico balístico com Sangrando, as 5 especializações, barulho do disparo para a IA e painel Tiroteio na ficha. Sem SQL novo. Testado só com campanha falsa (Mestre nos dois lados). **Teste manual:** Mestre e jogador em aparelhos separados com mapa: os dois lados do Mergulho (o Mestre online move o token), supressão com o alvo andando, queima-roupa com bloqueio, escopeta empurrando, arco silencioso contra inimigo em patrulha e o seletor no celular.
 - **Regras, Onda 12 · Itens caídos no mapa (`?v=2026112713`)**: desarmar e "Largar no mapa" (inventário, menu do token e HUD do combate) criam o item no chão, com ícone, ficha do item (hover, foco ou toque), névoa e visões do Mestre, botão "Pegar Item (1 Ação)" e "Devolver" para o Mestre. Sem SQL novo. Testado só com campanha falsa. **Teste manual:** Mestre e dois jogadores em aparelhos separados: desarmar um jogador, os dois pegarem juntos, largar com o Mestre fora da mesa, F5 no Mestre e conferir que nada duplicou nas fichas.
-- **Regras, Onda 13 · Manual Vivo e edição pelo Mestre (`?v=2026112714`)**: Manual com os 8 atributos, 18 perícias e 48 vertentes (1.7 a 1.10), Bloqueio, Manobras, Tiroteio, Coberturas, Condições e itens caídos (5.12 a 5.17), tudo lido dos dados do motor; textos antigos atualizados; central ⚙️ e lápis no Manual editam benefícios, números, perícias e vertentes (criar/excluir, com editor de efeitos); situações de vertente, +d20 concedido, curas de especialização e seletor da Mesa com vertentes e contexto CAR/APA (`js/60k` + `css/19`). Sem SQL.
+- **Regras, Onda 13 · Manual Vivo e edição pelo Mestre (`?v=2026112715`)**: Manual com os 8 atributos, 18 perícias e 48 vertentes (1.7 a 1.10), Bloqueio, Manobras, Tiroteio, Coberturas, Condições e itens caídos (5.12 a 5.17), tudo lido dos dados do motor; textos antigos atualizados; central ⚙️ e lápis no Manual editam benefícios, números, perícias e vertentes (criar/excluir, com editor de efeitos); situações de vertente, +d20 concedido, curas de especialização e seletor da Mesa com vertentes e contexto CAR/APA (`js/60k` + `css/19`). Sem SQL.
 
 **Bloco A (visual do Arcade, Ondas 1–7) e Bloco B (regras novas, Ondas 8–13) concluídos.** Testado só no Edge headless com campanha e Supabase falsos.
 
