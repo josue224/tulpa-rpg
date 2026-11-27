@@ -60,6 +60,9 @@
   G.pal={fe:'#ffd36b',natureza:'#7dffa8',inexistencia:'#b9a6ff',ilusao:'#ff9be0',verdade:'#7fe3ff',
     ink:'#f4ead6',bg:'#120d18',acc:'#ffd36b',perigo:'#ff5b6b'};
 
+  /* tira emojis de um texto que vai para o canvas (o texto original não muda) */
+  G.clean=str=>String(str??'').replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu,'').replace(/\s{2,}/g,' ').trim();
+
   /* ===================== cache offscreen ===================== */
   /* PRNG próprio: a arte nunca consome a semente nem o RNG dos jogos */
   G.rng=seed=>{let a=(seed>>>0)||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}};

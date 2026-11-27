@@ -213,21 +213,21 @@ Automático com `prefers-reduced-motion`: sem hit-stop, sem tremor, clarão frac
 
 ### Onde cada jogo desenha
 
-Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HUD (`C.hud`), nos botões de toque, na preparação e no resultado. As versões antigas em `js/26` e `js/28` a `js/34` estão sobrescritas: edite a versão abaixo (linhas de 27/11/2026). Os das Ondas 2 e 3 já usam o motor, com a arte no mesmo arquivo: `rnArt40` (`js/51`), `saArt56` (`js/59`), `bbArt47` (`js/54`), `rhArt38` e `fuArt38` (`js/50`; o Infinito da Fuga, em `js/29`, usa `fuArt38(6)`), `svArt41` (`js/51`) e `ktArt42` (`js/52`). As linhas da tabela abaixo são de antes dessas mudanças: procure pelo nome da função.
+Os 22 jogos desenham em **canvas**. Nenhum usa DOM para a cena; o DOM fica no HUD (`C.hud`), nos botões de toque, na preparação e no resultado. As versões antigas em `js/26` e `js/28` a `js/34` estão sobrescritas: edite a versão abaixo (linhas de 27/11/2026). Os das Ondas 2 a 4 já usam o motor, com a arte no mesmo arquivo: `rnArt40` (`js/51`), `saArt56` (`js/59`), `bbArt47` (`js/54`), `rhArt38` e `fuArt38` (`js/50`; o Infinito da Fuga, em `js/29`, usa `fuArt38(6)`), `svArt41` (`js/51`), `ktArt42` e `unoArt43` (`js/52`), `sdArt44` e `trArt45` (`js/53`) e `skArt46` (`js/54`). `GFX60.clean(texto)` tira emojis de textos desenhados no canvas. As linhas da tabela abaixo são de antes dessas mudanças: procure pelo nome da função.
 
 | Onda | Jogo (`id`) | Arquivo · função de desenho (linha) | W×H |
 |---|---|---|---|
 | 2 | Corredor do Vazio (`runner`) | `js/51` · `runner40().draw` (358) | 800×320 |
 | 2 | Salto Astral (`salto`) | `js/59` · `salto56().draw` (231) | 480×640 |
-| 2 | Block Blast Astral (`blast`) | `js/54` · `blast47().draw` (396); `drawBlock` (359), `drawMark`, `drawPiece` | 480×720 |
+| 2 | Block Blast Astral (`blast`) | `js/54` · `blast47().draw` (488); `drawBlock` (451), `drawMark`, `drawPiece` | 480×720 |
 | 3 | Rhythm (`rhythm`) | `js/50` · `rhythm38().draw` (442); `drawNote` (381) | 800×450 |
 | 3 | Fuga (`fuga`) | `js/50` · `fuga38().draw` (740) | 800×450 |
 | 3 | Salto Vazio (`vazio`) | `js/51` · `vazio41().draw` (649) | 800×450 |
-| 3 | Corrida (`corrida`) | `js/52` · `corrida42().draw` (229); pista pré-pintada em `paintTrack` (116) | 800×450 |
-| 4 | UNO (`uno`) | `js/52` · `uno43().draw` (436); `cardDraw` (393) | 800×450 |
-| 4 | Defesa (`santuario`) | `js/53` · `sanctuary44().draw` (194) | 800×450 |
-| 4 | Trono (`trono`) | `js/53` · `trono45().draw` (402) | 480×640 |
-| 4 | Sudoku (`sudoku`) | `js/54` · `sudoku46().draw` (125) | 480×720 |
+| 3 | Corrida (`corrida`) | `js/52` · `corrida42().draw` (318); pista pré-pintada em `ktArt42().track` | 800×450 |
+| 4 | UNO (`uno`) | `js/52` · `uno43().draw` (672); `cardDraw` (630) | 800×450 |
+| 4 | Defesa (`santuario`) | `js/53` · `sanctuary44().draw` (315) | 800×450 |
+| 4 | Trono (`trono`) | `js/53` · `trono45().draw` (780) | 480×640 |
+| 4 | Sudoku (`sudoku`) | `js/54` · `sudoku46().draw` (188) | 480×720 |
 | 5 | DOOM (`doom`) | `js/55` · `doom48().draw` (219), raycaster por colunas | 640×400 |
 | 5 | Julgamento (`julgamento`) | `js/55` · `julgamento49().draw` (535); PvP `juPvp49().draw` (622); arena `juArena49` → `A.draw` (450) | 600×450 |
 | 5 | Rinha (`rinha`) | `js/56` · `rinha50().draw` (206) | 800×450 |
