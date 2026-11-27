@@ -52,6 +52,27 @@ const S5={
   dead:t=>[98,196,247,294].forEach((f,i)=>o5('sine',f,t,2.4,{gain:.1-.02*i,attack:.01,wet:.9})),
   collapse:t=>{n5(t,.9,{freq:300,to:5000,q:.6,gain:.1,wet:.6});o5('sawtooth',220,t,.9,{to:233,gain:.04});o5('sawtooth',311,t,.9,{to:294,gain:.04})},
   meow:t=>o5('sine',620,t,.16,{to:980,gain:.03,wet:.2}),
+  /* folha virando (Manual Grimório): um único buffer de ruído com envelope duplo — deslize (120–260 ms) e farfalhar com estalo final — filtrado; cada virada varia duração, tom e ganho */
+  pageTurn:t=>{
+    const c=A5.ctx,v=vol5();if(!c||!v)return;
+    const R=Math.random,dur=.12+R()*.14,pitch=.85+R()*.3,gn=(.85+R()*.3)*v;
+    const tail=.05+R()*.07,total=dur+tail+.04,sr=c.sampleRate,len=Math.max(8,Math.floor(sr*total)),buf=c.createBuffer(1,len,sr),d=buf.getChannelData(0);
+    const ticks=[.62+R()*.1,.78+R()*.1,.92].map(k=>k*dur);
+    for(let i=0;i<len;i++){
+      const s=i/sr;let e=0;
+      if(s<dur){const k=s/dur;e=Math.pow(Math.sin(Math.PI*Math.min(1,k*1.15)),2)*.8}          /* deslize */
+      else{const k=(s-dur)/tail;e=Math.max(0,1-k)*.18}                                          /* assenta */
+      for(const tk of ticks){const k=s-tk;if(k>=0&&k<.012)e+=(1-k/.012)*.55}                  /* farfalhar */
+      const k2=s-(dur+.02);if(k2>=0&&k2<.018)e+=(1-k2/.018)*.9;                                   /* estalo final */
+      d[i]=(R()*2-1)*Math.min(1,e);
+    }
+    const src=c.createBufferSource();src.buffer=buf;
+    const bp=c.createBiquadFilter();bp.type='bandpass';bp.Q.value=.9;
+    bp.frequency.setValueAtTime(900*pitch,t);bp.frequency.exponentialRampToValueAtTime(3400*pitch,t+dur);bp.frequency.exponentialRampToValueAtTime(2200*pitch,t+total);
+    const hp=c.createBiquadFilter();hp.type='highpass';hp.frequency.value=420*pitch;
+    const g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,.16*gn),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+total);
+    src.connect(bp);bp.connect(hp);hp.connect(g);send5(g,.12);src.start(t);src.stop(t+total+.03);
+  },
 };
 const CAST5={Natureza:[150,220,330,440],Inexistência:[90,140,210,300],Ilusão:[660,520,780,1040],Verdade:[440,660,880,990],Fé:[330,495,660,990],Sol:[330,440,495,660,990],Desrealização:[150,140,220,210,300],Pofenia:[90,520,210,780,1040],Confabulação:[660,440,780,880,1040],Metáfora:[440,330,660,495,990]};
 function fx5(kind='click',element=''){

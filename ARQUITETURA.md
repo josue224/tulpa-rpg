@@ -31,7 +31,7 @@ sed -i 's/?v=[^"]*"/?v=NOVO_TOKEN"/g' index.html   # ex.: NOVO_TOKEN = 20261123a
          js/01 → js/02 → css/02 → js/03 → css/03 → js/04 → js/05 → js/06 → css/04 → js/07 → css/05 → js/08 → css/06
          → css/07 → css/08 → css/09 → css/10 (App Shell) → css/11 (Fichas) → css/12 (Manual/Alterações) → css/13 (Arcade/mapa) → css/14 (Polimento) → css/15 (Ficha: regras) → css/16 (Corpo a corpo) → css/17 (Tiroteio) → css/18 (Itens caídos) → css/19 (Manual: regras) → css/20 … css/23 → css/24 (Reconciliação do Manual)
          → js/09 → js/09b → js/10 … js/28 → js/32 → js/33 → js/35 … js/49 → js/60b (App Shell) → js/60c (Fichas) → js/60d (carregador) → js/60e (filtros Arcade)
-         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/60n (Ações das especializações) → js/60o (Barricadas) → js/60p (Reconciliação do Manual) → js/60q (Exportar PDF) → js/60r (Bancada & Investigação) → js/60s (Quadro de Pesquisa + motor) → js/60t (Guia do Mestre) → js/61   (61 = inicialização, sempre por último)
+         → js/60g (Ficha: regras) → js/60h (Corpo a corpo) → js/60i (Tiroteio) → js/60j (Itens caídos) → js/60k (Manual: regras) → js/60l (Sincronização) → js/60m (Mapa em branco) → js/60n (Ações das especializações) → js/60o (Barricadas) → js/60p (Reconciliação do Manual) → js/60q (Exportar PDF) → js/60r (Bancada & Investigação) → js/60s (Quadro de Pesquisa + motor) → js/60t (Guia do Mestre) → js/60u (Manual Grimório) → js/61   (61 = inicialização, sempre por último)
 
 Sob demanda (sem <script>; QUEUE do js/60d, nesta ordem, na 1ª abertura do Arcade):
          js/60f (motor gráfico) → js/29 → js/30 → js/31 → js/34 → js/50 → js/51 → … → js/60
@@ -70,6 +70,7 @@ Os `<link rel="stylesheet">` ficam no `<body>`, na posição de cada `<style>` o
 | 25 | `25-bancada.css` | novo | 9 KB | **Bancada (Onda 1)**: aba `#bn60r` (`.bn-*`), lista e detalhe em duas colunas no PC e uma no celular, selos de status (borda sólida/tracejada/pontilhada/dupla: nunca só cor), editor rico, vidro só com `data-ae-glass="1"`. |
 | 26 | `26-quadro.css` | novo | 14 KB | **Quadro (Onda 2)**: seletor Documentos/Quadro (`.bn-views`, `.bn-qwrap`) e o motor do mural (`.qd-*`): palco com grade de pontos, nós, âncoras, conexões SVG, barras flutuantes (faixas roláveis no celular, alvos 44 px), minimapa, menus, vidro só nas barras. Cores só de variáveis, exceto post-its e fios (dados). |
 | 27 | `27-guia-mestre.css` | novo | 9 KB | **Guia do Mestre (Onda 3)**: `.gm-*` (seções recolhíveis, cards do Pinboard, relógios SVG, checklist, fluxograma, diálogo de revelação). Só variáveis; exceções: cores dos relógios e o vermelho da conexão de falha (dados). Sem vidro. |
+| 28 | `28-grimorio.css` | novo | 14 KB | **Manual Grimório (Onda 4)**: `.gr-*` (barra de modos, livro, página, folha 3D, capa, índice, fitas, controles). Papel/tinta/ouro vêm do JS (`--gr-*` em `#grWrap`); o CSS só usa `--panel --text --accent --line --ae-rad --ae-brad --f-ui --f-display`. Sem vidro, exceto as fitas com `body.t3-pal[data-ae-glass="1"]`. |
 
 > `08-esteticas.css` é a camada estrutural da Galeria de Estéticas (`[data-aesthetic]`, botões gloss/gel, textura). As paletas/temas em si são montados pelo JS (`js/38-esteticas.js`).
 
@@ -161,6 +162,7 @@ Arquivos `01`–`08` são os scripts que já eram separados no original (cada um
 | 60r | `60r-bancada-investigacao.js` | novo | 40 KB | **Bancada (Onda 1)** (IIFE): aba "Bancada & Investigação" (destino `bancada` no `ITEMS` do `60b`, Alt+5). Dossiês com código automático, 7 categorias, selo, tags, texto rico sanitizado, imagem (URL ou upload ≤ ~60 KB), favoritos e anotações de margem privados, busca, exportar JSON e imprimir. Publica `T3.bancada` e dispara `tulpa:bancada-pin`. Veja a seção abaixo. |
 | 60s | `60s-quadro-investigacao.js` | novo | 70 KB | **Quadro (Onda 2)** (IIFE, publica só `T3.quadroEngine` e `T3.quadro`): (1) **motor reutilizável** de mural estilo Miro (`T3.quadroEngine.create`); (2) **Quadro de Pesquisa** da campanha: tipos de nó, estilos de conexão, 5 modelos, adaptador `campaign_store` (chave `quadro`) com pedidos de jogador. Veja a seção abaixo. |
 | 60t | `60t-guia-mestre.js` | novo | 45 KB | **Guia da Campanha (Onda 3)** (IIFE, sem globais; só Mestre): Pinboard, relógios, checklist, fluxograma (usa `T3.quadroEngine`) e Revelação Seletiva. Registro privado `guia`. Veja a seção abaixo. |
+| 60u | `60u-manual-grimorio.js` | novo | 40 KB | **Manual Grimório (Onda 4)** (IIFE; só publica `T3.manualGrim`): apresentação paginada e 3D do Manual Vivo (clona os blocos de `#m31content`, pagina medindo alturas reais, índice com número de página, fitas, lacre, posição lembrada). Encadeia `paint31` e `go31`. Seção "Manual Grimório" abaixo. |
 | 61 | `61-init.js` | 23605–23608 | 0.5 KB | Inicialização final: Exporta tulpaPubSummary, completa T3 com Object.assign e dispara initTheme/renderSheetTabs/initNav/initPerseus/render. |
 
 ## Motor de regras: atributos e vertentes (Onda 8, `js/10`)
@@ -309,6 +311,24 @@ Entrada: `{id,line,st:'floor'|'taken',map,x,y,from,by?,as?,item,...}`. `line` li
 **Revelação Seletiva.** `revealOf(kind,id)` separa `pub` ({title,text}) de `hid` (só para destacar na prévia). Os destinos recebem **apenas `pub`**: `T3.bancada.deliver({title,text,cat})` (novo no `js/60r`, só Mestre; cria documento com `from:'guia'` pelo `saveShared` e avisa a mesa) ou `T3.quadro.ensure()` + `addNode('note')`. Depois marca `revealed` na origem. Ao criar um novo tipo revelável, monte `pub` só com campos públicos.
 
 **Fluxograma.** `T3.quadroEngine.create(null,{id:'guia-fluxo', masterOnly:true, isMaster:gm, nodeTypes:NT, connTypes:CT, templates:TPL, adapter})`, `viewKey tulpa_guia_v_*`; o adaptador lê/grava `G.flow` e chama `touch()`. Tipos de nó `ato|cena|enc|virada|segredo|gancho|npc` (render próprio, botão "Detalhes" abre o diálogo com status, notas secretas e Revelar); conexões `principal|alt|falha|oculta`; modelos `atos|teia|arvore|cronograma`.
+
+## Manual Grimório (Bancada, Onda 4)
+
+**Arquivos.** `js/60u-manual-grimorio.js` (IIFE), `css/28-grimorio.css`, e o som `pageTurn` em `S5` do `js/19` (o motor de som é o `js/19`: o `js/04` só delega para `tulpaFx5`). Carrega depois do `60t` e antes do `61`.
+
+**Princípio.** É só uma apresentação: nenhuma regra ou texto novo. A fonte é o `#m31content` que o `paint31` (`js/43`, já encadeado pelo `js/60p`) mantém pintado, inclusive escondido no Modo Grimório (`#man31.m31-grim .m31-paper{display:none}`). O `60u` encadeia `paint31` e `go31` (mesmo padrão do `60p`) e injeta, uma vez, a barra `#grBar` e `#grWrap` dentro de `#m31main`. Os cliques nos clones (`.m31-ref` e os pop-ups de ritual/estado/trauma) usam a delegação que o `js/43` já tem em `#m31main`.
+
+**Pipeline (`build`).** (1) clona cada `.m31-chap` e limpa (`clean`: tira controles do Mestre, `rec-*`, `textarea`, ids, `.m31-hid`; abre `details`); (2) vira uma lista de *unidades* (cada filho de `.m31-sec`; cabeçalhos grudam no bloco seguinte), cada uma num `div.gr-u` (`display:flow-root`) dentro do `#grMeasure`, que tem a mesma largura e tipografia da página; (3) uma leitura de layout mede todas; (4) `flow` enche páginas de altura `H`; o que não cabe é cortado por `split`: tabela por linhas (repete `thead`), contêiner de blocos pelos filhos, descendo na cadeia de invólucros de um só filho e, se o primeiro item sozinho já passa da página, quebrando-o por dentro; só o que continua indivisível vira página `gr-tall` (rolagem interna, `tabindex=0`); (5) o índice é paginado à parte e os números reais saem de `índice + capa + posição`; (6) as páginas são criadas sob demanda (`buildEl`) e **movidas** entre os encaixes `#grSL`/`#grSR`/folha; virar nunca re-renderiza.
+
+**API (`T3.manualGrim`).** `setMode('grimorio'|'rolagem',{persist,focus})`, `go(t,{user,instant})` (`t` = par de páginas em página dupla, página em página única), `goPage(i,o)`, `goSection(id,user)`, `step(±1,user)`, `repaginate()`, `defMode()`, `state()` (`mode,dbl,t,max,pages,index,pw,ph,anim,chaps,secPg`). Páginas: 0 capa, 1… índice, depois o conteúdo; número exibido = índice + 1.
+
+**Armazenamento (só no aparelho).** `tulpa_manual_modo` (`grimorio|rolagem`), `tulpa_manual_pos_<camp>_<uid>` (`{sid,off,i}`: id de seção + deslocamento, resolvido de novo a cada paginação), `tulpa_manual_lacre_<camp>_<uid>`. Tudo com `try/catch`.
+
+**Cores.** `applyPaper()` lê `--panel/--text/--accent` (via elemento sonda e `canvas`, aceita `rgb()`, `color(srgb …)` e `color-mix`), compõe sobre `--m31-base` e grava `--gr-paper/-paper2/-ink/-ink2/-gold/-rule/-leather/-foil/-wax` em `#grWrap`. Tinta ≥ 7:1 (senão `#1b160e`/`#f3ecdc`), tinta secundária e ouro ≥ 5:1, foil da capa ≥ 7:1. Roda ao abrir e quando o `body` muda de classe/estética/estilo.
+
+**Som.** `T3.fx('pageTurn')` (`js/19`, `S5.pageTurn`): um `AudioBuffer` de ruído com dois envelopes (deslize + farfalhar/estalo), `bandpass` varrendo para cima e `highpass`; duração, tom e ganho sorteados a cada virada; respeita `prefs.sound` (off/low) e o debounce de 90 ms do `fx5`; só roda em gesto do usuário.
+
+**Testes feitos (Chromium headless, campanha falsa).** 1440×900, 390×844, 1024×768 e 768×1024 em Pergaminho claro, Cyberpunk, Dark Academia e Frutiger Aero: página dupla ≥ 1024 e única abaixo; nenhuma página cortada (todas as páginas percorridas); contraste de todo texto amostrado ≥ 4,5:1; sem rolagem horizontal nem erro de console; `rotateY` observado durante a virada por botão, setas, bordas, deslize simulado e fita; som chamado (AudioContext falso); índice com números reais e navegação; posição e lacre após recarregar; busca levando à página com destaque; edição do Mestre aparecendo no Grimório após `paint31`; Modo Rolagem com lápis e PDF intactos; jogador sem controles; `prefers-reduced-motion` sem folha.
 
 ## App Shell (Onda 1)
 
